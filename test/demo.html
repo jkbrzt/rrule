@@ -1,0 +1,65 @@
+<!doctype html>
+<title>rrule.js demo</title>
+<script src="vendor/jquery-1.8.0.min.js"></script>
+<script src="vendor/underscore.js"></script>
+<script src="../rrule.js"></script>
+<script src="../nlp.js"></script>
+<style>
+    body {
+        font-family: sans-serif;
+    }
+    #i {
+        font-size: 1.2em;
+        width: 70%;
+        padding: .2em;
+    }
+    .error #i {
+        color: red;
+    }
+    #os {
+        font-family: monospace;
+    }
+    li {
+        font-family: monospace;
+    }
+
+</style>
+
+<p>
+	Repeat
+    <input type="text" id="i" value="every " />
+</p>
+
+<p><code>RRule.fromText(t).toString():</code> <span id="os"></span></p>
+<p><code>RRule.fromText(t).toText():</code> <em id="ot"></em></p>
+
+<ul></ul>
+
+<script type="text/javascript">
+	$('#i').focus();
+	$('#i').keyup(function() {
+		var rule = RRule.fromText(this.value);
+		if (!(rule instanceof RRule)) {
+			$(document.body).addClass('error');
+			$('#os').html('');
+			$('#ot').html('');
+		} else {
+			$(document.body).removeClass('error');
+			$('#os').html(rule.toString());
+			$('#ot').html(rule.toText());
+            var added = 0;
+            var ul = $('ul').html('');
+            rule.all(function(date) {
+                var text;
+                if (added == 20) {
+                    $('<li/>').text('...').appendTo(ul);
+                    return false;
+                } else {
+                    $('<li/>').text(date.toString()).appendTo(ul);
+                }
+                added++;
+            });
+		}
+
+	});
+</script>

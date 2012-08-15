@@ -26,7 +26,7 @@ if (serverSide) {
 }
 
 
-getnlp = function() {
+var getnlp = function() {
     if (!getnlp._nlp) {
         if (serverSide) {
             // Lazy, runtime import to avoid circular refs.

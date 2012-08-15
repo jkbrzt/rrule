@@ -1,6 +1,6 @@
-##############################################################
-rrule.js: JavaScript library for working with recurring dates.
-##############################################################
+#######################################################################
+rrule.js: Library for working with recurrence rules for calendar dates.
+#######################################################################
 
 rrule.js supports recurrence rules as defined in the `iCalendar RFC`_.
 It is a partial port of the ``rrule`` module from the excellent

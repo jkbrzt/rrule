@@ -189,9 +189,9 @@ Option          Description
 ``bysecond``    If given, it must be either an integer, or a sequence of
                 integers, meaning the seconds to apply the recurrence to.
 
-``byeaster``    **Not implemented in the JS port.**
-                This is an extension to the RFC specification which the Python
+``byeaster``    This is an extension to the RFC specification which the Python
                 implementation provides.
+                **Not implemented in the JavaScript version.**
 ==============  ===============================================================
 
 See also `python-dateutil`_ documentation.
@@ -213,7 +213,7 @@ Occurrence Retrieval Methods
     prematurely).
 
 ``RRule.prototype.between(after, before, inc=false [, iterator])``
-    Returns all the occurrences of the rrule between after and before.
+    Returns all the occurrences of the rrule between ``after`` and ``before``.
     The inc keyword defines what happens if ``after`` and/or ``before`` are
     themselves occurrences. With ``inc == true``, they will be included in the
     list, if they are found in the recurrence set.
@@ -222,14 +222,14 @@ Occurrence Retrieval Methods
     ``RRule.prototype.all()``.
 
 ``RRule.prototype.after(dt, inc=false)``
-    Returns the last recurrence before the given datetime instance.
-    The ``inc`` argument defines what happens if dt is an occurrence.
+    Returns the last recurrence before the given ``Date`` instance.
+    The ``inc`` argument defines what happens if ``dt`` is an occurrence.
     With ``inc == true``, if ``dt`` itself is an occurrence,
     it will be returned.
 
 ``RRule.prototype.before(dt, inc=false)``
-    Returns the last recurrence after the given datetime instance.
-    The ``inc`` argument defines what happens if dt is an occurrence.
+    Returns the last recurrence after the given ``Date`` instance.
+    The ``inc`` argument defines what happens if ``dt`` is an occurrence.
     With ``inc == true``, if ``dt`` itself is an occurrence,
     it will be returned.
 
@@ -259,7 +259,7 @@ To use these methods in the browser, you need to include the
 
 
 ``RRule.prototype.toText(rrule, [today, [gettext, [language]]])``
-    Returns a textual representation of the rule.
+    Returns a textual representation of ``rule``.
     You need to pass ``today`` only when the rule has the ``until``
     option.
     The ``gettext`` callback, if provided, will be called for each text token

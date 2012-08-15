@@ -1,5 +1,5 @@
 /*!
- * rrule.js - library for working with recurring dates. v1.0
+ * rrule.js - library for working with recurring dates. v1.0.0-beta
  * https://github.com/jkbr/rrule
  *
  * Copyright 2010, Jakub Roztocil and Lars Schoning

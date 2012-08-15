@@ -73,7 +73,7 @@ Usage
     ['Mon Aug 27 2012 10:30:00 GMT+0200 (CEST)',
      'Fri Aug 31 2012 10:30:00 GMT+0200 (CEST)']
 
-    // Get an iCalendar UNTIL rule string representation:
+    // Get an iCalendar RRULE string representation:
     // The output can be used with RRule.fromString().
     rule.toString();
     "FREQ=WEEKLY;BYDAY=MO,FR;INTERVAL=5;UNTIL=20130130T230000Z"

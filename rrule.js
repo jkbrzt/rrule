@@ -130,7 +130,8 @@ var dateutil = {
         var millisecsFromBase = ordinal * dateutil.ONE_DAY;
         return new Date(dateutil.ORDINAL_BASE.getTime()
                         - dateutil.tzOffset(dateutil.ORDINAL_BASE)
-                        +  millisecsFromBase);
+                        +  millisecsFromBase
+                        + dateutil.tzOffset(new Date(millisecsFromBase)));
     },
 
     /**

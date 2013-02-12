@@ -1811,7 +1811,7 @@ CallbackIterResult.prototype = IterResult.prototype;
 
 if (serverSide) {
     module.exports = {
-        RRule: RRule,
+        RRule: RRule
         // rruleset: rruleset
     }
 } else {

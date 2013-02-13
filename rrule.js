@@ -876,7 +876,7 @@ RRule.prototype = {
 	* Will convert all rules described in nlp:ToText
 	* to text.
 	*/
-	toText: function(today, today, gettext, language) {
+	toText: function(today, gettext, language) {
         if (!_.has(this, '_text')) {
             this._text = getnlp().toText(this, today, gettext, language);
         }

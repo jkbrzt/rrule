@@ -278,6 +278,8 @@ To use these methods in the browser, you need to include the
 Changelog
 =========
 
+* 1.0.1 (2013-02-26)
+    * Fixed leap years (thanks @jessevogt)
 * 1.0.0 (2013-01-24)
     * Fixed timezone offset issues related to DST (thanks @evro).
 * 1.0.0-beta (2012-08-15)

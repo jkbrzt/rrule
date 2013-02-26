@@ -755,6 +755,24 @@ testRecurring('testMonthlyBySetPos', new RRule(RRule.MONTHLY, {
         datetime(1997, 9, 17, 6, 0),
         datetime(1997, 10, 13, 18, 0)]);
 
+testRecurring('testMonthlyNegByMonthDayJanFebForNonLeapYear', new RRule(RRule.MONTHLY, {
+    count: 4,
+    bymonthday: -1,
+    dtstart: parse("20131201T0900000")}),
+    [datetime(2013, 12, 31, 9, 0),
+        datetime(2014, 1, 31, 9, 0),
+        datetime(2014, 2, 28, 9, 0),
+        datetime(2014, 3, 31, 9, 0)]);
+
+testRecurring('testMonthlyNegByMonthDayJanFebForLeapYear', new RRule(RRule.MONTHLY, {
+    count: 4,
+    bymonthday: -1,
+    dtstart: parse("20151201T0900000")}),
+    [datetime(2015, 12, 31, 9, 0),
+        datetime(2016, 1, 31, 9, 0),
+        datetime(2016, 2, 29, 9, 0),
+        datetime(2016, 3, 31, 9, 0)]);
+
 testRecurring('testWeekly', new RRule(RRule.WEEKLY, {
     count:3,
     dtstart:parse("19970902T090000")}),

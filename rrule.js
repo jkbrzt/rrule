@@ -369,7 +369,7 @@ var WDAYMASK = (function() {
 M29 = M30 = M31 = null;
 M365MASK = M365MASK.slice(0, 58).concat(M365MASK.slice(59, M365MASK.length));
 MDAY365MASK = MDAY365MASK.slice(0, 58).concat(MDAY365MASK.slice(59));
-NMDAY365MASK = NMDAY365MASK.slice(0, 30).concat(NMDAY365MASK.slice(31));
+NMDAY365MASK = NMDAY365MASK.slice(0, 31).concat(NMDAY365MASK.slice(32));
 
 
 //=============================================================================

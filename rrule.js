@@ -1342,10 +1342,10 @@ RRule.prototype = {
 
 };
 
-RRule.fromString = function(string, dtstart) {
+RRule.fromString = function(string, dtstart, options) {
     var i, j, key, value, freq, attr,
         attrs = string.split(';'),
-        options = {};
+        options = (options == undefined ? {} : options);
 
     for (i = 0; i < attrs.length; i++) {
         attr = attrs[i].split('=');

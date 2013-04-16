@@ -242,8 +242,8 @@ iCalendar RFC String Methods
 ``RRule.prototype.toString()``
     Returns a string representation of the rule as per the iCalendar RFC.
 
-``RRule.fromString(rfcString)``
-    Constructs an ``RRule`` instance from ``rfcString``.
+``RRule.fromString(rfcString, dtstart, options)``
+    Constructs an ``RRule`` instance from ``rfcString``, with start date ``dtstart`` (nullable) and RRule options ``options`` (nullable).
 
 
 Natural Language Text Methods

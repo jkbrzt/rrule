@@ -21,8 +21,11 @@ var _;
 
 if (serverSide) {
     _ = require('underscore');
-} else if (!(_ = root._)) {
-    throw 'You need to include underscore.js for rrule to work.'
+} else if (root._) {
+    _ = root._;
+} else if (!_ && (typeof require !== 'undefined')){
+    //Client needs to load underscore with requirejs.
+    _ = require('underscore');
 }
 
 
@@ -1814,10 +1817,17 @@ if (serverSide) {
         RRule: RRule
         // rruleset: rruleset
     }
-} else {
-  root['RRule'] = RRule;
-  // root['rruleset'] = rruleset;
+}
+if (typeof ender === 'undefined') {
+    root['RRule'] = RRule;
+    // root['rruleset'] = rruleset;
 }
 
+if (typeof define === "function" && define.amd) {
+    /*global define:false */
+    define("rrule", [], function () {
+        return RRule;
+    });
+}
 
 }(this));

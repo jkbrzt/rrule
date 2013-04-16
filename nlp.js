@@ -28,11 +28,14 @@ var _, RRule;
 if (serverSide) {
     _ = require('underscore');
     RRule = require('./rrule').RRule;
-} else if (!root.RRule || !root._) {
-    throw 'rrule.js and underscore.js are required for rrule/nlp.js to work'
-} else {
+} else if (root.RRule || root._) {
     RRule = root.RRule;
     _ = root._;
+} else if (typeof require !== 'undefined') {
+    if (!RRule) {RRule = require('rrule');}
+    if (!_ && (typeof require !== 'undefined')) { _ = require('underscore');}
+} else {
+    throw 'rrule.js and underscore.js are required for rrule/nlp.js to work'
 }
 
 
@@ -1054,5 +1057,11 @@ if (serverSide) {
   root['_RRuleNLP'] = nlp;
 }
 
+if (typeof define === "function" && define.amd) {
+    /*global define:false */
+    define("rrule", [], function () {
+        return RRule;
+    });
+}
 
 })(this);

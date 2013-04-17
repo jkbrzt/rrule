@@ -211,6 +211,22 @@ var dateutil = {
             }
         }
         return comps.join('');
+    },
+
+    untilStringToDate: function(until) {
+        var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z)?$/;
+        bits = re.exec(until);
+        if (!bits.length) {
+            throw new Error('Invalid UNTIL value: ' + until)
+        }
+        return new Date(
+            Date.UTC(bits[1],
+            bits[2] - 1,
+            bits[3],
+            bits[5] || 0,
+            bits[6] || 0,
+            bits[7] || 0
+        ));
     }
 
 };
@@ -1399,10 +1415,7 @@ RRule.fromString = function(string, dtstart, options) {
                 }
                 break;
             case 'UNTIL':
-                var date = /(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/.exec(value);
-                options.until = new Date(
-                    Date.UTC(date[1], date[2] - 1,
-                        date[3], date[4], date[5], date[6]));
+                options.until = dateutil.untilStringToDate(value);
                 break;
             default:
                 throw new Error("Unknown attribute '" + key + "'");

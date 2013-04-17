@@ -55,15 +55,16 @@ test('fromText()', function() {
 });
 
 
-test('toText()', function() {
-    $.each(texts, function(){
-        var text = this[0],
-            string = this[1];
-        equal(
-            RRule.fromString(string).toText().toLowerCase(),
-            text.toLowerCase(),
-            string + ' => ' + text
-        );
+strings = [
+    ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],
+
+    // Parse also `date` but return `date-time`
+    ['FREQ=WEEKLY;UNTIL=20100101', 'FREQ=WEEKLY;UNTIL=20100101T000000Z']
+];
+test('fromString()', function() {
+    $.each(strings, function(){
+        var s = this[0], s2 = this[1];
+        equal(RRule.fromString(s).toString(), s2, s + ' => ' + s2);
     });
 
 });

@@ -274,10 +274,14 @@ To use these methods in the browser, you need to include the
 ``RRule.fromText(text[, dtstart[, language]])``
     Constructs an ``RRule`` instance from ``text``.
 
- 
+
 Changelog
 =========
 
+* 1.1.0-dev
+    * Handle dates in ``UNTIL`` in ``RRule.fromString``.
+    * Added support for RequireJS.
+    * Added ``options`` argument to ``RRule.fromString``.
 * 1.0.1 (2013-02-26)
     * Fixed leap years (thanks @jessevogt)
 * 1.0.0 (2013-01-24)

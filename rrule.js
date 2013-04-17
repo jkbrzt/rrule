@@ -216,7 +216,7 @@ var dateutil = {
     untilStringToDate: function(until) {
         var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z)?$/;
         bits = re.exec(until);
-        if (!bits.length) {
+        if (!bits) {
             throw new Error('Invalid UNTIL value: ' + until)
         }
         return new Date(

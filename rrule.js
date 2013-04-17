@@ -880,10 +880,7 @@ RRule.prototype = {
 	* to text.
 	*/
 	toText: function(today, gettext, language) {
-        if (!_.has(this, '_text')) {
-            this._text = getnlp().toText(this, today, gettext, language);
-        }
-        return this._text;
+        return getnlp().toText(this, today, gettext, language);
 	},
 
     isFullyConvertibleToText: function() {

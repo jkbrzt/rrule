@@ -9,7 +9,6 @@ serialization of recurrence rules from and to natural language.
 
 The only dependency is `Underscore.js`_.
 
-
 .. contents::
     :local:
     :backlinks: none
@@ -17,6 +16,9 @@ The only dependency is `Underscore.js`_.
 
 Quick Start
 ===========
+
+* `Demo app`_
+* `Test suite`_
 
 Client Side
 -----------
@@ -84,7 +86,7 @@ Usage
     "every 5 weeks on Monday, Friday until January 31, 2013"
 
 
-For more examples see `test/tests.js`_ and `python-dateutil`_ documentation.
+For more examples see `tests/tests.js`_ and `python-dateutil`_ documentation.
 
 API
 ====
@@ -279,6 +281,7 @@ Changelog
 =========
 
 * 1.1.0-dev
+    * Added a `demo app`_.
     * Handle dates in ``UNTIL`` in ``RRule.fromString``.
     * Added support for RequireJS.
     * Added ``options`` argument to ``RRule.fromString``.
@@ -310,4 +313,6 @@ See `LICENCE`_ for more details.
 .. _@lyschoening: http://twitter.com/lyschoening
 .. _Gustavo Niemeyer: http://niemeyer.net/
 .. _LICENCE: https://github.com/jkbr/rrule/blob/master/LICENCE
-.. _test/tests.js: https://github.com/jkbr/rrule/blob/master/test/tests.js
+.. _tests/tests.js: https://github.com/jkbr/rrule/blob/master/tests/tests.js
+.. _demo app: http://jkbr.github.io/rrule
+.. _Test suite: http://jkbr.github.io/rrule/tests/index.html

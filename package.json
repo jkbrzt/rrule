@@ -10,7 +10,7 @@
         "icalendar"
     ],
     "author": "Jakub Roztocil and Lars Schöning",
-    "main": "rrule",
+    "main": "lib/rrule",
     "repository" :{
         "type": "git",
         "url": "https://github.com/jkbr/rrule"

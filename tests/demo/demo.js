@@ -204,9 +204,7 @@
         $("#rfc-output").text(rule.toString());
         $("#text-output").text(rule.toText());
         max = 500;
-        dates = [];
-        rule.all(function(date, i) {
-          dates.push(date);
+        dates = rule.all(function(date, i) {
           if (!rule.options.count && i === max) {
             return false;
           }

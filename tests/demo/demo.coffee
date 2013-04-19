@@ -162,11 +162,9 @@ $ ->
             $("#rfc-output").text rule.toString()
             $("#text-output").text rule.toText()
             max = 500
-            dates = []
-            rule.all (date, i)->
-                dates.push(date);
+            dates = rule.all (date, i)->
                 if not rule.options.count and i == max
-                    no
+                    return false  # That's enough
 
             html = makeRows dates
             if not rule.options.count

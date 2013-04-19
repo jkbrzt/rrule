@@ -129,7 +129,7 @@
                     </div>
                 </div>
             </th>
-            <td><input type="number" max="1000" min="1" value="100" name="count"/>
+            <td><input type="number" max="1000" min="1" value="30" name="count"/>
             </td>
         </tr>
         <tr>
@@ -394,7 +394,7 @@
 
     <section id="rfc-input">
         <h3><code>RRULE</code> string</h3>
-        <p><input  value="FREQ=WEEKLY"/></p>
+        <p><input  value="FREQ=DAILY;INTERVAL=2;COUNT=4"/></p>
         <p>
             Enter an <code>RRULE</code> as per <a href="http://www.kanzaki.com/docs/ical/rrule.html">iCalendar RFC</a>.
         </p>
@@ -412,7 +412,7 @@
     <section id="text-input">
         <h3>Text input</h3>
         <p>
-            <input value="Every 2 months" />
+            <input value="Every 2 weeks on Friday for 6 times" />
         </p>
         <p>Examples:</p>
         <ul class="examples">

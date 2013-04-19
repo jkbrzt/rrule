@@ -69,6 +69,11 @@ input {
 }
 
 
+#page {
+    min-width: 960px;
+    margin: auto;
+}
+
 #intro {
     text-align: center;
     font-size: 1.2em;
@@ -181,8 +186,14 @@ input {
 #output li:nth-child(even) {
     background: #f1f1f1;
 }
+#dates {
+    font-size: .9em;
+}
 #dates td:first-child {
     color: #ccc;
+}
+#dates td:first-child {
+    text-align: right;
 }
 #dates td.b {
     background: #eaeaea;

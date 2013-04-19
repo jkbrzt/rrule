@@ -88,7 +88,7 @@
         })();
         prevParts = parts;
         prevStates = states;
-        _results.push("<tr><td>" + (index++) + "<td>" + (cells.join('\n')) + "</tr>");
+        _results.push("<tr><td>" + (index++) + "</td>" + (cells.join('\n')) + "</tr>");
       }
       return _results;
     })();
@@ -123,7 +123,7 @@
       return $code.parents("section:first").find("input").val($code.text()).change();
     });
     $("input, select").on("keyup change", function() {
-      var $in, $section, d, dates, e, freq, getDay, init, inputMethod, k, makeRule, max, options, rule, v, values,
+      var $in, $section, d, dates, e, freq, getDay, html, init, inputMethod, k, makeRule, max, options, rule, v, values,
         _this = this;
 
       $in = $(this);
@@ -207,11 +207,15 @@
         dates = [];
         rule.all(function(date, i) {
           dates.push(date);
-          if (i + 1 === max) {
+          if (!rule.options.count && i === max) {
             return false;
           }
         });
-        return $("#dates").html(makeRows(dates));
+        html = makeRows(dates);
+        if (!rule.options.count) {
+          html += "<tr><td colspan='7'><em>Showing first " + max + " dates, set\n<code>count</code> to see more.</em></td></tr>";
+        }
+        return $("#dates").html(html);
       }
     });
     return activateTab($tabs.find("a:first"));

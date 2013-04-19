@@ -73,7 +73,7 @@ makeRows = (dates)->
         prevParts = parts
         prevStates = states
 
-        "<tr><td>#{ index++ }<td>#{ cells.join('\n') }</tr>"
+        "<tr><td>#{ index++ }</td>#{ cells.join('\n') }</tr>"
 
     rows.join('\n\n')
 
@@ -165,10 +165,16 @@ $ ->
             dates = []
             rule.all (date, i)->
                 dates.push(date);
-                if i + 1 == max
-                    return false
-            $("#dates").html makeRows dates
+                if not rule.options.count and i == max
+                    no
 
+            html = makeRows dates
+            if not rule.options.count
+                html += """
+                    <tr><td colspan='7'><em>Showing first #{max} dates, set
+                    <code>count</code> to see more.</em></td></tr>
+                """
+            $("#dates").html html
 
 
     activateTab $tabs.find("a:first")

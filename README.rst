@@ -303,8 +303,8 @@ Python ``dateutil`` is written by `Gustavo Niemeyer`_.
 
 See `LICENCE`_ for more details.
 
-.. _rrule.js: https://raw.github.com/jkbr/rrule/master/rrule.js
-.. _nlp.js: https://raw.github.com/jkbr/rrule/master/nlp.js
+.. _rrule.js: https://raw.github.com/jkbr/rrule/master/lib/rrule.js
+.. _nlp.js: https://raw.github.com/jkbr/rrule/master/lib/nlp.js
 .. _iCalendar RFC: http://www.ietf.org/rfc/rfc2445.txt
 .. _python-dateutil: http://labix.org/python-dateutil/
 .. _Underscore.js: http://underscorejs.org/

@@ -314,5 +314,5 @@ See `LICENCE`_ for more details.
 .. _Gustavo Niemeyer: http://niemeyer.net/
 .. _LICENCE: https://github.com/jkbr/rrule/blob/master/LICENCE
 .. _tests/tests.js: https://github.com/jkbr/rrule/blob/master/tests/tests.js
-.. _demo app: http://jkbr.github.io/rrule
+.. _demo app: http://jkbr.github.io/rrule/
 .. _Test suite: http://jkbr.github.io/rrule/tests/index.html

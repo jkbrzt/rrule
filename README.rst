@@ -280,7 +280,7 @@ To use these methods in the browser, you need to include the
 Changelog
 =========
 
-* 1.1.0-dev
+* 1.1.0 (2013-05-21)
     * Added a `demo app`_.
     * Handle dates in ``UNTIL`` in ``RRule.fromString``.
     * Added support for RequireJS.

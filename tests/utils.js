@@ -47,8 +47,8 @@ var assertDatesEqual = function(actual, expected, msg) {
     }
 
     for (var exp, act, i = 0; i < expected.length; i++) {
-        exp = actual[i];
-        act = expected[i];
+        act = actual[i];
+        exp = expected[i];
         equal(exp instanceof Date ? exp.toString() : exp,
               act.toString(), msg + (i + 1) + '/' + expected.length);
     }
@@ -56,7 +56,7 @@ var assertDatesEqual = function(actual, expected, msg) {
 
 
 var testRecurring = function(msg, rruleOrObj, expectedDates) {
-
+    console.log(msg)
     var rrule, method, args;
 
     if (rruleOrObj instanceof RRule) {

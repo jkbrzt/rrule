@@ -27,11 +27,11 @@
       _results = [];
       for (k in options) {
         v = options[k];
-        if (_.contains(["dtstart", "until"], k)) {
-          console.log(k, v);
+        if (k === 'freq') {
+          v = 'RRule.' + RRule.FREQUENCIES[v];
+        } else if (_.contains(["dtstart", "until"], k)) {
           v = "new Date(" + [v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds()].join(', ') + ")";
         } else if (k === "byweekday") {
-          console.log('BBBB', v);
           if (v instanceof Array) {
             v = _.map(v, function(d) {
               return days[d.weekday];
@@ -123,7 +123,7 @@
       return $code.parents("section:first").find("input").val($code.text()).change();
     });
     $("input, select").on("keyup change", function() {
-      var $in, $section, d, dates, e, freq, getDay, html, init, inputMethod, k, makeRule, max, options, rule, v, values,
+      var $in, $section, d, dates, e, getDay, html, init, inputMethod, k, makeRule, max, options, rule, v, values,
         _this = this;
 
       $in = $(this);
@@ -180,12 +180,10 @@
             }
             options[k] = v;
           }
-          freq = options.freq;
-          delete options.freq;
           makeRule = function() {
-            return new RRule(freq, options);
+            return new RRule(options);
           };
-          init = "new RRule(RRule." + RRule.FREQUENCIES[freq] + ", " + getOptionsCode(options) + ")";
+          init = "new RRule(" + getOptionsCode(options) + ")";
           console.log(options);
       }
       $("#init").html(init);
@@ -208,6 +206,7 @@
           if (!rule.options.count && i === max) {
             return false;
           }
+          return true;
         });
         html = makeRows(dates);
         if (!rule.options.count) {

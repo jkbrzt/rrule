@@ -1,6 +1,9 @@
 #######################################################################
-rrule.js: Library for working with recurrence rules for calendar dates.
+rrule.js
 #######################################################################
+-------------------------------------------------------------
+Library for working with recurrence rules for calendar dates.
+-------------------------------------------------------------
 
 rrule.js supports recurrence rules as defined in the `iCalendar RFC`_.
 It is a partial port of the ``rrule`` module from the excellent
@@ -9,19 +12,27 @@ serialization of recurrence rules from and to natural language.
 
 The only dependency is `Underscore.js`_.
 
+
+------
+
+
 .. contents::
     :local:
     :backlinks: none
+    :depth: 2
+
+
+------
 
 
 Quick Start
-===========
+###########
 
 * `Demo app`_
 * `Test suite`_
 
 Client Side
------------
+===========
 
 Download `rrule.js`_.  If you want to use ``RRule.prototype.toText()``
 or ``RRule.fromText()``, you'll also need `nlp.js`_.
@@ -30,14 +41,14 @@ or ``RRule.fromText()``, you'll also need `nlp.js`_.
 .. code-block:: html
 
     <script src="underscore.js"></script>
-    <script src="rrule/rrule.js"></script>
+    <script src="rrule/lib/rrule.js"></script>
 
     <!-- Optional -->
-    <script src="rrule/nlp.js"></script>
+    <script src="rrule/lib/nlp.js"></script>
 
 
 Server Side
------------
+===========
 
 .. code-block:: bash
 
@@ -50,12 +61,13 @@ Server Side
 
 
 Usage
------------
+=====
 
 .. code-block:: javascript
 
     // Create a rule:
-    var rule = new RRule(RRule.WEEKLY, {
+    var rule = new RRule({
+        freq: RRule.WEEKLY,
         interval: 5,
         byweekday: [RRule.MO, RRule.FR],
         dtstart: new Date(2012, 1, 1, 10, 30),
@@ -78,7 +90,7 @@ Usage
     // Get an iCalendar RRULE string representation:
     // The output can be used with RRule.fromString().
     rule.toString();
-    "FREQ=WEEKLY;BYDAY=MO,FR;INTERVAL=5;UNTIL=20130130T230000Z"
+    "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
     // Get a human-friendly text representation:
     // The output can be used with RRule.fromText().
@@ -88,40 +100,36 @@ Usage
 
 For more examples see `tests/tests.js`_ and `python-dateutil`_ documentation.
 
+
 API
-====
+####
 
 
 ``RRule`` Constructor
----------------------
+=====================
 
 .. code-block:: javascript
 
-    rule = new RRule(freq, options)
-
-The ``freq`` is one of the following constants:
+    new RRule(options[, noCache=false])
 
 
-* ``RRule.YEARLY``
-* ``RRule.MONTHLY``
-* ``RRule.WEEKLY``
-* ``RRule.DAILY``
-* ``RRule.HOURLY``
-* ``RRule.MINUTELY``
-* ``RRule.SECONDLY``
-
-
-The optional ``options`` argument is an object that can specify one or more
-of the following options:
-
+``options``:
+    mostly correspond to the properties defined for ``RRULE``
+    in the iCalendar RFC. Only ``freq`` is required.
 
 ==============  ===============================================================
 Option          Description
 ==============  ===============================================================
-``cache``       If given, it must be a boolean value specifying to enable or
-                disable caching of results. If you will use the same rrule
-                instance multiple times, enabling caching will improve the
-                performance considerably.
+``freq``        (required) One of the following constants:
+
+                * ``RRule.YEARLY``
+                * ``RRule.MONTHLY``
+                * ``RRule.WEEKLY``
+                * ``RRule.DAILY``
+                * ``RRule.HOURLY``
+                * ``RRule.MINUTELY``
+                * ``RRule.SECONDLY``
+
 
 ``dtstart``     The recurrence start. Besides being the base for the
                 recurrence, missing parameters in the final recurrence
@@ -196,60 +204,180 @@ Option          Description
                 **Not implemented in the JavaScript version.**
 ==============  ===============================================================
 
+``noCache``:
+    Set to ``true`` to disable caching of results. If you will use the same
+    rrule instance multiple times, enabling caching will improve the performance
+    considerably. Enabled by default.
+
+
 See also `python-dateutil`_ documentation.
+
+----
+
+Instance properties
+===================
+
+``rule.options``:
+    Processed options applied to the rule. Includes default options
+    (such us ``wkstart``).
+    Currently, ``rule.options.byweekday``
+    isn't equal to ``rule.origOptions.byweekday`` (which is an inconsistency).
+
+
+
+``rule.origOptions``:
+    The original ``options`` argument passed to the constructor.
+
+----
 
 
 Occurrence Retrieval Methods
----------------------------------
+============================
+
 
 ``RRule.prototype.all([iterator])``
-    Returns all dates matching the rule. It is a replacement for the iterator
-    protocol this class implements in the Python version.
+-----------------------------------
 
-    As rules without ``until`` or ``count`` represent infinite date series,
-    you can optionally pass ``iterator``,
-    which is a function that is called for each date matched by the rule.
-    It gets two parameters ``date`` (the ``Date`` instance being added),
-    and ``i`` (zero-indexed position of ``date`` in the result).
-    If the function returns ``false``, the iteration is interrupted (possibly
-    prematurely).
+Returns all dates matching the rule. It is a replacement for the iterator
+protocol this class implements in the Python version.
+
+As rules without ``until`` or ``count`` represent infinite date series,
+you can optionally pass ``iterator``,
+which is a function that is called for each date matched by the rule.
+It gets two parameters ``date`` (the ``Date`` instance being added),
+and ``i`` (zero-indexed position of ``date`` in the result).
+Dates are being added to the result as long as the iterator returns
+``true``. If a ``false``-y value is returned, ``date`` isn't added
+to the result and the iteration is interrupted (possibly prematurely).
+
+
+.. code-block:: javascript
+
+    rule.all()
+    ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
+     'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',
+     'Fri Mar 09 2012 10:30:00 GMT+0100 (CET)',
+     'Mon Apr 09 2012 10:30:00 GMT+0200 (CEST)',
+     /* … */]
+
+
+
+    rule.all(function (date, i){return i < 2});
+    ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
+     'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',]
+
 
 ``RRule.prototype.between(after, before, inc=false [, iterator])``
-    Returns all the occurrences of the rrule between ``after`` and ``before``.
-    The inc keyword defines what happens if ``after`` and/or ``before`` are
-    themselves occurrences. With ``inc == true``, they will be included in the
-    list, if they are found in the recurrence set.
+------------------------------------------------------------------
+Returns all the occurrences of the rrule between ``after`` and ``before``.
+The inc keyword defines what happens if ``after`` and/or ``before`` are
+themselves occurrences. With ``inc == true``, they will be included in the
+list, if they are found in the recurrence set.
 
-    Optional ``iterator`` has the same function as it has with
-    ``RRule.prototype.all()``.
+Optional ``iterator`` has the same function as it has with
+``RRule.prototype.all()``.
+
+.. code-block:: javascript
+
+    rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
+    ['Mon Aug 27 2012 10:30:00 GMT+0200 (CEST)',
+     'Fri Aug 31 2012 10:30:00 GMT+0200 (CEST)']
+
 
 ``RRule.prototype.after(dt, inc=false)``
-    Returns the last recurrence before the given ``Date`` instance.
-    The ``inc`` argument defines what happens if ``dt`` is an occurrence.
-    With ``inc == true``, if ``dt`` itself is an occurrence,
-    it will be returned.
+----------------------------------------
+Returns the last recurrence before the given ``Date`` instance.
+The ``inc`` argument defines what happens if ``dt`` is an occurrence.
+With ``inc == true``, if ``dt`` itself is an occurrence,
+it will be returned.
 
 ``RRule.prototype.before(dt, inc=false)``
-    Returns the last recurrence after the given ``Date`` instance.
-    The ``inc`` argument defines what happens if ``dt`` is an occurrence.
-    With ``inc == true``, if ``dt`` itself is an occurrence,
-    it will be returned.
+----------------------------------------
+Returns the last recurrence after the given ``Date`` instance.
+The ``inc`` argument defines what happens if ``dt`` is an occurrence.
+With ``inc == true``, if ``dt`` itself is an occurrence,
+it will be returned.
+
 
 See also `python-dateutil`_ documentation.
 
 
+----
+
+
 iCalendar RFC String Methods
-----------------------------
+============================
+
+
 
 ``RRule.prototype.toString()``
-    Returns a string representation of the rule as per the iCalendar RFC.
+------------------------------
 
-``RRule.fromString(rfcString, dtstart, options)``
-    Constructs an ``RRule`` instance from ``rfcString``, with start date ``dtstart`` (nullable) and RRule options ``options`` (nullable).
+Returns a string representation of the rule as per the iCalendar RFC.
+Only properties explicitely specified in ``options`` are included:
+
+.. code-block:: javascript
+
+    rule.toString();
+    "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
+
+    rule.toString() == RRule.optionsToString(rule.origOptions)
+    true
+
+
+``RRule.optionsToString(options)``
+---------------------------------
+
+Converts ``options`` to iCalendar RFC ``RRULE`` string:
+
+.. code-block:: javascript
+
+    // Get full a string representation of all options,
+    // including the default and inferred ones.
+    RRule.optionsToString(rule.options)
+    "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;WKST=0;UNTIL=20130130T230000Z;BYDAY=0,4;BYHOUR=10;BYMINUTE=30;BYSECOND=0"
+
+    // Cherry-pick only some options from an rrule:
+    RRule.optionsToString({
+        freq: rule.options.freq,
+        dtstart: rule.options.dtstart,
+    })
+    "FREQ=WEEKLY;DTSTART=20120201T093000Z"
+
+
+
+``RRule.fromString(rfcString)``
+-------------------------------
+
+Constructs an ``RRule`` instance from a complete ``rfcString``:
+
+.. code-block:: javascript
+
+    var rule = RRule.fromString("FREQ=WEEKLY;DTSTART=20120201T093000Z")
+
+    // This is equivalent
+    var rule = new RRule(RRule.parseString("FREQ=WEEKLY;DTSTART=20120201T093000Z"))
+
+
+
+``RRule.parseString(rfcString)``
+--------------------------------
+
+Only parse RFC string and return ``options``.
+
+.. code-block:: javascript
+
+    var options = RRule.parseString('FREQ=DAY;INTERVAL=6')
+    options.dtstart = new Date(2000, 1, 1)
+    var rule = new RRule(options)
+
+
+
+----
 
 
 Natural Language Text Methods
------------------------------
+=============================
 
 These methods provide an incomplete support for text–``RRule`` and
 ``RRule``–text conversion. You should test them with your input to see
@@ -260,26 +388,75 @@ To use these methods in the browser, you need to include the
 ``rrule/nlp.js`` file as well.
 
 
-``RRule.prototype.toText(rrule, [today, [gettext, [language]]])``
-    Returns a textual representation of ``rule``.
-    You need to pass ``today`` only when the rule has the ``until``
-    option.
-    The ``gettext`` callback, if provided, will be called for each text token
-    and its return value used instead.
-    The optional ``language`` argument is a language definition to be used
-    (defaults to ``rrule/nlp.js:ENGLISH``).
+``RRule.prototype.toText([gettext, [language]])``
+-----------------------------------------------------------------
+
+Returns a textual representation of ``rule``.
+The ``gettext`` callback, if provided, will be called for each text token
+and its return value used instead.
+The optional ``language`` argument is a language definition to be used
+(defaults to ``rrule/nlp.js:ENGLISH``).
+
+.. code-block:: javascript
+
+    var rule = new RRule({
+      freq: RRule.WEEKLY,
+      count: 23
+    })
+    rule.toText()
+    "every week for 23 times"
+
 
 ``RRule.prototype.isFullyConvertibleToText()``
-    Provides a hint on whether all the options the rule has are convertible
-    to text.
+----------------------------------------------
+
+Provides a hint on whether all the options the rule has are convertible
+to text.
+
+
 
 ``RRule.fromText(text[, dtstart[, language]])``
-    Constructs an ``RRule`` instance from ``text``.
+-----------------------------------------------
+Constructs an ``RRule`` instance from ``text``.
 
+.. code-block:: javascript
+
+    rule = RRule.fromText('every day for 3 times')
+
+
+
+``RRule.parseText(text[, language])``
+-----------------------------------------------
+Parse ``text`` into ``options``:
+
+.. code-block:: javascript
+
+    options = RRule.parseText('every day for 3 times')
+    // {freq: 3, count: "3"}
+    options.dtstart = new Date(2000, 1, 1)
+    var rule = new RRule(options)
+
+
+
+----
 
 Changelog
-=========
+#########
 
+* 2.0.0-dev
+    * More flexible, backwards-incompatible API:
+        * ``freq`` is now ``options.freq``.
+        * ``options.cache`` is now ``noCache``.
+        * ``iterator`` has to return ``true``
+        * ``dtstart`` and ``options`` arguments removed from ``RRule.fromString``
+          (use ``RRule.parseString`` and modify ``options`` manually instead).
+        * ``today`` argument removed from ``Rule.prototype.toText``
+          (never actually used).
+        * ``rule.toString()`` now includes ``DTSTART``
+          (if explicitely specified in ``options``).
+    * Added ``RRule.parseString``
+    * Added ``RRule.parseText``
+    * Added ``RRule.optionsToString``
 * 1.1.0 (2013-05-21)
     * Added a `demo app`_.
     * Handle dates in ``UNTIL`` in ``RRule.fromString``.

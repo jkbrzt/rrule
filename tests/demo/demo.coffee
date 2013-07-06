@@ -22,9 +22,9 @@ getOptionsCode = (options) ->
     ]
 
     items = for k, v of options
-
-        if _.contains ["dtstart", "until"], k
-            console.log k, v
+        if k is 'freq'
+            v = 'RRule.' + RRule.FREQUENCIES[v]
+        else if _.contains ["dtstart", "until"], k
             v = "new Date(" + [
                 v.getFullYear()
                 v.getMonth()
@@ -34,7 +34,6 @@ getOptionsCode = (options) ->
                 v.getSeconds()
             ].join(', ') + ")"
         else if k is "byweekday"
-            console.log 'BBBB', v
             if v instanceof Array
                 v = _.map v, (d)-> days[d.weekday]
             else
@@ -137,12 +136,12 @@ $ ->
                         continue
 
                     options[k] = v
+#
+#                freq = options.freq
+#                delete options.freq
 
-                freq = options.freq
-                delete options.freq
-
-                makeRule = -> new RRule(freq, options)
-                init = "new RRule(RRule." + RRule.FREQUENCIES[freq] + ", " + getOptionsCode(options) + ")"
+                makeRule = -> new RRule(options)
+                init = "new RRule(" + getOptionsCode(options) + ")"
                 console.log options
 
         $("#init").html init
@@ -165,6 +164,7 @@ $ ->
             dates = rule.all (date, i)->
                 if not rule.options.count and i == max
                     return false  # That's enough
+                return true
 
             html = makeRows dates
             if not rule.options.count

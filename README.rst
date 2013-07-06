@@ -335,7 +335,7 @@ Converts ``options`` to iCalendar RFC ``RRULE`` string:
     // Get full a string representation of all options,
     // including the default and inferred ones.
     RRule.optionsToString(rule.options)
-    "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;WKST=0;UNTIL=20130130T230000Z;BYDAY=0,4;BYHOUR=10;BYMINUTE=30;BYSECOND=0"
+    "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;WKST=0;UNTIL=20130130T230000Z;BYDAY=MO,FR;BYHOUR=10;BYMINUTE=30;BYSECOND=0"
 
     // Cherry-pick only some options from an rrule:
     RRule.optionsToString({

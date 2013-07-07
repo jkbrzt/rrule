@@ -55,7 +55,7 @@ label {
     cursor: pointer;
     font-size: .9em;
 }
-input:not([type=checkbox]), select {
+input:not([type=checkbox]):not([type=radio]), select {
     width: 100%;
     font-size: 1.4em;
     box-sizing: border-box;

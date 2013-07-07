@@ -415,7 +415,7 @@ to text.
 
 
 
-``RRule.fromText(text[, dtstart[, language]])``
+``RRule.fromText(text[, language])``
 -----------------------------------------------
 Constructs an ``RRule`` instance from ``text``.
 

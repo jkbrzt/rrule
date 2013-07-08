@@ -27,14 +27,23 @@
       _results = [];
       for (k in options) {
         v = options[k];
-        if (k === 'freq') {
+        if (v === null) {
+          v = 'null';
+        } else if (k === 'freq') {
           v = 'RRule.' + RRule.FREQUENCIES[v];
         } else if (_.contains(["dtstart", "until"], k)) {
           v = "new Date(" + [v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds()].join(', ') + ")";
         } else if (k === "byweekday") {
           if (v instanceof Array) {
-            v = _.map(v, function(d) {
-              return days[d.weekday];
+            v = _.map(v, function(wday) {
+              var s;
+
+              console.log('wday', wday);
+              s = days[wday.weekday];
+              if (wday.n) {
+                s += '.nth(' + wday.n + ')';
+              }
+              return s;
             });
           } else {
             v = days[v.weekday];
@@ -189,6 +198,7 @@
       $("#init").html(init);
       $("#rfc-output a").html("");
       $("#text-output a").html("");
+      $("#options-output").html("");
       $("#dates").html("");
       try {
         rule = makeRule();
@@ -201,6 +211,12 @@
       text = rule.toText();
       $("#rfc-output a").text(rfc).attr('href', "#rfc=" + rfc);
       $("#text-output a").text(text).attr('href', "#text=" + text);
+      $("#options-output").text(getOptionsCode(rule.origOptions));
+      if (inputMethod === 'options') {
+        $("#options-output").parents('tr').hide();
+      } else {
+        $("#options-output").parents('tr').show();
+      }
       max = 500;
       dates = rule.all(function(date, i) {
         if (!rule.options.count && i === max) {

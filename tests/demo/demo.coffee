@@ -22,7 +22,9 @@ getOptionsCode = (options) ->
     ]
 
     items = for k, v of options
-        if k is 'freq'
+        if v == null
+            v = 'null'
+        else if k is 'freq'
             v = 'RRule.' + RRule.FREQUENCIES[v]
         else if _.contains ["dtstart", "until"], k
             v = "new Date(" + [
@@ -35,7 +37,12 @@ getOptionsCode = (options) ->
             ].join(', ') + ")"
         else if k is "byweekday"
             if v instanceof Array
-                v = _.map v, (d)-> days[d.weekday]
+                v = _.map v, (wday)->
+                    console.log 'wday', wday
+                    s = days[wday.weekday]
+                    if wday.n
+                        s+= '.nth(' + wday.n + ')'
+                    s
             else
                 v = days[v.weekday]
         else if k is "wkst"
@@ -147,6 +154,7 @@ $ ->
         $("#init").html init
         $("#rfc-output a").html ""
         $("#text-output a").html ""
+        $("#options-output").html ""
         $("#dates").html ""
 
         try
@@ -159,6 +167,11 @@ $ ->
         text = rule.toText()
         $("#rfc-output a").text(rfc).attr('href', "#rfc=#{rfc}")
         $("#text-output a").text(text).attr('href', "#text=#{text}")
+        $("#options-output").text(getOptionsCode(rule.origOptions))
+        if inputMethod is 'options'
+            $("#options-output").parents('tr').hide()
+        else
+            $("#options-output").parents('tr').show()
         max = 500
         dates = rule.all (date, i)->
             if not rule.options.count and i == max

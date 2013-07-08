@@ -185,8 +185,10 @@ Option          Description
                 the weekday instances, which will mean the nth occurrence of
                 this weekday in the period. For example, with ``RRule.MONTHLY``,
                 or with ``RRule.YEARLY`` and ``BYMONTH``, using
-                ``RRule.FR.clone(+1)`` in ``byweekday`` will specify the
-                first friday of the month where the recurrence happens. Notice
+                ``RRule.FR.nth(+1)`` or ``RRule.FR.nth(-1)``  in ``byweekday``
+                will specify the first or last friday of the month where the
+                recurrence happens.
+                Notice
                 that the RFC documentation, this is specified as ``BYDAY``,
                 but was renamed to avoid the ambiguity of that argument.
 
@@ -455,6 +457,8 @@ Changelog
           (never actually used).
         * ``rule.toString()`` now includes ``DTSTART``
           (if explicitely specified in ``options``).
+        * Day constants ``.clone`` is now ``.nth``, eg. ``RRule.FR.nth(-1)``
+          (last Friday).
     * Added ``RRule.parseString``
     * Added ``RRule.parseText``
     * Added ``RRule.optionsToString``

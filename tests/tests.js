@@ -71,6 +71,21 @@ test('fromString()', function() {
 });
 
 
+testRecurring(
+    'missing Feb 28 https://github.com/jkbr/rrule/issues/21',
+    new RRule({
+      freq: RRule.MONTHLY,
+      dtstart: new Date(2013, 0, 1),
+      count: 3,
+      bymonthday: [28]
+    }),
+    [
+        new Date(2013, 0, 28),
+        new Date(2013, 1, 28),
+        new Date(2013, 2, 28)
+    ]);
+
+
 //=============================================================================
 // The original `dateutil.rrule` test suite converted from Py to JS.
 //=============================================================================

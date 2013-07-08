@@ -444,6 +444,7 @@ Changelog
 #########
 
 * 2.0.0-dev
+    * Fixed a February 28-related issue.
     * More flexible, backwards-incompatible API:
         * ``freq`` is now ``options.freq``.
         * ``options.cache`` is now ``noCache``.

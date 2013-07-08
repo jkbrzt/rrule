@@ -125,7 +125,7 @@ input {
     font-family: monospace;
 }
 
-#options input, #options select {
+#options-input input, #options-input select {
     font-size: 1em;
 }
 .option-name  {
@@ -200,4 +200,8 @@ input {
 }
 #dates td.b {
     background: #f0f0f0;
+}
+
+#output a {
+    color: inherit
 }

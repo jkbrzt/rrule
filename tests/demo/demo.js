@@ -96,7 +96,7 @@
   };
 
   $(function() {
-    var $tabs, activateTab;
+    var $tabs, activateTab, processHash;
 
     $tabs = $("#tabs");
     activateTab = function($a) {
@@ -123,7 +123,7 @@
       return $code.parents("section:first").find("input").val($code.text()).change();
     });
     $("input, select").on("keyup change", function() {
-      var $in, $section, d, dates, e, getDay, html, init, inputMethod, k, makeRule, max, options, rule, v, values,
+      var $in, $section, d, dates, e, getDay, html, init, inputMethod, k, makeRule, max, options, rfc, rule, text, v, values,
         _this = this;
 
       $in = $(this);
@@ -187,35 +187,50 @@
           console.log(options);
       }
       $("#init").html(init);
-      $("#rfc-output").html("");
-      $("#text-output").html("");
+      $("#rfc-output a").html("");
+      $("#text-output a").html("");
       $("#dates").html("");
       try {
         rule = makeRule();
       } catch (_error) {
         e = _error;
-      }
-      if (!rule) {
         $("#init").append($('<pre class="error"/>').text('=> ' + String(e || null)));
+        return;
       }
-      if (rule) {
-        $("#rfc-output").text(rule.toString());
-        $("#text-output").text(rule.toText());
-        max = 500;
-        dates = rule.all(function(date, i) {
-          if (!rule.options.count && i === max) {
-            return false;
-          }
-          return true;
-        });
-        html = makeRows(dates);
-        if (!rule.options.count) {
-          html += "<tr><td colspan='7'><em>Showing first " + max + " dates, set\n<code>count</code> to see more.</em></td></tr>";
+      rfc = rule.toString();
+      text = rule.toText();
+      $("#rfc-output a").text(rfc).attr('href', "#rfc=" + rfc);
+      $("#text-output a").text(text).attr('href', "#text=" + text);
+      max = 500;
+      dates = rule.all(function(date, i) {
+        if (!rule.options.count && i === max) {
+          return false;
         }
-        return $("#dates").html(html);
+        return true;
+      });
+      html = makeRows(dates);
+      if (!rule.options.count) {
+        html += "<tr><td colspan='7'><em>Showing first " + max + " dates, set\n<code>count</code> to see more.</em></td></tr>";
       }
+      return $("#dates").html(html);
     });
-    return activateTab($tabs.find("a:first"));
+    activateTab($tabs.find("a:first"));
+    processHash = function() {
+      var arg, hash, match, method;
+
+      hash = location.hash.substring(1);
+      if (hash) {
+        match = /^(rfc|text)=(.+)$/.exec(hash);
+        if (match) {
+          method = match[1];
+          arg = match[2];
+          activateTab($("a[href=#" + method + "-input]"));
+          return $("#" + method + "-input input:first").val(arg).change();
+        }
+      }
+    };
+    processHash();
+    return $(window).on('hashchange', processHash);
   });
 
 }).call(this);

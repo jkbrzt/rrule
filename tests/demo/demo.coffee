@@ -79,12 +79,15 @@ makeRows = (dates)->
 
 $ ->
     $tabs = $("#tabs")
+
     activateTab = ($a) ->
         id = $a.attr("href").split("#")[1]
         $tabs.find("a").removeClass "active"
         $a.addClass "active"
         $("#input-types section").hide()
         $("#input-types #" + id).show().find("input:first").focus().change()
+
+
     $("#input-types section").hide().each ->
         $("<a />",
           href: "#" + $(this).attr("id")
@@ -136,43 +139,50 @@ $ ->
                         continue
 
                     options[k] = v
-#
-#                freq = options.freq
-#                delete options.freq
 
                 makeRule = -> new RRule(options)
                 init = "new RRule(" + getOptionsCode(options) + ")"
                 console.log options
 
         $("#init").html init
-        $("#rfc-output").html ""
-        $("#text-output").html ""
+        $("#rfc-output a").html ""
+        $("#text-output a").html ""
         $("#dates").html ""
 
         try
             rule = makeRule()
         catch e
-
-
-        if not rule
             $("#init").append($('<pre class="error"/>').text('=> ' + String(e||null)))
+            return
 
-        if rule
-            $("#rfc-output").text rule.toString()
-            $("#text-output").text rule.toText()
-            max = 500
-            dates = rule.all (date, i)->
-                if not rule.options.count and i == max
-                    return false  # That's enough
-                return true
+        rfc = rule.toString()
+        text = rule.toText()
+        $("#rfc-output a").text(rfc).attr('href', "#rfc=#{rfc}")
+        $("#text-output a").text(text).attr('href', "#text=#{text}")
+        max = 500
+        dates = rule.all (date, i)->
+            if not rule.options.count and i == max
+                return false  # That's enough
+            return true
 
-            html = makeRows dates
-            if not rule.options.count
-                html += """
-                    <tr><td colspan='7'><em>Showing first #{max} dates, set
-                    <code>count</code> to see more.</em></td></tr>
-                """
-            $("#dates").html html
-
+        html = makeRows dates
+        if not rule.options.count
+            html += """
+                <tr><td colspan='7'><em>Showing first #{max} dates, set
+                <code>count</code> to see more.</em></td></tr>
+            """
+        $("#dates").html html
 
     activateTab $tabs.find("a:first")
+
+    processHash = ->
+        hash = location.hash.substring(1)
+        if hash
+            match = /^(rfc|text)=(.+)$/.exec(hash)
+            if match
+                method = match[1]  # rfc | text
+                arg = match[2]
+                activateTab($("a[href=##{method}-input]"))
+                $("##{method}-input input:first").val(arg).change()
+    processHash()
+    $(window).on('hashchange', processHash)

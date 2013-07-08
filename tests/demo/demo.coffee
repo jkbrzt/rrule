@@ -165,8 +165,8 @@ $ ->
 
         rfc = rule.toString()
         text = rule.toText()
-        $("#rfc-output a").text(rfc).attr('href', "#rfc=#{rfc}")
-        $("#text-output a").text(text).attr('href', "#text=#{text}")
+        $("#rfc-output a").text(rfc).attr('href', "#/rfc/#{rfc}")
+        $("#text-output a").text(text).attr('href', "#/text/#{text}")
         $("#options-output").text(getOptionsCode(rule.origOptions))
         if inputMethod is 'options'
             $("#options-output").parents('tr').hide()
@@ -191,7 +191,7 @@ $ ->
     processHash = ->
         hash = location.hash.substring(1)
         if hash
-            match = /^(rfc|text)=(.+)$/.exec(hash)
+            match = /^\/(rfc|text)\/(.+)$/.exec(hash)
             if match
                 method = match[1]  # rfc | text
                 arg = match[2]

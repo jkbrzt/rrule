@@ -454,33 +454,34 @@ var rule = new RRule(options)
 ### Changelog
 
 * 2.0.0 (2013-07-16)
-  * Fixed a February 28-related issue.
-  * More flexible, backwards-incompatible API:
-        * `freq` is now `options.freq`.
-        * `options.cache` is now `noCache`.
-        * `iterator` has to return `true`
-        * `dtstart` and `options` arguments removed from `RRule.fromString`
-          (use `RRule.parseString` and modify `options` manually instead).
-        * `today` argument removed from `Rule.prototype.toText`
-          (never actually used).
-        * `rule.toString()` now includes `DTSTART` (if explicitely specified
-          in `options`).
-        * Day constants `.clone` is now `.nth`, eg. `RRule.FR.nth(-1)`
-          (last Friday).
-  * Added `RRule.parseString`
-  * Added `RRule.parseText`
-  * Added `RRule.optionsToString`
+   * Fixed a February 28-related issue.
+   * More flexible, backwards-incompatible API:
+      * `freq` is now `options.freq`.
+      * `options.cache` is now `noCache`.
+      * `iterator` has to return `true`
+      * `dtstart` and `options` arguments removed from `RRule.fromString`
+        (use `RRule.parseString` and modify `options` manually instead).
+      * `today` argument removed from `Rule.prototype.toText`
+        (never actually used).
+      * `rule.toString()` now includes `DTSTART` (if explicitely specified
+        in `options`).
+      * Day constants `.clone` is now `.nth`, eg. `RRule.FR.nth(-1)`
+        (last Friday).
+   * Added `RRule.parseString`
+   * Added `RRule.parseText`
+   * Added `RRule.optionsToString`
 * 1.1.0 (2013-05-21)
-  * Added a [demo app](http://jkbr.github.io/rrule/).
-  * Handle dates in `UNTIL` in `RRule.fromString`.
-  * Added support for RequireJS.
-  * Added `options` argument to `RRule.fromString`.
+   * Added a [demo app](http://jkbr.github.io/rrule/).
+   * Handle dates in `UNTIL` in `RRule.fromString`.
+   * Added support for RequireJS.
+   * Added `options` argument to `RRule.fromString`.
 * 1.0.1 (2013-02-26)
-  * Fixed leap years (thanks @jessevogt)
+   * Fixed leap years (thanks @jessevogt)
 * 1.0.0 (2013-01-24)
-  * Fixed timezone offset issues related to DST (thanks @evro).
+   * Fixed timezone offset issues related to DST (thanks @evro).
 * 1.0.0-beta (2012-08-15)
-  * Initial public release.
+   * Initial public release.
+
 
 #### Authors
 

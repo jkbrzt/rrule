@@ -453,7 +453,7 @@ var rule = new RRule(options)
 
 ### Changelog
 
-* 2.0.0-dev
+* 2.0.0 (2013-07-16)
   * Fixed a February 28-related issue.
   * More flexible, backwards-incompatible API:
         * `freq` is now `options.freq`.

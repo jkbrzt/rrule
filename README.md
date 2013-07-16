@@ -267,8 +267,10 @@ documentation.
 <dl>
     <dt><code>rule.options</code></dt>
     <dd>Processed options applied to the rule. Includes default options
-    (such us `wkstart`). Currently, `rule.options.byweekday` isn't equal
-    to `rule.origOptions.byweekday` (which is an inconsistency).</dd>
+    (such us <code>wkstart</code>). Currently,
+    <code>rule.options.byweekday</code> isn't equal
+    to <code>rule.origOptions.byweekday</code> (which is an inconsistency).
+    </dd>
 
     <dt><code>rule.origOptions</code></dt>
     <dd>The original <code>options</code> argument passed to

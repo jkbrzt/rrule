@@ -395,7 +395,7 @@ var rule = new RRule(RRule.parseString("FREQ=WEEKLY;DTSTART=20120201T093000Z"))
 Only parse RFC string and return `options`.
 
 ```javascript
-var options = RRule.parseString('FREQ=DAY;INTERVAL=6')
+var options = RRule.parseString('FREQ=DAILY;INTERVAL=6')
 options.dtstart = new Date(2000, 1, 1)
 var rule = new RRule(options)
 ```

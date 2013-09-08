@@ -354,17 +354,14 @@ testRecurring('testYearlyByWeekNoAndWeekDayLast', new RRule({freq: RRule.YEARLY,
         datetime(1999, 1, 3, 9, 0),
         datetime(2000, 1, 2, 9, 0)]);
 
-
-/* byeaster not implemented
-assertRecurring('testYearlyByEaster', new RRule({freq: RRule.YEARLY,
-                          count: 3,
+testRecurring('testYearlyByEaster', new RRule({ count: 3,
                           byeaster: 0,
                           dtstart: parse("19970902T090000")}),
                      [datetime(1998, 4, 12, 9, 0),
                       datetime(1999, 4, 4, 9, 0),
                       datetime(2000, 4, 23, 9, 0)])
 
-assertRecurring('testYearlyByEasterPos', new RRule({freq: RRule.YEARLY,
+testRecurring('testYearlyByEasterPos', new RRule({freq: RRule.YEARLY,
                           count: 3,
                           byeaster: 1,
                           dtstart: parse("19970902T090000")}),
@@ -372,14 +369,14 @@ assertRecurring('testYearlyByEasterPos', new RRule({freq: RRule.YEARLY,
                       datetime(1999, 4, 5, 9, 0),
                       datetime(2000, 4, 24, 9, 0)])
 
-assertRecurring('testYearlyByEasterNeg', new RRule({freq: RRule.YEARLY,
+testRecurring('testYearlyByEasterNeg', new RRule({freq: RRule.YEARLY,
                           count: 3,
                           byeaster: -1,
                           dtstart: parse("19970902T090000")}),
                      [datetime(1998, 4, 11, 9, 0),
                       datetime(1999, 4, 3, 9, 0),
                       datetime(2000, 4, 22, 9, 0)])
-*/
+
 testRecurring('testYearlyByWeekNoAndWeekDay53', new RRule({freq: RRule.YEARLY,
     count:3,
     byweekno:53,

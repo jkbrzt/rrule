@@ -327,7 +327,7 @@ rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
 
 ##### `RRule.prototype.after(dt, inc=false)`
 
-Returns the last recurrence before the given `Date` instance. The `inc`
+Returns the last recurrence after the given `Date` instance. The `inc`
 argument defines what happens if `dt` is an occurrence. With
 `inc == true`, if `dt` itself is an occurrence, it will be returned.
 
@@ -335,7 +335,7 @@ argument defines what happens if `dt` is an occurrence. With
 ##### `RRule.prototype.before(dt, inc=false)`
 
 Returns the last recurrence
-after the given `Date` instance. The `inc` argument defines what happens
+before the given `Date` instance. The `inc` argument defines what happens
 if `dt` is an occurrence. With `inc == true`, if `dt` itself is an
 occurrence, it will be returned.
 

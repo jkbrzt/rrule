@@ -325,17 +325,17 @@ rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
  'Fri Aug 31 2012 10:30:00 GMT+0200 (CEST)']
 ```
 
-##### `RRule.prototype.after(dt, inc=false)`
+##### `RRule.prototype.before(dt, inc=false)`
 
-Returns the last recurrence after the given `Date` instance. The `inc`
+Returns the last recurrence before the given `Date` instance. The `inc`
 argument defines what happens if `dt` is an occurrence. With
 `inc == true`, if `dt` itself is an occurrence, it will be returned.
 
 
-##### `RRule.prototype.before(dt, inc=false)`
+##### `RRule.prototype.after(dt, inc=false)`
 
-Returns the last recurrence
-before the given `Date` instance. The `inc` argument defines what happens
+Returns the first recurrence
+after the given `Date` instance. The `inc` argument defines what happens
 if `dt` is an occurrence. With `inc == true`, if `dt` itself is an
 occurrence, it will be returned.
 

@@ -487,7 +487,7 @@ var rule = new RRule(options)
 
 #### Authors
 
-* [Jakub Roztocil](http://roztocil.name/)
+* [Jakub Roztocil](http://subtleapps.com/)
     ([@jkbrzt](http://twitter.com/jkbrzt))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 

@@ -488,7 +488,7 @@ var rule = new RRule(options)
 #### Authors
 
 * [Jakub Roztocil](http://roztocil.name/)
-    ([@jakubroztocil](http://twitter.com/jakubroztocil))
+    ([@jkbrzt](http://twitter.com/jkbrzt))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 
 Python `dateutil` is written by [Gustavo

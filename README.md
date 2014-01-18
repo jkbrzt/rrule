@@ -23,9 +23,13 @@ The only dependency is [Underscore.js](http://underscorejs.org/).
 
 #### Client Side
 
-Download
-[rrule.js](https://raw.github.com/jkbr/rrule/master/lib/rrule.js). If
-you want to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
+```bash
+$ bower install rrule
+```
+
+Alternatively, download
+[rrule.js](https://raw.github.com/jkbr/rrule/master/lib/rrule.js) manually. If
+you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
 also need [nlp.js](https://raw.github.com/jkbr/rrule/master/lib/nlp.js).
 
 ```html

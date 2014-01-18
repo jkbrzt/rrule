@@ -1,21 +1,35 @@
 {
     "name": "rrule",
-    "version": "2.0.1",
     "description": "JavaScript library for working with recurrence rules for calendar dates.",
     "homepage": "https://github.com/jkbr/rrule",
-    "keywords":[
+    "keywords": [
         "dates",
         "recurrences",
         "calendar",
         "icalendar",
         "rfc"
     ],
-    "author": "Jakub Roztocil and Lars Schöning",
-    "main": "lib/rrule",
-    "repository" :{
+    "repository": {
         "type": "git",
         "url": "git://github.com/jkbr/rrule.git"
     },
+
+    "version": "2.0.1",
+    "authors": [
+        {
+            "name": "Jakub Roztočil",
+            "homepage": "http://subtleapps.com/"
+        },
+        {
+            "name": "Lars Schöning"
+        }
+    ],
+    "main": "rrule.js",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "components"
+    ],
     "dependencies": {
         "underscore": ">= 1.3.3"
     }

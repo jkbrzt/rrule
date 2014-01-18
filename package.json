@@ -2,7 +2,7 @@
     "name": "rrule",
     "version": "2.0.1",
     "description": "JavaScript library for working with recurrence rules for calendar dates.",
-    "homepage": "https://github.com/jkbr/rrule",
+    "homepage": "http://jkbr.github.io/rrule/",
     "keywords":[
         "dates",
         "recurrences",

@@ -10,6 +10,16 @@ date = datetime = function(y, m, d, h, i, s) {
     return new Date(y, m - 1, d, h, i, s);
 };
 
+var dateTz, datetimeTz;
+dateTz = datetimeTz = function(timezone, y, m, d, h, i, s) {
+    h = h || 0;
+    i = i || 0;
+    s = s || 0;
+    return window.timezoneJS
+        ? new timezoneJS.Date(y, m - 1, d, h, i, s, timezone)
+        : new Date(y, m - 1, d, h, i, s);  
+};
+
 
 /**
  * dateutil.parser.parse
@@ -49,8 +59,11 @@ var assertDatesEqual = function(actual, expected, msg) {
     for (var exp, act, i = 0; i < expected.length; i++) {
         act = actual[i];
         exp = expected[i];
-        equal(exp instanceof Date ? exp.toString() : exp,
-              act.toString(), msg + (i + 1) + '/' + expected.length);
+        equal(act.toUTCString(),
+              (exp instanceof Date) ?
+                exp.toUTCString() : (exp instanceof timezoneJS.Date) ?
+                    exp.toUTCString() : exp,
+              msg + (i + 1) + '/' + expected.length);
     }
 };
 

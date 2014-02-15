@@ -1,3 +1,7 @@
+if (window.timezoneJS) {
+    timezoneJS.timezone.zoneFileBasePath = 'vendor/tz';
+    timezoneJS.timezone.init();
+}
 
 module("RRule", {
 
@@ -2259,7 +2263,34 @@ testRecurring('testMaxYear', new RRule({freq: RRule.YEARLY,
     dtstart:parse("99970902T090000")}),
     []);
 
+/* test timezone */
+testRecurring('testTimezone', new RRule({freq: RRule.WEEKLY,
+    count:5,
+    byweekday:[RRule.TU],
+    dtstart:datetimeTz('America/New_York', 1997, 9, 2, 23, 0)}),
+    [datetimeTz('America/New_York', 1997, 9, 2, 23, 0),
+        datetimeTz('America/New_York', 1997, 9, 9, 23, 0),
+        datetimeTz('America/New_York', 1997, 9, 16, 23, 0),
+        datetimeTz('America/New_York', 1997, 9, 23, 23, 0),
+        datetimeTz('America/New_York', 1997, 9, 30, 23, 0)]);
 
+testRecurring('testTimezoneNoDST', new RRule({freq: RRule.HOURLY,
+    count:5,
+    dtstart:datetimeTz('Europe/London', 2013, 3, 30, 0, 0)}),
+    [datetimeTz('Asia/Bangkok', 2013, 3, 30, 7, 0),
+        datetimeTz('Asia/Bangkok', 2013, 3, 30, 8, 0),
+        datetimeTz('Asia/Bangkok', 2013, 3, 30, 9, 0),
+        datetimeTz('Asia/Bangkok', 2013, 3, 30, 10, 0),
+        datetimeTz('Asia/Bangkok', 2013, 3, 30, 11, 0)]);
+
+testRecurring('testTimezoneDST', new RRule({freq: RRule.HOURLY,
+    count:5,
+    dtstart:datetimeTz('Europe/London', 2013, 4, 1, 0, 0)}),
+    [datetimeTz('Asia/Bangkok', 2013, 4, 1, 6, 0),
+        datetimeTz('Asia/Bangkok', 2013, 4, 1, 7, 0),
+        datetimeTz('Asia/Bangkok', 2013, 4, 1, 8, 0),
+        datetimeTz('Asia/Bangkok', 2013, 4, 1, 9, 0),
+        datetimeTz('Asia/Bangkok', 2013, 4, 1, 10, 0)]);
 
 
 /* these tests basically test the iterator implementation only */

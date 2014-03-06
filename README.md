@@ -10,8 +10,6 @@ RFC](http://www.ietf.org/rfc/rfc2445.txt). It is a partial port of the
 that, it supports parsing and serialization of recurrence rules from and
 to natural language.
 
-The only dependency is [Underscore.js](http://underscorejs.org/).
-
 * * * * *
 
 
@@ -33,7 +31,6 @@ you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
 also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
-<script src="underscore.js"></script>
 <script src="rrule/lib/rrule.js"></script>
 
 <!-- Optional -->

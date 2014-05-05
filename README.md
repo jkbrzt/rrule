@@ -17,8 +17,8 @@ The only dependency is [Underscore.js](http://underscorejs.org/).
 
 ### Quick Start
 
--   [Demo app](http://jkbr.github.io/rrule/)
--   [Test suite](http://jkbr.github.io/rrule/tests/index.html)
+-   [Demo app](http://jakubroztocil.github.io/rrule/)
+-   [Test suite](http://jakubroztocil.github.io/rrule/tests/index.html)
 
 
 #### Client Side
@@ -28,9 +28,9 @@ $ bower install rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jkbr/rrule/master/lib/rrule.js) manually. If
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/lib/rrule.js) manually. If
 you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jkbr/rrule/master/lib/nlp.js).
+also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
 <script src="underscore.js"></script>
@@ -87,7 +87,7 @@ rule.toText()
 ```
 
 For more examples see
-[tests/tests.js](https://github.com/jkbr/rrule/blob/master/tests/tests.js)
+[tests/tests.js](https://github.com/jakubroztocil/rrule/blob/master/tests/tests.js)
 and [python-dateutil](http://labix.org/python-dateutil/) documentation.
 
 ### API
@@ -479,7 +479,7 @@ var rule = new RRule(options)
    * Added `RRule.parseText`
    * Added `RRule.optionsToString`
 * 1.1.0 (2013-05-21)
-   * Added a [demo app](http://jkbr.github.io/rrule/).
+   * Added a [demo app](http://jakubroztocil.github.io/rrule/).
    * Handle dates in `UNTIL` in `RRule.fromString`.
    * Added support for RequireJS.
    * Added `options` argument to `RRule.fromString`.
@@ -494,11 +494,11 @@ var rule = new RRule(options)
 #### Authors
 
 * [Jakub Roztocil](http://subtleapps.com/)
-    ([@jkbrzt](http://twitter.com/jkbrzt))
+    ([@jakubroztocilzt](http://twitter.com/jakubroztocilzt))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 
 Python `dateutil` is written by [Gustavo
 Niemeyer](http://niemeyer.net/).
 
-See [LICENCE](https://github.com/jkbr/rrule/blob/master/LICENCE) for
+See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
 more details.

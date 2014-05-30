@@ -27,6 +27,9 @@ var texts = [
     ['Every week on Monday, Wednesday', 'FREQ=WEEKLY;BYDAY=MO,WE'],
     ['Every weekday', 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
     ['Every day', 'FREQ=DAILY'],
+    ['Every day at 23', 'FREQ=DAILY;BYHOUR=23'],
+    ['Every day at 2:30pm', 'FREQ=DAILY;BYHOUR=14;BYMINUTE=30'],
+    ['Every day at 2:00:30 a.m. for 2 times', 'FREQ=DAILY;COUNT=2;BYHOUR=2;BYMINUTE=0;BYSECOND=30'],
     ['Every week', 'FREQ=WEEKLY'],
     ['Every 2 weeks', 'FREQ=WEEKLY;INTERVAL=2'],
     ['Every month', 'FREQ=MONTHLY'],
@@ -36,6 +39,7 @@ var texts = [
     ['Every month on the 4th last', 'FREQ=MONTHLY;BYMONTHDAY=-4'],
     ['Every month on the 3rd Tuesday', 'FREQ=MONTHLY;BYDAY=+3TU'],
     ['Every month on the 3rd last Tuesday', 'FREQ=MONTHLY;BYDAY=-3TU'],
+    ['Every month on the 3rd last Tuesday at 14:05:30', 'FREQ=MONTHLY;BYDAY=-3TU;BYHOUR=14;BYMINUTE=5;BYSECOND=30'],
     ['Every month on the last Monday', 'FREQ=MONTHLY;BYDAY=-1MO'],
     ['Every month on the 2nd last Friday', 'FREQ=MONTHLY;BYDAY=-2FR'],
     // This one will fail.
@@ -55,6 +59,20 @@ test('fromText()', function() {
 
 });
 
+var totexts = [
+    ['FREQ=DAILY;BYHOUR=23', 'every day at 23'],
+    ['FREQ=DAILY;BYHOUR=14;BYMINUTE=30', 'every day at 14:30'],
+    ['FREQ=MONTHLY;BYDAY=-3TU;BYHOUR=14;BYMINUTE=5;BYSECOND=30', 'every month on the 3rd last Tuesday at 14:05:30']
+];
+test('toText()', function() {
+    $.each(totexts, function(){
+        var string = this[0],
+            text = this[1];
+        equal(RRule.fromString(string).toText(), text,
+            string + ' => ' + text);
+    });
+
+});
 
 strings = [
     ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],

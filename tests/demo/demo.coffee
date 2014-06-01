@@ -26,7 +26,7 @@ getOptionsCode = (options) ->
             v = 'null'
         else if k is 'freq'
             v = 'RRule.' + RRule.FREQUENCIES[v]
-        else if _.contains ["dtstart", "until"], k
+        else if k in ["dtstart", "until"]
             v = "new Date(" + [
                 v.getFullYear()
                 v.getMonth()
@@ -37,7 +37,7 @@ getOptionsCode = (options) ->
             ].join(', ') + ")"
         else if k is "byweekday"
             if v instanceof Array
-                v = _.map v, (wday)->
+                v = v.map (wday)->
                     console.log 'wday', wday
                     s = days[wday.weekday]
                     if wday.n
@@ -106,7 +106,7 @@ $ ->
         $code = $(this)
         $code.parents("section:first").find("input").val($code.text()).change()
 
-    $("input, select").on "keyup change", ->
+    $("input, select").on 'keyup change', ->
         $in = $(this)
         $section = $in.parents("section:first")
         inputMethod = $section.attr("id").split("-")[0]
@@ -121,31 +121,44 @@ $ ->
             when 'options'
                 values = getFormValues($in.parents("form"))
                 options = {}
-                getDay = (i)-> [RRule.MO, RRule.TU, RRule.WE,
-                                RRule.TH, RRule.FR, RRule.SA, RRule.SU][i]
-                for k, v of values
-                    continue if not v
-                    if _.contains ["dtstart", "until"], k
-                        d = new Date(Date.parse(v))
-                        v = new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000))
-                    else if k is 'byweekday'
-                        if v instanceof Array
-                            v = _.map v, getDay
+                days = [
+                    RRule.MO
+                    RRule.TU
+                    RRule.WE
+                    RRule.TH
+                    RRule.FR
+                    RRule.SA
+                    RRule.SU
+                ]
+                getDay = (i)-> days[i]
+
+                for key, value of values
+
+                    if not value
+                        continue
+                    else if key in ['dtstart', 'until']
+                        date = new Date(Date.parse(value))
+                        value = new Date(date.getTime() + (date.getTimezoneOffset() * 60 * 1000))
+                    else if key is 'byweekday'
+                        if value instanceof Array
+                            value = value.map(getDay)
                         else
-                            v = getDay v
-                    else if /^by/.test(k)
-                        v = _.compact(v.split(/[,\s]+/)) if not (v instanceof Array)
-                        v = _.map v, (n) -> parseInt n, 10
+                            value = getDay(value)
+                    else if /^by/.test(key)
+                        if not value instanceof Array
+                            value = value.split(/[,\s]+/)
+                        value = (v for v in value when v)
+                        value = value.map (n) -> parseInt(n, 10)
                     else
-                        v = parseInt(v, 10)
+                        value = parseInt(value, 10)
 
-                    if k is 'wkst'
-                        v = getDay v
+                    if key is 'wkst'
+                        value = getDay(value)
 
-                    if k is 'interval' and v == 1
+                    if key is 'interval' and value is 1
                         continue
 
-                    options[k] = v
+                    options[key] = value
 
                 makeRule = -> new RRule(options)
                 init = "new RRule(" + getOptionsCode(options) + ")"

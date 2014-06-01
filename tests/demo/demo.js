@@ -31,11 +31,11 @@
           v = 'null';
         } else if (k === 'freq') {
           v = 'RRule.' + RRule.FREQUENCIES[v];
-        } else if (_.contains(["dtstart", "until"], k)) {
+        } else if (k === "dtstart" || k === "until") {
           v = "new Date(" + [v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds()].join(', ') + ")";
         } else if (k === "byweekday") {
           if (v instanceof Array) {
-            v = _.map(v, function(wday) {
+            v = v.map(function(wday) {
               var s;
 
               console.log('wday', wday);
@@ -131,8 +131,8 @@
       $code = $(this);
       return $code.parents("section:first").find("input").val($code.text()).change();
     });
-    $("input, select").on("keyup change", function() {
-      var $in, $section, d, dates, e, getDay, html, init, inputMethod, k, makeRule, max, options, rfc, rule, text, v, values,
+    $("input, select").on('keyup change', function() {
+      var $in, $section, date, dates, days, e, getDay, html, init, inputMethod, key, makeRule, max, options, rfc, rule, text, v, value, values,
         _this = this;
 
       $in = $(this);
@@ -154,40 +154,52 @@
         case 'options':
           values = getFormValues($in.parents("form"));
           options = {};
+          days = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU];
           getDay = function(i) {
-            return [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU][i];
+            return days[i];
           };
-          for (k in values) {
-            v = values[k];
-            if (!v) {
+          for (key in values) {
+            value = values[key];
+            if (!value) {
               continue;
-            }
-            if (_.contains(["dtstart", "until"], k)) {
-              d = new Date(Date.parse(v));
-              v = new Date(d.getTime() + (d.getTimezoneOffset() * 60 * 1000));
-            } else if (k === 'byweekday') {
-              if (v instanceof Array) {
-                v = _.map(v, getDay);
+            } else if (key === 'dtstart' || key === 'until') {
+              date = new Date(Date.parse(value));
+              value = new Date(date.getTime() + (date.getTimezoneOffset() * 60 * 1000));
+            } else if (key === 'byweekday') {
+              if (value instanceof Array) {
+                value = value.map(getDay);
               } else {
-                v = getDay(v);
+                value = getDay(value);
               }
-            } else if (/^by/.test(k)) {
-              if (!(v instanceof Array)) {
-                v = _.compact(v.split(/[,\s]+/));
+            } else if (/^by/.test(key)) {
+              if (!value instanceof Array) {
+                value = value.split(/[,\s]+/);
               }
-              v = _.map(v, function(n) {
+              value = (function() {
+                var _i, _len, _results;
+
+                _results = [];
+                for (_i = 0, _len = value.length; _i < _len; _i++) {
+                  v = value[_i];
+                  if (v) {
+                    _results.push(v);
+                  }
+                }
+                return _results;
+              })();
+              value = value.map(function(n) {
                 return parseInt(n, 10);
               });
             } else {
-              v = parseInt(v, 10);
+              value = parseInt(value, 10);
             }
-            if (k === 'wkst') {
-              v = getDay(v);
+            if (key === 'wkst') {
+              value = getDay(value);
             }
-            if (k === 'interval' && v === 1) {
+            if (key === 'interval' && value === 1) {
               continue;
             }
-            options[k] = v;
+            options[key] = value;
           }
           makeRule = function() {
             return new RRule(options);

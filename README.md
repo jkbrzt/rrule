@@ -456,6 +456,9 @@ var rule = new RRule(options)
 
 ### Changelog
 
+* 2.1.0
+   * Removed dependency on Underscore.js (thanks @gsf).
+   * Various small bugfixes and improvements.
 * 2.0.1
    * Added bower.json.
 * 2.0.0 (2013-07-16)

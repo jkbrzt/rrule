@@ -4,5 +4,6 @@ Package.describe({
 
 Package.on_use(function (api) {
   api.export('RRule');
-  api.add_files(['lib/rrule.js', 'lib/nlp.js']);
+  var files = ['lib/rrule.js', 'lib/nlp.js'];
+  api.add_files(files, ['client', 'server']);
 });

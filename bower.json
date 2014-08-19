@@ -24,7 +24,7 @@
             "name": "Lars Schöning"
         }
     ],
-    "main": "rrule.js",
+    "main": "lib/rrule.js",
     "ignore": [
         "**/.*",
         "node_modules",

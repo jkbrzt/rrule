@@ -155,7 +155,7 @@ $ ->
                     if key is 'wkst'
                         value = getDay(value)
 
-                    if key is 'interval' and value is 1
+                    if key is 'interval' and (value is 1 or not value)
                         continue
 
                     options[key] = value

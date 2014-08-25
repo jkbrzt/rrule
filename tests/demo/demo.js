@@ -32,7 +32,7 @@
         } else if (k === 'freq') {
           v = 'RRule.' + RRule.FREQUENCIES[v];
         } else if (k === "dtstart" || k === "until") {
-          v = "new Date(" + [v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds()].join(', ') + ")";
+          v = "new Date(" + [v.getFullYear(), v.getMonth() + 1, v.getDate(), v.getHours(), v.getMinutes(), v.getSeconds()].join(', ') + ")";
         } else if (k === "byweekday") {
           if (v instanceof Array) {
             v = v.map(function(wday) {

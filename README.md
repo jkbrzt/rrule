@@ -163,6 +163,17 @@ iCalendar RFC. Only `freq` is required.
         </td>
     </tr>
     <tr>
+        <td><code>onlydate</code></td>
+        <td>This boolean flag, which is <code>false</code> by default, controls
+        whether <code>toString()</code> will output <code>until</code> and
+        <code>dtstart</code> including the time or not. When set to <code>false</code>,
+        <code>toString()</code> will generate <code>DATE-TIME</code> values, and
+        <code>DATE</code> when set to <code>true</code>. <code>fromString()</code>
+        will automatically set it depending on included <code>UNTIL</code> and
+        <code>DTSTART</code>, if present.
+        </td>
+    </tr>
+    <tr>
         <td><code>bysetpos</code></td>
         <td>If given, it must be either an integer, or a sequence of
             integers, positive or negative. Each given integer will specify

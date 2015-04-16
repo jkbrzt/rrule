@@ -196,7 +196,7 @@
             if (key === 'wkst') {
               value = getDay(value);
             }
-            if (key === 'interval' && value === 1) {
+            if (key === 'interval' && (value === 1 || !value)) {
               continue;
             }
             options[key] = value;

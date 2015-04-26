@@ -17,7 +17,11 @@ this.MomentDate = (function(superClass) {
     if (args.length === 1) {
       args = args[0];
     }
-    this._moment = moment.tz(args, timeZone);
+    if (timeZone) {
+      this._moment = moment.tz(args, timeZone);
+    } else {
+      this._moment = moment(args);
+    }
   }
 
   MomentDate.prototype.toString = function() {
@@ -29,7 +33,7 @@ this.MomentDate = (function(superClass) {
   };
 
   MomentDate.prototype.toDate = function() {
-    return new Date(this.toString());
+    return this._moment.toDate();
   };
 
   return MomentDate;
@@ -47,7 +51,7 @@ _.each(propertyNames, function(propertyName) {
   args = arguments;
   return MomentDate.prototype[propertyName] = function() {
     var date;
-    date = this._moment.toDate();
+    date = this.toDate();
     return date[propertyName].apply(date, args);
   };
 });

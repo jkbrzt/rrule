@@ -2285,6 +2285,12 @@ testRecurring('testMaxYear', new RRule({freq: RRule.YEARLY,
     dtstart:parse("99970902T090000")}),
     []);
 
+testRecurring('testSubsecondStart' , new RRule({freq: RRule.YEARLY,
+    count:1,
+    dtstart:new Date(1420063200001)
+    }),
+
+    [new Date(1420063200001)]);
 
 
 

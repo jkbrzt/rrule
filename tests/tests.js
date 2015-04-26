@@ -17,6 +17,8 @@ module("RRule", {
         // NOTE: can take a longer time.
         this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
 
+        this.ALSO_TEST_SUBSECOND_PRECISION=true;
+
     }
 
 });
@@ -2285,13 +2287,22 @@ testRecurring('testMaxYear', new RRule({freq: RRule.YEARLY,
     dtstart:parse("99970902T090000")}),
     []);
 
-testRecurring('testSubsecondStart' , new RRule({freq: RRule.YEARLY,
+testRecurring('testSubsecondStartYearly' , new RRule({
+    freq: RRule.YEARLY,
     count:1,
     dtstart:new Date(1420063200001)
     }),
 
     [new Date(1420063200001)]);
 
+testRecurring('testSubsecondStartMonthlyByMonthDay' , new RRule({
+    
+    freq: RRule.MONTHLY,
+    count: 1,
+    bysetpos: [-1,1] ,   
+    dtstart:new Date(1356991200001)
+    }),
+    [new Date(1356991200001)]);
 
 
 /* these tests basically test the iterator implementation only */

@@ -172,7 +172,7 @@
                 value = getDay(value);
               }
             } else if (/^by/.test(key)) {
-              if (!value instanceof Array) {
+              if (!(value instanceof Array)) {
                 value = value.split(/[,\s]+/);
               }
               value = (function() {

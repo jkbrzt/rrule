@@ -2420,296 +2420,344 @@ assertRecurring('testCachePostContains',
     datetime(1997, 9, 3, 9, 0) in rr, True)
  */
 
-/* sets and other unimplemented stuff  */
+module("RRuleSet", {
 
-/*
-assertRecurring('testSet',
-    set :  rruleset()
+    setup: function() {
+
+        // Enable additional toString() / fromString() tests
+        //for each testRecurring().
+        this.ALSO_TEST_STRING_FUNCTIONS = false;
+
+        // Enable additional toText() / fromText() tests
+        // for each testRecurring().
+        // Many of the tests fail because the conversion is only approximate,
+        // but it gives an idea about how well or bad it converts.
+        this.ALSO_TEST_NLP_FUNCTIONS = false;
+
+        // Thorough after()/before()/between() tests.
+        // NOTE: can take a longer time.
+        this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
+
+    }
+
+});
+
+testRecurring('testSet',(
+    set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
 
-assertRecurring('testSetDate',
-    set :  rruleset()
+testRecurring('testSetDate',(
+    set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TU,
-                    dtstart: parse("19970902T090000")))
-    set.rdate(datetime(1997, 9, 4, 9))
-    set.rdate(datetime(1997, 9, 9, 9))
+                    dtstart: parse("19970902T090000")})),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
 
-assertRecurring('testSetExRule',
-    set :  rruleset()
+testRecurring('testSetExRule',
+    (set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 6, byweekday: [RRule.TU, RRule.TH],
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.exrule(new RRule({freq: RRule.YEARLY,  count: 3, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testSetExDate',
-    set :  rruleset()
+testRecurring('testSetExDate',
+    (set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 6, byweekday: [RRule.TU, RRule.TH],
-                    dtstart: parse("19970902T090000")))
-    set.exdate(datetime(1997, 9, 4, 9))
-    set.exdate(datetime(1997, 9, 11, 9))
-    set.exdate(datetime(1997, 9, 18, 9))
+                    dtstart: parse("19970902T090000")})),
+    set.exdate(datetime(1997, 9, 4, 9)),
+    set.exdate(datetime(1997, 9, 11, 9)),
+    set.exdate(datetime(1997, 9, 18, 9)),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testSetExDateRevOrder',
-    set :  rruleset()
+testRecurring('testSetExDateRevOrder',
+    (set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.MONTHLY,  count: 5, bymonthday: 10,
-                    dtstart: parse("20040101T090000")))
-    set.exdate(datetime(2004, 4, 10, 9, 0))
-    set.exdate(datetime(2004, 2, 10, 9, 0))
+                    dtstart: parse("20040101T090000")})),
+    set.exdate(datetime(2004, 4, 10, 9, 0)),
+    set.exdate(datetime(2004, 2, 10, 9, 0)),
     set),
                      [datetime(2004, 1, 10, 9, 0),
                       datetime(2004, 3, 10, 9, 0),
                       datetime(2004, 5, 10, 9, 0)])
 
-assertRecurring('testSetDateAndExDate',
-    set :  rruleset()
-    set.rdate(datetime(1997, 9, 2, 9))
-    set.rdate(datetime(1997, 9, 4, 9))
-    set.rdate(datetime(1997, 9, 9, 9))
-    set.rdate(datetime(1997, 9, 11, 9))
-    set.rdate(datetime(1997, 9, 16, 9))
-    set.rdate(datetime(1997, 9, 18, 9))
-    set.exdate(datetime(1997, 9, 4, 9))
-    set.exdate(datetime(1997, 9, 11, 9))
-    set.exdate(datetime(1997, 9, 18, 9))
+testRecurring('testSetDateAndExDate',
+    (set = new RRuleSet(),
+    set.rdate(datetime(1997, 9, 2, 9)),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
+    set.rdate(datetime(1997, 9, 11, 9)),
+    set.rdate(datetime(1997, 9, 16, 9)),
+    set.rdate(datetime(1997, 9, 18, 9)),
+    set.exdate(datetime(1997, 9, 4, 9)),
+    set.exdate(datetime(1997, 9, 11, 9)),
+    set.exdate(datetime(1997, 9, 18, 9)),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testSetDateAndExRule',
-    set :  rruleset()
-    set.rdate(datetime(1997, 9, 2, 9))
-    set.rdate(datetime(1997, 9, 4, 9))
-    set.rdate(datetime(1997, 9, 9, 9))
-    set.rdate(datetime(1997, 9, 11, 9))
-    set.rdate(datetime(1997, 9, 16, 9))
-    set.rdate(datetime(1997, 9, 18, 9))
+testRecurring('testSetDateAndExRule',
+    (set = new RRuleSet(),
+    set.rdate(datetime(1997, 9, 2, 9)),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
+    set.rdate(datetime(1997, 9, 11, 9)),
+    set.rdate(datetime(1997, 9, 16, 9)),
+    set.rdate(datetime(1997, 9, 18, 9)),
     set.exrule(new RRule({freq: RRule.YEARLY,  count: 3, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testSetCount',
-    set :  rruleset()
+testRecurringSetCount('testSetCount',
+    (set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 6, byweekday: [RRule.TU, RRule.TH],
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.exrule(new RRule({freq: RRule.YEARLY,  count: 3, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
-    set.count(), 3)
+                    dtstart: parse("19970902T090000")})),
+    set), 3)
 
-assertRecurring('testSetCachePre',
-    set :  rruleset()
+testRecurring('testSetCachePre',
+    (set = new RRuleSet(),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
 
-assertRecurring('testSetCachePost',
-    set :  rruleset(cache: True)
+testRecurring('testSetCachePost',
+    (set = new RRuleSet(true),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
-    for x in set: pass
+                    dtstart: parse("19970902T090000")})),
+    set.all(),
     set),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
-
-assertRecurring('testSetCachePostInternal',
-    set :  rruleset(cache: True)
+/*
+testRecurring('testSetCachePostInternal',
+    (set = new RRuleSet(true),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
-                    dtstart: parse("19970902T090000")))
+                    dtstart: parse("19970902T090000")})),
     set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
-                    dtstart: parse("19970902T090000")))
-    for x in set: pass
+                    dtstart: parse("19970902T090000")})),
+    set.all(),
     set._cache),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
-                      datetime(1997, 9, 9, 9, 0)])
+                      datetime(1997, 9, 9, 9, 0)])*/
 
-assertRecurring('testStr', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 3\n"
-                          }),
+module("rrulestr", {
+
+    setup: function() {
+
+        // Enable additional toString() / fromString() tests
+        //for each testRecurring().
+        this.ALSO_TEST_STRING_FUNCTIONS = false;
+
+        // Enable additional toText() / fromText() tests
+        // for each testRecurring().
+        // Many of the tests fail because the conversion is only approximate,
+        // but it gives an idea about how well or bad it converts.
+        this.ALSO_TEST_NLP_FUNCTIONS = false;
+
+        // Thorough after()/before()/between() tests.
+        // NOTE: can take a longer time.
+        this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
+
+    }
+
+});
+testRecurring('testStr', rrulestr(
+                        "DTSTART:19970902T090000\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=3\n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrType', isinstance(rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 3\n"
-                          ), rrule), True)
+assertStrType('testStrType', rrulestr(
+    "DTSTART:19970902T090000\n" +
+    "RRULE:FREQ=YEARLY;COUNT=3\n"
+    ), RRule)
 
-assertRecurring('testStrForceSetType', isinstance(rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 3\n"
-                          , forceset: True), rruleset), True)
+assertStrType('testStrForceSetType', rrulestr(
+    "DTSTART:19970902T090000\n" +
+    "RRULE:FREQ=YEARLY;COUNT=3\n", {
+        forceset: true
+}), RRuleSet)
 
-assertRecurring('testStrSetType', isinstance(rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 2;BYDAY: RRule.TU\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 1;BYDAY: RRule.TH\n"
-                          ), rruleset), True)
+assertStrType('testStrSetType', rrulestr(
+    "DTSTART:19970902T090000\n"+
+    "RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n" +
+    "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n"
+), RRuleSet)
 
-assertRecurring('testStrCase', rrulestr(
-                          "dtstart:19970902T090000\n"
-                          "rrule:freq: yearly;count: 3\n"
-                          }),
+testRecurring('testStrCase', rrulestr(
+                        "dtstart:19970902T090000\n" +
+                        "rrule:freq=yearly;count=3\n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrSpaces', rrulestr(
-                          " DTSTART:19970902T090000 "
-                          " RRULE:FREQ: YEARLY;COUNT: 3 "
-                          }),
+testRecurring('testStrSpaces', rrulestr(
+                        " DTSTART:19970902T090000 " +
+                        " RRULE:FREQ=YEARLY;COUNT=3 "
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrSpacesAndLines', rrulestr(
-                          " DTSTART:19970902T090000 \n"
-                          " \n"
-                          " RRULE:FREQ: YEARLY;COUNT: 3 \n"
-                          }),
+
+testRecurring('testStrSpacesAndLines', rrulestr(
+                        " DTSTART:19970902T090000 \n"+
+                        " \n RRULE:FREQ=YEARLY;COUNT=3 \n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrNoDTStart', rrulestr(
-                          "RRULE:FREQ: YEARLY;COUNT: 3\n"
-                          , dtstart: parse("19970902T090000")}),
+
+testRecurring('testStrNoDTStart', rrulestr(
+                        "RRULE:FREQ=YEARLY;COUNT=3\n", 
+                        {dtstart: parse("19970902T090000")}
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrValueOnly', rrulestr(
-                          "FREQ: YEARLY;COUNT: 3\n"
-                          , dtstart: parse("19970902T090000")}),
+testRecurring('testStrValueOnly', rrulestr(
+                          "FREQ=YEARLY;COUNT=3\n", 
+                          { dtstart: parse("19970902T090000") }
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrUnfold', rrulestr(
-                          "FREQ: YEA\n RLY;COUNT: 3\n", unfold: True,
-                          dtstart: parse("19970902T090000")}),
+testRecurring('testStrUnfold', rrulestr(
+                          "FREQ=YEA\n RLY;COUNT=3\n",
+                          {
+                              unfold: true,
+                              dtstart: parse("19970902T090000")
+                          }
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1998, 9, 2, 9, 0),
                       datetime(1999, 9, 2, 9, 0)])
 
-assertRecurring('testStrSet', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 2;BYDAY: RRule.TU\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 1;BYDAY: RRule.TH\n"
-                          }),
+testRecurring('testStrSet', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n" +
+                          "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
 
-assertRecurring('testStrSetDate', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 1;BYDAY: RRule.TU\n"
-                          "RDATE:19970904T090000\n"
+testRecurring('testStrSetDate', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TU\n" +
+                          "RDATE:19970904T090000\n" +
                           "RDATE:19970909T090000\n"
-                          }),
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 4, 9, 0),
                       datetime(1997, 9, 9, 9, 0)])
 
-assertRecurring('testStrSetExRule', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 6;BYDAY: RRule.TU, RRule.TH\n"
-                          "EXRULE:FREQ: YEARLY;COUNT: 3;BYDAY: RRule.TH\n"
-                          }),
+testRecurring('testStrSetExRule', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RRULE:FREQ=YEARLY;COUNT=6;BYDAY=TU,TH\n" +
+                          "EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testStrSetExDate', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 6;BYDAY: RRule.TU, RRule.TH\n"
-                          "EXDATE:19970904T090000\n"
-                          "EXDATE:19970911T090000\n"
+testRecurring('testStrSetExDate', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RRULE:FREQ=YEARLY;COUNT=6;BYDAY=TU,TH\n" +
+                          "EXDATE:19970904T090000\n" +
+                          "EXDATE:19970911T090000\n" +
                           "EXDATE:19970918T090000\n"
-                          }),
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testStrSetDateAndExDate', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RDATE:19970902T090000\n"
-                          "RDATE:19970904T090000\n"
-                          "RDATE:19970909T090000\n"
-                          "RDATE:19970911T090000\n"
-                          "RDATE:19970916T090000\n"
-                          "RDATE:19970918T090000\n"
-                          "EXDATE:19970904T090000\n"
-                          "EXDATE:19970911T090000\n"
+testRecurring('testStrSetDateAndExDate', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RDATE:19970902T090000\n" +
+                          "RDATE:19970904T090000\n" +
+                          "RDATE:19970909T090000\n" +
+                          "RDATE:19970911T090000\n" +
+                          "RDATE:19970916T090000\n" +
+                          "RDATE:19970918T090000\n" +
+                          "EXDATE:19970904T090000\n" +
+                          "EXDATE:19970911T090000\n" +
                           "EXDATE:19970918T090000\n"
-                          }),
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testStrSetDateAndExRule', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RDATE:19970902T090000\n"
-                          "RDATE:19970904T090000\n"
-                          "RDATE:19970909T090000\n"
-                          "RDATE:19970911T090000\n"
-                          "RDATE:19970916T090000\n"
-                          "RDATE:19970918T090000\n"
-                          "EXRULE:FREQ: YEARLY;COUNT: 3;BYDAY: RRule.TH\n"
-                          }),
+testRecurring('testStrSetDateAndExRule', rrulestr(
+                          "DTSTART:19970902T090000\n" +
+                          "RDATE:19970902T090000\n" +
+                          "RDATE:19970904T090000\n" +
+                          "RDATE:19970909T090000\n" +
+                          "RDATE:19970911T090000\n" +
+                          "RDATE:19970916T090000\n" +
+                          "RDATE:19970918T090000\n" +
+                          "EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n"
+                     ),
                      [datetime(1997, 9, 2, 9, 0),
                       datetime(1997, 9, 9, 9, 0),
                       datetime(1997, 9, 16, 9, 0)])
 
-assertRecurring('testStrKeywords', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 3;INTERVAL: 3;"
-                                "BYMONTH: 3;byweekday: RRule.TH;BYMONTHDAY: 3;"
-                                "BYHOUR: 3;BYMINUTE: 3;BYSECOND: 3\n"
-                          }),
+testRecurring('testStrKeywords', rrulestr(
+                        "DTSTART:19970902T090000\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=3;INTERVAL=3;" +
+                        "BYMONTH=3;byweekday=TH;BYMONTHDAY=3;" +
+                        "BYHOUR=3;BYMINUTE=3;BYSECOND=3\n"
+                     ),
                      [datetime(2033, 3, 3, 3, 3, 3),
                       datetime(2039, 3, 3, 3, 3, 3),
                       datetime(2072, 3, 3, 3, 3, 3)])
 
-assertRecurring('testStrNWeekDay', rrulestr(
-                          "DTSTART:19970902T090000\n"
-                          "RRULE:FREQ: YEARLY;COUNT: 3;BYDAY: 1TU, -1TH\n"
-                          }),
+testRecurring('testStrNWeekDay', rrulestr(
+                        "DTSTART:19970902T090000\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=3;BYDAY=1TU,-1TH\n"
+                     ),
                      [datetime(1997, 12, 25, 9, 0),
                       datetime(1998, 1, 6, 9, 0),
                       datetime(1998, 12, 31, 9, 0)])
- */
+
 /*
 assertRecurring('testBadBySetPos',
     self.assertRaises(ValueError,

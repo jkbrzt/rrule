@@ -15,7 +15,7 @@ date = datetime = function(y, m, d, h, i, s) {
  * dateutil.parser.parse
  */
 var parse = function(str) {
-    var parts = str.match(/^(\d{4})(\d{2})(\d{2}T(\d{2})(\d{2})(\d{2}))/);
+    var parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/);
     var y = parts[1], m = parts[2],
         d = parts[3], h = parts[4],
         i = parts[5], s = parts[6];
@@ -57,29 +57,34 @@ var assertDatesEqual = function(actual, expected, msg) {
 var extractTime = function(date) {
   return date != null ? date.getTime() : void 0;
 }
-var testRecurring = function(msg, rruleOrObj, expectedDates) {
-    console.log(msg)
-    var rrule, method, args;
 
-    if (rruleOrObj instanceof RRule) {
-        rrule = rruleOrObj;
+var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
+    console.log(msg)
+    var rruleOrRRuleSet, method, args;
+
+    if (rruleOrObjOrRRuleSetObj instanceof RRule || rruleOrObjOrRRuleSetObj instanceof RRuleSet) {
+        rruleOrRRuleSet = rruleOrObjOrRRuleSetObj;
         method = 'all';
         args = [];
     } else {
-        rrule = rruleOrObj.rrule;
-        method = rruleOrObj.method;
-        args = rruleOrObj.args;
+        rruleOrRRuleSet = rruleOrObjOrRRuleSetObj.rrule;
+        method = rruleOrObjOrRRuleSetObj.method;
+        args = rruleOrObjOrRRuleSetObj.args;
     }
 
     // Use text and string representation of the rrule as the message.
-    msg = msg + ' [' +
-          (rrule.isFullyConvertibleToText() ? rrule.toText() : 'no text repr') +
+    if (rruleOrRRuleSet instanceof RRule) {
+        msg = msg + ' [' +
+          (rruleOrRRuleSet.isFullyConvertibleToText() ? rruleOrRRuleSet.toText() : 'no text repr') +
           ']' +
-          ' ['  + rrule.toString() + ']';
+          ' ['  + rruleOrRRuleSet.toString() + ']';
+    } else {
+        msg = msg + rruleOrRRuleSet.toString();
+    }
 
     test(msg, function() {
 
-        var actualDates = rrule[method].apply(rrule, args);
+        var actualDates = rruleOrRRuleSet[method].apply(rruleOrRRuleSet, args);
 
         if (!(actualDates instanceof Array)) actualDates = [actualDates];
         if (!(expectedDates instanceof Array)) expectedDates = [expectedDates];
@@ -92,12 +97,12 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
         // ==========================================================
 
         if(this.ALSO_TEST_SUBSECOND_PRECISION)
-        
+
             deepEqual( actualDates.map(extractTime), expectedDates.map(extractTime));
         if (this.ALSO_TEST_STRING_FUNCTIONS) {
             // Test toString()/fromString()
-            var string = rrule.toString();
-            var rrule2 = RRule.fromString(string, rrule.options.dtstart);
+            var string = rruleOrRRuleSet.toString();
+            var rrule2 = RRule.fromString(string, rruleOrRRuleSet.options.dtstart);
             var string2 = rrule2.toString();
             equal(string, string2,
                 'toString() == fromString(toString()).toString()');
@@ -112,16 +117,16 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
         }
 
 
-        if (this.ALSO_TEST_NLP_FUNCTIONS && rrule.isFullyConvertibleToText()) {
+        if (this.ALSO_TEST_NLP_FUNCTIONS && rruleOrRRuleSet.isFullyConvertibleToText()) {
             // Test fromText()/toText().
-            var text = rrule.toText();
-            var rrule2 = RRule.fromText(text, rrule.options.dtstart);
+            var text = rruleOrRRuleSet.toText();
+            var rrule2 = RRule.fromText(text, rruleOrRRuleSet.options.dtstart);
             var text2 = rrule2.toText();
             equal(text2, text, 'toText() == fromText(toText()).toText()');
 
             // Test fromText()/toString().
-            var text = rrule.toText();
-            var rrule3 = RRule.fromText(text, rrule.options.dtstart);
+            var text = rruleOrRRuleSet.toText();
+            var rrule3 = RRule.fromText(text, rruleOrRRuleSet.options.dtstart);
             var string3 = rrule2.toString();
             equal(string3, string,
                 'toString() == fromText(toText()).toString()');
@@ -133,12 +138,12 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
             // Test before, after, and between - use the expected dates.
 
             // create a clean copy of the rrule object to bypass caching
-            rrule = rruleOrObj.clone();
+            rruleOrRRuleSet = rruleOrRRuleSet.clone();
 
             if (expectedDates.length > 2) {
                 // Test between()
                 assertDatesEqual(
-                    rrule.between(
+                    rruleOrRRuleSet.between(
                         expectedDates[0],
                         expectedDates[expectedDates.length - 1],
                         true
@@ -147,7 +152,7 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
                     'between, inc=true'
                 );
                 assertDatesEqual(
-                    rrule.between(
+                    rruleOrRRuleSet.between(
                         expectedDates[0],
                         expectedDates[expectedDates.length - 1],
                         false
@@ -169,15 +174,15 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
 
                     // Test after() and before() with inc=true.
                     assertDatesEqual(
-                        rrule.after(date, true), date, 'after, inc=true');
+                        rruleOrRRuleSet.after(date, true), date, 'after, inc=true');
                     assertDatesEqual(
-                        rrule.before(date, true), date, 'before, inc=true');
+                        rruleOrRRuleSet.before(date, true), date, 'before, inc=true');
 
                     // Test after() and before() with inc=false.
                     next && assertDatesEqual(
-                        rrule.after(date, false), next, 'after, inc=false');
+                        rruleOrRRuleSet.after(date, false), next, 'after, inc=false');
                     prev && assertDatesEqual(
-                        rrule.before(date, false), prev, 'before, inc=false');
+                        rruleOrRRuleSet.before(date, false), prev, 'before, inc=false');
 
                 }
             }
@@ -186,3 +191,17 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
 
     });
 };
+
+var testRecurringSetCount = function(msg, rrulesetObj, expectedCount) {
+    msg = msg + rrulesetObj.toString();
+    test(msg, function () {
+        var actualCount = rrulesetObj.count()
+        equal(actualCount, expectedCount)
+    })
+}
+
+var assertStrType = function (msg, rruleOrrruleSet, type) {
+    test(msg, function () {
+        ok(rruleOrrruleSet instanceof type)
+    })
+}

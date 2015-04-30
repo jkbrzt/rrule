@@ -17,7 +17,7 @@ module("RRule", {
         // NOTE: can take a longer time.
         this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
 
-        this.ALSO_TEST_SUBSECOND_PRECISION=true;
+        this.ALSO_TEST_SUBSECOND_PRECISION = true;
 
     }
 

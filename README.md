@@ -455,10 +455,12 @@ var rule = new RRule(options)
 * * * * *
 
 ### Changelog
-
 * 2.1.0
    * Removed dependency on Underscore.js (thanks @gsf).
    * Various small bugfixes and improvements.
+   * Added Millisecond precision
+     * millisecond offset extracted ftom dtstart (dtstart.getTime()%1000)
+     * each reccurence is returned with the same offset
 * 2.0.1
    * Added bower.json.
 * 2.0.0 (2013-07-16)

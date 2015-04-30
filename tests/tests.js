@@ -2278,6 +2278,22 @@ testRecurring('testSubsecondStartMonthlyByMonthDay' , new RRule({
     }),
     [new Date(1356991200001)]);
 
+test('testAfterBefore', function(){
+    "YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY".split(',').forEach( function (freq_str){
+        var date= new Date(1356991200001);
+        var rr= new RRule({
+                freq:RRule[freq_str],
+                dtstart:date
+            });
+        equal(date.getTime(), rr.options.dtstart.getTime(), "the supplied dtstart differs from RRule.options.dtstart");
+        res=rr.before(rr.after(rr.options.dtstart));
+        if (!(res == null)) {
+            // on purpose ==, so that undefined also matches
+            res=res.getTime();
+        } 
+        equal( res, rr.options.dtstart.getTime(), 'after dtstart , followed by before does not return dtstart');
+    });   
+})
 
 /* these tests basically test the iterator implementation only */
 /*

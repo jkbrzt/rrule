@@ -32,5 +32,8 @@
   "devDependencies": {
     "underscore": "~1.8.3",
     "moment-timezone": "~0.3.1"
+  },
+  "dependencies": {
+    "tz-date": "https://github.com/aramk/tz-date.git"
   }
 }

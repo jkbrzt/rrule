@@ -145,7 +145,7 @@ $ ->
                         else
                             value = getDay(value)
                     else if /^by/.test(key)
-                        if not value instanceof Array
+                        if not (value instanceof Array)
                             value = value.split(/[,\s]+/)
                         value = (v for v in value when v)
                         value = value.map (n) -> parseInt(n, 10)
@@ -155,7 +155,7 @@ $ ->
                     if key is 'wkst'
                         value = getDay(value)
 
-                    if key is 'interval' and value is 1
+                    if key is 'interval' and (value is 1 or not value)
                         continue
 
                     options[key] = value

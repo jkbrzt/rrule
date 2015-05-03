@@ -3,7 +3,7 @@
     "version": "2.1.0",
     "description": "JavaScript library for working with recurrence rules for calendar dates.",
     "homepage": "http://jakubroztocil.github.io/rrule/",
-    "keywords":[
+    "keywords": [
         "dates",
         "recurrences",
         "calendar",
@@ -12,7 +12,7 @@
     ],
     "author": "Jakub Roztocil and Lars Schöning",
     "main": "lib/rrule",
-    "repository" :{
+    "repository": {
         "type": "git",
         "url": "git://github.com/jakubroztocil/rrule.git"
     },

@@ -1,2 +1,5 @@
 node_modules/
 bower_components/
+.idea/
+.build*
+*.sublime-workspace

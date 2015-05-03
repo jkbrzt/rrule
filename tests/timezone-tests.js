@@ -6,6 +6,18 @@ module("RRule Time Zones", {
 
 });
 
+// Ensure all dates are created as TimeZoneDate.
+
+/**
+ * datetime.date/datetime.datetime
+ */
+date = datetime = function(y, m, d, h, i, s) {
+    h = h || 0;
+    i = i || 0;
+    s = s || 0;
+    return new TimeZoneDate(y, m - 1, d, h, i, s);
+};
+
 var melbTimeZone = 'Australia/Melbourne';
 var otherTimeZone = 'America/Los_Angeles';
 
@@ -60,5 +72,5 @@ test('testBetween Melbourne', function() {
     var start = new TimeZoneDate(dtstart, melbTimeZone);
     var end = new TimeZoneDate('2014-12-30T09:00:00+11:00', melbTimeZone);
     var results = rule.between(start, end);
-    equal(results[0].toString(), 'Fri Dec 26 2014 09:00:00 GMT+1100');
+    equal(results[0].toString(), 'Fri Dec 26 2014 09:00:00 GMT+1100 (AEDT)');
 });

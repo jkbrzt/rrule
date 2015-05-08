@@ -2,12 +2,19 @@
 /**
  * datetime.date/datetime.datetime
  */
-var date, datetime;
+var date, datetime, datetimeUTC;
 date = datetime = function(y, m, d, h, i, s) {
     h = h || 0;
     i = i || 0;
     s = s || 0;
     return new Date(y, m - 1, d, h, i, s);
+};
+
+datetimeUTC = function(y, m, d, h, i, s) {
+    h = h || 0;
+    i = i || 0;
+    s = s || 0;
+    return new Date(Date.UTC(y, m - 1, d, h, i, s));
 };
 
 
@@ -151,6 +158,7 @@ var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
                     expectedDates,
                     'between, inc=true'
                 );
+                console.log(msg)
                 assertDatesEqual(
                     rruleOrRRuleSet.between(
                         expectedDates[0],
@@ -158,7 +166,7 @@ var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
                         false
                     ),
                     expectedDates.slice(1, expectedDates.length - 1),
-                    'between, inc=true, inc=false'
+                    'between, inc=false'
                 );
             }
 

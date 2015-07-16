@@ -82,7 +82,7 @@ test('fromString()', function() {
 });
 
 test('toText() with weekday as integer', function() {
-    var options = {"freq":"2", "byweekday":1};
+    var options = {"freq":"2", "byweekday":0};
     var rule = new RRule(options);
     var text = "Every week on Monday";
 

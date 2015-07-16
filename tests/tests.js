@@ -81,6 +81,14 @@ test('fromString()', function() {
 
 });
 
+test('toText() with weekday as integer', function() {
+    var options = {"freq":"2", "byweekday":1};
+    var rule = new RRule(options);
+    var text = "Every week on Monday";
+
+    console.log(text, rule.toString());
+    equal(text.toLowerCase(), rule.toText().toLowerCase());
+});
 
 testRecurring(
     'missing Feb 28 https://github.com/jkbrzt/rrule/issues/21',

@@ -38,6 +38,7 @@ var texts = [
     ['Every month on the 3rd last Tuesday', 'FREQ=MONTHLY;BYDAY=-3TU'],
     ['Every month on the last Monday', 'FREQ=MONTHLY;BYDAY=-1MO'],
     ['Every month on the 2nd last Friday', 'FREQ=MONTHLY;BYDAY=-2FR'],
+    ['Every month on the 3rd, 10th, 17th and last', 'FREQ=MONTHLY;BYMONTHDAY=3,10,17,-1'],
     // This one will fail.
     // The text date should be treated as a floating one, but toString
     // always returns UTC dates.
@@ -55,6 +56,16 @@ test('fromText()', function() {
 
 });
 
+test('toText()', function() {
+    $.each(texts, function(){
+        var text = this[0],
+            string = this[1];
+        console.log(text, string)
+        equal(text.toLowerCase(), new RRule(RRule.parseString(string)).toText().toLowerCase(),
+            text + ' => ' + string);
+    });
+
+});
 
 strings = [
     ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],

@@ -81,6 +81,20 @@ test('fromString()', function() {
 
 });
 
+bysetpos_strings = [
+    ['Every month on the last Monday and last Tuesday', 'FREQ=MONTHLY;BYDAY=MO,TU;BYSETPOS=-1']
+]
+
+test('toText() with bysetpos', function() {
+    $.each(bysetpos_strings, function(){
+        var text = this[0],
+            string = this[1];
+        console.log(text, string)
+        equal(new RRule(RRule.parseString(string)).toText().toLowerCase(), text.toLowerCase(),
+            text + ' => ' + string);
+    });
+});
+
 test('toText() with weekday as integer', function() {
     var options = {"freq":"2", "byweekday":0};
     var rule = new RRule(options);
@@ -787,6 +801,15 @@ testRecurring('testMonthlyBySetPos', new RRule({freq: RRule.MONTHLY,
     [datetime(1997, 9, 13, 18, 0),
         datetime(1997, 9, 17, 6, 0),
         datetime(1997, 10, 13, 18, 0)]);
+
+testRecurring('testMonthlyBySetPosLastMonday', new RRule({freq: RRule.MONTHLY,
+    count:3,
+    byweekday:0,
+    bysetpos:-1,
+    dtstart:parse("20150701T000000")}),
+    [datetime(2015, 7, 27),
+        datetime(2015, 8, 31),
+        datetime(2015, 9, 28)]);
 
 testRecurring('testMonthlyNegByMonthDayJanFebForNonLeapYear', new RRule({freq: RRule.MONTHLY,
     count: 4,

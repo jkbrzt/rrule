@@ -38,6 +38,7 @@ var texts = [
     ['Every month on the 3rd last Tuesday', 'FREQ=MONTHLY;BYDAY=-3TU'],
     ['Every month on the last Monday', 'FREQ=MONTHLY;BYDAY=-1MO'],
     ['Every month on the 2nd last Friday', 'FREQ=MONTHLY;BYDAY=-2FR'],
+    ['Every month on the 3rd, 10th, 17th and last', 'FREQ=MONTHLY;BYMONTHDAY=3,10,17,-1'],
     // This one will fail.
     // The text date should be treated as a floating one, but toString
     // always returns UTC dates.
@@ -55,6 +56,16 @@ test('fromText()', function() {
 
 });
 
+test('toText()', function() {
+    $.each(texts, function(){
+        var text = this[0],
+            string = this[1];
+        console.log(text, string)
+        equal(text.toLowerCase(), new RRule(RRule.parseString(string)).toText().toLowerCase(),
+            text + ' => ' + string);
+    });
+
+});
 
 strings = [
     ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],
@@ -70,6 +81,28 @@ test('fromString()', function() {
 
 });
 
+bysetpos_strings = [
+    ['Every month on the last Monday and last Tuesday', 'FREQ=MONTHLY;BYDAY=MO,TU;BYSETPOS=-1']
+]
+
+test('toText() with bysetpos', function() {
+    $.each(bysetpos_strings, function(){
+        var text = this[0],
+            string = this[1];
+        console.log(text, string)
+        equal(new RRule(RRule.parseString(string)).toText().toLowerCase(), text.toLowerCase(),
+            text + ' => ' + string);
+    });
+});
+
+test('toText() with weekday as integer', function() {
+    var options = {"freq":"2", "byweekday":0};
+    var rule = new RRule(options);
+    var text = "Every week on Monday";
+
+    console.log(text, rule.toString());
+    equal(text.toLowerCase(), rule.toText().toLowerCase());
+});
 
 testRecurring(
     'missing Feb 28 https://github.com/jkbrzt/rrule/issues/21',
@@ -768,6 +801,15 @@ testRecurring('testMonthlyBySetPos', new RRule({freq: RRule.MONTHLY,
     [datetime(1997, 9, 13, 18, 0),
         datetime(1997, 9, 17, 6, 0),
         datetime(1997, 10, 13, 18, 0)]);
+
+testRecurring('testMonthlyBySetPosLastMonday', new RRule({freq: RRule.MONTHLY,
+    count:3,
+    byweekday:0,
+    bysetpos:-1,
+    dtstart:parse("20150701T000000")}),
+    [datetime(2015, 7, 27),
+        datetime(2015, 8, 31),
+        datetime(2015, 9, 28)]);
 
 testRecurring('testMonthlyNegByMonthDayJanFebForNonLeapYear', new RRule({freq: RRule.MONTHLY,
     count: 4,

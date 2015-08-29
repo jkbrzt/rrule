@@ -43,7 +43,7 @@ $ npm install rrule
 ```
 
 ```javascript
-var RRule = require('rrule').RRule;
+var RRule = require('rrule');
 ```
 
 #### Usage

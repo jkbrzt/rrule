@@ -54,7 +54,9 @@ var assertDatesEqual = function(actual, expected, msg) {
     }
 };
 
-
+var extractTime = function(date) {
+  return date != null ? date.getTime() : void 0;
+}
 var testRecurring = function(msg, rruleOrObj, expectedDates) {
     console.log(msg)
     var rrule, method, args;
@@ -85,9 +87,13 @@ var testRecurring = function(msg, rruleOrObj, expectedDates) {
         assertDatesEqual(actualDates, expectedDates);
 
 
+
         // Additional tests using the expected dates
         // ==========================================================
 
+        if(this.ALSO_TEST_SUBSECOND_PRECISION)
+        
+            deepEqual( actualDates.map(extractTime), expectedDates.map(extractTime));
         if (this.ALSO_TEST_STRING_FUNCTIONS) {
             // Test toString()/fromString()
             var string = rrule.toString();

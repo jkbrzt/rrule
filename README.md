@@ -455,7 +455,10 @@ var rule = new RRule(options)
 * * * * *
 
 ### Changelog
-
+* 2.1.0-dev
+    * Added Millisecond precision
+        * millisecond offset extracted from dtstart (dtstart.getTime()%1000)
+        * each reccurence is returned with the same offset
 * 2.1.0
    * Removed dependency on Underscore.js (thanks @gsf).
    * Various small bugfixes and improvements.

@@ -61,8 +61,8 @@ test('fromText()', function() {
 strings = [
     ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],
 
-    // Parse also `date` but return `date-time`
-    ['FREQ=WEEKLY;UNTIL=20100101', 'FREQ=WEEKLY;UNTIL=20100101T000000Z']
+    // Detect that the original RRULE uses only dates
+    ['FREQ=WEEKLY;UNTIL=20100101', 'FREQ=WEEKLY;UNTIL=20100101']
 ];
 test('fromString()', function() {
     $.each(strings, function(){

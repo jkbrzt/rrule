@@ -25,6 +25,7 @@ module("RRule", {
 
 
 var texts = [
+    ['Every day', 'FREQ=DAILY'],
     ['Every day at 10, 12 and 17', 'FREQ=DAILY;BYHOUR=10,12,17'],
     ['Every week', 'FREQ=WEEKLY'],
     ['Every hour', 'FREQ=HOURLY'],

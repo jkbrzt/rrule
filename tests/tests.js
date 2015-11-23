@@ -25,10 +25,10 @@ module("RRule", {
 
 
 var texts = [
+    ['Every day at 10, 12 and 17', 'FREQ=DAILY;BYHOUR=10,12,17'],
     ['Every week', 'FREQ=WEEKLY'],
     ['Every hour', 'FREQ=HOURLY'],
     ['Every 4 hours', 'INTERVAL=4;FREQ=HOURLY'],
-    ['Every day at 10 and 17', 'FREQ=DAILY;BYHOUR=10,17'],
     ['Every week on Tuesday', 'FREQ=WEEKLY;BYDAY=TU'],
     ['Every week on Monday, Wednesday', 'FREQ=WEEKLY;BYDAY=MO,WE'],
     ['Every weekday', 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
@@ -55,6 +55,17 @@ test('fromText()', function() {
         console.log(text, string)
         equal(RRule.fromText(text).toString(), string,
             text + ' => ' + string);
+    });
+
+});
+
+test('toText()', function() {
+    $.each(texts, function(){
+        var text = this[0],
+          string = this[1];
+        console.log(text, string)
+        equal(RRule.fromString(string).toText().toLowerCase(), text.toLowerCase(),
+          string + ' => ' + text);
     });
 
 });

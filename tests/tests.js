@@ -25,11 +25,13 @@ module("RRule", {
 
 
 var texts = [
+    ['Every week', 'FREQ=WEEKLY'],
+    ['Every hour', 'FREQ=HOURLY'],
+    ['Every 4 hours', 'INTERVAL=4;FREQ=HOURLY'],
+    ['Every day at 10 and 17', 'FREQ=DAILY;BYHOUR=10,17'],
     ['Every week on Tuesday', 'FREQ=WEEKLY;BYDAY=TU'],
     ['Every week on Monday, Wednesday', 'FREQ=WEEKLY;BYDAY=MO,WE'],
     ['Every weekday', 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
-    ['Every day', 'FREQ=DAILY'],
-    ['Every week', 'FREQ=WEEKLY'],
     ['Every 2 weeks', 'INTERVAL=2;FREQ=WEEKLY'],
     ['Every month', 'FREQ=MONTHLY'],
     ['Every 6 months', 'INTERVAL=6;FREQ=MONTHLY'],

@@ -36,7 +36,6 @@ var parse = function(str) {
 
 
 var assertDatesEqual = function(actual, expected, msg) {
-
     msg = msg ? ' [' + msg + '] ' : '';
 
     if (!(actual instanceof Array)) {
@@ -90,15 +89,17 @@ var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
     }
 
     test(msg, function() {
-
+        var time = Date.now();
         var actualDates = rruleOrRRuleSet[method].apply(rruleOrRRuleSet, args);
+        time = Date.now() - time
+
+        equal(time < 100, true,
+            rruleOrRRuleSet + '\' method "' + method + '" should finish in 100 ms, but ' + time + ' ms');
 
         if (!(actualDates instanceof Array)) actualDates = [actualDates];
         if (!(expectedDates instanceof Array)) expectedDates = [expectedDates];
 
         assertDatesEqual(actualDates, expectedDates);
-
-
 
         // Additional tests using the expected dates
         // ==========================================================
@@ -158,7 +159,6 @@ var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
                     expectedDates,
                     'between, inc=true'
                 );
-                console.log(msg)
                 assertDatesEqual(
                     rruleOrRRuleSet.between(
                         expectedDates[0],
@@ -199,14 +199,6 @@ var testRecurring = function(msg, rruleOrObjOrRRuleSetObj, expectedDates) {
 
     });
 };
-
-var testRecurringSetCount = function(msg, rrulesetObj, expectedCount) {
-    msg = msg + rrulesetObj.toString();
-    test(msg, function () {
-        var actualCount = rrulesetObj.count()
-        equal(actualCount, expectedCount)
-    })
-}
 
 var assertStrType = function (msg, rruleOrrruleSet, type) {
     test(msg, function () {

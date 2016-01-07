@@ -655,7 +655,7 @@ the parser documentation.
 * 1.0.0-beta (2012-08-15)
    * Initial public release.
 
-Up
+
 #### Authors
 
 * [Jakub Roztocil](http://roztocil.co/)

@@ -171,7 +171,33 @@ testRecurring('testBetweenInc',
     ]
 );
 
+test('testBetweenInvalidBefore', function () {
+    var rule = new RRule({freq: RRule.WEEKLY, byweekday: RRule.MO, dtstart: parse("19970902T090000")});
+    assert.throws(
+        function() {
+            rule.between(rule.options.dstart, new Date(undefined), true, function(occurrence, i) {
+                return true;
+            });
+        },
+        function (err) {
+            return err.message === 'Invalid before date';
+        }
+    );
+});
 
+test('testBetweenInvalidAfter', function () {
+    var rule = new RRule({freq: RRule.WEEKLY, byweekday: RRule.MO, dtstart: parse("19970902T090000")});
+    assert.throws(
+        function() {
+            rule.between(new Date(undefined), parse("19970906T090000"), true, function(occurrence, i) {
+                return true;
+            });
+        },
+        function (err) {
+            return err.message === 'Invalid after date';
+        }
+    );
+});
 
 testRecurring('testYearly', new RRule({freq: RRule.YEARLY,
     count:3,

@@ -621,6 +621,8 @@ the parser documentation.
     * Added Millisecond precision
         * Millisecond offset extracted from `dtstart` (`dtstart.getTime() % 1000`)
         * Each recurrence is returned with the same offset
+    * Added some NLP support for hourly and byhour.
+    * Fixed export in nlp.js.
 * 2.1.0
    * Removed dependency on Underscore.js (thanks, @gsf).
    * Various small bugfixes and improvements.

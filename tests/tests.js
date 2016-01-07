@@ -50,7 +50,7 @@ test('fromText()', function() {
     $.each(texts, function(){
         var text = this[0],
             string = this[1];
-        console.log(text, string)
+
         equal(RRule.fromText(text).toString(), string,
             text + ' => ' + string);
     });
@@ -2270,10 +2270,10 @@ testRecurring('testSubsecondStartYearly' , new RRule({
     [new Date(1420063200001)]);
 
 testRecurring('testSubsecondStartMonthlyByMonthDay' , new RRule({
-    
+
     freq: RRule.MONTHLY,
     count: 1,
-    bysetpos: [-1,1] ,   
+    bysetpos: [-1,1] ,
     dtstart:new Date(1356991200001)
     }),
     [new Date(1356991200001)]);
@@ -2290,9 +2290,9 @@ test('testAfterBefore', function(){
         if (!(res == null)) {
             // on purpose ==, so that undefined also matches
             res=res.getTime();
-        } 
+        }
         equal( res, rr.options.dtstart.getTime(), 'after dtstart , followed by before does not return dtstart');
-    });   
+    });
 })
 
 /* these tests basically test the iterator implementation only */
@@ -2724,3 +2724,397 @@ assertRecurring('testBadBySetPosMany',
                              count: 1,
                              bysetpos: [-1, 0, 1],
                              dtstart: parse("19970902T090000")) */
+
+module("RRuleSet", {
+
+    setup: function() {
+
+        // Enable additional toString() / fromString() tests
+        //for each testRecurring().
+        this.ALSO_TEST_STRING_FUNCTIONS = false;
+
+        // Enable additional toText() / fromText() tests
+        // for each testRecurring().
+        // Many of the tests fail because the conversion is only approximate,
+        // but it gives an idea about how well or bad it converts.
+        this.ALSO_TEST_NLP_FUNCTIONS = false;
+
+        // Thorough after()/before()/between() tests.
+        // NOTE: can take a longer time.
+        this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
+
+    }
+
+});
+
+testRecurring('testSet',(
+    set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
+                    dtstart: parse("19970902T090000")})),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 4, 9, 0),
+                      datetime(1997, 9, 9, 9, 0)])
+
+testRecurring('testSetDate',(
+    set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TU,
+                    dtstart: parse("19970902T090000")})),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 4, 9, 0),
+                      datetime(1997, 9, 9, 9, 0)])
+
+testRecurring('testSetExRule',
+    (set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 6, byweekday: [RRule.TU, RRule.TH],
+                    dtstart: parse("19970902T090000")})),
+    set.exrule(new RRule({freq: RRule.YEARLY,  count: 3, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 9, 9, 0),
+                      datetime(1997, 9, 16, 9, 0)])
+
+testRecurring('testSetExDate',
+    (set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 6, byweekday: [RRule.TU, RRule.TH],
+                    dtstart: parse("19970902T090000")})),
+    set.exdate(datetime(1997, 9, 4, 9)),
+    set.exdate(datetime(1997, 9, 11, 9)),
+    set.exdate(datetime(1997, 9, 18, 9)),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 9, 9, 0),
+                      datetime(1997, 9, 16, 9, 0)])
+
+testRecurring('testSetExDateRevOrder',
+    (set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.MONTHLY,  count: 5, bymonthday: 10,
+                    dtstart: parse("20040101T090000")})),
+    set.exdate(datetime(2004, 4, 10, 9, 0)),
+    set.exdate(datetime(2004, 2, 10, 9, 0)),
+    set),
+                     [datetime(2004, 1, 10, 9, 0),
+                      datetime(2004, 3, 10, 9, 0),
+                      datetime(2004, 5, 10, 9, 0)])
+
+testRecurring('testSetDateAndExDate',
+    (set = new RRuleSet(),
+    set.rdate(datetime(1997, 9, 2, 9)),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
+    set.rdate(datetime(1997, 9, 11, 9)),
+    set.rdate(datetime(1997, 9, 16, 9)),
+    set.rdate(datetime(1997, 9, 18, 9)),
+    set.exdate(datetime(1997, 9, 4, 9)),
+    set.exdate(datetime(1997, 9, 11, 9)),
+    set.exdate(datetime(1997, 9, 18, 9)),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 9, 9, 0),
+                      datetime(1997, 9, 16, 9, 0)])
+
+testRecurring('testSetDateAndExRule',
+    (set = new RRuleSet(),
+    set.rdate(datetime(1997, 9, 2, 9)),
+    set.rdate(datetime(1997, 9, 4, 9)),
+    set.rdate(datetime(1997, 9, 9, 9)),
+    set.rdate(datetime(1997, 9, 11, 9)),
+    set.rdate(datetime(1997, 9, 16, 9)),
+    set.rdate(datetime(1997, 9, 18, 9)),
+    set.exrule(new RRule({freq: RRule.YEARLY,  count: 3, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 9, 9, 0),
+                      datetime(1997, 9, 16, 9, 0)])
+
+testRecurring('testSetCachePre',
+    (set = new RRuleSet(),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
+                    dtstart: parse("19970902T090000")})),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 4, 9, 0),
+                      datetime(1997, 9, 9, 9, 0)])
+
+testRecurring('testSetCachePost',
+    (set = new RRuleSet(true),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
+                    dtstart: parse("19970902T090000")})),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set.all(),
+    set),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 4, 9, 0),
+                      datetime(1997, 9, 9, 9, 0)])
+
+testRecurring('testSetInfiniteAll',
+    {
+        rrule: (set = new RRuleSet(),
+                set.rrule(new RRule({freq: RRule.YEARLY, dtstart: parse("19970902T090000")})),
+                set.exrule(new RRule({freq: RRule.YEARLY, count: 10, dtstart: parse("19970902T090000")})),
+                set),
+        method: 'all',
+        args: [function (date, count) {
+            return count < 3
+        }]
+    },
+    [
+        datetime(2007, 9, 2, 9, 0),
+        datetime(2008, 9, 2, 9, 0),
+        datetime(2009, 9, 2, 9, 0)
+    ]
+);
+
+testRecurring('testSetInfiniteBetween',
+    {
+        rrule: (set = new RRuleSet(),
+                set.rrule(new RRule({freq: RRule.YEARLY, dtstart: parse("19970902T090000")})),
+                set.exrule(new RRule({freq: RRule.YEARLY, count: 10, dtstart: parse("19970902T090000")})),
+                set),
+        method: 'between',
+        args: [datetime(2000, 9, 2, 9, 0), datetime(2010, 9, 2, 9, 0)]
+    },
+    [
+        datetime(2007, 9, 2, 9, 0),
+        datetime(2008, 9, 2, 9, 0),
+        datetime(2009, 9, 2, 9, 0)
+    ]
+);
+
+testRecurring('testSetInfiniteBefore',
+    {
+        rrule: (set = new RRuleSet(),
+                set.rrule(new RRule({freq: RRule.YEARLY, dtstart: parse("19970902T090000")})),
+                set.exrule(new RRule({freq: RRule.YEARLY, count: 10, dtstart: parse("19970902T090000")})),
+                set),
+        method: 'before',
+        args: [datetime(2015, 9, 2, 9, 0), false]
+    },
+    [
+        datetime(2014, 9, 2, 9, 0)
+    ]
+);
+
+testRecurring('testSetInfiniteAfter',
+    {
+        rrule: (set = new RRuleSet(),
+                set.rrule(new RRule({freq: RRule.YEARLY, dtstart: parse("19970902T090000")})),
+                set.exrule(new RRule({freq: RRule.YEARLY, count: 10, dtstart: parse("19970902T090000")})),
+                set),
+        method: 'after',
+        args: [datetime(2000, 9, 2, 9, 0), false]
+    },
+    [
+        datetime(2007, 9, 2, 9, 0)
+    ]
+);
+
+/*
+testRecurring('testSetCachePostInternal',
+    (set = new RRuleSet(true),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 2, byweekday: RRule.TU,
+                    dtstart: parse("19970902T090000")})),
+    set.rrule(new RRule({freq: RRule.YEARLY,  count: 1, byweekday: RRule.TH,
+                    dtstart: parse("19970902T090000")})),
+    set.all(),
+    set._cache),
+                     [datetime(1997, 9, 2, 9, 0),
+                      datetime(1997, 9, 4, 9, 0),
+                      datetime(1997, 9, 9, 9, 0)])*/
+
+module("rrulestr", {
+
+    setup: function() {
+
+        // Enable additional toString() / fromString() tests
+        //for each testRecurring().
+        this.ALSO_TEST_STRING_FUNCTIONS = false;
+
+        // Enable additional toText() / fromText() tests
+        // for each testRecurring().
+        // Many of the tests fail because the conversion is only approximate,
+        // but it gives an idea about how well or bad it converts.
+        this.ALSO_TEST_NLP_FUNCTIONS = false;
+
+        // Thorough after()/before()/between() tests.
+        // NOTE: can take a longer time.
+        this.ALSO_TEST_BEFORE_AFTER_BETWEEN = true;
+
+    }
+
+});
+
+testRecurring('testStr', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=3\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1998, 9, 2, 9, 0),
+                      datetimeUTC(1999, 9, 2, 9, 0)])
+
+assertStrType('testStrType', rrulestr(
+    "DTSTART:19970902T090000Z\n" +
+    "RRULE:FREQ=YEARLY;COUNT=3\n"
+    ), RRule)
+
+assertStrType('testStrForceSetType', rrulestr(
+    "DTSTART:19970902T090000Z\n" +
+    "RRULE:FREQ=YEARLY;COUNT=3\n", {
+        forceset: true
+}), RRuleSet)
+
+assertStrType('testStrSetType', rrulestr(
+    "DTSTART:19970902T090000Z\n" +
+    "RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n" +
+    "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n"
+), RRuleSet)
+
+testRecurring('testStrCase', rrulestr(
+                        "dtstart:19970902T090000Z\n" +
+                        "rrule:freq=yearly;count=3\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1998, 9, 2, 9, 0),
+                      datetimeUTC(1999, 9, 2, 9, 0)])
+
+testRecurring('testStrSpaces', rrulestr(
+                        " DTSTART:19970902T090000Z " +
+                        " RRULE:FREQ=YEARLY;COUNT=3 "
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1998, 9, 2, 9, 0),
+                      datetimeUTC(1999, 9, 2, 9, 0)])
+
+
+testRecurring('testStrSpacesAndLines', rrulestr(
+                        " DTSTART:19970902T090000Z \n"+
+                        " \n RRULE:FREQ=YEARLY;COUNT=3 \n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1998, 9, 2, 9, 0),
+                      datetimeUTC(1999, 9, 2, 9, 0)])
+
+
+testRecurring('testStrNoDTStart', rrulestr(
+                        "RRULE:FREQ=YEARLY;COUNT=3\n",
+                        {dtstart: parse("19970902T090000")}
+                    ),
+                    [datetime(1997, 9, 2, 9, 0),
+                      datetime(1998, 9, 2, 9, 0),
+                      datetime(1999, 9, 2, 9, 0)])
+
+testRecurring('testStrValueOnly', rrulestr(
+                        "FREQ=YEARLY;COUNT=3\n",
+                        { dtstart: parse("19970902T090000") }
+                    ),
+                    [datetime(1997, 9, 2, 9, 0),
+                      datetime(1998, 9, 2, 9, 0),
+                      datetime(1999, 9, 2, 9, 0)])
+
+testRecurring('testStrUnfold', rrulestr(
+                        "FREQ=YEA\n RLY;COUNT=3\n",
+                        {
+                            unfold: true,
+                            dtstart: parse("19970902T090000")
+                        }
+                    ),
+                    [datetime(1997, 9, 2, 9, 0),
+                      datetime(1998, 9, 2, 9, 0),
+                      datetime(1999, 9, 2, 9, 0)])
+
+testRecurring('testStrSet', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 4, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0)])
+
+testRecurring('testStrSetDate', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TU\n" +
+                        "RDATE:19970904T090000Z\n" +
+                        "RDATE:19970909T090000Z\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 4, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0)])
+
+testRecurring('testStrSetExRule', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=6;BYDAY=TU,TH\n" +
+                        "EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0),
+                      datetimeUTC(1997, 9, 16, 9, 0)])
+
+testRecurring('testStrSetExDate', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=6;BYDAY=TU,TH\n" +
+                        "EXDATE:19970904T090000Z\n" +
+                        "EXDATE:19970911T090000Z\n" +
+                        "EXDATE:19970918T090000Z\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0),
+                      datetimeUTC(1997, 9, 16, 9, 0)])
+
+testRecurring('testStrSetDateAndExDate', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RDATE:19970902T090000Z\n" +
+                        "RDATE:19970904T090000Z\n" +
+                        "RDATE:19970909T090000Z\n" +
+                        "RDATE:19970911T090000Z\n" +
+                        "RDATE:19970916T090000Z\n" +
+                        "RDATE:19970918T090000Z\n" +
+                        "EXDATE:19970904T090000Z\n" +
+                        "EXDATE:19970911T090000Z\n" +
+                        "EXDATE:19970918T090000Z\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0),
+                      datetimeUTC(1997, 9, 16, 9, 0)])
+
+testRecurring('testStrSetDateAndExRule', rrulestr(
+                        "DTSTART:19970902T090000Z\n" +
+                        "RDATE:19970902T090000Z\n" +
+                        "RDATE:19970904T090000Z\n" +
+                        "RDATE:19970909T090000Z\n" +
+                        "RDATE:19970911T090000Z\n" +
+                        "RDATE:19970916T090000Z\n" +
+                        "RDATE:19970918T090000Z\n" +
+                        "EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n"
+                    ),
+                    [datetimeUTC(1997, 9, 2, 9, 0),
+                      datetimeUTC(1997, 9, 9, 9, 0),
+                      datetimeUTC(1997, 9, 16, 9, 0)])
+/*
+testRecurring('testStrKeywords', rrulestr(
+                        "DTSTART:19970902T030000Z\n" +
+                        "RRULE:FREQ=YEARLY;COUNT=3;INTERVAL=3;" +
+                        "BYMONTH=3;byweekday=TH;BYMONTHDAY=3;" +
+                        "BYHOUR=3;BYMINUTE=3;BYSECOND=3\n"
+                    ),
+                    [datetimeUTC(2033, 3, 3, 3, 3, 3),
+                      datetimeUTC(2039, 3, 3, 3, 3, 3),
+                      datetimeUTC(2072, 3, 3, 3, 3, 3)])*/
+
+testRecurring('testStrNWeekDay', rrulestr(
+                      "DTSTART:19970902T090000Z\n" +
+                      "RRULE:FREQ=YEARLY;COUNT=3;BYDAY=1TU,-1TH\n"
+                    ),
+                    [datetimeUTC(1997, 12, 25, 9, 0),
+                      datetimeUTC(1998, 1, 6, 9, 0),
+                      datetimeUTC(1998, 12, 31, 9, 0)])

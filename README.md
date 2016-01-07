@@ -45,11 +45,14 @@ $ npm install rrule
 
 ```javascript
 var RRule = require('rrule').RRule;
+var RRuleSet = require('rrule').RRuleSet;
+var rrulestr = require('rrule').rrulestr;
 ```
 
 #### Usage
 
-```javascript
+**RRule:**
+```js
 // Create a rule:
 var rule = new RRule({
     freq: RRule.WEEKLY,
@@ -81,6 +84,70 @@ rule.toString();
 // The output can be used with RRule.fromText().
 rule.toText()
 "every 5 weeks on Monday, Friday until January 31, 2013"
+```
+
+**RRuleSet:**
+```js
+var rruleSet = new RRuleSet();
+
+// Add a rrule to rruleSet
+rruleSet.rrule(new RRule({
+    freq: RRule.MONTHLY,
+    count: 5,
+    dtstart: new Date(2012, 1, 1, 10, 30)
+}));
+
+// Add a date to rruleSet
+rruleSet.rdate(new Date(2012, 6, 1, 10, 30));
+
+// Add another date to rruleSet
+rruleSet.rdate(new Date(2012, 6, 2, 10, 30));
+
+// Add a exclusion rrule to rruleSet
+rruleSet.exrule(new r.RRule({
+    freq: RRule.MONTHLY,
+    count: 2,
+    dtstart: new Date(2012, 2, 1, 10, 30)
+}));
+
+// Add a exclusion date to rruleSet
+rruleSet.exdate(new Date(2012, 5, 1, 10, 30));
+
+// Get all occurrence dates (Date instances):
+rruleSet.all();
+['Wed Feb 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Tue May 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Mon Jul 02 2012 10:30:00 GMT+0800 (CST)']
+
+// Get a slice:
+rruleSet.between(new Date(2012, 2, 1), new Date(2012, 6, 2))
+['Tue May 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)']
+
+ // To string
+rruleSet.valueOf();
+['RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z',
+ 'RDATE:20120701T023000Z,20120702T023000Z',
+ 'EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z',
+ 'EXDATE:20120601T023000Z']
+
+// To string
+rruleSet.toString();
+'["RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z","RDATE:20120701T023000Z,20120702T023000Z","EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z","EXDATE:20120601T023000Z"]'
+```
+
+**rrulestr:**
+```js
+// Parse a RRule string, return a RRule object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z');
+
+// Parse a RRule string, return a RRuleSet object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true});
+
+// Parse a RRuleSet string, return a RRuleSet object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z');
+
 ```
 
 For more examples see
@@ -451,6 +518,99 @@ options = RRule.parseText('every day for 3 times')
 options.dtstart = new Date(2000, 1, 1)
 var rule = new RRule(options)
 ```
+
+
+* * * * *
+
+#### `RRuleSet` Constructor
+
+```javascript
+new RRuleSet([noCache=false])
+```
+
+The RRuleSet instance allows more complex recurrence setups, mixing multiple
+ rules, dates, exclusion rules, and exclusion dates.
+
+Default `noCache` argument is `false`, caching of results will be enabled,
+improving performance of multiple queries considerably.
+
+##### `RRuleSet.prototype.rrule(rrule)`
+
+Include the given rrule instance in the recurrence set generation.
+
+##### `RRuleSet.prototype.rdate(dt)`
+Include the given datetime instance in the recurrence set generation.
+
+##### `RRuleSet.prototype.exrule(rrule)`
+Include the given rrule instance in the recurrence set exclusion list. Dates
+which are part of the given recurrence rules will not be generated, even if
+some inclusive rrule or rdate matches them.
+
+##### `RRuleSet.prototype.exdate(dt)`
+Include the given datetime instance in the recurrence set exclusion list. Dates
+included that way will not be generated, even if some inclusive rrule or
+rdate matches them.
+
+##### `RRuleSet.prototype.all([iterator])`
+
+Same as `RRule.prototype.all`.
+
+##### `RRuleSet.prototype.between(after, before, inc=false [, iterator])`
+
+Same as `RRule.prototype.between`.
+
+##### `RRuleSet.prototype.before(dt, inc=false)`
+
+Same as `RRule.prototype.before`.
+
+##### `RRuleSet.prototype.after(dt, inc=false)`
+
+Same as `RRule.prototype.after`.
+
+* * * * *
+
+#### `rrulestr` Function
+
+```javascript
+rrulestr(rruleStr[, options]);
+```
+
+The `rrulestr` function is a parser for RFC-like syntaxes. The string passed
+as parameter may be a multiple line string, a single line string, or just the
+RRULE property value.
+
+Additionally, it accepts the following keyword arguments:
+
+`cache`
+If True, the rruleset or rrule created instance will cache its results.
+Default is not to cache.
+
+`dtstart`
+If given, it must be a datetime instance that will be used when no DTSTART
+property is found in the parsed string. If it is not given, and the property
+is not found, datetime.now() will be used instead.
+
+`unfold`
+If set to True, lines will be unfolded following the RFC specification. It
+defaults to False, meaning that spaces before every line will be stripped.
+
+`forceset`
+If set to True a rruleset instance will be returned, even if only a single rule
+is found. The default is to return an rrule if possible, and an rruleset if necessary.
+
+`compatible`
+If set to True, the parser will operate in RFC-compatible mode. Right now it
+means that unfold will be turned on, and if a DTSTART is found, it will be
+considered the first recurrence instance, as documented in the RFC.
+
+`ignoretz`
+If set to True, the date parser will ignore timezone information available in
+the DTSTART property, or the UNTIL attribute.
+
+`tzinfos`
+If set, it will be passed to the datetime string parser to resolve unknown
+timezone settings. For more information about what could be used here, check
+the parser documentation.
 
 * * * * *
 

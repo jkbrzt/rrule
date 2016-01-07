@@ -615,12 +615,14 @@ the parser documentation.
 * * * * *
 
 ### Changelog
-* 2.1.0-dev
+* 2.2.0-dev
+    * Added support `RRuleSet`, which allows more complex recurrence setups, 
+      mixing multiple rules, dates, exclusion rules, and exclusion dates.
     * Added Millisecond precision
-        * millisecond offset extracted from dtstart (dtstart.getTime()%1000)
-        * each reccurence is returned with the same offset
+        * Millisecond offset extracted from `dtstart` (`dtstart.getTime() % 1000`)
+        * Each recurrence is returned with the same offset
 * 2.1.0
-   * Removed dependency on Underscore.js (thanks @gsf).
+   * Removed dependency on Underscore.js (thanks, @gsf).
    * Various small bugfixes and improvements.
 * 2.0.1
    * Added bower.json.
@@ -653,10 +655,10 @@ the parser documentation.
 * 1.0.0-beta (2012-08-15)
    * Initial public release.
 
-
+Up
 #### Authors
 
-* [Jakub Roztocil](http://subtleapps.com/)
+* [Jakub Roztocil](http://roztocil.co/)
     ([@jkbrzt](http://twitter.com/jkbrzt))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 

@@ -1,22 +1,35 @@
 {
-    "name": "rrule",
-    "version": "2.2.0-dev",
-    "description": "JavaScript library for working with recurrence rules for calendar dates.",
-    "homepage": "http://jkbrzt.github.io/rrule/",
-    "keywords":[
-        "dates",
-        "recurrences",
-        "calendar",
-        "icalendar",
-        "rfc"
-    ],
-    "author": "Jakub Roztocil and Lars Schöning",
-    "main": "lib/rrule",
-    "repository" :{
-        "type": "git",
-        "url": "git://github.com/jkbrzt/rrule.git"
-    },
-    "scripts": {
-        "test": "echo Run tests in the browser at tests/index.html"
-    }
+  "name": "rrule",
+  "version": "2.2.0-dev",
+  "description": "JavaScript library for working with recurrence rules for calendar dates.",
+  "homepage": "http://jkbrzt.github.io/rrule/",
+  "keywords": [
+    "dates",
+    "recurrences",
+    "calendar",
+    "icalendar",
+    "rfc"
+  ],
+  "author": "Jakub Roztocil and Lars Schöning",
+  "main": "lib/rrule",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jkbrzt/rrule.git"
+  },
+  "scripts": {
+    "test": "standard"
+  },
+  "devDependencies": {
+    "standard": "^5.4.1"
+  },
+  "standard": {
+    "ignore": [
+      "tests/demo",
+      "tests/vendor"
+    ]
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ]
 }

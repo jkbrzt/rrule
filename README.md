@@ -3,6 +3,11 @@ rrule.js
 
 **Library for working with recurrence rules for calendar dates.**
 
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![js-standard-style][js-standard-image]][js-standard-url]
+[![Downloads][downloads-image]][downloads-url]
+
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](http://www.ietf.org/rfc/rfc2445.txt). It is a partial port of the
 `rrule` module from the excellent
@@ -16,8 +21,6 @@ to natural language.
 ### Quick Start
 
 -   [Demo app](http://jkbrzt.github.io/rrule/)
--   [Test suite](http://jkbrzt.github.io/rrule/tests/index.html)
-
 
 #### Client Side
 
@@ -44,9 +47,9 @@ $ npm install rrule
 ```
 
 ```javascript
-var RRule = require('rrule').RRule;
-var RRuleSet = require('rrule').RRuleSet;
-var rrulestr = require('rrule').rrulestr;
+var RRule = require('rrule').RRule
+var RRuleSet = require('rrule').RRuleSet
+var rrulestr = require('rrule').rrulestr
 ```
 
 #### Usage
@@ -55,15 +58,15 @@ var rrulestr = require('rrule').rrulestr;
 ```js
 // Create a rule:
 var rule = new RRule({
-    freq: RRule.WEEKLY,
-    interval: 5,
-    byweekday: [RRule.MO, RRule.FR],
-    dtstart: new Date(2012, 1, 1, 10, 30),
-    until: new Date(2012, 12, 31)
-});
+  freq: RRule.WEEKLY,
+  interval: 5,
+  byweekday: [RRule.MO, RRule.FR],
+  dtstart: new Date(2012, 1, 1, 10, 30),
+  until: new Date(2012, 12, 31)
+})
 
 // Get all occurrence dates (Date instances):
-rule.all();
+rule.all()
 ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
  'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',
  'Fri Mar 09 2012 10:30:00 GMT+0100 (CET)',
@@ -77,7 +80,7 @@ rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
 
 // Get an iCalendar RRULE string representation:
 // The output can be used with RRule.fromString().
-rule.toString();
+rule.toString()
 "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 // Get a human-friendly text representation:
@@ -88,33 +91,33 @@ rule.toText()
 
 **RRuleSet:**
 ```js
-var rruleSet = new RRuleSet();
+var rruleSet = new RRuleSet()
 
 // Add a rrule to rruleSet
 rruleSet.rrule(new RRule({
-    freq: RRule.MONTHLY,
-    count: 5,
-    dtstart: new Date(2012, 1, 1, 10, 30)
-}));
+  freq: RRule.MONTHLY,
+  count: 5,
+  dtstart: new Date(2012, 1, 1, 10, 30)
+}))
 
 // Add a date to rruleSet
-rruleSet.rdate(new Date(2012, 6, 1, 10, 30));
+rruleSet.rdate(new Date(2012, 6, 1, 10, 30))
 
 // Add another date to rruleSet
-rruleSet.rdate(new Date(2012, 6, 2, 10, 30));
+rruleSet.rdate(new Date(2012, 6, 2, 10, 30))
 
 // Add a exclusion rrule to rruleSet
 rruleSet.exrule(new r.RRule({
-    freq: RRule.MONTHLY,
-    count: 2,
-    dtstart: new Date(2012, 2, 1, 10, 30)
-}));
+  freq: RRule.MONTHLY,
+  count: 2,
+  dtstart: new Date(2012, 2, 1, 10, 30)
+}))
 
 // Add a exclusion date to rruleSet
-rruleSet.exdate(new Date(2012, 5, 1, 10, 30));
+rruleSet.exdate(new Date(2012, 5, 1, 10, 30))
 
 // Get all occurrence dates (Date instances):
-rruleSet.all();
+rruleSet.all()
 ['Wed Feb 01 2012 10:30:00 GMT+0800 (CST)',
  'Tue May 01 2012 10:30:00 GMT+0800 (CST)',
  'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)',
@@ -126,33 +129,32 @@ rruleSet.between(new Date(2012, 2, 1), new Date(2012, 6, 2))
  'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)']
 
  // To string
-rruleSet.valueOf();
+rruleSet.valueOf()
 ['RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z',
  'RDATE:20120701T023000Z,20120702T023000Z',
  'EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z',
  'EXDATE:20120601T023000Z']
 
 // To string
-rruleSet.toString();
+rruleSet.toString()
 '["RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z","RDATE:20120701T023000Z,20120702T023000Z","EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z","EXDATE:20120601T023000Z"]'
 ```
 
 **rrulestr:**
 ```js
 // Parse a RRule string, return a RRule object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z');
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z')
 
 // Parse a RRule string, return a RRuleSet object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true});
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true})
 
 // Parse a RRuleSet string, return a RRuleSet object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z');
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z')
 
 ```
 
 For more examples see
-[tests/tests.js](https://github.com/jkbrzt/rrule/blob/master/tests/tests.js)
-and [python-dateutil](http://labix.org/python-dateutil/) documentation.
+[python-dateutil](http://labix.org/python-dateutil/) documentation.
 
 ### API
 
@@ -372,7 +374,7 @@ rule.all()
  'Mon Apr 09 2012 10:30:00 GMT+0200 (CEST)',
  /* … */]
 
-rule.all(function (date, i){return i < 2});
+rule.all(function (date, i){return i < 2})
 ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
  'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',]
 ```
@@ -422,7 +424,7 @@ Returns a string representation of the rule as per the iCalendar RFC.
 Only properties explicitly specified in `options` are included:
 
 ```javascript
-rule.toString();
+rule.toString()
 "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 rule.toString() == RRule.optionsToString(rule.origOptions)
@@ -441,8 +443,8 @@ RRule.optionsToString(rule.options)
 
 // Cherry-pick only some options from an rrule:
 RRule.optionsToString({
-    freq: rule.options.freq,
-    dtstart: rule.options.dtstart,
+  freq: rule.options.freq,
+  dtstart: rule.options.dtstart
 })
 "FREQ=WEEKLY;DTSTART=20120201T093000Z"
 ```
@@ -571,8 +573,8 @@ Same as `RRule.prototype.after`.
 
 #### `rrulestr` Function
 
-```javascript
-rrulestr(rruleStr[, options]);
+```js
+rrulestr(rruleStr[, options])
 ```
 
 The `rrulestr` function is a parser for RFC-like syntaxes. The string passed
@@ -614,9 +616,13 @@ the parser documentation.
 
 * * * * *
 
+### Development
+
+rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+
 ### Changelog
 * 2.2.0-dev
-    * Added support `RRuleSet`, which allows more complex recurrence setups, 
+    * Added support `RRuleSet`, which allows more complex recurrence setups,
       mixing multiple rules, dates, exclusion rules, and exclusion dates.
     * Added Millisecond precision
         * Millisecond offset extracted from `dtstart` (`dtstart.getTime() % 1000`)
@@ -669,3 +675,15 @@ Niemeyer](http://niemeyer.net/).
 
 See [LICENCE](https://github.com/jkbrzt/rrule/blob/master/LICENCE) for
 more details.
+
+[npm-url]: https://npmjs.org/package/rrule
+[npm-image]: http://img.shields.io/npm/v/rrule.svg
+
+[travis-url]: https://travis-ci.org/jkbrzt/rrule
+[travis-image]: http://img.shields.io/travis/jkbrzt/rrule.svg
+
+[downloads-url]: https://npmjs.org/package/rrule
+[downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
+
+[js-standard-url]: https://github.com/feross/standard
+[js-standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat

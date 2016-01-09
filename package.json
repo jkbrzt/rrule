@@ -17,15 +17,15 @@
     "url": "git://github.com/jkbrzt/rrule.git"
   },
   "scripts": {
-    "test": "standard"
+    "test": "standard && mocha"
   },
   "devDependencies": {
+    "mocha": "^2.3.4",
     "standard": "^5.4.1"
   },
   "standard": {
     "ignore": [
-      "tests/demo",
-      "tests/vendor"
+      "demo"
     ]
   },
   "files": [

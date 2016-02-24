@@ -9,7 +9,8 @@ rrule.js
 [![Downloads][downloads-image]][downloads-url]
 
 rrule.js supports recurrence rules as defined in the [iCalendar
-RFC](http://www.ietf.org/rfc/rfc2445.txt). It is a partial port of the
+RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important
+[differences](#differences-from-icalendar-rfc). It is a partial port of the
 `rrule` module from the excellent
 [python-dateutil](http://labix.org/python-dateutil/) library. On top of
 that, it supports parsing and serialization of recurrence rules from and
@@ -615,6 +616,36 @@ timezone settings. For more information about what could be used here, check
 the parser documentation.
 
 * * * * *
+
+### Differences From iCalendar RFC
+
+* `RRule` has no `byday` keyword. The equivalent keyword has been replaced by
+the `byweekday` keyword, to remove the ambiguity present in the original
+keyword.
+* Unlike documented in the RFC, the starting datetime, `dtstart`, is
+not the first recurrence instance, unless it does fit in the specified rules.
+This is in part due to this project being a port of
+[python-dateutil](https://labix.org/python-dateutil#head-a65103993a21b717f6702063f3717e6e75b4ba66),
+which has the same non-compliant functionality. Note that you can get the
+original behavior by using a `RRuleSet` and adding the `dtstart` as an `rdate`.
+
+```javascript
+var rruleSet = new RRuleSet()
+var start = new Date(2012, 1, 1, 10, 30)
+
+// Add a rrule to rruleSet
+rruleSet.rrule(new RRule({
+  freq: RRule.MONTHLY,
+  count: 5,
+  dtstart: start
+}))
+
+// Add a date to rruleSet
+rruleSet.rdate(start)
+```
+
+* Unlike documented in the RFC, every keyword is valid on every frequency (the
+RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 ### Development
 

@@ -19,6 +19,9 @@
   "scripts": {
     "test": "standard && mocha"
   },
+  "dependencies": {
+    "moment-timezone": "^0.5.3",
+  },
   "devDependencies": {
     "mocha": "^2.3.4",
     "standard": "^5.4.1"

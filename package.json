@@ -20,7 +20,7 @@
     "test": "standard && mocha"
   },
   "dependencies": {
-    "moment-timezone": "^0.5.3",
+    "moment-timezone": "^0.5.3"
   },
   "devDependencies": {
     "mocha": "^2.3.4",

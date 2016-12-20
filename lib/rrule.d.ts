@@ -76,6 +76,6 @@ declare module __RRule {
   }
 }
 
-declare module "rrule" {
+declare module "rrule-alt" {
   export = __RRule;
 }

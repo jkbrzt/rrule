@@ -3480,10 +3480,10 @@ describe('RRule', function () {
   )
 
   it('testAfterBefore', function () {
-    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freq_str) {
+    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freqStr) {
       var date = new Date(1356991200001)
       var rr = new RRule({
-        freq: RRule[freq_str],
+        freq: RRule[freqStr],
         dtstart: date
       })
 

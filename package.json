@@ -21,8 +21,8 @@
     "test": "standard && mocha"
   },
   "devDependencies": {
-    "mocha": "^2.3.4",
-    "standard": "^5.4.1"
+    "mocha": "^3.2.0",
+    "standard": "^8.6.0"
   },
   "standard": {
     "ignore": [

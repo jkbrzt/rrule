@@ -32,7 +32,7 @@ replacement until development resumes.
 #### Client Side
 
 ```bash
-$ bower install rrule
+$ bower install rrule-alt
 ```
 
 Alternatively, download
@@ -41,22 +41,22 @@ you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
 also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
-<script src="rrule/lib/rrule.js"></script>
+<script src="rrule-alt/lib/rrule.js"></script>
 
 <!-- Optional -->
-<script src="rrule/lib/nlp.js"></script>
+<script src="rrule-alt/lib/nlp.js"></script>
 ```
 
 #### Server Side
 
 ```bash
-$ npm install rrule
+$ npm install rrule-alt
 ```
 
 ```javascript
-var RRule = require('rrule').RRule
-var RRuleSet = require('rrule').RRuleSet
-var rrulestr = require('rrule').rrulestr
+var RRule = require('rrule-alt').RRule
+var RRuleSet = require('rrule-alt').RRuleSet
+var rrulestr = require('rrule-alt').rrulestr
 ```
 
 #### Usage

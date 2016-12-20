@@ -12,6 +12,7 @@
   ],
   "author": "Jakub Roztocil and Lars Schöning",
   "main": "lib/rrule",
+  "types": "lib/rrule.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"

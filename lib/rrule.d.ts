@@ -3,7 +3,7 @@
 // Definitions by: James Bracy <https://github.com/waratuman>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare module 'rrule' {
+declare module 'rrule-alt' {
     export = RRule;
 }
 

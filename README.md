@@ -714,14 +714,14 @@ Niemeyer](http://niemeyer.net/).
 See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
 more details.
 
-[npm-url]: https://npmjs.org/package/rrule
-[npm-image]: http://img.shields.io/npm/v/rrule.svg
+[npm-url]: https://npmjs.org/package/rrule-alt
+[npm-image]: http://img.shields.io/npm/v/rrule-alt.svg
 
 [travis-url]: https://travis-ci.org/jakubroztocil/rrule
 [travis-image]: http://img.shields.io/travis/jakubroztocil/rrule.svg
 
-[downloads-url]: https://npmjs.org/package/rrule
-[downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/rrule-alt
+[downloads-image]: http://img.shields.io/npm/dm/rrule-alt.svg?style=flat-square
 
 [js-standard-url]: https://github.com/feross/standard
 [js-standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat

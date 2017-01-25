@@ -9,6 +9,9 @@ declare module 'rrule-alt' {
 
 declare namespace RRule {
 
+    type WeekdayStr = 'SU' | 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA'
+    type ByWeekday = WeekdayStr | Weekday | number
+
     /**
     * see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
     * The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
@@ -25,7 +28,7 @@ declare namespace RRule {
         bymonthday?: number | number[];
         byyearday?: number | number[];
         byweekno?: number | number[];
-        byweekday?:  Weekday | Weekday[] | number | number[];
+        byweekday?: ByWeekday | ByWeekday[];
         byhour?: number | number[];
         byminute?: number | number[];
         bysecond?: number | number[];

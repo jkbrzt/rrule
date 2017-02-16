@@ -75,7 +75,7 @@ declare class RRule {
     *                   to stop the iteration.
     * @return Array containing all recurrences.
     */
-    all(iterator?: (date: Date, index?: number) => void): Date[];
+    all(iterator?: (date: Date, index: number) => void): Date[];
 
     /**
     * Returns all the occurrences of the rrule between after and before.

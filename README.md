@@ -21,7 +21,7 @@ to natural language.
 
 ### Quick Start
 
--   [Demo app](http://jkbrzt.github.io/rrule/)
+-   [Demo app](http://jakubroztocil.github.io/rrule/)
 
 #### Client Side
 
@@ -30,9 +30,9 @@ $ bower install rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jkbrzt/rrule/master/lib/rrule.js) manually. If
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/lib/rrule.js) manually. If
 you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jkbrzt/rrule/master/lib/nlp.js).
+also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
 <script src="rrule/lib/rrule.js"></script>
@@ -683,7 +683,7 @@ rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) cod
    * Added `RRule.parseText`
    * Added `RRule.optionsToString`
 * 1.1.0 (2013-05-21)
-   * Added a [demo app](http://jkbrzt.github.io/rrule/).
+   * Added a [demo app](http://jakubroztocil.github.io/rrule/).
    * Handle dates in `UNTIL` in `RRule.fromString`.
    * Added support for RequireJS.
    * Added `options` argument to `RRule.fromString`.
@@ -698,20 +698,20 @@ rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) cod
 #### Authors
 
 * [Jakub Roztocil](http://roztocil.co/)
-    ([@jkbrzt](http://twitter.com/jkbrzt))
+    ([@jakubroztocil](http://twitter.com/jakubroztocil))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 
 Python `dateutil` is written by [Gustavo
 Niemeyer](http://niemeyer.net/).
 
-See [LICENCE](https://github.com/jkbrzt/rrule/blob/master/LICENCE) for
+See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
 more details.
 
 [npm-url]: https://npmjs.org/package/rrule
 [npm-image]: http://img.shields.io/npm/v/rrule.svg
 
-[travis-url]: https://travis-ci.org/jkbrzt/rrule
-[travis-image]: http://img.shields.io/travis/jkbrzt/rrule.svg
+[travis-url]: https://travis-ci.org/jakubroztocil/rrule
+[travis-image]: http://img.shields.io/travis/jakubroztocil/rrule.svg
 
 [downloads-url]: https://npmjs.org/package/rrule
 [downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square

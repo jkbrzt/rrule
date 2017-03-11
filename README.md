@@ -652,7 +652,8 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) coding style.
 
 ### Changelog
-* 2.2.0-dev
+
+* 2.2.0 (2017-03-11)
     * Added support `RRuleSet`, which allows more complex recurrence setups,
       mixing multiple rules, dates, exclusion rules, and exclusion dates.
     * Added Millisecond precision

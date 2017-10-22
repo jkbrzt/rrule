@@ -3496,4 +3496,26 @@ describe('RRule', function () {
         'after dtstart , followed by before does not return dtstart')
     })
   })
+
+  it('testConvertAndBack', function () {
+    [6, RRule.SU].forEach(wkst => {
+      var rr = new RRule({
+        dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
+        until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),
+        freq: RRule.MONTHLY,
+        interval: 1,
+        bysetpos: 17,
+        byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
+        wkst: wkst,
+        byhour: 11,
+        byminute: 0,
+        bysecond: 0
+      })
+
+      var rrstr = rr.toString()
+      assert.equal(rrstr, 'DTSTART=20171017T003000Z;UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
+      var newrr = RRule.fromString(rrstr)
+      assert.equal(rrstr, newrr.toString())
+    })
+  })
 })

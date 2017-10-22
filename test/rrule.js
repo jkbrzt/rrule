@@ -3504,7 +3504,7 @@ describe('RRule', function () {
   })
 
   it('testConvertAndBack', function () {
-    [6, RRule.SU].forEach(wkst => {
+    [6, RRule.SU].forEach(function (wkst) {
       var rr = new RRule({
         dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
         until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),

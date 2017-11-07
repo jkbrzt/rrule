@@ -1,6 +1,6 @@
 {
   "name": "rrule-alt",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "https://github.com/arolson101/rrule-alt",
   "keywords": [

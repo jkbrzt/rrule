@@ -7,6 +7,7 @@ rrule.js
 [![Build Status][travis-image]][travis-url]
 [![js-standard-style][js-standard-image]][js-standard-url]
 [![Downloads][downloads-image]][downloads-url]
+[![Gitter][gitter-image]][gitter-url]
 
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important
@@ -719,3 +720,6 @@ more details.
 
 [js-standard-url]: https://github.com/feross/standard
 [js-standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat
+
+[gitter-url]: https://gitter.im/rrule-js/Lobby
+[gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg

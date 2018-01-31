@@ -1,5 +1,6 @@
-/* global describe */
+/* global describe, it */
 
+var assert = require('assert')
 var utils = require('./lib/utils')
 var RRule = require('../')
 
@@ -343,4 +344,29 @@ describe('RRuleSet', function () {
       datetime(2007, 9, 2, 9, 0)
     ]
   )
+
+  it('testAllday', function () {
+    var date = new Date('2012-12-31')
+    var set = new RRuleSet()
+    var allday = true
+    var rr = new RRule({
+      freq: RRule.DAILY,
+      dtstart: date,
+      until: new Date('2013-01-05'),
+      allday: allday
+    })
+    set.rrule(rr)
+
+    assert.deepEqual(
+      set.valueOf(allday),
+      ['RRULE:FREQ=DAILY;DTSTART=20121231;UNTIL=20130105'],
+      set.valueOf(allday)
+    )
+
+    set.exdate(rr.after(date))
+    assert.deepEqual(set.valueOf(allday), [
+      'RRULE:FREQ=DAILY;DTSTART=20121231;UNTIL=20130105',
+      'EXDATE:20130101'
+    ], 'the rruleset.exdate format yyyymmdd')
+  })
 })

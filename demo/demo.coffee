@@ -208,7 +208,7 @@ $ ->
             if match
                 method = match[1]  # rfc | text
                 arg = match[2]
-                activateTab($("a[href=##{method}-input]"))
+                activateTab($("a[href='##{method}-input']"))
                 $("##{method}-input input:first").val(arg).change()
     processHash()
     $(window).on('hashchange', processHash)

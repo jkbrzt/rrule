@@ -82,7 +82,7 @@ describe('RRule', function () {
     })
   })
 
-  testRecurring('missing Feb 28 https://github.com/jkbrzt/rrule/issues/21',
+  testRecurring('missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',
     new RRule({
       freq: RRule.MONTHLY,
       dtstart: new Date(2013, 0, 1),

@@ -241,7 +241,7 @@ iCalendar RFC. Only `freq` is required.
             the rule inside the frequency period. For example, a
             <code>bysetpos</code> of <code>-1</code> if combined with a <code>RRule.MONTHLY</code>
             frequency, and a byweekday of (<code>RRule.MO</code>, <code>RRule.TU</code>,
-            <code>RRule.WE</code>, <code>RRule.TH</code>, <code>FR</code>), will result in
+            <code>RRule.WE</code>, <code>RRule.TH</code>, <code>RRule.FR</code>), will result in
             the last
             work day of every month.
         </td>

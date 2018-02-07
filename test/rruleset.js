@@ -343,4 +343,24 @@ describe('RRuleSet', function () {
       datetime(2007, 9, 2, 9, 0)
     ]
   )
+  
+  testRecurring('testBefore70',
+    function () {
+      var set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000')
+      }))
+      return {
+        rrule: set,
+        method: 'all'
+      }
+    },
+    [
+      datetime(1960, 1, 1, 9, 0),
+      datetime(1961, 1, 1, 9, 0)
+    ]
+  )
 })

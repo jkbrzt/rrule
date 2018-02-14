@@ -657,6 +657,34 @@ describe('RRule', function () {
     ]
   )
 
+  testRecurring('testYearlyBetweenInc',
+    {
+      rrule: new RRule({
+        freq: RRule.YEARLY,
+        dtstart: parse('20150101T000000')
+      }),
+      method: 'between',
+      args: [parse('20160101T000000'), parse('20160101T000000'), true]
+    },
+    [
+      datetime(2016, 1, 1)
+    ]
+  )
+
+  testRecurring.skip('testYearlyBetweenIncLargeSpan',
+    {
+      rrule: new RRule({
+        freq: RRule.YEARLY,
+        dtstart: parse('19200101T000000') // Error because date lower than dateutil.ORDINAL_BASE
+      }),
+      method: 'between',
+      args: [parse('20160101T000000'), parse('20160101T000000'), true]
+    },
+    [
+      datetime(2016, 1, 1)
+    ]
+  )
+
   testRecurring('testMonthly',
     new RRule({freq: RRule.MONTHLY,
       count: 3,

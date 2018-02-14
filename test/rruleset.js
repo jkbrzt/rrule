@@ -343,7 +343,7 @@ describe('RRuleSet', function () {
       datetime(2007, 9, 2, 9, 0)
     ]
   )
-  
+
   testRecurring('testBefore70',
     function () {
       var set = new RRuleSet()

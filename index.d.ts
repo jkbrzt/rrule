@@ -1,10 +1,21 @@
 // Type definitions for rrule 2.1.0
 // Project: https://github.com/jkbrzt/rrule
-// Definitions by: James Bracy <https://github.com/waratuman>
+// Definitions by: James Bracy <https://github.com/waratuman>, Andrew Olson <https://github.com/arolson101>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare module 'rrule-alt' {
-    export = RRule;
+export as namespace RRule;
+
+/**
+ * Use `import rrule = require("rrule")` for AMD and `import { RRule } from "rrule"` for CommonJS loading.
+ */
+export = RRule;
+
+
+// For CommonJS it must be imported as `require("rrule").RRule`.
+import RRuleAlias = RRule;
+declare module "rrule" {
+    type RRule = RRuleAlias;
+    const RRule: typeof RRuleAlias;
 }
 
 declare namespace RRule {

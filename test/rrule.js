@@ -3496,4 +3496,15 @@ describe('RRule', function () {
         'after dtstart , followed by before does not return dtstart')
     })
   })
+
+  it('testAllday', function () {
+    var date = new Date('2012-12-31')
+    var rr = new RRule({
+      freq: RRule.DAILY,
+      dtstart: date,
+      allday: true
+    })
+    assert.strictEqual(rr.toString(), 'FREQ=DAILY;DTSTART=20121231',
+      'the rule dtstart format yyyymmdd')
+  })
 })

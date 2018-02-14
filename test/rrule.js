@@ -68,6 +68,12 @@ describe('RRule', function () {
     })
   })
 
+  it('rrulestr https://github.com/jkbrzt/rrule/pull/164', function () {
+    var s1 = 'FREQ=WEEKLY;WKST=WE'
+    var s2 = RRule.rrulestr(s1).toString()
+    assert.strictEqual(s1, s2, s1 + ' => ' + s2)
+  })
+
   it('fromString()', function () {
     var strings = [
       ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],

@@ -3,8 +3,15 @@ rrule.js
 
 **Library for working with recurrence rules for calendar dates.**
 
+[![NPM version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![js-standard-style][js-standard-image]][js-standard-url]
+[![Downloads][downloads-image]][downloads-url]
+[![Gitter][gitter-image]][gitter-url]
+
 rrule.js supports recurrence rules as defined in the [iCalendar
-RFC](http://www.ietf.org/rfc/rfc2445.txt). It is a partial port of the
+RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important
+[differences](#differences-from-icalendar-rfc). It is a partial port of the
 `rrule` module from the excellent
 [python-dateutil](http://labix.org/python-dateutil/) library. On top of
 that, it supports parsing and serialization of recurrence rules from and
@@ -15,9 +22,7 @@ to natural language.
 
 ### Quick Start
 
--   [Demo app](http://jkbrzt.github.io/rrule/)
--   [Test suite](http://jkbrzt.github.io/rrule/tests/index.html)
-
+-   [Demo app](http://jakubroztocil.github.io/rrule/)
 
 #### Client Side
 
@@ -26,9 +31,9 @@ $ bower install rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jkbrzt/rrule/master/lib/rrule.js) manually. If
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/lib/rrule.js) manually. If
 you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jkbrzt/rrule/master/lib/nlp.js).
+also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
 <script src="rrule/lib/rrule.js"></script>
@@ -44,23 +49,26 @@ $ npm install rrule
 ```
 
 ```javascript
-var RRule = require('rrule').RRule;
+var RRule = require('rrule').RRule
+var RRuleSet = require('rrule').RRuleSet
+var rrulestr = require('rrule').rrulestr
 ```
 
 #### Usage
 
-```javascript
+**RRule:**
+```js
 // Create a rule:
 var rule = new RRule({
-    freq: RRule.WEEKLY,
-    interval: 5,
-    byweekday: [RRule.MO, RRule.FR],
-    dtstart: new Date(2012, 1, 1, 10, 30),
-    until: new Date(2012, 12, 31)
-});
+  freq: RRule.WEEKLY,
+  interval: 5,
+  byweekday: [RRule.MO, RRule.FR],
+  dtstart: new Date(2012, 1, 1, 10, 30),
+  until: new Date(2012, 12, 31)
+})
 
 // Get all occurrence dates (Date instances):
-rule.all();
+rule.all()
 ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
  'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',
  'Fri Mar 09 2012 10:30:00 GMT+0100 (CET)',
@@ -74,7 +82,7 @@ rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
 
 // Get an iCalendar RRULE string representation:
 // The output can be used with RRule.fromString().
-rule.toString();
+rule.toString()
 "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 // Get a human-friendly text representation:
@@ -83,9 +91,72 @@ rule.toText()
 "every 5 weeks on Monday, Friday until January 31, 2013"
 ```
 
+**RRuleSet:**
+```js
+var rruleSet = new RRuleSet()
+
+// Add a rrule to rruleSet
+rruleSet.rrule(new RRule({
+  freq: RRule.MONTHLY,
+  count: 5,
+  dtstart: new Date(2012, 1, 1, 10, 30)
+}))
+
+// Add a date to rruleSet
+rruleSet.rdate(new Date(2012, 6, 1, 10, 30))
+
+// Add another date to rruleSet
+rruleSet.rdate(new Date(2012, 6, 2, 10, 30))
+
+// Add a exclusion rrule to rruleSet
+rruleSet.exrule(new r.RRule({
+  freq: RRule.MONTHLY,
+  count: 2,
+  dtstart: new Date(2012, 2, 1, 10, 30)
+}))
+
+// Add a exclusion date to rruleSet
+rruleSet.exdate(new Date(2012, 5, 1, 10, 30))
+
+// Get all occurrence dates (Date instances):
+rruleSet.all()
+['Wed Feb 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Tue May 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Mon Jul 02 2012 10:30:00 GMT+0800 (CST)']
+
+// Get a slice:
+rruleSet.between(new Date(2012, 2, 1), new Date(2012, 6, 2))
+['Tue May 01 2012 10:30:00 GMT+0800 (CST)',
+ 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)']
+
+ // To string
+rruleSet.valueOf()
+['RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z',
+ 'RDATE:20120701T023000Z,20120702T023000Z',
+ 'EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z',
+ 'EXDATE:20120601T023000Z']
+
+// To string
+rruleSet.toString()
+'["RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z","RDATE:20120701T023000Z,20120702T023000Z","EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z","EXDATE:20120601T023000Z"]'
+```
+
+**rrulestr:**
+```js
+// Parse a RRule string, return a RRule object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z')
+
+// Parse a RRule string, return a RRuleSet object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true})
+
+// Parse a RRuleSet string, return a RRuleSet object
+rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z')
+
+```
+
 For more examples see
-[tests/tests.js](https://github.com/jkbrzt/rrule/blob/master/tests/tests.js)
-and [python-dateutil](http://labix.org/python-dateutil/) documentation.
+[python-dateutil](http://labix.org/python-dateutil/) documentation.
 
 ### API
 
@@ -170,7 +241,7 @@ iCalendar RFC. Only `freq` is required.
             the rule inside the frequency period. For example, a
             <code>bysetpos</code> of <code>-1</code> if combined with a <code>RRule.MONTHLY</code>
             frequency, and a byweekday of (<code>RRule.MO</code>, <code>RRule.TU</code>,
-            <code>RRule.WE</code>, <code>RRule.TH</code>, <code>FR</code>), will result in
+            <code>RRule.WE</code>, <code>RRule.TH</code>, <code>RRule.FR</code>), will result in
             the last
             work day of every month.
         </td>
@@ -305,7 +376,7 @@ rule.all()
  'Mon Apr 09 2012 10:30:00 GMT+0200 (CEST)',
  /* … */]
 
-rule.all(function (date, i){return i < 2});
+rule.all(function (date, i){return i < 2})
 ['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
  'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',]
 ```
@@ -355,7 +426,7 @@ Returns a string representation of the rule as per the iCalendar RFC.
 Only properties explicitly specified in `options` are included:
 
 ```javascript
-rule.toString();
+rule.toString()
 "FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 rule.toString() == RRule.optionsToString(rule.origOptions)
@@ -374,8 +445,8 @@ RRule.optionsToString(rule.options)
 
 // Cherry-pick only some options from an rrule:
 RRule.optionsToString({
-    freq: rule.options.freq,
-    dtstart: rule.options.dtstart,
+  freq: rule.options.freq,
+  dtstart: rule.options.dtstart
 })
 "FREQ=WEEKLY;DTSTART=20120201T093000Z"
 ```
@@ -452,12 +523,147 @@ options.dtstart = new Date(2000, 1, 1)
 var rule = new RRule(options)
 ```
 
+
 * * * * *
+
+#### `RRuleSet` Constructor
+
+```javascript
+new RRuleSet([noCache=false])
+```
+
+The RRuleSet instance allows more complex recurrence setups, mixing multiple
+ rules, dates, exclusion rules, and exclusion dates.
+
+Default `noCache` argument is `false`, caching of results will be enabled,
+improving performance of multiple queries considerably.
+
+##### `RRuleSet.prototype.rrule(rrule)`
+
+Include the given rrule instance in the recurrence set generation.
+
+##### `RRuleSet.prototype.rdate(dt)`
+Include the given datetime instance in the recurrence set generation.
+
+##### `RRuleSet.prototype.exrule(rrule)`
+Include the given rrule instance in the recurrence set exclusion list. Dates
+which are part of the given recurrence rules will not be generated, even if
+some inclusive rrule or rdate matches them.
+
+##### `RRuleSet.prototype.exdate(dt)`
+Include the given datetime instance in the recurrence set exclusion list. Dates
+included that way will not be generated, even if some inclusive rrule or
+rdate matches them.
+
+##### `RRuleSet.prototype.all([iterator])`
+
+Same as `RRule.prototype.all`.
+
+##### `RRuleSet.prototype.between(after, before, inc=false [, iterator])`
+
+Same as `RRule.prototype.between`.
+
+##### `RRuleSet.prototype.before(dt, inc=false)`
+
+Same as `RRule.prototype.before`.
+
+##### `RRuleSet.prototype.after(dt, inc=false)`
+
+Same as `RRule.prototype.after`.
+
+* * * * *
+
+#### `rrulestr` Function
+
+```js
+rrulestr(rruleStr[, options])
+```
+
+The `rrulestr` function is a parser for RFC-like syntaxes. The string passed
+as parameter may be a multiple line string, a single line string, or just the
+RRULE property value.
+
+Additionally, it accepts the following keyword arguments:
+
+`cache`
+If True, the rruleset or rrule created instance will cache its results.
+Default is not to cache.
+
+`dtstart`
+If given, it must be a datetime instance that will be used when no DTSTART
+property is found in the parsed string. If it is not given, and the property
+is not found, datetime.now() will be used instead.
+
+`unfold`
+If set to True, lines will be unfolded following the RFC specification. It
+defaults to False, meaning that spaces before every line will be stripped.
+
+`forceset`
+If set to True a rruleset instance will be returned, even if only a single rule
+is found. The default is to return an rrule if possible, and an rruleset if necessary.
+
+`compatible`
+If set to True, the parser will operate in RFC-compatible mode. Right now it
+means that unfold will be turned on, and if a DTSTART is found, it will be
+considered the first recurrence instance, as documented in the RFC.
+
+`ignoretz`
+If set to True, the date parser will ignore timezone information available in
+the DTSTART property, or the UNTIL attribute.
+
+`tzinfos`
+If set, it will be passed to the datetime string parser to resolve unknown
+timezone settings. For more information about what could be used here, check
+the parser documentation.
+
+* * * * *
+
+### Differences From iCalendar RFC
+
+* `RRule` has no `byday` keyword. The equivalent keyword has been replaced by
+the `byweekday` keyword, to remove the ambiguity present in the original
+keyword.
+* Unlike documented in the RFC, the starting datetime, `dtstart`, is
+not the first recurrence instance, unless it does fit in the specified rules.
+This is in part due to this project being a port of
+[python-dateutil](https://labix.org/python-dateutil#head-a65103993a21b717f6702063f3717e6e75b4ba66),
+which has the same non-compliant functionality. Note that you can get the
+original behavior by using a `RRuleSet` and adding the `dtstart` as an `rdate`.
+
+```javascript
+var rruleSet = new RRuleSet()
+var start = new Date(2012, 1, 1, 10, 30)
+
+// Add a rrule to rruleSet
+rruleSet.rrule(new RRule({
+  freq: RRule.MONTHLY,
+  count: 5,
+  dtstart: start
+}))
+
+// Add a date to rruleSet
+rruleSet.rdate(start)
+```
+
+* Unlike documented in the RFC, every keyword is valid on every frequency (the
+RFC documents that `byweekno` is only valid on yearly frequencies, for example).
+
+### Development
+
+rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) coding style.
 
 ### Changelog
 
+* 2.2.0 (2017-03-11)
+    * Added support `RRuleSet`, which allows more complex recurrence setups,
+      mixing multiple rules, dates, exclusion rules, and exclusion dates.
+    * Added Millisecond precision
+        * Millisecond offset extracted from `dtstart` (`dtstart.getTime() % 1000`)
+        * Each recurrence is returned with the same offset
+    * Added some NLP support for hourly and byhour.
+    * Fixed export in nlp.js.
 * 2.1.0
-   * Removed dependency on Underscore.js (thanks @gsf).
+   * Removed dependency on Underscore.js (thanks, @gsf).
    * Various small bugfixes and improvements.
 * 2.0.1
    * Added bower.json.
@@ -479,7 +685,7 @@ var rule = new RRule(options)
    * Added `RRule.parseText`
    * Added `RRule.optionsToString`
 * 1.1.0 (2013-05-21)
-   * Added a [demo app](http://jkbrzt.github.io/rrule/).
+   * Added a [demo app](http://jakubroztocil.github.io/rrule/).
    * Handle dates in `UNTIL` in `RRule.fromString`.
    * Added support for RequireJS.
    * Added `options` argument to `RRule.fromString`.
@@ -493,12 +699,27 @@ var rule = new RRule(options)
 
 #### Authors
 
-* [Jakub Roztocil](http://subtleapps.com/)
-    ([@jkbrzt](http://twitter.com/jkbrzt))
+* [Jakub Roztocil](http://roztocil.co/)
+    ([@jakubroztocil](http://twitter.com/jakubroztocil))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 
 Python `dateutil` is written by [Gustavo
 Niemeyer](http://niemeyer.net/).
 
-See [LICENCE](https://github.com/jkbrzt/rrule/blob/master/LICENCE) for
+See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
 more details.
+
+[npm-url]: https://npmjs.org/package/rrule
+[npm-image]: http://img.shields.io/npm/v/rrule.svg
+
+[travis-url]: https://travis-ci.org/jakubroztocil/rrule
+[travis-image]: http://img.shields.io/travis/jakubroztocil/rrule.svg
+
+[downloads-url]: https://npmjs.org/package/rrule
+[downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
+
+[js-standard-url]: https://github.com/feross/standard
+[js-standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat
+
+[gitter-url]: https://gitter.im/rrule-js/Lobby
+[gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg

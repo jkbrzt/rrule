@@ -1,6 +1,6 @@
 {
   "name": "rrule",
-  "version": "2.2.0",
+  "version": "2.2.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "keywords": [
@@ -20,8 +20,8 @@
     "test": "standard && mocha"
   },
   "devDependencies": {
-    "mocha": "^2.3.4",
-    "standard": "^5.4.1"
+    "mocha": "^3.2.0",
+    "standard": "^8.6.0"
   },
   "standard": {
     "ignore": [

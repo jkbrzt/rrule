@@ -3486,10 +3486,10 @@ describe('RRule', function () {
   )
 
   it('testAfterBefore', function () {
-    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freq_str) {
+    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freqStr) {
       var date = new Date(1356991200001)
       var rr = new RRule({
-        freq: RRule[freq_str],
+        freq: RRule[freqStr],
         dtstart: date
       })
 
@@ -3500,6 +3500,40 @@ describe('RRule', function () {
       if (res != null) res = res.getTime()
       assert.strictEqual(res, rr.options.dtstart.getTime(),
         'after dtstart , followed by before does not return dtstart')
+    })
+  })
+
+  it('testConvertAndBack', function () {
+    [6, RRule.SU].forEach(function (wkst) {
+      var rr = new RRule({
+        dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
+        until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),
+        freq: RRule.MONTHLY,
+        interval: 1,
+        bysetpos: 17,
+        byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
+        wkst: wkst,
+        byhour: 11,
+        byminute: 0,
+        bysecond: 0
+      })
+
+      var rrstr = rr.toString()
+      assert.equal(rrstr, 'DTSTART=20171017T003000Z;UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
+      var newrr = RRule.fromString(rrstr)
+      assert.equal(rrstr, newrr.toString())
+    })
+  })
+
+  it('testByHourValues', function () {
+    [
+      ['DTSTART=20171101T010000Z;UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11,12;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 and 12 until December 13, 2017'],
+      ['DTSTART=20171101T010000Z;UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 until December 13, 2017']
+    ].forEach(function (pair) {
+      var rule = pair[0]
+      var rr = RRule.fromString(rule)
+      assert.ok(rr.toText())
+      // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })
   })
 })

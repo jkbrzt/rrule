@@ -27,7 +27,7 @@ to natural language.
 #### Client Side
 
 ```bash
-$ bower install rrule-alt
+$ bower install rrule
 ```
 
 Alternatively, download
@@ -36,22 +36,22 @@ you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
 also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
 
 ```html
-<script src="rrule-alt/lib/rrule.js"></script>
+<script src="rrule/lib/rrule.js"></script>
 
 <!-- Optional -->
-<script src="rrule-alt/lib/nlp.js"></script>
+<script src="rrule/lib/nlp.js"></script>
 ```
 
 #### Server Side
 
 ```bash
-$ npm install rrule-alt
+$ npm install rrule
 ```
 
 ```javascript
-var RRule = require('rrule-alt').RRule
-var RRuleSet = require('rrule-alt').RRuleSet
-var rrulestr = require('rrule-alt').rrulestr
+var RRule = require('rrule').RRule
+var RRuleSet = require('rrule').RRuleSet
+var rrulestr = require('rrule').rrulestr
 ```
 
 #### Usage
@@ -709,14 +709,14 @@ Niemeyer](http://niemeyer.net/).
 See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
 more details.
 
-[npm-url]: https://npmjs.org/package/rrule-alt
-[npm-image]: http://img.shields.io/npm/v/rrule-alt.svg
+[npm-url]: https://npmjs.org/package/rrule
+[npm-image]: http://img.shields.io/npm/v/rrule.svg
 
 [travis-url]: https://travis-ci.org/jakubroztocil/rrule
 [travis-image]: http://img.shields.io/travis/jakubroztocil/rrule.svg
 
-[downloads-url]: https://npmjs.org/package/rrule-alt
-[downloads-image]: http://img.shields.io/npm/dm/rrule-alt.svg?style=flat-square
+[downloads-url]: https://npmjs.org/package/rrule
+[downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
 
 [js-standard-url]: https://github.com/feross/standard
 [js-standard-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat

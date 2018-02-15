@@ -97,13 +97,13 @@ describe('RRule', function () {
     }
     var rule = new RRule(options)
 
-    assert.deepStrictEqual(options, {
+    assert.deepEqual(options, {
       freq: RRule.MONTHLY,
       dtstart: new Date(2013, 0, 1),
       count: 3,
       bymonthday: [28]
     })
-    assert.deepStrictEqual(rule.origOptions, options)
+    assert.deepEqual(rule.origOptions, options)
   })
 
   testRecurring('missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',

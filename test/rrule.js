@@ -88,6 +88,24 @@ describe('RRule', function () {
     })
   })
 
+  it('does not mutate the passed-in options object', function () {
+    var options = {
+      freq: RRule.MONTHLY,
+      dtstart: new Date(2013, 0, 1),
+      count: 3,
+      bymonthday: [28]
+    }
+    var rule = new RRule(options)
+
+    assert.deepEqual(options, {
+      freq: RRule.MONTHLY,
+      dtstart: new Date(2013, 0, 1),
+      count: 3,
+      bymonthday: [28]
+    })
+    assert.deepEqual(rule.origOptions, options)
+  })
+
   testRecurring('missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',
     new RRule({
       freq: RRule.MONTHLY,

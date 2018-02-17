@@ -654,6 +654,15 @@ rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) cod
 
 ### Changelog
 
+* 2.2.8 (2018-02-16)
+    * fix: isLeapYear only accepts integers instead of relying on instanceof to check the parameter type
+    * prevent new RRule from mutating passed-in options
+    * Add 'from text' and 'to text' support for minutes
+    * Add support for VALUE=DATE as a RDATE param
+    * Prevent unexpected results with dates lower than 1970
+    * merge in rrule-alt
+    * fix DAILY frequency when only 1 BYHOUR is provided
+    * added typescript definitions
 * 2.2.0 (2017-03-11)
     * Added support `RRuleSet`, which allows more complex recurrence setups,
       mixing multiple rules, dates, exclusion rules, and exclusion dates.

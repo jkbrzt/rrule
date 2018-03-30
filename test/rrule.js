@@ -88,6 +88,14 @@ describe('RRule', function () {
     })
   })
 
+  it('fromString() validation handles 3-digit years properly', function () {
+    var rule = new RRule({
+      dtstart: new Date(990, 0, 1)
+    })
+    var string = rule.toString()
+    assert.strictEqual(RRule.fromString(string).toString(), 'DTSTART=9900101T060000Z')
+  })
+
   it('does not mutate the passed-in options object', function () {
     var options = {
       freq: RRule.MONTHLY,

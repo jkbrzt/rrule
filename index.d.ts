@@ -172,6 +172,18 @@ declare namespace RRule {
 
     function fromString(value: string): RRule;
 
+    function rrulestr(s: string, options?: RRuleStrOptions): RRule;
+
+    interface RRuleStrOptions {
+        dtstart?: Date;
+        cache?: boolean;
+        unfold?: boolean;
+        forceset?: boolean;
+        compatible?: boolean;
+        ignoretz?: boolean;
+        tzinfos?: any;
+    }
+
     class RRuleSet extends RRule {
       /**
       *

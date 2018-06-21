@@ -172,7 +172,7 @@ declare namespace RRule {
 
     function fromString(value: string): RRule;
 
-    function rrulestr(s: string, options?: RRuleStrOptions): RRule;
+    function rrulestr(s: string, options?: RRuleStrOptions): RRule | RRuleSet;
 
     interface RRuleStrOptions {
         dtstart?: Date;

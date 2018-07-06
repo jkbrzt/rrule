@@ -17,6 +17,11 @@ RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important
 that, it supports parsing and serialization of recurrence rules from and
 to natural language.
 
+**Notes**
+This is a fork of [rrule](https://github.com/jkbrzt/rrule), which appears to have ceased development.
+I've ported the merge requests created there and will make only minor changes.  Should be a drop-in
+replacement until development resumes.
+
 * * * * *
 
 

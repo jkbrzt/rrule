@@ -1,6 +1,6 @@
 /* global describe */
 
-var utils = require('./lib/utils')
+var utils = require('./src/utils')
 var RRule = require('../')
 
 var RRuleSet = RRule.RRuleSet

@@ -1,7 +1,7 @@
 /* global describe, it */
 
 var assert = require('assert')
-var utils = require('./lib/utils')
+var utils = require('./src/utils')
 var RRule = require('../')
 
 var parse = utils.parse

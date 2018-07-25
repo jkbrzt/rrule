@@ -31,15 +31,15 @@ $ bower install rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/lib/rrule.js) manually. If
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/src/rrule.js) manually. If
 you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
+also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/src/nlp.js).
 
 ```html
-<script src="rrule/lib/rrule.js"></script>
+<script src="rrule/src/rrule.js"></script>
 
 <!-- Optional -->
-<script src="rrule/lib/nlp.js"></script>
+<script src="rrule/src/nlp.js"></script>
 ```
 
 #### Server Side

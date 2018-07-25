@@ -1,1 +1,1 @@
-module.exports = require('./lib/rrule');
+module.exports = require('./lib/rrule')

@@ -650,7 +650,13 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 ### Development
 
-rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+rrule.js uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+
+To run the tests, run:
+
+```
+$ TZ=UTC npm test
+```
 
 ### Changelog
 

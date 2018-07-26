@@ -1231,13 +1231,7 @@ Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
 function getnlp () {
   // Lazy, runtime import to avoid circular refs.
   if (!getnlp._nlp) {
-    if (root && root._getRRuleNLP) {
-      getnlp._nlp = root._getRRuleNLP(RRule)
-    } else if (typeof require === 'function') {
-      getnlp._nlp = require('./nlp')(RRule)
-    } else {
-      throw new Error('You need to include rrule/nlp.js for fromText/toText to work.')
-    }
+    getnlp._nlp = require('./nlp')
   }
   return getnlp._nlp
 }

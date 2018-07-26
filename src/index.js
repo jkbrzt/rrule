@@ -38,7 +38,4 @@ RRule.RRule = RRule
 RRule.RRuleSet = RRuleSet
 RRule.rrulestr = rrulestr
 
-window.RRule = RRule
-root = window
-
 export default RRule

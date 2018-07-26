@@ -652,6 +652,12 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 rrule.js uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
 
+To build, run:
+
+```
+$ npm run build
+```
+
 To run the tests, run:
 
 ```

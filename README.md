@@ -27,19 +27,19 @@ to natural language.
 #### Client Side
 
 ```bash
-$ bower install rrule
+$ npm install rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/src/rrule.js) manually. If
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/index.js) manually. If
 you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/src/nlp.js).
+also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/dist/nlp.js).
 
 ```html
-<script src="rrule/src/rrule.js"></script>
+<script src="rrule/dist/index.js"></script>
 
 <!-- Optional -->
-<script src="rrule/src/nlp.js"></script>
+<script src="rrule/dist/nlp.js"></script>
 ```
 
 #### Server Side

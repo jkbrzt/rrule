@@ -48,7 +48,7 @@ export const datetimeUTC = function (y, m, d, h, i, s) {
  */
 export const parse = function (str) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
-  let [ _, y, m, d, h, i, s] = parts
+  let [ _, y, m, d, h, i, s ] = parts // eslint-disable-line
   m = Number(m[0] === '0' ? m[1] : m) - 1
   d = d[0] === '0' ? d[1] : d
   h = h[0] === '0' ? h[1] : h
@@ -117,13 +117,13 @@ export const testRecurring = function (msg, testObj, expectedDates) {
 
     if (ctx.ALSO_TEST_NLP_FUNCTIONS && rule.isFullyConvertibleToText && rule.isFullyConvertibleToText()) {
       // Test fromText()/toText().
+      const string = rule.toString()
       const text = rule.toText()
       const text2 = rrule2.toText()
-      rrule2 = RRule.fromText(text, rule.options.dtstart)
+      const rrule2 = RRule.fromText(text, rule.options.dtstart)
       assert.strictEqual(text2, text, 'toText() == fromText(toText()).toText()')
 
       // Test fromText()/toString().
-      text = rule.toText()
       const rrule3 = RRule.fromText(text, rule.options.dtstart)
       assert.strictEqual(rrule3.toString(), string, 'toString() == fromText(toText()).toString()')
     }

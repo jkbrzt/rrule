@@ -27,7 +27,7 @@ import RRule from './index'
 /**
  * Return true if a value is in an array
  */
-var contains = function (arr, val) {
+const contains = function (arr, val) {
   return arr.indexOf(val) !== -1
 }
 
@@ -43,7 +43,7 @@ var contains = function (arr, val) {
  * @param {Object} language definition
  * @constructor
  */
-var ToText = function (rrule, gettext, language) {
+const ToText = function (rrule, gettext, language) {
   this.text = ''
   this.language = language || ENGLISH
   this.gettext = gettext || function (id) {
@@ -56,8 +56,8 @@ var ToText = function (rrule, gettext, language) {
   this.origOptions = rrule.origOptions
 
   if (this.origOptions.bymonthday) {
-    var bymonthday = [].concat(this.options.bymonthday)
-    var bynmonthday = [].concat(this.options.bynmonthday)
+    const bymonthday = [].concat(this.options.bymonthday)
+    const bynmonthday = [].concat(this.options.bynmonthday)
 
     bymonthday.sort()
     bynmonthday.sort()
@@ -68,9 +68,9 @@ var ToText = function (rrule, gettext, language) {
   }
 
   if (this.origOptions.byweekday) {
-    var byweekday = !(this.origOptions.byweekday instanceof Array)
+    const byweekday = !(this.origOptions.byweekday instanceof Array)
       ? [this.origOptions.byweekday] : this.origOptions.byweekday
-    var days = String(byweekday)
+    const days = String(byweekday)
 
     this.byweekday = {
       allWeeks: byweekday.filter(function (weekday) {
@@ -90,7 +90,7 @@ var ToText = function (rrule, gettext, language) {
       )
     }
 
-    var sortWeekDays = function (a, b) {
+    const sortWeekDays = function (a, b) {
       return a.weekday - b.weekday
     }
 
@@ -104,7 +104,7 @@ var ToText = function (rrule, gettext, language) {
   }
 }
 
-var common = [
+const common = [
   'count', 'until', 'interval',
   'byweekday', 'bymonthday', 'bymonth'
 ]
@@ -122,12 +122,12 @@ ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
  * @return {Boolean}
  */
 ToText.isFullyConvertible = function (rrule) {
-  var canConvert = true
+  let canConvert = true
 
   if (!(rrule.options.freq in ToText.IMPLEMENTED)) return false
   if (rrule.origOptions.until && rrule.origOptions.count) return false
 
-  for (var key in rrule.origOptions) {
+  for (let key in rrule.origOptions) {
     if (contains(['dtstart', 'wkst', 'freq'], key)) return true
     if (!contains(ToText.IMPLEMENTED[rrule.options.freq], key)) return false
   }
@@ -149,7 +149,7 @@ ToText.prototype = {
    * @return {*}
    */
   toString: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (!(this.options.freq in ToText.IMPLEMENTED)) {
       return gettext('RRule error: Unable to fully convert this rrule to text')
@@ -160,7 +160,7 @@ ToText.prototype = {
 
     if (this.options.until) {
       this.add(gettext('until'))
-      var until = this.options.until
+      const until = this.options.until
       this.add(this.language.monthNames[until.getMonth()])
         .add(until.getDate() + ',')
         .add(until.getFullYear())
@@ -177,7 +177,7 @@ ToText.prototype = {
   },
 
   HOURLY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval)
 
@@ -186,7 +186,7 @@ ToText.prototype = {
   },
 
   MINUTELY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval)
 
@@ -195,7 +195,7 @@ ToText.prototype = {
   },
 
   DAILY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval)
 
@@ -222,7 +222,7 @@ ToText.prototype = {
   },
 
   WEEKLY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.options.interval !== 1) {
       this.add(this.options.interval)
@@ -254,7 +254,7 @@ ToText.prototype = {
   },
 
   MONTHLY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.origOptions.bymonth) {
       if (this.options.interval !== 1) {
@@ -279,7 +279,7 @@ ToText.prototype = {
   },
 
   YEARLY: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     if (this.origOptions.bymonth) {
       if (this.options.interval !== 1) {
@@ -315,7 +315,7 @@ ToText.prototype = {
   },
 
   _bymonthday: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
     if (this.byweekday && this.byweekday.allWeeks) {
       this.add(gettext('on'))
         .add(this.list(this.byweekday.allWeeks, this.weekdaytext, gettext('or')))
@@ -329,7 +329,7 @@ ToText.prototype = {
   },
 
   _byweekday: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
     if (this.byweekday.allWeeks && !this.byweekday.isWeekdays) {
       this.add(gettext('on'))
         .add(this.list(this.byweekday.allWeeks, this.weekdaytext))
@@ -344,7 +344,7 @@ ToText.prototype = {
   },
 
   _byhour: function () {
-    var gettext = this.gettext
+    const gettext = this.gettext
 
     this.add(gettext('at'))
       .add(this.list(this.origOptions.byhour, null, gettext('and')))
@@ -355,8 +355,8 @@ ToText.prototype = {
   },
 
   nth: function (n) {
-    var nth, npos
-    var gettext = this.gettext
+    let nth, npos
+    const gettext = this.gettext
 
     if (n === -1) return gettext('last')
 
@@ -387,7 +387,7 @@ ToText.prototype = {
   },
 
   weekdaytext: function (wday) {
-    var weekday = typeof wday === 'number' ? wday : wday.getJsWeekday()
+    const weekday = typeof wday === 'number' ? wday : wday.getJsWeekday()
     return (wday.n ? this.nth(wday.n) + ' ' : '') +
       this.language.dayNames[weekday]
   },
@@ -406,10 +406,10 @@ ToText.prototype = {
     if (!(arr instanceof Array)) {
       arr = [arr]
     }
-    var delimJoin = function (array, delimiter, finalDelimiter) {
-      var list = ''
+    const delimJoin = function (array, delimiter, finalDelimiter) {
+      let list = ''
 
-      for (var i = 0; i < array.length; i++) {
+      for (let i = 0; i < array.length; i++) {
         if (i !== 0) {
           if (i === array.length - 1) {
             list += ' ' + finalDelimiter + ' '
@@ -426,8 +426,8 @@ ToText.prototype = {
     callback = callback || function (o) {
       return o
     }
-    var self = this
-    var realCallback = function (arg) {
+    const self = this
+    const realCallback = function (arg) {
       return callback.call(self, arg)
     }
 
@@ -510,13 +510,13 @@ ToText.prototype = {
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-var fromText = function (text, language) {
+const fromText = function (text, language) {
   return new RRule(parseText(text, language))
 }
 
-var parseText = function (text, language) {
-  var options = {}
-  var ttr = new Parser((language || ENGLISH).tokens)
+const parseText = function (text, language) {
+  const options = {}
+  const ttr = new Parser((language || ENGLISH).tokens)
 
   if (!ttr.start(text)) return null
 
@@ -525,7 +525,7 @@ var parseText = function (text, language) {
 
   function S () {
     // every [n]
-    var n
+    let n
 
     ttr.expect('every')
     if ((n = ttr.accept('number'))) options.interval = parseInt(n[0], 10)
@@ -611,7 +611,7 @@ var parseText = function (text, language) {
         while (ttr.accept('comma')) {
           if (ttr.isDone()) throw new Error('Unexpected end')
 
-          var wkd
+          let wkd
           if (!(wkd = decodeWKD())) {
             throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday')
           }
@@ -644,7 +644,7 @@ var parseText = function (text, language) {
         while (ttr.accept('comma')) {
           if (ttr.isDone()) throw new Error('Unexpected end')
 
-          var m
+          let m
           if (!(m = decodeM())) {
             throw new Error('Unexpected symbol ' + ttr.symbol + ', expected month')
           }
@@ -664,12 +664,12 @@ var parseText = function (text, language) {
   }
 
   function ON () {
-    var on = ttr.accept('on')
-    var the = ttr.accept('the')
+    const on = ttr.accept('on')
+    const the = ttr.accept('the')
     if (!(on || the)) return
 
     do {
-      var nth, wkd, m
+      let nth, wkd, m
 
       // nth <weekday> | <weekday>
       if ((nth = decodeNTH())) {
@@ -699,7 +699,7 @@ var parseText = function (text, language) {
         options.byweekday.push(RRule.FR)
       } else if (ttr.symbol === 'week(s)') {
         ttr.nextSymbol()
-        var n
+        let n
         if (!(n = ttr.accept('number'))) {
           throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number')
         }
@@ -721,11 +721,11 @@ var parseText = function (text, language) {
   }
 
   function AT () {
-    var at = ttr.accept('at')
+    const at = ttr.accept('at')
     if (!at) return
 
     do {
-      var n
+      let n
       if (!(n = ttr.accept('number'))) {
         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour')
       }
@@ -800,7 +800,7 @@ var parseText = function (text, language) {
         ttr.nextSymbol()
         return ttr.accept('last') ? -3 : 3
       case 'nth':
-        var v = parseInt(ttr.value[1], 10)
+        const v = parseInt(ttr.value[1], 10)
         if (v < -366 || v > 366) throw new Error('Nth out of range: ' + v)
 
         ttr.nextSymbol()
@@ -815,7 +815,7 @@ var parseText = function (text, language) {
     ttr.accept('on')
     ttr.accept('the')
 
-    var nth
+    let nth
     if (!(nth = decodeNTH())) return
 
     options.bymonthday = [nth]
@@ -833,7 +833,7 @@ var parseText = function (text, language) {
 
   function F () {
     if (ttr.symbol === 'until') {
-      var date = Date.parse(ttr.text)
+      const date = Date.parse(ttr.text)
 
       if (!date) throw new Error('Cannot parse until date:' + ttr.text)
       options.until = new Date(date)
@@ -849,7 +849,7 @@ var parseText = function (text, language) {
 // Parser
 // =============================================================================
 
-var Parser = function (rules) {
+const Parser = function (rules) {
   this.rules = rules
 }
 
@@ -864,17 +864,17 @@ Parser.prototype.isDone = function () {
 }
 
 Parser.prototype.nextSymbol = function () {
-  var best, bestSymbol
-  var p = this
+  let best, bestSymbol
+  const p = this
 
   this.symbol = null
   this.value = null
   do {
     if (this.done) return false
 
-    var match, rule
+    let match, rule
     best = null
-    for (var name in this.rules) {
+    for (let name in this.rules) {
       rule = this.rules[name]
       if ((match = rule.exec(p.text))) {
         if (best == null || match[0].length > best[0].length) {
@@ -906,7 +906,7 @@ Parser.prototype.nextSymbol = function () {
 Parser.prototype.accept = function (name) {
   if (this.symbol === name) {
     if (this.value) {
-      var v = this.value
+      const v = this.value
       this.nextSymbol()
       return v
     }
@@ -928,7 +928,7 @@ Parser.prototype.expect = function (name) {
 // i18n
 // =============================================================================
 
-var ENGLISH = {
+const ENGLISH = {
   dayNames: [
     'Sunday', 'Monday', 'Tuesday', 'Wednesday',
     'Thursday', 'Friday', 'Saturday'

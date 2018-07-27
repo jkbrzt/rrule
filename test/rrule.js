@@ -1,8 +1,8 @@
 /* global describe, it */
 
 var assert = require('assert')
-var utils = require('./src/utils')
-var RRule = require('../')
+var utils = require('./lib/utils')
+var { RRule } = require('../src/index')
 
 var parse = utils.parse
 var datetime = utils.datetime

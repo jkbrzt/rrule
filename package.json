@@ -22,10 +22,10 @@
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
   "scripts": {
-    "build": "npm run-script standard && webpack",
-    "fix": "npm run-script standard --fix",
+    "build": "npm run standard && webpack",
+    "fix": "npm run standard --fix",
     "standard": "standard src/**/*.js test/**/*.js",
-    "test": "npm run-script standard && mocha"
+    "test": "npm run standard && TZ=UTC mocha --compilers js:babel-core/register"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

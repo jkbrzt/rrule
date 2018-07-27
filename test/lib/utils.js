@@ -1,7 +1,7 @@
 /* global it */
 
 var assert = require('assert')
-var RRule = require('../../')
+var RRule = require('../../src/rrule')
 
 var assertDatesEqual = function (actual, expected, msg) {
   msg = msg ? ' [' + msg + '] ' : ''

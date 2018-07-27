@@ -3,4 +3,7 @@ node_js:
   - "6"
   - "8"
   - "10"
+script:
+  - yarn build
+  - yarn test
 sudo: false

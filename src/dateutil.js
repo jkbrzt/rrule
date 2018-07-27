@@ -19,9 +19,9 @@ const dateutil = {
   /**
    * Python uses 1-Jan-1 as the base for calculating ordinals but we don't
    * want to confuse the JS engine with milliseconds > Number.MAX_NUMBER,
-   * therefore we use 1-Jan-1900 instead
+   * therefore we use 1-Jan-1970 instead
    */
-  ORDINAL_BASE: new Date(1900, 0, 1),
+  ORDINAL_BASE: new Date(1970, 0, 1),
 
   /**
    * Python: MO-SU: 0 - 6
@@ -68,9 +68,6 @@ const dateutil = {
    * @see: <http://docs.python.org/library/datetime.html#datetime.date.toordinal>
    */
   toOrdinal: function (date) {
-    if (date < dateutil.ORDINAL_BASE) {
-      throw new Error('dates lower than ' + dateutil.ORDINAL_BASE + ' are not supported')
-    }
     return dateutil.daysBetween(date, dateutil.ORDINAL_BASE)
   },
 

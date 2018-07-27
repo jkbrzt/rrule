@@ -1,15 +1,15 @@
-const Weekday = require('./weekday')
-const dateutil = require('./dateutil')
-const {
+import Weekday from './weekday'
+import dateutil from './dateutil'
+import {
   range,
   repeat,
   pymod,
   divmod,
   plb,
   contains
-} = require('./helpers')
+} from './helpers'
 
-const {
+import {
   WDAYMASK,
   M365MASK,
   M365RANGE,
@@ -19,10 +19,10 @@ const {
   MDAY366MASK,
   NMDAY365MASK,
   NMDAY366MASK
-} = require('./masks')
+} from './masks'
 
-const IterResult = require('./iterresult')
-const CallbackIterResult = require('./callbackiterresult')
+import IterResult from './iterresult'
+import CallbackIterResult from './callbackiterresult'
 
 // =============================================================================
 // RRule
@@ -34,338 +34,371 @@ const CallbackIterResult = require('./callbackiterresult')
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-const RRule = function (options, noCache) {
-  options = options || {}
-  // RFC string
-  this._string = null
-  this._cache = noCache ? null : {
-    all: false,
-    before: [],
-    after: [],
-    between: []
-  }
+class RRule {
+  constructor (options, noCache) {
+    options = options || {}
+    // RFC string
+    this._string = null
+    this._cache = noCache ? null : {
+      all: false,
+      before: [],
+      after: [],
+      between: []
+    }
 
-  // used by toString()
-  this.origOptions = {}
+    // used by toString()
+    this.origOptions = {}
 
-  this.options = {}
+    this.options = {}
 
-  const invalid = []
-  const keys = Object.keys(options)
-  const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
+    const invalid = []
+    const keys = Object.keys(options)
+    const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
 
-  // Shallow copy for options and origOptions and check for invalid
-  keys.forEach(function (key) {
-    this.origOptions[key] = options[key]
-    this.options[key] = options[key]
-    if (!contains(defaultKeys, key)) invalid.push(key)
-  }, this)
+    // Shallow copy for options and origOptions and check for invalid
+    keys.forEach(function (key) {
+      this.origOptions[key] = options[key]
+      this.options[key] = options[key]
+      if (!contains(defaultKeys, key)) invalid.push(key)
+    }, this)
 
-  if (invalid.length) throw new Error('Invalid options: ' + invalid.join(', '))
+    if (invalid.length) throw new Error('Invalid options: ' + invalid.join(', '))
 
-  if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
-    throw new Error('Invalid frequency: ' + String(options.freq))
-  }
+    if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
+      throw new Error('Invalid frequency: ' + String(options.freq))
+    }
 
-  // Merge in default options
-  defaultKeys.forEach(function (key) {
-    if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
-  }, this)
+    // Merge in default options
+    defaultKeys.forEach(function (key) {
+      if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
+    }, this)
 
-  const opts = this.options
+    const opts = this.options
 
-  if (opts.byeaster !== null) opts.freq = RRule.YEARLY
-  if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
+    if (opts.byeaster !== null) opts.freq = RRule.YEARLY
+    if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
-  const millisecondModulo = opts.dtstart.getTime() % 1000
-  if (opts.wkst === null) {
-    opts.wkst = RRule.MO.weekday
-  } else if (typeof opts.wkst === 'number') {
-    // cool, just keep it like that
-  } else {
-    opts.wkst = opts.wkst.weekday
-  }
+    const millisecondModulo = opts.dtstart.getTime() % 1000
+    if (opts.wkst === null) {
+      opts.wkst = RRule.MO.weekday
+    } else if (typeof opts.wkst === 'number') {
+      // cool, just keep it like that
+    } else {
+      opts.wkst = opts.wkst.weekday
+    }
 
-  let v
-  if (opts.bysetpos !== null) {
-    if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos]
+    let v
+    if (opts.bysetpos !== null) {
+      if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos]
 
-    for (let i = 0; i < opts.bysetpos.length; i++) {
-      v = opts.bysetpos[i]
-      if (v === 0 || !(v >= -366 && v <= 366)) {
-        throw new Error('bysetpos must be between 1 and 366,' +
-          ' or between -366 and -1')
+      for (let i = 0; i < opts.bysetpos.length; i++) {
+        v = opts.bysetpos[i]
+        if (v === 0 || !(v >= -366 && v <= 366)) {
+          throw new Error('bysetpos must be between 1 and 366,' +
+            ' or between -366 and -1')
+        }
       }
     }
-  }
 
-  if (!(plb(opts.byweekno) || plb(opts.byyearday) || plb(opts.bymonthday) ||
-    opts.byweekday !== null || opts.byeaster !== null)) {
-    switch (opts.freq) {
-      case RRule.YEARLY:
-        if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1
-        opts.bymonthday = opts.dtstart.getDate()
-        break
-      case RRule.MONTHLY:
-        opts.bymonthday = opts.dtstart.getDate()
-        break
-      case RRule.WEEKLY:
-        opts.byweekday = dateutil.getWeekday(opts.dtstart)
-        break
-    }
-  }
-
-  // bymonth
-  if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
-    opts.bymonth = [opts.bymonth]
-  }
-  // byyearday
-  if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
-    opts.byyearday = [opts.byyearday]
-  }
-
-  // bymonthday
-  if (opts.bymonthday === null) {
-    opts.bymonthday = []
-    opts.bynmonthday = []
-  } else if (opts.bymonthday instanceof Array) {
-    const bymonthday = []
-    const bynmonthday = []
-
-    for (let i = 0; i < opts.bymonthday.length; i++) {
-      v = opts.bymonthday[i]
-      if (v > 0) {
-        bymonthday.push(v)
-      } else if (v < 0) {
-        bynmonthday.push(v)
+    if (!(plb(opts.byweekno) || plb(opts.byyearday) || plb(opts.bymonthday) ||
+      opts.byweekday !== null || opts.byeaster !== null)) {
+      switch (opts.freq) {
+        case RRule.YEARLY:
+          if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1
+          opts.bymonthday = opts.dtstart.getDate()
+          break
+        case RRule.MONTHLY:
+          opts.bymonthday = opts.dtstart.getDate()
+          break
+        case RRule.WEEKLY:
+          opts.byweekday = dateutil.getWeekday(opts.dtstart)
+          break
       }
     }
-    opts.bymonthday = bymonthday
-    opts.bynmonthday = bynmonthday
-  } else {
-    if (opts.bymonthday < 0) {
-      opts.bynmonthday = [opts.bymonthday]
+
+    // bymonth
+    if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
+      opts.bymonth = [opts.bymonth]
+    }
+    // byyearday
+    if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
+      opts.byyearday = [opts.byyearday]
+    }
+
+    // bymonthday
+    if (opts.bymonthday === null) {
       opts.bymonthday = []
-    } else {
       opts.bynmonthday = []
-      opts.bymonthday = [opts.bymonthday]
-    }
-  }
+    } else if (opts.bymonthday instanceof Array) {
+      const bymonthday = []
+      const bynmonthday = []
 
-  // byweekno
-  if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
-    opts.byweekno = [opts.byweekno]
-  }
-
-  // byweekday / bynweekday
-  if (opts.byweekday === null) {
-    opts.bynweekday = null
-  } else if (typeof opts.byweekday === 'number') {
-    opts.byweekday = [opts.byweekday]
-    opts.bynweekday = null
-  } else if (opts.byweekday instanceof Weekday) {
-    if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
-      opts.byweekday = [opts.byweekday.weekday]
-      opts.bynweekday = null
+      for (let i = 0; i < opts.bymonthday.length; i++) {
+        v = opts.bymonthday[i]
+        if (v > 0) {
+          bymonthday.push(v)
+        } else if (v < 0) {
+          bynmonthday.push(v)
+        }
+      }
+      opts.bymonthday = bymonthday
+      opts.bynmonthday = bynmonthday
     } else {
-      opts.bynweekday = [
-        [opts.byweekday.weekday, opts.byweekday.n]
-      ]
-      opts.byweekday = null
-    }
-  } else {
-    const byweekday = []
-    const bynweekday = []
-
-    for (let i = 0; i < opts.byweekday.length; i++) {
-      const wday = opts.byweekday[i]
-
-      if (typeof wday === 'number') {
-        byweekday.push(wday)
-      } else if (!wday.n || opts.freq > RRule.MONTHLY) {
-        byweekday.push(wday.weekday)
+      if (opts.bymonthday < 0) {
+        opts.bynmonthday = [opts.bymonthday]
+        opts.bymonthday = []
       } else {
-        bynweekday.push([wday.weekday, wday.n])
+        opts.bynmonthday = []
+        opts.bymonthday = [opts.bymonthday]
       }
     }
-    opts.byweekday = plb(byweekday) ? byweekday : null
-    opts.bynweekday = plb(bynweekday) ? bynweekday : null
-  }
 
-  // byhour
-  if (opts.byhour === null) {
-    opts.byhour = (opts.freq < RRule.HOURLY) ? [opts.dtstart.getHours()] : null
-  } else if (typeof opts.byhour === 'number') {
-    opts.byhour = [opts.byhour]
-  }
-
-  // byminute
-  if (opts.byminute === null) {
-    opts.byminute = (opts.freq < RRule.MINUTELY)
-      ? [opts.dtstart.getMinutes()] : null
-  } else if (typeof opts.byminute === 'number') {
-    opts.byminute = [opts.byminute]
-  }
-
-  // bysecond
-  if (opts.bysecond === null) {
-    opts.bysecond = (opts.freq < RRule.SECONDLY)
-      ? [opts.dtstart.getSeconds()] : null
-  } else if (typeof opts.bysecond === 'number') {
-    opts.bysecond = [opts.bysecond]
-  }
-
-  if (opts.freq >= RRule.HOURLY) {
-    this.timeset = null
-  } else {
-    this.timeset = []
-    for (let i = 0; i < opts.byhour.length; i++) {
-      const hour = opts.byhour[i]
-      for (let j = 0; j < opts.byminute.length; j++) {
-        const minute = opts.byminute[j]
-        for (let k = 0; k < opts.bysecond.length; k++) {
-          const second = opts.bysecond[k]
-          // python:
-          // datetime.time(hour, minute, second,
-          // tzinfo=self._tzinfo))
-          this.timeset.push(new dateutil.Time(hour, minute, second, millisecondModulo))
-        }
-      }
+    // byweekno
+    if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
+      opts.byweekno = [opts.byweekno]
     }
-    dateutil.sort(this.timeset)
-  }
-}
 
-// RRule class 'constants'
+    // byweekday / bynweekday
+    if (opts.byweekday === null) {
+      opts.bynweekday = null
+    } else if (typeof opts.byweekday === 'number') {
+      opts.byweekday = [opts.byweekday]
+      opts.bynweekday = null
+    } else if (opts.byweekday instanceof Weekday) {
+      if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
+        opts.byweekday = [opts.byweekday.weekday]
+        opts.bynweekday = null
+      } else {
+        opts.bynweekday = [
+          [opts.byweekday.weekday, opts.byweekday.n]
+        ]
+        opts.byweekday = null
+      }
+    } else {
+      const byweekday = []
+      const bynweekday = []
 
-RRule.FREQUENCIES = [
-  'YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY',
-  'HOURLY', 'MINUTELY', 'SECONDLY'
-]
+      for (let i = 0; i < opts.byweekday.length; i++) {
+        const wday = opts.byweekday[i]
 
-RRule.YEARLY = 0
-RRule.MONTHLY = 1
-RRule.WEEKLY = 2
-RRule.DAILY = 3
-RRule.HOURLY = 4
-RRule.MINUTELY = 5
-RRule.SECONDLY = 6
-
-RRule.MO = new Weekday(0)
-RRule.TU = new Weekday(1)
-RRule.WE = new Weekday(2)
-RRule.TH = new Weekday(3)
-RRule.FR = new Weekday(4)
-RRule.SA = new Weekday(5)
-RRule.SU = new Weekday(6)
-
-RRule.DEFAULT_OPTIONS = {
-  freq: null,
-  dtstart: null,
-  interval: 1,
-  wkst: RRule.MO,
-  count: null,
-  until: null,
-  bysetpos: null,
-  bymonth: null,
-  bymonthday: null,
-  bynmonthday: null,
-  byyearday: null,
-  byweekno: null,
-  byweekday: null,
-  bynweekday: null,
-  byhour: null,
-  byminute: null,
-  bysecond: null,
-  byeaster: null
-}
-
-RRule.parseText = function (text, language) {
-  return getnlp().parseText(text, language)
-}
-
-RRule.fromText = function (text, language) {
-  return getnlp().fromText(text, language)
-}
-
-RRule.optionsToString = function (options) {
-  let key, value, strValues
-  const pairs = []
-  const keys = Object.keys(options)
-  const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
-
-  for (let i = 0; i < keys.length; i++) {
-    if (!contains(defaultKeys, keys[i])) continue
-
-    key = keys[i].toUpperCase()
-    value = options[keys[i]]
-    strValues = []
-
-    if (value === null || value instanceof Array && !value.length) continue
-
-    switch (key) {
-      case 'FREQ':
-        value = RRule.FREQUENCIES[options.freq]
-        break
-      case 'WKST':
-        if (!(value instanceof Weekday)) {
-          value = new Weekday(value)
-        }
-        break
-      case 'BYWEEKDAY':
-        /*
-        NOTE: BYWEEKDAY is a special case.
-        RRule() deconstructs the rule.options.byweekday array
-        into an array of Weekday arguments.
-        On the other hand, rule.origOptions is an array of Weekdays.
-        We need to handle both cases here.
-        It might be worth change RRule to keep the Weekdays.
-
-        Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
-
-        */
-        key = 'BYDAY'
-        if (!(value instanceof Array)) value = [value]
-
-        for (let wday, j = 0; j < value.length; j++) {
-          wday = value[j]
-          if (wday instanceof Weekday) {
-            // good
-          } else if (wday instanceof Array) {
-            wday = new Weekday(wday[0], wday[1])
-          } else {
-            wday = new Weekday(wday)
-          }
-          strValues[j] = wday.toString()
-        }
-        value = strValues
-        break
-      case 'DTSTART':
-      case 'UNTIL':
-        value = dateutil.timeToUntilString(value)
-        break
-      default:
-        if (value instanceof Array) {
-          for (let j = 0; j < value.length; j++) strValues[j] = String(value[j])
-          value = strValues
+        if (typeof wday === 'number') {
+          byweekday.push(wday)
+        } else if (!wday.n || opts.freq > RRule.MONTHLY) {
+          byweekday.push(wday.weekday)
         } else {
-          value = String(value)
+          bynweekday.push([wday.weekday, wday.n])
         }
-
+      }
+      opts.byweekday = plb(byweekday) ? byweekday : null
+      opts.bynweekday = plb(bynweekday) ? bynweekday : null
     }
-    pairs.push([key, value])
+
+    // byhour
+    if (opts.byhour === null) {
+      opts.byhour = (opts.freq < RRule.HOURLY) ? [opts.dtstart.getHours()] : null
+    } else if (typeof opts.byhour === 'number') {
+      opts.byhour = [opts.byhour]
+    }
+
+    // byminute
+    if (opts.byminute === null) {
+      opts.byminute = (opts.freq < RRule.MINUTELY)
+        ? [opts.dtstart.getMinutes()] : null
+    } else if (typeof opts.byminute === 'number') {
+      opts.byminute = [opts.byminute]
+    }
+
+    // bysecond
+    if (opts.bysecond === null) {
+      opts.bysecond = (opts.freq < RRule.SECONDLY)
+        ? [opts.dtstart.getSeconds()] : null
+    } else if (typeof opts.bysecond === 'number') {
+      opts.bysecond = [opts.bysecond]
+    }
+
+    if (opts.freq >= RRule.HOURLY) {
+      this.timeset = null
+    } else {
+      this.timeset = []
+      for (let i = 0; i < opts.byhour.length; i++) {
+        const hour = opts.byhour[i]
+        for (let j = 0; j < opts.byminute.length; j++) {
+          const minute = opts.byminute[j]
+          for (let k = 0; k < opts.bysecond.length; k++) {
+            const second = opts.bysecond[k]
+            // python:
+            // datetime.time(hour, minute, second,
+            // tzinfo=self._tzinfo))
+            this.timeset.push(new dateutil.Time(hour, minute, second, millisecondModulo))
+          }
+        }
+      }
+      dateutil.sort(this.timeset)
+    }
   }
 
-  const strings = []
-  for (let i = 0; i < pairs.length; i++) {
-    const attr = pairs[i]
-    strings.push(attr[0] + '=' + attr[1].toString())
+  static parseText (text, language) {
+    return getnlp().parseText(text, language)
   }
-  return strings.join(';')
-}
 
-RRule.prototype = {
-  constructor: RRule,
+  static fromText (text, language) {
+    return getnlp().fromText(text, language)
+  }
+
+  static parseString (rfcString) {
+    rfcString = rfcString.replace(/^\s+|\s+$/, '')
+    if (!rfcString.length) return null
+
+    let key, value, attr
+    const attrs = rfcString.split(';')
+    const options = {}
+
+    for (let i = 0; i < attrs.length; i++) {
+      attr = attrs[i].split('=')
+      key = attr[0]
+      value = attr[1]
+      switch (key) {
+        case 'FREQ':
+          options.freq = RRule[value]
+          break
+        case 'WKST':
+          options.wkst = RRule[value]
+          break
+        case 'COUNT':
+        case 'INTERVAL':
+        case 'BYSETPOS':
+        case 'BYMONTH':
+        case 'BYMONTHDAY':
+        case 'BYYEARDAY':
+        case 'BYWEEKNO':
+        case 'BYHOUR':
+        case 'BYMINUTE':
+        case 'BYSECOND':
+          if (value.indexOf(',') !== -1) {
+            value = value.split(',')
+            for (let j = 0; j < value.length; j++) {
+              if (/^[+-]?\d+$/.test(value[j])) value[j] = Number(value[j])
+            }
+          } else if (/^[+-]?\d+$/.test(value)) {
+            value = Number(value)
+          }
+          key = key.toLowerCase()
+          options[key] = value
+          break
+        case 'BYDAY': // => byweekday
+          let n, wday, day
+          const days = value.split(',')
+
+          options.byweekday = []
+          for (let j = 0; j < days.length; j++) {
+            day = days[j]
+            if (day.length === 2) { // MO, TU, ...
+              wday = RRule[day] // wday instanceof Weekday
+              options.byweekday.push(wday)
+            } else { // -1MO, +3FR, 1SO, ...
+              day = day.match(/^([+-]?\d)([A-Z]{2})$/)
+              n = Number(day[1])
+              wday = day[2]
+              wday = RRule[wday].weekday
+              options.byweekday.push(new Weekday(wday, n))
+            }
+          }
+          break
+        case 'DTSTART':
+          options.dtstart = dateutil.untilStringToDate(value)
+          break
+        case 'UNTIL':
+          options.until = dateutil.untilStringToDate(value)
+          break
+        case 'BYEASTER':
+          options.byeaster = Number(value)
+          break
+        default:
+          throw new Error("Unknown RRULE property '" + key + "'")
+      }
+    }
+    return options
+  }
+
+  static fromString (string) {
+    return new RRule(RRule.parseString(string))
+  }
+
+  static optionsToString (options) {
+    let key, value, strValues
+    const pairs = []
+    const keys = Object.keys(options)
+    const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
+
+    for (let i = 0; i < keys.length; i++) {
+      if (!contains(defaultKeys, keys[i])) continue
+
+      key = keys[i].toUpperCase()
+      value = options[keys[i]]
+      strValues = []
+
+      if (value === null || value instanceof Array && !value.length) continue
+
+      switch (key) {
+        case 'FREQ':
+          value = RRule.FREQUENCIES[options.freq]
+          break
+        case 'WKST':
+          if (!(value instanceof Weekday)) {
+            value = new Weekday(value)
+          }
+          break
+        case 'BYWEEKDAY':
+          /*
+          NOTE: BYWEEKDAY is a special case.
+          RRule() deconstructs the rule.options.byweekday array
+          into an array of Weekday arguments.
+          On the other hand, rule.origOptions is an array of Weekdays.
+          We need to handle both cases here.
+          It might be worth change RRule to keep the Weekdays.
+
+          Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
+
+          */
+          key = 'BYDAY'
+          if (!(value instanceof Array)) value = [value]
+
+          for (let wday, j = 0; j < value.length; j++) {
+            wday = value[j]
+            if (wday instanceof Weekday) {
+              // good
+            } else if (wday instanceof Array) {
+              wday = new Weekday(wday[0], wday[1])
+            } else {
+              wday = new Weekday(wday)
+            }
+            strValues[j] = wday.toString()
+          }
+          value = strValues
+          break
+        case 'DTSTART':
+        case 'UNTIL':
+          value = dateutil.timeToUntilString(value)
+          break
+        default:
+          if (value instanceof Array) {
+            for (let j = 0; j < value.length; j++) strValues[j] = String(value[j])
+            value = strValues
+          } else {
+            value = String(value)
+          }
+
+      }
+      pairs.push([key, value])
+    }
+
+    const strings = []
+    for (let i = 0; i < pairs.length; i++) {
+      const attr = pairs[i]
+      strings.push(attr[0] + '=' + attr[1].toString())
+    }
+    return strings.join(';')
+  }
 
   /**
    * @param {Function} iterator - optional function that will be called
@@ -373,7 +406,7 @@ RRule.prototype = {
    *                   to stop the iteration.
    * @return Array containing all recurrences.
    */
-  all: function (iterator) {
+  all (iterator) {
     if (iterator) {
       return this._iter(new CallbackIterResult('all', {}, iterator))
     } else {
@@ -384,7 +417,7 @@ RRule.prototype = {
       }
       return result
     }
-  },
+  }
 
   /**
    * Returns all the occurrences of the rrule between after and before.
@@ -393,7 +426,7 @@ RRule.prototype = {
    * list, if they are found in the recurrence set.
    * @return Array
    */
-  between: function (after, before, inc, iterator) {
+  between (after, before, inc, iterator) {
     const args = {
       before: before,
       after: after,
@@ -409,7 +442,7 @@ RRule.prototype = {
       this._cacheAdd('between', result, args)
     }
     return result
-  },
+  }
 
   /**
    * Returns the last recurrence before the given datetime instance.
@@ -417,7 +450,7 @@ RRule.prototype = {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  before: function (dt, inc) {
+  before (dt, inc) {
     const args = {dt: dt, inc: inc}
     let result = this._cacheGet('before', args)
     if (result === false) {
@@ -425,7 +458,7 @@ RRule.prototype = {
       this._cacheAdd('before', result, args)
     }
     return result
-  },
+  }
 
   /**
    * Returns the first recurrence after the given datetime instance.
@@ -433,7 +466,7 @@ RRule.prototype = {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  after: function (dt, inc) {
+  after (dt, inc) {
     const args = {dt: dt, inc: inc}
     let result = this._cacheGet('after', args)
     if (result === false) {
@@ -441,43 +474,43 @@ RRule.prototype = {
       this._cacheAdd('after', result, args)
     }
     return result
-  },
+  }
 
   /**
    * Returns the number of recurrences in this set. It will have go trough
    * the whole recurrence, if this hasn't been done before.
    */
-  count: function () {
+  count () {
     return this.all().length
-  },
+  }
 
   /**
    * Converts the rrule into its string representation
    * @see <http://www.ietf.org/rfc/rfc2445.txt>
    * @return String
    */
-  toString: function () {
+  toString () {
     return RRule.optionsToString(this.origOptions)
-  },
+  }
 
   /**
   * Will convert all rules described in nlp:ToText
   * to text.
   */
-  toText: function (gettext, language) {
+  toText (gettext, language) {
     return getnlp().toText(this, gettext, language)
-  },
+  }
 
-  isFullyConvertibleToText: function () {
+  isFullyConvertibleToText () {
     return getnlp().isFullyConvertible(this)
-  },
+  }
 
   /**
    * @param {String} what - all/before/after/between
    * @param {Array,Date} value - an array of dates, one date, or null
    * @param {Object?} args - _iter arguments
    */
-  _cacheAdd: function (what, value, args) {
+  _cacheAdd (what, value, args) {
     if (!this._cache) return
 
     if (value) {
@@ -491,7 +524,7 @@ RRule.prototype = {
       args._value = value
       this._cache[what].push(args)
     }
-  },
+  }
 
   /**
    * @return false - not in the cache
@@ -500,7 +533,7 @@ RRule.prototype = {
    *         []    - cached, but zero occurrences (all/between)
    *         [Date1, DateN] - cached (all/between)
    */
-  _cacheGet: function (what, args) {
+  _cacheGet (what, args) {
     if (!this._cache) return false
 
     let cached = false
@@ -540,17 +573,17 @@ RRule.prototype = {
     return cached instanceof Array
       ? dateutil.cloneDates(cached)
       : (cached instanceof Date ? dateutil.clone(cached) : cached)
-  },
+  }
 
   /**
    * @return a RRule instance with the same freq and options
    *          as this one (cache is not cloned)
    */
-  clone: function () {
+  clone () {
     return new RRule(this.origOptions)
-  },
+  }
 
-  _iter: function (iterResult) {
+  _iter (iterResult) {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
 
@@ -881,353 +914,319 @@ RRule.prototype = {
       }
     }
   }
-
 }
 
-RRule.parseString = function (rfcString) {
-  rfcString = rfcString.replace(/^\s+|\s+$/, '')
-  if (!rfcString.length) return null
+// RRule class 'constants'
 
-  let key, value, attr
-  const attrs = rfcString.split(';')
-  const options = {}
+RRule.FREQUENCIES = [
+  'YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY',
+  'HOURLY', 'MINUTELY', 'SECONDLY'
+]
 
-  for (let i = 0; i < attrs.length; i++) {
-    attr = attrs[i].split('=')
-    key = attr[0]
-    value = attr[1]
-    switch (key) {
-      case 'FREQ':
-        options.freq = RRule[value]
-        break
-      case 'WKST':
-        options.wkst = RRule[value]
-        break
-      case 'COUNT':
-      case 'INTERVAL':
-      case 'BYSETPOS':
-      case 'BYMONTH':
-      case 'BYMONTHDAY':
-      case 'BYYEARDAY':
-      case 'BYWEEKNO':
-      case 'BYHOUR':
-      case 'BYMINUTE':
-      case 'BYSECOND':
-        if (value.indexOf(',') !== -1) {
-          value = value.split(',')
-          for (let j = 0; j < value.length; j++) {
-            if (/^[+-]?\d+$/.test(value[j])) value[j] = Number(value[j])
-          }
-        } else if (/^[+-]?\d+$/.test(value)) {
-          value = Number(value)
-        }
-        key = key.toLowerCase()
-        options[key] = value
-        break
-      case 'BYDAY': // => byweekday
-        let n, wday, day
-        const days = value.split(',')
+RRule.YEARLY = 0
+RRule.MONTHLY = 1
+RRule.WEEKLY = 2
+RRule.DAILY = 3
+RRule.HOURLY = 4
+RRule.MINUTELY = 5
+RRule.SECONDLY = 6
 
-        options.byweekday = []
-        for (let j = 0; j < days.length; j++) {
-          day = days[j]
-          if (day.length === 2) { // MO, TU, ...
-            wday = RRule[day] // wday instanceof Weekday
-            options.byweekday.push(wday)
-          } else { // -1MO, +3FR, 1SO, ...
-            day = day.match(/^([+-]?\d)([A-Z]{2})$/)
-            n = Number(day[1])
-            wday = day[2]
-            wday = RRule[wday].weekday
-            options.byweekday.push(new Weekday(wday, n))
-          }
-        }
-        break
-      case 'DTSTART':
-        options.dtstart = dateutil.untilStringToDate(value)
-        break
-      case 'UNTIL':
-        options.until = dateutil.untilStringToDate(value)
-        break
-      case 'BYEASTER':
-        options.byeaster = Number(value)
-        break
-      default:
-        throw new Error("Unknown RRULE property '" + key + "'")
-    }
-  }
-  return options
-}
+RRule.MO = new Weekday(0)
+RRule.TU = new Weekday(1)
+RRule.WE = new Weekday(2)
+RRule.TH = new Weekday(3)
+RRule.FR = new Weekday(4)
+RRule.SA = new Weekday(5)
+RRule.SU = new Weekday(6)
 
-RRule.fromString = function (string) {
-  return new RRule(RRule.parseString(string))
+RRule.DEFAULT_OPTIONS = {
+  freq: null,
+  dtstart: null,
+  interval: 1,
+  wkst: RRule.MO,
+  count: null,
+  until: null,
+  bysetpos: null,
+  bymonth: null,
+  bymonthday: null,
+  bynmonthday: null,
+  byyearday: null,
+  byweekno: null,
+  byweekday: null,
+  bynweekday: null,
+  byhour: null,
+  byminute: null,
+  bysecond: null,
+  byeaster: null
 }
 
 // =============================================================================
 // Iterinfo
 // =============================================================================
 
-const Iterinfo = function (rrule) {
-  this.rrule = rrule
-  this.lastyear = null
-  this.lastmonth = null
-  this.yearlen = null
-  this.nextyearlen = null
-  this.yearordinal = null
-  this.yearweekday = null
-  this.mmask = null
-  this.mrange = null
-  this.mdaymask = null
-  this.nmdaymask = null
-  this.wdaymask = null
-  this.wnomask = null
-  this.nwdaymask = null
-  this.eastermask = null
-}
+class Iterinfo {
+  constructor (rrule) {
+    this.rrule = rrule
+    this.lastyear = null
+    this.lastmonth = null
+    this.yearlen = null
+    this.nextyearlen = null
+    this.yearordinal = null
+    this.yearweekday = null
+    this.mmask = null
+    this.mrange = null
+    this.mdaymask = null
+    this.nmdaymask = null
+    this.wdaymask = null
+    this.wnomask = null
+    this.nwdaymask = null
+    this.eastermask = null
+  }
 
-Iterinfo.prototype.easter = function (y, offset) {
-  offset = offset || 0
+  easter (y, offset) {
+    offset = offset || 0
 
-  const a = y % 19
-  const b = Math.floor(y / 100)
-  const c = y % 100
-  const d = Math.floor(b / 4)
-  const e = b % 4
-  const f = Math.floor((b + 8) / 25)
-  const g = Math.floor((b - f + 1) / 3)
-  const h = Math.floor(19 * a + b - d - g + 15) % 30
-  const i = Math.floor(c / 4)
-  const k = c % 4
-  const l = Math.floor(32 + 2 * e + 2 * i - h - k) % 7
-  const m = Math.floor((a + 11 * h + 22 * l) / 451)
-  const month = Math.floor((h + l - 7 * m + 114) / 31)
-  const day = (h + l - 7 * m + 114) % 31 + 1
-  const date = Date.UTC(y, month - 1, day + offset)
-  const yearStart = Date.UTC(y, 0, 1)
+    const a = y % 19
+    const b = Math.floor(y / 100)
+    const c = y % 100
+    const d = Math.floor(b / 4)
+    const e = b % 4
+    const f = Math.floor((b + 8) / 25)
+    const g = Math.floor((b - f + 1) / 3)
+    const h = Math.floor(19 * a + b - d - g + 15) % 30
+    const i = Math.floor(c / 4)
+    const k = c % 4
+    const l = Math.floor(32 + 2 * e + 2 * i - h - k) % 7
+    const m = Math.floor((a + 11 * h + 22 * l) / 451)
+    const month = Math.floor((h + l - 7 * m + 114) / 31)
+    const day = (h + l - 7 * m + 114) % 31 + 1
+    const date = Date.UTC(y, month - 1, day + offset)
+    const yearStart = Date.UTC(y, 0, 1)
 
-  return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))]
-}
+    return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))]
+  }
 
-Iterinfo.prototype.rebuild = function (year, month) {
-  const rr = this.rrule
+  rebuild (year, month) {
+    const rr = this.rrule
 
-  if (year !== this.lastyear) {
-    this.yearlen = dateutil.isLeapYear(year) ? 366 : 365
-    this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365
-    const firstyday = new Date(year, 0, 1)
+    if (year !== this.lastyear) {
+      this.yearlen = dateutil.isLeapYear(year) ? 366 : 365
+      this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365
+      const firstyday = new Date(year, 0, 1)
 
-    this.yearordinal = dateutil.toOrdinal(firstyday)
-    this.yearweekday = dateutil.getWeekday(firstyday)
+      this.yearordinal = dateutil.toOrdinal(firstyday)
+      this.yearweekday = dateutil.getWeekday(firstyday)
 
-    const wday = dateutil.getWeekday(new Date(year, 0, 1))
+      const wday = dateutil.getWeekday(new Date(year, 0, 1))
 
-    if (this.yearlen === 365) {
-      this.mmask = [].concat(M365MASK)
-      this.mdaymask = [].concat(MDAY365MASK)
-      this.nmdaymask = [].concat(NMDAY365MASK)
-      this.wdaymask = WDAYMASK.slice(wday)
-      this.mrange = [].concat(M365RANGE)
-    } else {
-      this.mmask = [].concat(M366MASK)
-      this.mdaymask = [].concat(MDAY366MASK)
-      this.nmdaymask = [].concat(NMDAY366MASK)
-      this.wdaymask = WDAYMASK.slice(wday)
-      this.mrange = [].concat(M366RANGE)
-    }
-
-    if (!plb(rr.options.byweekno)) {
-      this.wnomask = null
-    } else {
-      this.wnomask = repeat(0, this.yearlen + 7)
-      let no1wkst, firstwkst, wyearlen
-      no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7)
-      if (no1wkst >= 4) {
-        no1wkst = 0
-        // Number of days in the year, plus the days we got
-        // from last year.
-        wyearlen = this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7)
+      if (this.yearlen === 365) {
+        this.mmask = [].concat(M365MASK)
+        this.mdaymask = [].concat(MDAY365MASK)
+        this.nmdaymask = [].concat(NMDAY365MASK)
+        this.wdaymask = WDAYMASK.slice(wday)
+        this.mrange = [].concat(M365RANGE)
       } else {
-        // Number of days in the year, minus the days we
-        // left in last year.
-        wyearlen = this.yearlen - no1wkst
-      }
-      const div = Math.floor(wyearlen / 7)
-      const mod = pymod(wyearlen, 7)
-      const numweeks = Math.floor(div + (mod / 4))
-      for (let n, i, j = 0; j < rr.options.byweekno.length; j++) {
-        n = rr.options.byweekno[j]
-        if (n < 0) {
-          n += numweeks + 1
-        } if (!(n > 0 && n <= numweeks)) {
-          continue
-        } if (n > 1) {
-          i = no1wkst + (n - 1) * 7
-          if (no1wkst !== firstwkst) {
-            i -= 7 - firstwkst
-          }
-        } else {
-          i = no1wkst
-        }
-        for (let k = 0; k < 7; k++) {
-          this.wnomask[i] = 1
-          i++
-          if (this.wdaymask[i] === rr.options.wkst) break
-        }
+        this.mmask = [].concat(M366MASK)
+        this.mdaymask = [].concat(MDAY366MASK)
+        this.nmdaymask = [].concat(NMDAY366MASK)
+        this.wdaymask = WDAYMASK.slice(wday)
+        this.mrange = [].concat(M366RANGE)
       }
 
-      if (contains(rr.options.byweekno, 1)) {
-        // Check week number 1 of next year as well
-        // orig-TODO : Check -numweeks for next year.
-        let i = no1wkst + numweeks * 7
-        if (no1wkst !== firstwkst) i -= 7 - firstwkst
-        if (i < this.yearlen) {
-          // If week starts in next year, we
-          // don't care about it.
-          for (let j = 0; j < 7; j++) {
+      if (!plb(rr.options.byweekno)) {
+        this.wnomask = null
+      } else {
+        this.wnomask = repeat(0, this.yearlen + 7)
+        let no1wkst, firstwkst, wyearlen
+        no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7)
+        if (no1wkst >= 4) {
+          no1wkst = 0
+          // Number of days in the year, plus the days we got
+          // from last year.
+          wyearlen = this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7)
+        } else {
+          // Number of days in the year, minus the days we
+          // left in last year.
+          wyearlen = this.yearlen - no1wkst
+        }
+        const div = Math.floor(wyearlen / 7)
+        const mod = pymod(wyearlen, 7)
+        const numweeks = Math.floor(div + (mod / 4))
+        for (let n, i, j = 0; j < rr.options.byweekno.length; j++) {
+          n = rr.options.byweekno[j]
+          if (n < 0) {
+            n += numweeks + 1
+          } if (!(n > 0 && n <= numweeks)) {
+            continue
+          } if (n > 1) {
+            i = no1wkst + (n - 1) * 7
+            if (no1wkst !== firstwkst) {
+              i -= 7 - firstwkst
+            }
+          } else {
+            i = no1wkst
+          }
+          for (let k = 0; k < 7; k++) {
             this.wnomask[i] = 1
-            i += 1
+            i++
             if (this.wdaymask[i] === rr.options.wkst) break
           }
         }
-      }
 
-      if (no1wkst) {
-        // Check last week number of last year as
-        // well. If no1wkst is 0, either the year
-        // started on week start, or week number 1
-        // got days from last year, so there are no
-        // days from last year's last week number in
-        // this year.
-        let lnumweeks
-        if (!contains(rr.options.byweekno, -1)) {
-          const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
-          let lno1wkst = pymod(7 - lyearweekday + rr.options.wkst, 7)
-          const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
-          if (lno1wkst >= 4) {
-            lno1wkst = 0
-            lnumweeks = Math.floor(52 +
-              pymod(lyearlen + pymod(lyearweekday - rr.options.wkst, 7), 7) / 4)
+        if (contains(rr.options.byweekno, 1)) {
+          // Check week number 1 of next year as well
+          // orig-TODO : Check -numweeks for next year.
+          let i = no1wkst + numweeks * 7
+          if (no1wkst !== firstwkst) i -= 7 - firstwkst
+          if (i < this.yearlen) {
+            // If week starts in next year, we
+            // don't care about it.
+            for (let j = 0; j < 7; j++) {
+              this.wnomask[i] = 1
+              i += 1
+              if (this.wdaymask[i] === rr.options.wkst) break
+            }
+          }
+        }
+
+        if (no1wkst) {
+          // Check last week number of last year as
+          // well. If no1wkst is 0, either the year
+          // started on week start, or week number 1
+          // got days from last year, so there are no
+          // days from last year's last week number in
+          // this year.
+          let lnumweeks
+          if (!contains(rr.options.byweekno, -1)) {
+            const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
+            let lno1wkst = pymod(7 - lyearweekday + rr.options.wkst, 7)
+            const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
+            if (lno1wkst >= 4) {
+              lno1wkst = 0
+              lnumweeks = Math.floor(52 +
+                pymod(lyearlen + pymod(lyearweekday - rr.options.wkst, 7), 7) / 4)
+            } else {
+              lnumweeks = Math.floor(52 + pymod(this.yearlen - no1wkst, 7) / 4)
+            }
           } else {
-            lnumweeks = Math.floor(52 + pymod(this.yearlen - no1wkst, 7) / 4)
+            lnumweeks = -1
+          }
+          if (contains(rr.options.byweekno, lnumweeks)) {
+            for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
+          }
+        }
+      }
+    }
+
+    if (plb(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
+      let ranges = []
+      if (rr.options.freq === RRule.YEARLY) {
+        if (plb(rr.options.bymonth)) {
+          for (let j = 0; j < rr.options.bymonth.length; j++) {
+            month = rr.options.bymonth[j]
+            ranges.push(this.mrange.slice(month - 1, month + 1))
           }
         } else {
-          lnumweeks = -1
+          ranges = [[0, this.yearlen]]
         }
-        if (contains(rr.options.byweekno, lnumweeks)) {
-          for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
-        }
+      } else if (rr.options.freq === RRule.MONTHLY) {
+        ranges = [this.mrange.slice(month - 1, month + 1)]
       }
-    }
-  }
+      if (plb(ranges)) {
+        // Weekly frequency won't get here, so we may not
+        // care about cross-year weekly periods.
+        this.nwdaymask = repeat(0, this.yearlen)
 
-  if (plb(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
-    let ranges = []
-    if (rr.options.freq === RRule.YEARLY) {
-      if (plb(rr.options.bymonth)) {
-        for (let j = 0; j < rr.options.bymonth.length; j++) {
-          month = rr.options.bymonth[j]
-          ranges.push(this.mrange.slice(month - 1, month + 1))
-        }
-      } else {
-        ranges = [[0, this.yearlen]]
-      }
-    } else if (rr.options.freq === RRule.MONTHLY) {
-      ranges = [this.mrange.slice(month - 1, month + 1)]
-    }
-    if (plb(ranges)) {
-      // Weekly frequency won't get here, so we may not
-      // care about cross-year weekly periods.
-      this.nwdaymask = repeat(0, this.yearlen)
-
-      for (let j = 0; j < ranges.length; j++) {
-        const rang = ranges[j]
-        const first = rang[0]
-        let last = rang[1]
-        last -= 1
-        for (let k = 0; k < rr.options.bynweekday.length; k++) {
-          let i
-          const wday = rr.options.bynweekday[k][0]
-          const n = rr.options.bynweekday[k][1]
-          if (n < 0) {
-            i = last + (n + 1) * 7
-            i -= pymod(this.wdaymask[i] - wday, 7)
-          } else {
-            i = first + (n - 1) * 7
-            i += pymod(7 - this.wdaymask[i] + wday, 7)
+        for (let j = 0; j < ranges.length; j++) {
+          const rang = ranges[j]
+          const first = rang[0]
+          let last = rang[1]
+          last -= 1
+          for (let k = 0; k < rr.options.bynweekday.length; k++) {
+            let i
+            const wday = rr.options.bynweekday[k][0]
+            const n = rr.options.bynweekday[k][1]
+            if (n < 0) {
+              i = last + (n + 1) * 7
+              i -= pymod(this.wdaymask[i] - wday, 7)
+            } else {
+              i = first + (n - 1) * 7
+              i += pymod(7 - this.wdaymask[i] + wday, 7)
+            }
+            if (first <= i && i <= last) this.nwdaymask[i] = 1
           }
-          if (first <= i && i <= last) this.nwdaymask[i] = 1
         }
       }
+
+      this.lastyear = year
+      this.lastmonth = month
     }
 
-    this.lastyear = year
-    this.lastmonth = month
+    if (rr.options.byeaster !== null) {
+      this.eastermask = this.easter(year, rr.options.byeaster)
+    }
   }
 
-  if (rr.options.byeaster !== null) {
-    this.eastermask = this.easter(year, rr.options.byeaster)
+  ydayset (year, month, day) {
+    return [range(this.yearlen), 0, this.yearlen]
   }
-}
 
-Iterinfo.prototype.ydayset = function (year, month, day) {
-  return [range(this.yearlen), 0, this.yearlen]
-}
+  mdayset (year, month, day) {
+    const set = repeat(null, this.yearlen)
+    const start = this.mrange[month - 1]
+    const end = this.mrange[month]
+    for (let i = start; i < end; i++) set[i] = i
+    return [set, start, end]
+  }
 
-Iterinfo.prototype.mdayset = function (year, month, day) {
-  const set = repeat(null, this.yearlen)
-  const start = this.mrange[month - 1]
-  const end = this.mrange[month]
-  for (let i = start; i < end; i++) set[i] = i
-  return [set, start, end]
-}
+  wdayset (year, month, day) {
+    // We need to handle cross-year weeks here.
+    const set = repeat(null, this.yearlen + 7)
+    let i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
+    const start = i
+    for (let j = 0; j < 7; j++) {
+      set[i] = i
+      ++i
+      if (this.wdaymask[i] === this.rrule.options.wkst) break
+    }
+    return [set, start, i]
+  }
 
-Iterinfo.prototype.wdayset = function (year, month, day) {
-  // We need to handle cross-year weeks here.
-  const set = repeat(null, this.yearlen + 7)
-  let i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
-  const start = i
-  for (let j = 0; j < 7; j++) {
+  ddayset (year, month, day) {
+    const set = repeat(null, this.yearlen)
+    const i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
     set[i] = i
-    ++i
-    if (this.wdaymask[i] === this.rrule.options.wkst) break
+    return [set, i, i + 1]
   }
-  return [set, start, i]
-}
 
-Iterinfo.prototype.ddayset = function (year, month, day) {
-  const set = repeat(null, this.yearlen)
-  const i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
-  set[i] = i
-  return [set, i, i + 1]
-}
+  htimeset (hour, minute, second, millisecond) {
+    const set = []
+    const rr = this.rrule
+    for (let i = 0; i < rr.options.byminute.length; i++) {
+      minute = rr.options.byminute[i]
+      for (let j = 0; j < rr.options.bysecond.length; j++) {
+        second = rr.options.bysecond[j]
+        set.push(new dateutil.Time(hour, minute, second, millisecond))
+      }
+    }
+    dateutil.sort(set)
+    return set
+  }
 
-Iterinfo.prototype.htimeset = function (hour, minute, second, millisecond) {
-  const set = []
-  const rr = this.rrule
-  for (let i = 0; i < rr.options.byminute.length; i++) {
-    minute = rr.options.byminute[i]
+  mtimeset (hour, minute, second, millisecond) {
+    const set = []
+    const rr = this.rrule
     for (let j = 0; j < rr.options.bysecond.length; j++) {
       second = rr.options.bysecond[j]
       set.push(new dateutil.Time(hour, minute, second, millisecond))
     }
+    dateutil.sort(set)
+    return set
   }
-  dateutil.sort(set)
-  return set
-}
 
-Iterinfo.prototype.mtimeset = function (hour, minute, second, millisecond) {
-  const set = []
-  const rr = this.rrule
-  for (let j = 0; j < rr.options.bysecond.length; j++) {
-    second = rr.options.bysecond[j]
-    set.push(new dateutil.Time(hour, minute, second, millisecond))
+  stimeset (hour, minute, second, millisecond) {
+    return [new dateutil.Time(hour, minute, second, millisecond)]
   }
-  dateutil.sort(set)
-  return set
-}
-
-Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
-  return [new dateutil.Time(hour, minute, second, millisecond)]
 }
 
 function getnlp () {

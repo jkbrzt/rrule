@@ -5,13 +5,8 @@
 /**
  * This class helps us to emulate python's generators, sorta.
  */
-var IterResult = function (method, args) {
-  this.init(method, args)
-}
-
-IterResult.prototype = {
-  constructor: IterResult,
-  init: function (method, args) {
+export default class IterResult {
+  constructor (method, args) {
     this.method = method
     this.args = args
     this.minDate = null
@@ -28,7 +23,7 @@ IterResult.prototype = {
     } else if (method === 'after') {
       this.minDate = args.inc ? args.dt : new Date(args.dt.getTime() + 1)
     }
-  },
+  }
 
   /**
    * Possibly adds a date into the result.
@@ -38,9 +33,9 @@ IterResult.prototype = {
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept: function (date) {
-    var tooEarly = this.minDate && date < this.minDate
-    var tooLate = this.maxDate && date > this.maxDate
+  accept (date) {
+    const tooEarly = this.minDate && date < this.minDate
+    const tooLate = this.maxDate && date > this.maxDate
 
     if (this.method === 'between') {
       if (tooEarly) return true
@@ -54,25 +49,25 @@ IterResult.prototype = {
     }
 
     return this.add(date)
-  },
+  }
 
   /**
    *
    * @param {Date} date that is part of the result.
    * @return {Boolean} whether we are interested in more values.
    */
-  add: function (date) {
+  add (date) {
     this._result.push(date)
     return true
-  },
+  }
 
   /**
    * 'before' and 'after' return only one date, whereas 'all'
    * and 'between' an array.
    * @return {Date,Array?}
    */
-  getValue: function () {
-    var res = this._result
+  getValue () {
+    const res = this._result
     switch (this.method) {
       case 'all':
       case 'between':
@@ -81,11 +76,9 @@ IterResult.prototype = {
       case 'after':
         return res.length ? res[res.length - 1] : null
     }
-  },
+  }
 
-  clone: function () {
+  clone () {
     return new IterResult(this.method, this.args)
   }
 }
-
-module.exports = IterResult

@@ -1,83 +1,49 @@
-var RRule = require('./rrule')
-var RRuleSet = require('./rruleset')
-var dateutil = require('./dateutil')
-var Weekday = require('./weekday')
-var {
+import RRule from './rrule'
+import RRuleSet from './rruleset'
+import dateutil from './dateutil'
+import Weekday from './weekday'
+import {
   contains,
   split
-} = require('./helpers')
+} from './helpers'
 
 /**
  * RRuleStr
  *  To parse a set of rrule strings
  */
 
-var RRuleStr = function () {}
-
-RRuleStr.DEFAULT_OPTIONS = {
-  dtstart: null,
-  cache: false,
-  unfold: false,
-  forceset: false,
-  compatible: false,
-  ignoretz: false,
-  tzinfos: null
-}
-
-RRuleStr._freq_map = {
-  'YEARLY': RRule.YEARLY,
-  'MONTHLY': RRule.MONTHLY,
-  'WEEKLY': RRule.WEEKLY,
-  'DAILY': RRule.DAILY,
-  'HOURLY': RRule.HOURLY,
-  'MINUTELY': RRule.MINUTELY,
-  'SECONDLY': RRule.SECONDLY
-}
-
-RRuleStr._weekday_map = {
-  'MO': 0,
-  'TU': 1,
-  'WE': 2,
-  'TH': 3,
-  'FR': 4,
-  'SA': 5,
-  'SU': 6
-}
-
-RRuleStr.prototype = {
-  constructor: RRuleStr,
-
-  _handle_int: function (rrkwargs, name, value, options) {
+class RRuleStr {
+  _handle_int (rrkwargs, name, value, options) { // eslint-disable-line
     rrkwargs[name.toLowerCase()] = parseInt(value, 10)
-  },
+  }
 
-  _handle_int_list: function (rrkwargs, name, value, options) {
+  _handle_int_list (rrkwargs, name, value, options) { // eslint-disable-line
     rrkwargs[name.toLowerCase()] = value.split(',').map(function (x) {
       return parseInt(x, 10)
     })
-  },
+  }
 
-  _handle_FREQ: function (rrkwargs, name, value, options) {
+  _handle_FREQ (rrkwargs, name, value, options) { // eslint-disable-line
     rrkwargs['freq'] = RRuleStr._freq_map[value]
-  },
+  }
 
-  _handle_UNTIL: function (rrkwargs, name, value, options) {
+  _handle_UNTIL (rrkwargs, name, value, options) { // eslint-disable-line
     try {
       rrkwargs['until'] = dateutil.untilStringToDate(value)
     } catch (error) {
       throw new Error('invalid until date')
     }
-  },
+  }
 
-  _handle_WKST: function (rrkwargs, name, value, options) {
+  _handle_WKST (rrkwargs, name, value, options) { // eslint-disable-line
     rrkwargs['wkst'] = RRuleStr._weekday_map[value]
-  },
+  }
 
-  _handle_BYWEEKDAY: function (rrkwargs, name, value, options) {
+  _handle_BYWEEKDAY (rrkwargs, name, value, options) { // eslint-disable-line
     // Two ways to specify this: +1MO or MO(+1)
-    var splt, i, j, n, w, wday
-    var l = []
-    var wdays = value.split(',')
+    let splt, i, j, n, w, wday
+    const l = []
+    const wdays = value.split(',')
 
     for (i = 0; i < wdays.length; i++) {
       wday = wdays[i]
@@ -97,20 +63,20 @@ RRuleStr.prototype = {
         if (n) n = parseInt(n, 10)
       }
 
-      var weekday = new Weekday(RRuleStr._weekday_map[w], n)
+      const weekday = new Weekday(RRuleStr._weekday_map[w], n)
       l.push(weekday)
     }
     rrkwargs['byweekday'] = l
-  },
+  }
 
-  _parseRfcRRule: function (line, options) {
+  _parseRfcRRule (line, options) {
     options = options || {}
     options.dtstart = options.dtstart || null
     options.cache = options.cache || false
     options.ignoretz = options.ignoretz || false
     options.tzinfos = options.tzinfos || null
 
-    var name, value, parts
+    let name, value, parts
     if (line.indexOf(':') !== -1) {
       parts = line.split(':')
       name = parts[0]
@@ -121,9 +87,9 @@ RRuleStr.prototype = {
       value = line
     }
 
-    var i
-    var rrkwargs = {}
-    var pairs = value.split(';')
+    let i
+    const rrkwargs = {}
+    const pairs = value.split(';')
 
     for (i = 0; i < pairs.length; i++) {
       parts = pairs[i].split('=')
@@ -141,9 +107,9 @@ RRuleStr.prototype = {
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
     return new RRule(rrkwargs, !options.cache)
-  },
+  }
 
-  _parseRfc: function (s, options) {
+  _parseRfc (s, options) {
     if (options.compatible) {
       options.forceset = true
       options.unfold = true
@@ -152,8 +118,8 @@ RRuleStr.prototype = {
     s = s && s.toUpperCase().trim()
     if (!s) throw new Error('Invalid empty string')
 
-    var i = 0
-    var line, lines
+    let i = 0
+    let line, lines
 
     // More info about 'unfold' option
     // Go head to http://www.ietf.org/rfc/rfc2445.txt
@@ -175,11 +141,11 @@ RRuleStr.prototype = {
       lines = s.split(/\s/)
     }
 
-    var rrulevals = []
-    var rdatevals = []
-    var exrulevals = []
-    var exdatevals = []
-    var name, value, parts, parms, parm, dtstart, rset, j, k, datestrs, datestr
+    const rrulevals = []
+    const rdatevals = []
+    const exrulevals = []
+    const exdatevals = []
+    let name, value, parts, parms, parm, dtstart, rset, j, k, datestrs, datestr
 
     if (!options.forceset && lines.length === 1 && (s.indexOf(':') === -1 ||
       s.indexOf('RRULE:') === 0)) {
@@ -190,7 +156,7 @@ RRuleStr.prototype = {
         tzinfos: options.tzinfos
       })
     } else {
-      for (i = 0; i < lines.length; i++) {
+      for (let i = 0; i < lines.length; i++) {
         line = lines[i]
         if (!line) continue
         if (line.indexOf(':') === -1) {
@@ -284,14 +250,14 @@ RRuleStr.prototype = {
         })
       }
     }
-  },
+  }
 
-  parse: function (s, options) {
+  parse (s, options) {
     options = options || {}
 
-    var invalid = []
-    var keys = Object.keys(options)
-    var defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS)
+    const invalid = []
+    const keys = Object.keys(options)
+    const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS)
 
     keys.forEach(function (key) {
       if (!contains(defaultKeys, key)) invalid.push(key)
@@ -306,6 +272,36 @@ RRuleStr.prototype = {
 
     return this._parseRfc(s, options)
   }
+}
+
+RRuleStr.DEFAULT_OPTIONS = {
+  dtstart: null,
+  cache: false,
+  unfold: false,
+  forceset: false,
+  compatible: false,
+  ignoretz: false,
+  tzinfos: null
+}
+
+RRuleStr._freq_map = {
+  'YEARLY': RRule.YEARLY,
+  'MONTHLY': RRule.MONTHLY,
+  'WEEKLY': RRule.WEEKLY,
+  'DAILY': RRule.DAILY,
+  'HOURLY': RRule.HOURLY,
+  'MINUTELY': RRule.MINUTELY,
+  'SECONDLY': RRule.SECONDLY
+}
+
+RRuleStr._weekday_map = {
+  'MO': 0,
+  'TU': 1,
+  'WE': 2,
+  'TH': 3,
+  'FR': 4,
+  'SA': 5,
+  'SU': 6
 }
 
 RRuleStr.prototype._handle_DTSTART = function (rrkwargs, name, value, options) {
@@ -324,4 +320,4 @@ RRuleStr.prototype._handle_COUNT = RRuleStr.prototype._handle_int
   RRuleStr.prototype[method] = RRuleStr.prototype._handle_int_list
 })
 
-module.exports = RRuleStr
+export default RRuleStr

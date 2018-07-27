@@ -1,16 +1,10 @@
 /* global describe */
 
-var utils = require('./lib/utils')
-var { RRule } = require('../src/index')
+import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
+import RRule from '../src/index'
 
-var RRuleSet = RRule.RRuleSet
-var rrulestr = RRule.rrulestr
-
-var parse = utils.parse
-var datetime = utils.datetime
-var datetimeUTC = utils.datetimeUTC
-var testRecurring = utils.testRecurring
-var assertStrType = utils.assertStrType
+const RRuleSet = RRule.RRuleSet
+const rrulestr = RRule.rrulestr
 
 describe('rrulestr', function () {
   // Enable additional toString() / fromString() tests

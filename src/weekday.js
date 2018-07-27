@@ -24,7 +24,7 @@ export default class Weekday {
 
   // __repr__
   toString () {
-    var s = WDAYS[this.weekday]
+    let s = WDAYS[this.weekday]
     if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s
     return s
   }

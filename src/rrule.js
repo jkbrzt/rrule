@@ -1237,4 +1237,4 @@ function getnlp () {
   return getnlp._nlp
 }
 
-module.exports = RRule
+export default RRule

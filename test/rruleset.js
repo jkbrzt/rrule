@@ -1,13 +1,9 @@
 /* global describe */
 
-var utils = require('./lib/utils')
-var { RRule } = require('../src/index')
+import { parse, datetime, testRecurring } from './lib/utils'
+import RRule from '../src/index'
 
-var RRuleSet = RRule.RRuleSet
-
-var parse = utils.parse
-var datetime = utils.datetime
-var testRecurring = utils.testRecurring
+const RRuleSet = RRule.RRuleSet
 
 describe('RRuleSet', function () {
   // Enable additional toString() / fromString() tests
@@ -20,7 +16,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSet',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -45,7 +41,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetDate',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -66,7 +62,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetExRule',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -91,7 +87,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetExDate',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -113,7 +109,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetExDateRevOrder',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.MONTHLY,
@@ -134,7 +130,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetDateAndExDate',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rdate(datetime(1997, 9, 2, 9))
       set.rdate(datetime(1997, 9, 4, 9))
@@ -156,7 +152,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetDateAndExRule',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rdate(datetime(1997, 9, 2, 9))
       set.rdate(datetime(1997, 9, 4, 9))
@@ -181,7 +177,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetCachePre',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -206,7 +202,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetCachePost',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -232,7 +228,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetInfiniteAll',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -263,7 +259,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetInfiniteBetween',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -292,7 +288,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetInfiniteBefore',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -319,7 +315,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testSetInfiniteAfter',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
@@ -346,7 +342,7 @@ describe('RRuleSet', function () {
 
   testRecurring('testBefore70',
     function () {
-      var set = new RRuleSet()
+      const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,

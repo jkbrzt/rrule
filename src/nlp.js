@@ -387,7 +387,7 @@ ToText.prototype = {
   },
 
   weekdaytext: function (wday) {
-    const weekday = typeof wday === 'number' ? wday : wday.getJsWeekday()
+    const weekday = typeof wday === 'number' ? (wday + 1) % 7 : wday.getJsWeekday()
     return (wday.n ? this.nth(wday.n) + ' ' : '') +
       this.language.dayNames[weekday]
   },

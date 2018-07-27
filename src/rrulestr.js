@@ -196,7 +196,7 @@ class RRuleStr {
           for (j = 0; j < parms.length; j++) {
             parm = parms[j]
             if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-              throw new Error('unsupported RDATE parm: ' + parm)
+              throw new Error('unsupported EXDATE parm: ' + parm)
             }
           }
           exdatevals.push(value)

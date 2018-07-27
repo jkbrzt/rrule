@@ -20,7 +20,7 @@
   }, {
     "name": "Lars Schöning"
   }],
-  "main": "src/rrule.js",
+  "main": "dist/index.js",
   "ignore": [
     "**/.*",
     "node_modules",

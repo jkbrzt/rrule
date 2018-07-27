@@ -119,8 +119,8 @@ export const testRecurring = function (msg, testObj, expectedDates) {
       // Test fromText()/toText().
       const string = rule.toString()
       const text = rule.toText()
-      const text2 = rrule2.toText()
       const rrule2 = RRule.fromText(text, rule.options.dtstart)
+      const text2 = rrule2.toText()
       assert.strictEqual(text2, text, 'toText() == fromText(toText()).toText()')
 
       // Test fromText()/toString().

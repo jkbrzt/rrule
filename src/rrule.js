@@ -337,7 +337,7 @@ class RRule {
       value = options[keys[i]]
       strValues = []
 
-      if (value === null || value instanceof Array && !value.length) continue
+      if (value === null || (value instanceof Array && !value.length)) continue
 
       switch (key) {
         case 'FREQ':
@@ -387,8 +387,8 @@ class RRule {
           } else {
             value = String(value)
           }
-
       }
+
       pairs.push([key, value])
     }
 
@@ -858,7 +858,7 @@ class RRule {
         if (filtered) {
           // Jump to one iteration before next day
           second += Math.floor(
-              (86399 - (hour * 3600 + minute * 60 + second)) / interval) * interval
+            (86399 - (hour * 3600 + minute * 60 + second)) / interval) * interval
         }
         while (true) {
           second += interval

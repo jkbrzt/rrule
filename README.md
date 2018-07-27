@@ -661,7 +661,7 @@ $ npm run build
 To run the tests, run:
 
 ```
-$ TZ=UTC npm test
+$ npm test
 ```
 
 ### Changelog

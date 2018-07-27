@@ -659,7 +659,6 @@ const parseText = function (text, language) {
 
       default:
         throw new Error('Unknown symbol')
-
     }
   }
 

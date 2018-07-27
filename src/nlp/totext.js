@@ -1,5 +1,5 @@
-import RRule from './rrule'
 import ENGLISH from './i18n'
+import RRule from '../index'
 
 // =============================================================================
 // Helper functions

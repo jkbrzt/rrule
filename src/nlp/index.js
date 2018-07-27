@@ -1,6 +1,6 @@
-import RRule from './index'
 import ToText from './totext'
 import parseText from './parsetext'
+import RRule from '../index'
 
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.

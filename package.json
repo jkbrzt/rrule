@@ -3,6 +3,11 @@
   "version": "2.2.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
+  "babel": {
+    "presets": [
+      "env"
+    ]
+  },
   "keywords": [
     "dates",
     "recurrences",
@@ -11,17 +16,24 @@
     "rfc"
   ],
   "author": "Jakub Roztocil and Lars Schöning",
-  "main": "lib/rrule",
+  "main": "dist/index",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
   "scripts": {
-    "test": "standard && mocha"
+    "build": "npm run standard && webpack",
+    "fix": "npm run standard --fix",
+    "standard": "standard src/**/*.js test/**/*.js",
+    "test": "npm run standard && TZ=UTC mocha --compilers js:babel-core/register"
   },
   "devDependencies": {
-    "mocha": "^3.2.0",
-    "standard": "^8.6.0"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "mocha": "^5.2.0",
+    "standard": "^11.0.1",
+    "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0"
   },
   "standard": {
     "ignore": [

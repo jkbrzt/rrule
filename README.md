@@ -27,25 +27,20 @@ to natural language.
 #### Client Side
 
 ```bash
-$ bower install rrule
+$ yarn add rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/lib/rrule.js) manually. If
-you intend to use `RRule.prototype.toText()` or `RRule.fromText()`, you'll
-also need [nlp.js](https://raw.github.com/jakubroztocil/rrule/master/lib/nlp.js).
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/index.js) manually.
 
 ```html
-<script src="rrule/lib/rrule.js"></script>
-
-<!-- Optional -->
-<script src="rrule/lib/nlp.js"></script>
+<script src="rrule/dist/index.js"></script>
 ```
 
 #### Server Side
 
 ```bash
-$ npm install rrule
+$ yarn add rrule
 ```
 
 ```javascript
@@ -480,9 +475,6 @@ These methods provide an incomplete support for text–`RRule` and
 `RRule`–text conversion. You should test them with your input to see
 whether the result is acceptable.
 
-To use these methods in the browser, you need to include the
-`rrule/nlp.js` file as well.
-
 ##### `RRule.prototype.toText([gettext, [language]])`
 
 Returns a textual representation of `rule`. The `gettext` callback, if
@@ -650,7 +642,19 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 ### Development
 
-rrule.js use [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+rrule.js uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+
+To build, run:
+
+```
+$ yarn build
+```
+
+To run the tests, run:
+
+```
+$ yarn test
+```
 
 ### Changelog
 

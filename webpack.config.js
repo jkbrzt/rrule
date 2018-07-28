@@ -1,14 +1,26 @@
 const path = require('path');
 
-module.exports = {
+module.exports = [{
   entry: {
-    demo: './demo/demo.js',
     index: './src/index.js'
   },
   output: {
-    filename: '[name].js',
+    filename: 'index.js',
+    path: path.resolve(__dirname, 'dist'),
+    library: 'rrule',
+    libraryTarget: 'umd',
+    globalObject: 'typeof self !== \'undefined\' ? self : this'
+  },
+  devtool: 'eval',
+  mode: 'production'
+}, {
+  entry: {
+    demo: './demo/demo.js',
+  },
+  output: {
+    filename: 'demo.js',
     path: path.resolve(__dirname, 'dist')
   },
   devtool: 'source-map',
   mode: 'production'
-};
+}];

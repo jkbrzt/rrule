@@ -34,7 +34,7 @@ import CallbackIterResult from './callbackiterresult'
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-class RRule {
+export default class RRule {
   constructor (options, noCache) {
     options = options || {}
     // RFC string
@@ -1236,5 +1236,3 @@ function getnlp () {
   }
   return getnlp._nlp
 }
-
-export default RRule

@@ -1,7 +1,7 @@
 /* global describe */
 
 import { parse, datetime, testRecurring } from './lib/utils'
-import RRule from '../src/index'
+import { RRule } from '../dist/index.js'
 
 const RRuleSet = RRule.RRuleSet
 

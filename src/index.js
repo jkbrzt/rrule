@@ -24,14 +24,14 @@ import RRuleStr from './rrulestr'
 
 // Only one RRuleStr instance for all rrule string parsing work.
 const rruleStr = new RRuleStr()
-export const rrulestr = function () {
+const rrulestr = function () {
   return rruleStr.parse.apply(rruleStr, arguments)
 }
 
 export {
   RRule,
   RRuleSet,
-  RRuleStr
+  rrulestr
 }
 
 RRule.RRule = RRule

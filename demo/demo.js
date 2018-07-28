@@ -1,4 +1,4 @@
-import RRule from '../src/index'
+import RRule from '../dist/index'
 
 /*
  * decaffeinate suggestions:

@@ -11,7 +11,7 @@ module.exports = [{
     libraryTarget: 'umd',
     globalObject: 'typeof self !== \'undefined\' ? self : this'
   },
-  devtool: 'eval',
+  devtool: 'source-map',
   mode: 'production'
 }, {
   entry: {

@@ -3,9 +3,10 @@
   "version": "2.2.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
+  "license": "BSD-3-Clause-No-Nuclear-License-2014",
   "babel": {
     "presets": [
-      "env"
+      "@babel/preset-env"
     ]
   },
   "keywords": [
@@ -28,7 +29,10 @@
     "test": "npm run standard && TZ=UTC mocha --compilers js:babel-core/register"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-beta.55",
+    "@babel/preset-env": "^7.0.0-beta.55",
     "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "mocha": "^5.2.0",
     "standard": "^11.0.1",

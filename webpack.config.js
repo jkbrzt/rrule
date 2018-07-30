@@ -12,7 +12,22 @@ module.exports = [{
     globalObject: 'typeof self !== \'undefined\' ? self : this'
   },
   devtool: 'source-map',
-  mode: 'production'
+  mode: 'production',
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
+      }
+    }]
+  },
+  optimization: {
+    minimize: false
+  }
 }, {
   entry: {
     demo: './demo/demo.js',
@@ -22,5 +37,17 @@ module.exports = [{
     path: path.resolve(__dirname, 'dist')
   },
   devtool: 'source-map',
-  mode: 'production'
+  mode: 'production',
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        }
+      }
+    }]
+  }
 }];

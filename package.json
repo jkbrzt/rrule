@@ -3,7 +3,7 @@
   "version": "2.2.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
-  "license" : "SEE LICENSE IN LICENSE",
+  "license": "SEE LICENSE IN LICENSE",
   "babel": {
     "presets": [
       "@babel/preset-env"
@@ -24,15 +24,20 @@
   },
   "scripts": {
     "build": "yarn lint && tsc && webpack",
-    "lint": "yarn tslint --fix src/**/*.ts test/**/*.js",
-    "test": "yarn lint && TZ=UTC mocha --compilers js:babel-core/register"
+    "lint": "yarn tslint --fix src/**/*.ts test/**/*.ts",
+    "test": "yarn lint && TZ=UTC mocha --compilers ts:ts-node/register"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.55",
     "@babel/preset-env": "^7.0.0-beta.55",
+    "@types/assert": "^0.0.31",
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.4",
     "babel-cli": "^6.26.0",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
     "coffee-loader": "^0.9.0",
     "coffeescript": "^2.3.1",
     "copy-webpack-plugin": "^4.5.2",
@@ -41,6 +46,7 @@
     "mocha": "^5.2.0",
     "source-map-loader": "^0.2.3",
     "ts-loader": "^4.4.2",
+    "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",

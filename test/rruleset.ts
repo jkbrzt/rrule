@@ -1,9 +1,7 @@
 /* global describe */
 
 import { parse, datetime, testRecurring } from './lib/utils'
-import { RRule } from '../dist/es6/rrule.js'
-
-const RRuleSet = RRule.RRuleSet
+import { RRule, RRuleSet } from '../src'
 
 describe('RRuleSet', function () {
   // Enable additional toString() / fromString() tests
@@ -244,7 +242,7 @@ describe('RRuleSet', function () {
         rrule: set,
         method: 'all',
         args: [
-          function (date, count) {
+          function (_: any, count: number) {
             return count < 3
           }
         ]

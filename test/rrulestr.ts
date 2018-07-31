@@ -1,10 +1,7 @@
 /* global describe */
 
 import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
-import RRule from '../dist/es6/rrule.js'
-
-const RRuleSet = RRule.RRuleSet
-const rrulestr = RRule.rrulestr
+import { RRule, RRuleSet, rrulestr } from '../src'
 
 describe('rrulestr', function () {
   // Enable additional toString() / fromString() tests

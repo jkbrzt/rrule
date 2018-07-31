@@ -276,12 +276,15 @@ export default function parseText (text: string, language: Language) {
         options.byweekday.push(RRule[wkd])
       } else if (ttr.symbol === 'weekday(s)') {
         ttr.nextSymbol()
-        if (!options.byweekday) options.byweekday = []
-        options.byweekday.push(RRule.MO)
-        options.byweekday.push(RRule.TU)
-        options.byweekday.push(RRule.WE)
-        options.byweekday.push(RRule.TH)
-        options.byweekday.push(RRule.FR)
+        if (!options.byweekday) {
+          options.byweekday = [
+            RRule.MO,
+            RRule.TU,
+            RRule.WE,
+            RRule.TH,
+            RRule.FR
+          ]
+        }
       } else if (ttr.symbol === 'week(s)') {
         ttr.nextSymbol()
         let n = ttr.accept('number')

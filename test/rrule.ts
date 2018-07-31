@@ -1,8 +1,7 @@
-/* global describe, it */
-
-import assert from 'assert'
 import { parse, datetime, testRecurring } from './lib/utils'
-import { RRule } from '../dist/es6/rrule.js'
+import { expect } from 'chai'
+// @ts-ignore
+import { RRule, rrulestr } from '../src/index'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -50,24 +49,24 @@ describe('RRule', function () {
   it('fromText()', function () {
     texts.forEach(function (item) {
       const text = item[0]
-      const string = item[1]
-      assert.strictEqual(RRule.fromText(text).toString(), string, text + ' => ' + string)
+      const str = item[1]
+      expect(RRule.fromText(text).toString()).equals(str, text + ' => ' + str)
     })
   })
 
   it('toText()', function () {
     texts.forEach(function (item) {
       const text = item[0]
-      const string = item[1]
-      assert.strictEqual(RRule.fromString(string).toText().toLowerCase(), text.toLowerCase(),
-        string + ' => ' + text)
+      const str = item[1]
+      expect(RRule.fromString(str).toText().toLowerCase()).equals(text.toLowerCase(),
+        str + ' => ' + text)
     })
   })
 
   it('rrulestr https://github.com/jkbrzt/rrule/pull/164', function () {
     const s1 = 'FREQ=WEEKLY;WKST=WE'
-    const s2 = RRule.rrulestr(s1).toString()
-    assert.strictEqual(s1, s2, s1 + ' => ' + s2)
+    const s2 = rrulestr(s1).toString()
+    expect(s1).equals(s2, s1 + ' => ' + s2)
   })
 
   it('fromString()', function () {
@@ -80,7 +79,7 @@ describe('RRule', function () {
     strings.forEach(function (item) {
       const s = item[0]
       const s2 = item[1]
-      assert.strictEqual(RRule.fromString(s).toString(), s2, s + ' => ' + s2)
+      expect(RRule.fromString(s).toString()).equals(s2, s + ' => ' + s2)
     })
   })
 
@@ -93,13 +92,13 @@ describe('RRule', function () {
     }
     const rule = new RRule(options)
 
-    assert.deepEqual(options, {
+    expect(options).deep.equals({
       freq: RRule.MONTHLY,
       dtstart: new Date(2013, 0, 1),
       count: 3,
       bymonthday: [28]
     })
-    assert.deepEqual(rule.origOptions, options)
+    expect(rule.origOptions).deep.equals(options)
   })
 
   testRecurring('missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',
@@ -3531,16 +3530,18 @@ describe('RRule', function () {
     'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freqStr) {
       const date = new Date(1356991200001)
       const rr = new RRule({
+        // @ts-ignore
         freq: RRule[freqStr],
         dtstart: date
       })
 
-      assert.strictEqual(date.getTime(), rr.options.dtstart.getTime(),
+      expect(date.getTime()).equals(rr.options.dtstart.getTime(),
         'the supplied dtstart differs from RRule.options.dtstart')
-      let res = rr.before(rr.after(rr.options.dtstart))
+      let res: Date = rr.before(rr.after(rr.options.dtstart))
 
-      if (res != null) res = res.getTime()
-      assert.strictEqual(res, rr.options.dtstart.getTime(),
+      let resTimestamp: number
+      if (res != null) resTimestamp = res.getTime()
+      expect(resTimestamp).equals(rr.options.dtstart.getTime(),
         'after dtstart , followed by before does not return dtstart')
     })
   })
@@ -3561,9 +3562,9 @@ describe('RRule', function () {
       })
 
       const rrstr = rr.toString()
-      assert.equal(rrstr, 'DTSTART=20171017T003000Z;UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
+      expect(rrstr).equals('DTSTART=20171017T003000Z;UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
       const newrr = RRule.fromString(rrstr)
-      assert.equal(rrstr, newrr.toString())
+      expect(rrstr).equals(newrr.toString())
     })
   })
 
@@ -3574,7 +3575,8 @@ describe('RRule', function () {
     ].forEach(function (pair) {
       const rule = pair[0]
       const rr = RRule.fromString(rule)
-      assert.ok(rr.toText())
+      // tslint:disable-next-line:no-unused-expression
+      expect(rr.toText()).to.be.ok
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })
   })

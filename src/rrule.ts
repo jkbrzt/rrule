@@ -16,6 +16,7 @@ import {
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
+import { Language } from './nlp/i18n'
 
 interface GetNlp {
   _nlp: any
@@ -51,17 +52,17 @@ export interface RRuleOrigOptions {
   wkst?: Weekday | number
   count?: number | null
   until?: Date | null
-  bysetpos?: number[] | null
+  bysetpos?: number | number[] | null
   bymonth?: number[] | number | null
   bymonthday?: number[] | number | null
   bynmonthday?: number[] | null
   byyearday?: number[] | null
-  byweekno?: number[] | null
-  byweekday?: (Weekday | number)[] | null
+  byweekno?: number | number[] | null
+  byweekday?: Weekday | number | (Weekday | number)[] | null
   bynweekday?: number[][] | null
-  byhour?: number[] | null
-  byminute?: number[] | null
-  bysecond?: number[] | null
+  byhour?: number | number[] | null
+  byminute?: number | number[] | null
+  bysecond?: number | number[] | null
   byeaster?: number | null
 }
 
@@ -368,7 +369,7 @@ export default class RRule {
     return getnlp().parseText(text, language)
   }
 
-  static fromText (text: string, language: string) {
+  static fromText (text: string, language?: Language) {
     return getnlp().fromText(text, language)
   }
 
@@ -592,14 +593,14 @@ export default class RRule {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  before (dt: Date, inc = false) {
+  before (dt: Date, inc = false): Date | null {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
       result = this._iter(new IterResult('before', args))
       this._cacheAdd('before', result, args)
     }
-    return result
+    return result as Date
   }
 
   /**
@@ -608,14 +609,14 @@ export default class RRule {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  after (dt: Date, inc = false) {
+  after (dt: Date, inc = false): Date | null {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {
       result = this._iter(new IterResult('after', args))
       this._cacheAdd('after', result, args)
     }
-    return result
+    return result as Date
   }
 
   /**
@@ -639,7 +640,7 @@ export default class RRule {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext: string, language: string) {
+  toText (gettext?: string, language?: string) {
     return getnlp().toText(this, gettext, language)
   }
 
@@ -803,11 +804,11 @@ export default class RRule {
       }[freq]
 
       if (
-        (freq >= RRule.HOURLY && plb(byhour) && !contains(byhour, hour)) ||
+        (freq >= RRule.HOURLY && plb(byhour) && !contains(byhour as number[], hour)) ||
         (freq >= RRule.MINUTELY &&
           plb(byminute) &&
-          !contains(byminute, minute)) ||
-        (freq >= RRule.SECONDLY && plb(bysecond) && !contains(bysecond, second))
+          !contains(byminute as number[], minute)) ||
+        (freq >= RRule.SECONDLY && plb(bysecond) && !contains(bysecond as number[], second))
       ) {
         timeset = []
       } else {
@@ -875,8 +876,8 @@ export default class RRule {
         let timepos: number
         const poslist: Date[] = []
 
-        for (let j = 0; j < bysetpos.length; j++) {
-          pos = bysetpos[j]
+        for (let j = 0; j < (bysetpos as number[]).length; j++) {
+          pos = (bysetpos as number[])[j]
 
           if (pos < 0) {
             daypos = Math.floor(pos / timeset.length)
@@ -1010,7 +1011,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!plb(byhour) || contains(byhour, hour)) break
+          if (!plb(byhour) || contains(byhour as number[], hour)) break
         }
         timeset = gettimeset.call(ii, hour, minute, second)
       } else if (freq === RRule.MINUTELY) {
@@ -1039,8 +1040,8 @@ export default class RRule {
             }
           }
           if (
-            (!plb(byhour) || contains(byhour, hour)) &&
-            (!plb(byminute) || contains(byminute, minute))
+            (!plb(byhour) || contains(byhour as number[], hour)) &&
+            (!plb(byminute) || contains(byminute as number[], minute))
           ) {
             break
           }
@@ -1079,9 +1080,9 @@ export default class RRule {
             }
           }
           if (
-            (!plb(byhour) || contains(byhour, hour)) &&
-            (!plb(byminute) || contains(byminute, minute)) &&
-            (!plb(bysecond) || contains(bysecond, second))
+            (!plb(byhour) || contains(byhour as number[], hour)) &&
+            (!plb(byminute) || contains(byminute as number[], minute)) &&
+            (!plb(bysecond) || contains(bysecond as number[], second))
           ) {
             break
           }
@@ -1222,9 +1223,9 @@ class Iterinfo {
         const mod = pymod(wyearlen, 7)
         const numweeks = Math.floor(div + mod / 4)
 
-        for (let j = 0; j < rr.options.byweekno.length; j++) {
+        for (let j = 0; j < (rr.options.byweekno as number[]).length; j++) {
           let i: number
-          let n = rr.options.byweekno[j]
+          let n = (rr.options.byweekno as number[])[j]
           if (n < 0) {
             n += numweeks + 1
           }
@@ -1246,7 +1247,7 @@ class Iterinfo {
           }
         }
 
-        if (contains(rr.options.byweekno, 1)) {
+        if (contains(rr.options.byweekno as number[], 1)) {
           // Check week number 1 of next year as well
           // orig-TODO : Check -numweeks for next year.
           let i = no1wkst + numweeks * 7
@@ -1270,7 +1271,7 @@ class Iterinfo {
           // days from last year's last week number in
           // this year.
           let lnumweeks
-          if (!contains(rr.options.byweekno, -1)) {
+          if (!contains(rr.options.byweekno as number[], -1)) {
             const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
             let lno1wkst = pymod(
               7 - lyearweekday.valueOf() + rr.options.wkst,
@@ -1293,7 +1294,7 @@ class Iterinfo {
           } else {
             lnumweeks = -1
           }
-          if (contains(rr.options.byweekno, lnumweeks)) {
+          if (contains(rr.options.byweekno as number[], lnumweeks)) {
             for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
           }
         }
@@ -1389,10 +1390,10 @@ class Iterinfo {
   htimeset (hour: number, minute: number, second: number, millisecond: number) {
     const set = []
     const rr = this.rrule
-    for (let i = 0; i < rr.options.byminute.length; i++) {
-      minute = rr.options.byminute[i]
-      for (let j = 0; j < rr.options.bysecond.length; j++) {
-        second = rr.options.bysecond[j]
+    for (let i = 0; i < (rr.options.byminute as number[]).length; i++) {
+      minute = (rr.options.byminute as number[])[i]
+      for (let j = 0; j < (rr.options.bysecond as number[]).length; j++) {
+        second = (rr.options.bysecond as number[])[j]
         set.push(new dateutil.Time(hour, minute, second, millisecond))
       }
     }
@@ -1403,8 +1404,8 @@ class Iterinfo {
   mtimeset (hour: number, minute: number, second: number, millisecond: number) {
     const set = []
     const rr = this.rrule
-    for (let j = 0; j < rr.options.bysecond.length; j++) {
-      second = rr.options.bysecond[j]
+    for (let j = 0; j < (rr.options.bysecond as number[]).length; j++) {
+      second = (rr.options.bysecond as number[])[j]
       set.push(new dateutil.Time(hour, minute, second, millisecond))
     }
     dateutil.sort(set)

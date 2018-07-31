@@ -24,7 +24,7 @@ import RRuleStr from './rrulestr'
 
 // Only one RRuleStr instance for all rrule string parsing work.
 const rruleStr = new RRuleStr()
-const rrulestr = function () {
+const rrulestr: typeof rruleStr.parse = function () {
   return rruleStr.parse.apply(rruleStr, arguments)
 }
 

@@ -313,7 +313,7 @@ export default class ToText {
     if (this.options.byweekno) {
       this.add(gettext('in'))
         .add(
-          this.plural(this.options.byweekno.length)
+          this.plural((this.options.byweekno as number[]).length)
             ? gettext('weeks')
             : gettext('week')
         )

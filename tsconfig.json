@@ -3,13 +3,15 @@
     "outDir": "./dist/es6",
     "noImplicitAny": true,
     "sourceMap": true,
-    "module": "es6",
+    "module": "commonjs",
+    "noEmitOnError": true,
     "target": "es6",
     "jsx": "react",
     "allowJs": true
   },
   "include": [
     "./src/**/*",
+    "./test/**/*",
     "./types/**/*"
   ]
 }

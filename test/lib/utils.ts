@@ -1,70 +1,72 @@
 /* global it */
 
-import assert from 'assert'
-import { RRule } from '../../dist/es6/rrule.js'
+import { expect } from 'chai'
+import { RRule, RRuleSet } from '../../src'
 
-const assertDatesEqual = function (actual, expected, msg) {
+const assertDatesEqual = function (actual: Date | Date[], expected: Date | Date[], msg?: string) {
   msg = msg ? ' [' + msg + '] ' : ''
 
   if (!(actual instanceof Array)) actual = [actual]
   if (!(expected instanceof Array)) expected = [expected]
 
   if (expected.length > 1) {
-    assert.strictEqual(actual.length, expected.length, msg + 'number of recurrences')
+    expect(actual).to.have.length(expected.length, msg + 'number of recurrences')
     msg = ' - '
   }
 
-  for (let exp, act, i = 0; i < expected.length; i++) {
-    act = actual[i]
-    exp = expected[i]
-    assert.strictEqual(exp instanceof Date ? exp.toString() : exp,
+  for (let i = 0; i < expected.length; i++) {
+    const act = actual[i]
+    const exp = expected[i]
+    expect(exp instanceof Date ? exp.toString() : exp).to.equal(
       act.toString(), msg + (i + 1) + '/' + expected.length)
   }
 }
 
-const extractTime = function (date) {
+const extractTime = function (date: Date) {
   return date != null ? date.getTime() : void 0
 }
 
 /**
  * datetime.datetime
  */
-export const datetime = function (y, m, d, h, i, s) {
-  h = h || 0
-  i = i || 0
-  s = s || 0
+export const datetime = function (y: number, m: number, d: number, h: number = 0, i: number = 0, s: number = 0) {
   return new Date(y, m - 1, d, h, i, s)
 }
 
-export const datetimeUTC = function (y, m, d, h, i, s) {
-  h = h || 0
-  i = i || 0
-  s = s || 0
+export const datetimeUTC = function (y: number, m: number, d: number, h: number = 0, i: number = 0, s: number = 0) {
   return new Date(Date.UTC(y, m - 1, d, h, i, s))
 }
 
 /**
  * dateutil.parser.parse
  */
-export const parse = function (str) {
+export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
   let [ _, y, m, d, h, i, s ] = parts // eslint-disable-line
-  m = Number(m[0] === '0' ? m[1] : m) - 1
-  d = d[0] === '0' ? d[1] : d
-  h = h[0] === '0' ? h[1] : h
-  i = i[0] === '0' ? i[1] : i
-  s = s[0] === '0' ? s[1] : s
-  return new Date(y, m, d, h, i, s)
+  const year = Number(y)
+  const month = Number(m[0] === '0' ? m[1] : m) - 1
+  const day = Number(d[0] === '0' ? d[1] : d)
+  const hour = Number(h[0] === '0' ? h[1] : h)
+  const minute = Number(i[0] === '0' ? i[1] : i)
+  const second = Number(s[0] === '0' ? s[1] : s)
+  return new Date(year, month, day, hour, minute, second)
 }
 
-export const testRecurring = function (msg, testObj, expectedDates) {
-  let rule, method, args
+interface TestRecurring {
+  (m: string, testObj: any, expectedDates: Date | Date[]): void
+  skip: (...args: any[]) => void
+}
+
+export const testRecurring: TestRecurring = function (msg: string, testObj: any, expectedDates: Date | Date[]) {
+  let rule: any
+  let method: string
+  let args: any
 
   if (typeof testObj === 'function') {
     testObj = testObj()
   }
 
-  if (testObj instanceof RRule || testObj instanceof RRule.RRuleSet) {
+  if (testObj instanceof RRule || testObj instanceof RRuleSet) {
     rule = testObj
     method = 'all'
     args = []
@@ -89,7 +91,7 @@ export const testRecurring = function (msg, testObj, expectedDates) {
     let actualDates = rule[method].apply(rule, args)
     time = Date.now() - time
 
-    assert.strictEqual(time < 100, true,
+    expect(time).to.be.lessThan(100,
       rule + '\' method "' + method + '" should finish in 100 ms, but ' + time + ' ms')
 
     if (!(actualDates instanceof Array)) actualDates = [actualDates]
@@ -101,15 +103,15 @@ export const testRecurring = function (msg, testObj, expectedDates) {
     // ==========================================================
 
     if (ctx.ALSO_TEST_SUBSECOND_PRECISION) {
-      assert.deepEqual(actualDates.map(extractTime), expectedDates.map(extractTime))
+      expect(actualDates.map(extractTime)).to.deep.equal(expectedDates.map(extractTime))
     }
 
     if (ctx.ALSO_TEST_STRING_FUNCTIONS) {
       // Test toString()/fromString()
-      const string = rule.toString()
-      const rrule2 = RRule.fromString(string, rule.options.dtstart)
+      const str = rule.toString()
+      const rrule2 = RRule.fromString(str /*, rule.options.dtstart */)
       const string2 = rrule2.toString()
-      assert.strictEqual(string, string2, 'toString() == fromString(toString()).toString()')
+      expect(str).to.equal(string2, 'toString() == fromString(toString()).toString()')
       if (method === 'all') {
         assertDatesEqual(rrule2.all(), expectedDates, 'fromString().all()')
       }
@@ -117,15 +119,15 @@ export const testRecurring = function (msg, testObj, expectedDates) {
 
     if (ctx.ALSO_TEST_NLP_FUNCTIONS && rule.isFullyConvertibleToText && rule.isFullyConvertibleToText()) {
       // Test fromText()/toText().
-      const string = rule.toString()
+      const str = rule.toString()
       const text = rule.toText()
       const rrule2 = RRule.fromText(text, rule.options.dtstart)
       const text2 = rrule2.toText()
-      assert.strictEqual(text2, text, 'toText() == fromText(toText()).toText()')
+      expect(text2).to.equal(text, 'toText() == fromText(toText()).toText()')
 
       // Test fromText()/toString().
       const rrule3 = RRule.fromText(text, rule.options.dtstart)
-      assert.strictEqual(rrule3.toString(), string, 'toString() == fromText(toText()).toString()')
+      expect(rrule3.toString()).to.equal(str, 'toString() == fromText(toText()).toString()')
     }
 
     if (method === 'all' && ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN) {
@@ -157,7 +159,10 @@ export const testRecurring = function (msg, testObj, expectedDates) {
       }
 
       if (expectedDates.length > 1) {
-        for (let date, next, prev, i = 0; i < expectedDates.length; i++) {
+        let date
+        let next
+        let prev
+        for (let i = 0; i < expectedDates.length; i++) {
           date = expectedDates[i]
           next = expectedDates[i + 1]
           prev = expectedDates[i - 1]
@@ -173,14 +178,14 @@ export const testRecurring = function (msg, testObj, expectedDates) {
       }
     }
   })
-}
+} as TestRecurring
 
 testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
 
-export const assertStrType = function (msg, obj, type) {
+export const assertStrType = function (msg: string, obj: object, type: any) {
   it(msg, function () {
-    assert.ok(obj instanceof type)
+    expect(obj).to.be.instanceof(type)
   })
 }

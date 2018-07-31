@@ -1,6 +1,6 @@
-import ToText from './totext'
-import parseText from './parsetext'
-import RRule from '../index'
+import ToText from "./totext";
+import parseText from "./parsetext";
+import RRule from "../index";
 
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
@@ -93,36 +93,35 @@ import RRule from '../index'
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text, language) {
-  return new RRule(parseText(text, language))
-}
+const fromText = function(text: string, language: string) {
+  return new RRule(parseText(text, language));
+};
 
 const common = [
-  'count', 'until', 'interval',
-  'byweekday', 'bymonthday', 'bymonth'
-]
+  "count",
+  "until",
+  "interval",
+  "byweekday",
+  "bymonthday",
+  "bymonth"
+];
 
-ToText.IMPLEMENTED = []
-ToText.IMPLEMENTED[RRule.HOURLY] = common
-ToText.IMPLEMENTED[RRule.MINUTELY] = common
-ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common)
-ToText.IMPLEMENTED[RRule.WEEKLY] = common
-ToText.IMPLEMENTED[RRule.MONTHLY] = common
-ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
+ToText.IMPLEMENTED = [];
+ToText.IMPLEMENTED[RRule.HOURLY] = common;
+ToText.IMPLEMENTED[RRule.MINUTELY] = common;
+ToText.IMPLEMENTED[RRule.DAILY] = ["byhour"].concat(common);
+ToText.IMPLEMENTED[RRule.WEEKLY] = common;
+ToText.IMPLEMENTED[RRule.MONTHLY] = common;
+ToText.IMPLEMENTED[RRule.YEARLY] = ["byweekno", "byyearday"].concat(common);
 
 // =============================================================================
 // Export
 // =============================================================================
 
-const toText = function (rrule, gettext, language) {
-  return new ToText(rrule, gettext, language).toString()
-}
+const toText = function(rrule: RRule, gettext: () => void, language: string) {
+  return new ToText(rrule, gettext, language).toString();
+};
 
-const { isFullyConvertible } = ToText
+const { isFullyConvertible } = ToText;
 
-export {
-  fromText,
-  parseText,
-  isFullyConvertible,
-  toText
-}
+export { fromText, parseText, isFullyConvertible, toText };

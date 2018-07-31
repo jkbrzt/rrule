@@ -34,8 +34,4 @@ export {
   rrulestr
 }
 
-RRule.RRule = RRule
-RRule.RRuleSet = RRuleSet
-RRule.rrulestr = rrulestr
-
 export default RRule

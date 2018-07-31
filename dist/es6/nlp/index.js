@@ -1,8 +1,6 @@
-import ToText, { GetText } from './totext'
-import parseText from './parsetext'
-import RRule from '../index'
-import { Language } from './i18n'
-
+import ToText from './totext';
+import parseText from './parsetext';
+import RRule from '../index';
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -12,7 +10,6 @@ import { Language } from './i18n'
 * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
 *
 */
-
 /**
  *
  * Implementation of RRule.fromText() and RRule::toText().
@@ -22,7 +19,6 @@ import { Language } from './i18n'
  * when those functions are used.
  *
  */
-
 // =============================================================================
 // fromText
 // =============================================================================
@@ -94,35 +90,30 @@ import { Language } from './i18n'
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text: string, language?: Language) {
-  return new RRule(parseText(text, language))
-}
-
+const fromText = function (text, language) {
+    return new RRule(parseText(text, language));
+};
 const common = [
-  'count',
-  'until',
-  'interval',
-  'byweekday',
-  'bymonthday',
-  'bymonth'
-]
-
-ToText.IMPLEMENTED = []
-ToText.IMPLEMENTED[RRule.HOURLY] = common
-ToText.IMPLEMENTED[RRule.MINUTELY] = common
-ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common)
-ToText.IMPLEMENTED[RRule.WEEKLY] = common
-ToText.IMPLEMENTED[RRule.MONTHLY] = common
-ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
-
+    'count',
+    'until',
+    'interval',
+    'byweekday',
+    'bymonthday',
+    'bymonth'
+];
+ToText.IMPLEMENTED = [];
+ToText.IMPLEMENTED[RRule.HOURLY] = common;
+ToText.IMPLEMENTED[RRule.MINUTELY] = common;
+ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common);
+ToText.IMPLEMENTED[RRule.WEEKLY] = common;
+ToText.IMPLEMENTED[RRule.MONTHLY] = common;
+ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common);
 // =============================================================================
 // Export
 // =============================================================================
-
-const toText = function (rrule: RRule, gettext: GetText, language?: Language) {
-  return new ToText(rrule, gettext, language).toString()
-}
-
-const { isFullyConvertible } = ToText
-
-export { fromText, parseText, isFullyConvertible, toText }
+const toText = function (rrule, gettext, language) {
+    return new ToText(rrule, gettext, language).toString();
+};
+const { isFullyConvertible } = ToText;
+export { fromText, parseText, isFullyConvertible, toText };
+//# sourceMappingURL=index.js.map

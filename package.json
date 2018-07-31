@@ -23,10 +23,9 @@
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
   "scripts": {
-    "build": "npm run standard && webpack",
-    "fix": "npm run standard --fix",
-    "standard": "standard src/**/*.js test/**/*.js",
-    "test": "npm run standard && TZ=UTC mocha --compilers js:babel-core/register"
+    "build": "yarn lint && tsc && webpack",
+    "lint": "yarn tslint --fix src/**/*.ts test/**/*.js",
+    "test": "yarn lint && TZ=UTC mocha --compilers js:babel-core/register"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.55",
@@ -36,8 +35,9 @@
     "babel-preset-env": "^1.7.0",
     "mocha": "^5.2.0",
     "source-map-loader": "^0.2.3",
-    "standard": "^11.0.1",
     "ts-loader": "^4.4.2",
+    "tslint": "^5.11.0",
+    "tslint-config-standard": "^7.1.0",
     "typescript": "^3.0.1",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.1.0"

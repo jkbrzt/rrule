@@ -3,39 +3,39 @@
 // =============================================================================
 
 export interface IterArgs {
-  inc: boolean;
-  before: Date;
-  after: Date;
-  dt: Date;
-  _value: any;
+  inc: boolean
+  before: Date
+  after: Date
+  dt: Date
+  _value: any
 }
 
 /**
  * This class helps us to emulate python's generators, sorta.
  */
 export default class IterResult {
-  public readonly method: string;
-  public readonly args: Partial<IterArgs>;
-  public readonly minDate: Date | null;
-  public readonly maxDate: Date | null;
-  public _result: (Date | IterArgs)[];
+  public readonly method: string
+  public readonly args: Partial<IterArgs>
+  public readonly minDate: Date | null
+  public readonly maxDate: Date | null
+  public _result: (Date | IterArgs)[]
 
-  constructor(method: string, args: Partial<IterArgs>) {
-    this.method = method;
-    this.args = args;
-    this.minDate = null;
-    this.maxDate = null;
-    this._result = [];
+  constructor (method: string, args: Partial<IterArgs>) {
+    this.method = method
+    this.args = args
+    this.minDate = null
+    this.maxDate = null
+    this._result = []
 
-    if (method === "between") {
+    if (method === 'between') {
       this.maxDate = args.inc
         ? args.before
-        : new Date(args.before.getTime() - 1);
-      this.minDate = args.inc ? args.after : new Date(args.after.getTime() + 1);
-    } else if (method === "before") {
-      this.maxDate = args.inc ? args.dt : new Date(args.dt.getTime() - 1);
-    } else if (method === "after") {
-      this.minDate = args.inc ? args.dt : new Date(args.dt.getTime() + 1);
+        : new Date(args.before.getTime() - 1)
+      this.minDate = args.inc ? args.after : new Date(args.after.getTime() + 1)
+    } else if (method === 'before') {
+      this.maxDate = args.inc ? args.dt : new Date(args.dt.getTime() - 1)
+    } else if (method === 'after') {
+      this.minDate = args.inc ? args.dt : new Date(args.dt.getTime() + 1)
     }
   }
 
@@ -47,22 +47,22 @@ export default class IterResult {
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept(date: Date | IterArgs) {
-    const tooEarly = this.minDate && date < this.minDate;
-    const tooLate = this.maxDate && date > this.maxDate;
+  accept (date: Date | IterArgs) {
+    const tooEarly = this.minDate && date < this.minDate
+    const tooLate = this.maxDate && date > this.maxDate
 
-    if (this.method === "between") {
-      if (tooEarly) return true;
-      if (tooLate) return false;
-    } else if (this.method === "before") {
-      if (tooLate) return false;
-    } else if (this.method === "after") {
-      if (tooEarly) return true;
-      this.add(date);
-      return false;
+    if (this.method === 'between') {
+      if (tooEarly) return true
+      if (tooLate) return false
+    } else if (this.method === 'before') {
+      if (tooLate) return false
+    } else if (this.method === 'after') {
+      if (tooEarly) return true
+      this.add(date)
+      return false
     }
 
-    return this.add(date);
+    return this.add(date)
   }
 
   /**
@@ -70,9 +70,9 @@ export default class IterResult {
    * @param {Date} date that is part of the result.
    * @return {Boolean} whether we are interested in more values.
    */
-  add(date: Date | IterArgs) {
-    this._result.push(date);
-    return true;
+  add (date: Date | IterArgs) {
+    this._result.push(date)
+    return true
   }
 
   /**
@@ -80,19 +80,19 @@ export default class IterResult {
    * and 'between' an array.
    * @return {Date,Array?}
    */
-  getValue() {
-    const res = this._result;
+  getValue () {
+    const res = this._result
     switch (this.method) {
-      case "all":
-      case "between":
-        return res;
-      case "before":
-      case "after":
-        return res.length ? res[res.length - 1] : null;
+      case 'all':
+      case 'between':
+        return res
+      case 'before':
+      case 'after':
+        return res.length ? res[res.length - 1] : null
     }
   }
 
-  clone() {
-    return new IterResult(this.method, this.args);
+  clone () {
+    return new IterResult(this.method, this.args)
   }
 }

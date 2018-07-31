@@ -2,7 +2,15 @@
 // i18n
 // =============================================================================
 
-const ENGLISH = {
+export interface Language {
+  dayNames: string[]
+  monthNames: string[]
+  tokens: {
+    [k: string]: RegExp
+  }
+}
+
+const ENGLISH: Language = {
   dayNames: [
     'Sunday', 'Monday', 'Tuesday', 'Wednesday',
     'Thursday', 'Friday', 'Saturday'

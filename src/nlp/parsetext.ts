@@ -1,8 +1,99 @@
-import ENGLISH from './i18n'
+import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
+import { RRuleOrigOptions } from '../rrule'
 
-const parseText = function (text, language) {
-  const options = {}
+// =============================================================================
+// Parser
+// =============================================================================
+
+class Parser {
+  private readonly rules: { [k: string]: RegExp }
+  public text: string
+  public symbol: string | null
+  public value: any
+  private done = true
+
+  constructor (rules: { [k: string]: RegExp }) {
+    this.rules = rules
+  }
+
+  start (text: string) {
+    this.text = text
+    this.done = false
+    return this.nextSymbol()
+  }
+
+  isDone () {
+    return this.done && this.symbol == null
+  }
+
+  nextSymbol () {
+    let best: RegExpExecArray
+    let bestSymbol: string
+    const p = this
+
+    this.symbol = null
+    this.value = null
+    do {
+      if (this.done) return false
+
+      let match: RegExpExecArray
+      let rule: RegExp
+      best = null
+      for (let name in this.rules) {
+        rule = this.rules[name]
+        match = rule.exec(p.text)
+        if (match) {
+          if (best == null || match[0].length > best[0].length) {
+            best = match
+            bestSymbol = name
+          }
+        }
+      }
+
+      if (best != null) {
+        this.text = this.text.substr(best[0].length)
+
+        if (this.text === '') this.done = true
+      }
+
+      if (best == null) {
+        this.done = true
+        this.symbol = null
+        this.value = null
+        return
+      }
+    } while (bestSymbol === 'SKIP')
+
+    this.symbol = bestSymbol
+    this.value = best
+    return true
+  }
+
+  accept (name: string) {
+    if (this.symbol === name) {
+      if (this.value) {
+        const v = this.value
+        this.nextSymbol()
+        return v
+      }
+
+      this.nextSymbol()
+      return true
+    }
+
+    return false
+  }
+
+  expect (name: string) {
+    if (this.accept(name)) return true
+
+    throw new Error('expected ' + name + ' but found ' + this.symbol)
+  }
+}
+
+export default function parseText (text: string, language: Language) {
+  const options: Partial<RRuleOrigOptions> = {}
   const ttr = new Parser((language || ENGLISH).tokens)
 
   if (!ttr.start(text)) return null
@@ -12,10 +103,9 @@ const parseText = function (text, language) {
 
   function S () {
     // every [n]
-    let n
-
     ttr.expect('every')
-    if ((n = ttr.accept('number'))) options.interval = parseInt(n[0], 10)
+    let n = ttr.accept('number')
+    if (n) options.interval = parseInt(n[0], 10)
     if (ttr.isDone()) throw new Error('Unexpected end')
 
     switch (ttr.symbol) {
@@ -90,7 +180,9 @@ const parseText = function (text, language) {
       case 'saturday':
       case 'sunday':
         options.freq = RRule.WEEKLY
-        options.byweekday = [RRule[ttr.symbol.substr(0, 2).toUpperCase()]]
+        const key = ttr.symbol.substr(0, 2).toUpperCase() as keyof typeof RRule
+        // @ts-ignore
+        options.byweekday = [RRule[key]]
 
         if (!ttr.nextSymbol()) return
 
@@ -98,11 +190,12 @@ const parseText = function (text, language) {
         while (ttr.accept('comma')) {
           if (ttr.isDone()) throw new Error('Unexpected end')
 
-          let wkd
-          if (!(wkd = decodeWKD())) {
+          let wkd = decodeWKD() as keyof typeof RRule
+          if (!wkd) {
             throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday')
           }
 
+          // @ts-ignore
           options.byweekday.push(RRule[wkd])
           ttr.nextSymbol()
         }
@@ -123,7 +216,7 @@ const parseText = function (text, language) {
       case 'november':
       case 'december':
         options.freq = RRule.YEARLY
-        options.bymonth = [decodeM()]
+        options.bymonth = [decodeM() as number]
 
         if (!ttr.nextSymbol()) return
 
@@ -131,8 +224,8 @@ const parseText = function (text, language) {
         while (ttr.accept('comma')) {
           if (ttr.isDone()) throw new Error('Unexpected end')
 
-          let m
-          if (!(m = decodeM())) {
+          let m = decodeM()
+          if (!m) {
             throw new Error('Unexpected symbol ' + ttr.symbol + ', expected month')
           }
 
@@ -155,25 +248,31 @@ const parseText = function (text, language) {
     if (!(on || the)) return
 
     do {
-      let nth, wkd, m
+      let nth = decodeNTH()
+      let wkd = decodeWKD()
+      let m = decodeM()
 
       // nth <weekday> | <weekday>
-      if ((nth = decodeNTH())) {
+      if (nth) {
         // ttr.nextSymbol()
 
-        if ((wkd = decodeWKD())) {
+        if (wkd) {
           ttr.nextSymbol()
           if (!options.byweekday) options.byweekday = []
+          // @ts-ignore
           options.byweekday.push(RRule[wkd].nth(nth))
         } else {
           if (!options.bymonthday) options.bymonthday = []
+          // @ts-ignore
           options.bymonthday.push(nth)
           ttr.accept('day(s)')
         }
         // <weekday>
-      } else if ((wkd = decodeWKD())) {
+      } else if (wkd) {
         ttr.nextSymbol()
         if (!options.byweekday) options.byweekday = []
+
+        // @ts-ignore
         options.byweekday.push(RRule[wkd])
       } else if (ttr.symbol === 'weekday(s)') {
         ttr.nextSymbol()
@@ -185,20 +284,23 @@ const parseText = function (text, language) {
         options.byweekday.push(RRule.FR)
       } else if (ttr.symbol === 'week(s)') {
         ttr.nextSymbol()
-        let n
-        if (!(n = ttr.accept('number'))) {
+        let n = ttr.accept('number')
+        if (!n) {
           throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number')
         }
         options.byweekno = [n[0]]
         while (ttr.accept('comma')) {
-          if (!(n = ttr.accept('number'))) {
+          n = ttr.accept('number')
+          if (!n) {
             throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
           }
           options.byweekno.push(n[0])
         }
-      } else if ((m = decodeM())) {
+      } else if (m) {
         ttr.nextSymbol()
         if (!options.bymonth) options.bymonth = []
+
+        // @ts-ignore
         options.bymonth.push(m)
       } else {
         return
@@ -211,13 +313,14 @@ const parseText = function (text, language) {
     if (!at) return
 
     do {
-      let n
-      if (!(n = ttr.accept('number'))) {
+      let n = ttr.accept('number')
+      if (!n) {
         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour')
       }
       options.byhour = [n[0]]
       while (ttr.accept('comma')) {
-        if (!(n = ttr.accept('number'))) {
+        n = ttr.accept('number')
+        if (!n) {
           throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour')
         }
         options.byhour.push(n[0])
@@ -301,14 +404,15 @@ const parseText = function (text, language) {
     ttr.accept('on')
     ttr.accept('the')
 
-    let nth
-    if (!(nth = decodeNTH())) return
+    let nth = decodeNTH()
+    if (!nth) return
 
     options.bymonthday = [nth]
     ttr.nextSymbol()
 
     while (ttr.accept('comma')) {
-      if (!(nth = decodeNTH())) {
+      nth = decodeNTH()
+      if (!nth) {
         throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
       }
 
@@ -330,86 +434,3 @@ const parseText = function (text, language) {
     }
   }
 }
-
-// =============================================================================
-// Parser
-// =============================================================================
-
-class Parser {
-  constructor (rules) {
-    this.rules = rules
-  }
-
-  start (text) {
-    this.text = text
-    this.done = false
-    return this.nextSymbol()
-  }
-
-  isDone () {
-    return this.done && this.symbol == null
-  }
-
-  nextSymbol () {
-    let best, bestSymbol
-    const p = this
-
-    this.symbol = null
-    this.value = null
-    do {
-      if (this.done) return false
-
-      let match, rule
-      best = null
-      for (let name in this.rules) {
-        rule = this.rules[name]
-        if ((match = rule.exec(p.text))) {
-          if (best == null || match[0].length > best[0].length) {
-            best = match
-            bestSymbol = name
-          }
-        }
-      }
-
-      if (best != null) {
-        this.text = this.text.substr(best[0].length)
-
-        if (this.text === '') this.done = true
-      }
-
-      if (best == null) {
-        this.done = true
-        this.symbol = null
-        this.value = null
-        return
-      }
-    } while (bestSymbol === 'SKIP')
-
-    this.symbol = bestSymbol
-    this.value = best
-    return true
-  }
-
-  accept (name) {
-    if (this.symbol === name) {
-      if (this.value) {
-        const v = this.value
-        this.nextSymbol()
-        return v
-      }
-
-      this.nextSymbol()
-      return true
-    }
-
-    return false
-  }
-
-  expect (name) {
-    if (this.accept(name)) return true
-
-    throw new Error('expected ' + name + ' but found ' + this.symbol)
-  }
-}
-
-export default parseText

@@ -1,38 +1,38 @@
-const WDAYS = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+const WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
 // =============================================================================
 // Weekday
 // =============================================================================
 
 export default class Weekday {
-  public readonly weekday: number;
-  public readonly n?: number;
+  public readonly weekday: number
+  public readonly n?: number
 
-  constructor(weekday: number, n?: number) {
-    if (n === 0) throw new Error("Can't create weekday with n == 0");
-    this.weekday = weekday;
-    this.n = n;
+  constructor (weekday: number, n?: number) {
+    if (n === 0) throw new Error("Can't create weekday with n == 0")
+    this.weekday = weekday
+    this.n = n
   }
 
   // __call__ - Cannot call the object directly, do it through
   // e.g. RRule.TH.nth(-1) instead,
-  nth(n: number) {
-    return this.n === n ? this : new Weekday(this.weekday, n);
+  nth (n: number) {
+    return this.n === n ? this : new Weekday(this.weekday, n)
   }
 
   // __eq__
-  equals(other: Weekday) {
-    return this.weekday === other.weekday && this.n === other.n;
+  equals (other: Weekday) {
+    return this.weekday === other.weekday && this.n === other.n
   }
 
   // __repr__
-  toString() {
-    let s = WDAYS[this.weekday];
-    if (this.n) s = (this.n > 0 ? "+" : "") + String(this.n) + s;
-    return s;
+  toString () {
+    let s = WDAYS[this.weekday]
+    if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s
+    return s
   }
 
-  getJsWeekday() {
-    return this.weekday === 6 ? 0 : this.weekday + 1;
+  getJsWeekday () {
+    return this.weekday === 6 ? 0 : this.weekday + 1
   }
 }

@@ -17,13 +17,15 @@ import {
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
+import { Nlp } from './nlp/index'
+import { GetText } from './nlp/totext'
 
 interface GetNlp {
-  _nlp: any
-  (): any
+  _nlp: Nlp
+  (): Nlp
 }
 
-const getnlp: GetNlp = function (): any {
+const getnlp: GetNlp = function () {
   // Lazy, runtime import to avoid circular refs.
   if (!getnlp._nlp) {
     getnlp._nlp = require('./nlp')
@@ -365,7 +367,7 @@ export default class RRule {
     }
   }
 
-  static parseText (text: string, language: string) {
+  static parseText (text: string, language: Language) {
     return getnlp().parseText(text, language)
   }
 
@@ -640,7 +642,7 @@ export default class RRule {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext?: string, language?: string) {
+  toText (gettext?: GetText, language?: Language) {
     return getnlp().toText(this, gettext, language)
   }
 

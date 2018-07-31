@@ -91,4 +91,10 @@ import { Language } from './i18n';
 declare const fromText: (text: string, language?: Language) => RRule;
 declare const toText: (rrule: RRule, gettext: GetText, language?: Language) => string;
 declare const isFullyConvertible: typeof ToText.isFullyConvertible;
+export interface Nlp {
+    fromText: typeof fromText;
+    parseText: typeof parseText;
+    isFullyConvertible: typeof isFullyConvertible;
+    toText: typeof toText;
+}
 export { fromText, parseText, isFullyConvertible, toText };

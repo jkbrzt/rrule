@@ -2,6 +2,7 @@ import Weekday from './weekday';
 import { Time } from './dateutil';
 import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
+import { GetText } from './nlp/totext';
 export declare enum Frequencies {
     YEARLY = 0,
     MONTHLY = 1,
@@ -72,8 +73,8 @@ export default class RRule {
     static readonly SA: Weekday;
     static readonly SU: Weekday;
     constructor(options?: RRuleOrigOptions, noCache?: boolean);
-    static parseText(text: string, language: string): any;
-    static fromText(text: string, language?: Language): any;
+    static parseText(text: string, language: Language): Partial<RRuleOrigOptions>;
+    static fromText(text: string, language?: Language): RRule;
     static parseString(rfcString: string): RRuleOrigOptions;
     static fromString(str: string): RRule;
     static optionsToString(options: RRuleOptions): string;
@@ -121,8 +122,8 @@ export default class RRule {
      * Will convert all rules described in nlp:ToText
      * to text.
      */
-    toText(gettext?: string, language?: string): any;
-    isFullyConvertibleToText(): any;
+    toText(gettext?: GetText, language?: Language): string;
+    isFullyConvertibleToText(): boolean;
     /**
      * @param {String} what - all/before/after/between
      * @param {Array,Date} value - an array of dates, one date, or null

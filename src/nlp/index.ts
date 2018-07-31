@@ -125,4 +125,11 @@ const toText = function (rrule: RRule, gettext: GetText, language?: Language) {
 
 const { isFullyConvertible } = ToText
 
+export interface Nlp {
+  fromText: typeof fromText
+  parseText: typeof parseText
+  isFullyConvertible: typeof isFullyConvertible
+  toText: typeof toText
+}
+
 export { fromText, parseText, isFullyConvertible, toText }

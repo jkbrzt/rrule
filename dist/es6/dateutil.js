@@ -1,4 +1,6 @@
-export class Time {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Time {
     constructor(hour, minute, second, millisecond) {
         this.hour = hour;
         this.minute = minute;
@@ -22,6 +24,7 @@ export class Time {
             this.millisecond);
     }
 }
+exports.Time = Time;
 /**
  * General date-related utilities.
  * Also handles several incompatibilities between JavaScript and Python
@@ -169,5 +172,5 @@ const dateutil = {
     },
     Time
 };
-export default dateutil;
+exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map

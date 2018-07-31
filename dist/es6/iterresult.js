@@ -1,10 +1,12 @@
+"use strict";
 // =============================================================================
 // Results
 // =============================================================================
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * This class helps us to emulate python's generators, sorta.
  */
-export default class IterResult {
+class IterResult {
     constructor(method, args) {
         this.method = method;
         this.args = args;
@@ -82,4 +84,5 @@ export default class IterResult {
         return new IterResult(this.method, this.args);
     }
 }
+exports.default = IterResult;
 //# sourceMappingURL=iterresult.js.map

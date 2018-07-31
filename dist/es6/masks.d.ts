@@ -1,0 +1,10 @@
+declare const M365MASK: any[];
+declare const M366MASK: any[];
+declare const MDAY366MASK: any[];
+declare const MDAY365MASK: any[];
+declare const NMDAY366MASK: any[];
+declare const NMDAY365MASK: any[];
+declare const M366RANGE: number[];
+declare const M365RANGE: number[];
+declare const WDAYMASK: number[];
+export { WDAYMASK, M365MASK, M365RANGE, M366MASK, M366RANGE, MDAY365MASK, MDAY366MASK, NMDAY365MASK, NMDAY366MASK };

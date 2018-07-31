@@ -1,13 +1,15 @@
-import RRule from './rrule';
-import RRuleSet from './rruleset';
-import dateutil from './dateutil';
-import Weekday from './weekday';
-import { contains, split } from './helpers';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const rrule_1 = require("./rrule");
+const rruleset_1 = require("./rruleset");
+const dateutil_1 = require("./dateutil");
+const weekday_1 = require("./weekday");
+const helpers_1 = require("./helpers");
 /**
  * RRuleStr
  *  To parse a set of rrule strings
  */
-export default class RRuleStr {
+class RRuleStr {
     constructor() {
         // tslint:disable-next-line:variable-name
         this._handle_BYDAY = this._handle_BYWEEKDAY;
@@ -37,7 +39,7 @@ export default class RRuleStr {
     // tslint:disable-next-line:variable-name
     _handle_DTSTART(rrkwargs, name, value, _) {
         // @ts-ignore
-        rrkwargs[name.toLowerCase()] = dateutil.untilStringToDate(value);
+        rrkwargs[name.toLowerCase()] = dateutil_1.default.untilStringToDate(value);
     }
     _handle_int(rrkwargs, name, value) {
         // @ts-ignore
@@ -54,7 +56,7 @@ export default class RRuleStr {
     _handle_UNTIL(rrkwargs, _, value, __) {
         // eslint-disable-line
         try {
-            rrkwargs['until'] = dateutil.untilStringToDate(value);
+            rrkwargs['until'] = dateutil_1.default.untilStringToDate(value);
         }
         catch (error) {
             throw new Error('invalid until date');
@@ -93,7 +95,7 @@ export default class RRuleStr {
                 if (n)
                     n = parseInt(n, 10);
             }
-            const weekday = new Weekday(RRuleStr._weekday_map[w], n);
+            const weekday = new weekday_1.default(RRuleStr._weekday_map[w], n);
             l.push(weekday);
         }
         rrkwargs['byweekday'] = l;
@@ -134,7 +136,7 @@ export default class RRuleStr {
             }
         }
         rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
-        return new RRule(rrkwargs, !options.cache);
+        return new rrule_1.default(rrkwargs, !options.cache);
     }
     _parseRfc(s, options) {
         if (options.compatible) {
@@ -204,7 +206,7 @@ export default class RRuleStr {
                     value = line;
                 }
                 else {
-                    parts = split(line, ':', 1);
+                    parts = helpers_1.split(line, ':', 1);
                     name = parts[0];
                     value = parts[1];
                 }
@@ -246,7 +248,7 @@ export default class RRuleStr {
                     exdatevals.push(value);
                 }
                 else if (name === 'DTSTART') {
-                    dtstart = dateutil.untilStringToDate(value);
+                    dtstart = dateutil_1.default.untilStringToDate(value);
                 }
                 else {
                     throw new Error('unsupported property: ' + name);
@@ -257,7 +259,7 @@ export default class RRuleStr {
                 rdatevals.length ||
                 exrulevals.length ||
                 exdatevals.length) {
-                rset = new RRuleSet(!options.cache);
+                rset = new rruleset_1.default(!options.cache);
                 for (j = 0; j < rrulevals.length; j++) {
                     rset.rrule(this._parseRfcRRule(rrulevals[j], {
                         dtstart: options.dtstart || dtstart,
@@ -269,7 +271,7 @@ export default class RRuleStr {
                     datestrs = rdatevals[j].split(',');
                     for (k = 0; k < datestrs.length; k++) {
                         datestr = datestrs[k];
-                        rset.rdate(dateutil.untilStringToDate(datestr));
+                        rset.rdate(dateutil_1.default.untilStringToDate(datestr));
                     }
                 }
                 for (j = 0; j < exrulevals.length; j++) {
@@ -283,7 +285,7 @@ export default class RRuleStr {
                     datestrs = exdatevals[j].split(',');
                     for (k = 0; k < datestrs.length; k++) {
                         datestr = datestrs[k];
-                        rset.exdate(dateutil.untilStringToDate(datestr));
+                        rset.exdate(dateutil_1.default.untilStringToDate(datestr));
                     }
                 }
                 if (options.campatiable && options.dtstart)
@@ -305,7 +307,7 @@ export default class RRuleStr {
         const keys = Object.keys(options);
         const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS);
         keys.forEach(function (key) {
-            if (!contains(defaultKeys, key))
+            if (!helpers_1.contains(defaultKeys, key))
                 invalid.push(key);
         }, this);
         if (invalid.length) {
@@ -314,7 +316,7 @@ export default class RRuleStr {
         // Merge in default options
         defaultKeys.forEach(function (key) {
             // @ts-ignore
-            if (!contains(keys, key))
+            if (!helpers_1.contains(keys, key))
                 options[key] = RRuleStr.DEFAULT_OPTIONS[key];
         });
         return this._parseRfc(s, options);
@@ -332,13 +334,13 @@ RRuleStr._weekday_map = {
 };
 // tslint:disable-next-line:variable-name
 RRuleStr._freq_map = {
-    YEARLY: RRule.YEARLY,
-    MONTHLY: RRule.MONTHLY,
-    WEEKLY: RRule.WEEKLY,
-    DAILY: RRule.DAILY,
-    HOURLY: RRule.HOURLY,
-    MINUTELY: RRule.MINUTELY,
-    SECONDLY: RRule.SECONDLY
+    YEARLY: rrule_1.default.YEARLY,
+    MONTHLY: rrule_1.default.MONTHLY,
+    WEEKLY: rrule_1.default.WEEKLY,
+    DAILY: rrule_1.default.DAILY,
+    HOURLY: rrule_1.default.HOURLY,
+    MINUTELY: rrule_1.default.MINUTELY,
+    SECONDLY: rrule_1.default.SECONDLY
 };
 RRuleStr.DEFAULT_OPTIONS = {
     dtstart: null,
@@ -349,4 +351,5 @@ RRuleStr.DEFAULT_OPTIONS = {
     ignoretz: false,
     tzinfos: null
 };
+exports.default = RRuleStr;
 //# sourceMappingURL=rrulestr.js.map

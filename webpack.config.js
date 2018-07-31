@@ -27,13 +27,13 @@ const rruleConfig = {
   mode: 'production',
   module: {
     rules: [{
-      test: /\.tsx?$/,
-      use: 'ts-loader',
+      test: /\.js?$/,
+      use: 'babel-loader',
       exclude: /node_modules/
     }]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.js']
   },
   optimization: {
     minimize: false

@@ -1,9 +1,11 @@
-import Weekday from './weekday';
-import dateutil from './dateutil';
-import { range, repeat, pymod, divmod, plb, contains } from './helpers';
-import { WDAYMASK, M365MASK, M365RANGE, M366MASK, M366RANGE, MDAY365MASK, MDAY366MASK, NMDAY365MASK, NMDAY366MASK } from './masks';
-import IterResult from './iterresult';
-import CallbackIterResult from './callbackiterresult';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const weekday_1 = require("./weekday");
+const dateutil_1 = require("./dateutil");
+const helpers_1 = require("./helpers");
+const masks_1 = require("./masks");
+const iterresult_1 = require("./iterresult");
+const callbackiterresult_1 = require("./callbackiterresult");
 const getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -11,7 +13,7 @@ const getnlp = function () {
     }
     return getnlp._nlp;
 };
-export var Frequencies;
+var Frequencies;
 (function (Frequencies) {
     Frequencies[Frequencies["YEARLY"] = 0] = "YEARLY";
     Frequencies[Frequencies["MONTHLY"] = 1] = "MONTHLY";
@@ -20,15 +22,15 @@ export var Frequencies;
     Frequencies[Frequencies["HOURLY"] = 4] = "HOURLY";
     Frequencies[Frequencies["MINUTELY"] = 5] = "MINUTELY";
     Frequencies[Frequencies["SECONDLY"] = 6] = "SECONDLY";
-})(Frequencies || (Frequencies = {}));
+})(Frequencies = exports.Frequencies || (exports.Frequencies = {}));
 const Days = {
-    MO: new Weekday(0),
-    TU: new Weekday(1),
-    WE: new Weekday(2),
-    TH: new Weekday(3),
-    FR: new Weekday(4),
-    SA: new Weekday(5),
-    SU: new Weekday(6)
+    MO: new weekday_1.default(0),
+    TU: new weekday_1.default(1),
+    WE: new weekday_1.default(2),
+    TH: new weekday_1.default(3),
+    FR: new weekday_1.default(4),
+    SA: new weekday_1.default(5),
+    SU: new weekday_1.default(6)
 };
 /**
  *
@@ -36,7 +38,7 @@ const Days = {
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule {
+class RRule {
     constructor(options = {}, noCache = false) {
         // RFC string
         this._string = null;
@@ -58,7 +60,7 @@ export default class RRule {
         keys.forEach(function (key) {
             this.origOptions[key] = options[key];
             this.options[key] = options[key];
-            if (!contains(defaultKeys, key))
+            if (!helpers_1.contains(defaultKeys, key))
                 invalid.push(key);
         }, this);
         if (invalid.length) {
@@ -69,7 +71,7 @@ export default class RRule {
         }
         // Merge in default options
         defaultKeys.forEach(function (key) {
-            if (!contains(keys, key))
+            if (!helpers_1.contains(keys, key))
                 this.options[key] = RRule.DEFAULT_OPTIONS[key];
         }, this);
         const opts = this.options;
@@ -98,9 +100,9 @@ export default class RRule {
                 }
             }
         }
-        if (!(plb(opts.byweekno) ||
-            plb(opts.byyearday) ||
-            plb(opts.bymonthday) ||
+        if (!(helpers_1.plb(opts.byweekno) ||
+            helpers_1.plb(opts.byyearday) ||
+            helpers_1.plb(opts.bymonthday) ||
             opts.byweekday !== null ||
             opts.byeaster !== null)) {
             switch (opts.freq) {
@@ -113,7 +115,7 @@ export default class RRule {
                     opts.bymonthday = opts.dtstart.getDate();
                     break;
                 case RRule.WEEKLY:
-                    opts.byweekday = [dateutil.getWeekday(opts.dtstart)];
+                    opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
                     break;
             }
         }
@@ -167,7 +169,7 @@ export default class RRule {
             opts.byweekday = [opts.byweekday];
             opts.bynweekday = null;
         }
-        else if (opts.byweekday instanceof Weekday) {
+        else if (opts.byweekday instanceof weekday_1.default) {
             if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
                 opts.byweekday = [opts.byweekday.weekday];
                 opts.bynweekday = null;
@@ -192,8 +194,8 @@ export default class RRule {
                     bynweekday.push([wday.weekday, wday.n]);
                 }
             }
-            opts.byweekday = plb(byweekday) ? byweekday : null;
-            opts.bynweekday = plb(bynweekday) ? bynweekday : null;
+            opts.byweekday = helpers_1.plb(byweekday) ? byweekday : null;
+            opts.bynweekday = helpers_1.plb(bynweekday) ? bynweekday : null;
         }
         // byhour
         if (opts.byhour === null) {
@@ -232,11 +234,11 @@ export default class RRule {
                         // python:
                         // datetime.time(hour, minute, second,
                         // tzinfo=self._tzinfo))
-                        this.timeset.push(new dateutil.Time(hour, minute, second, millisecondModulo));
+                        this.timeset.push(new dateutil_1.default.Time(hour, minute, second, millisecondModulo));
                     }
                 }
             }
-            dateutil.sort(this.timeset);
+            dateutil_1.default.sort(this.timeset);
         }
     }
     static parseText(text, language) {
@@ -309,15 +311,15 @@ export default class RRule {
                             n = Number(parts[1]);
                             const wdaypart = parts[2];
                             wday = Days[wdaypart].weekday;
-                            options.byweekday.push(new Weekday(wday, n));
+                            options.byweekday.push(new weekday_1.default(wday, n));
                         }
                     }
                     break;
                 case 'DTSTART':
-                    options.dtstart = dateutil.untilStringToDate(value);
+                    options.dtstart = dateutil_1.default.untilStringToDate(value);
                     break;
                 case 'UNTIL':
-                    options.until = dateutil.untilStringToDate(value);
+                    options.until = dateutil_1.default.untilStringToDate(value);
                     break;
                 case 'BYEASTER':
                     options.byeaster = Number(value);
@@ -336,7 +338,7 @@ export default class RRule {
         const keys = Object.keys(options);
         const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         for (let i = 0; i < keys.length; i++) {
-            if (!contains(defaultKeys, keys[i]))
+            if (!helpers_1.contains(defaultKeys, keys[i]))
                 continue;
             let key = keys[i].toUpperCase();
             let value = options[keys[i]];
@@ -348,8 +350,8 @@ export default class RRule {
                     value = RRule.FREQUENCIES[options.freq];
                     break;
                 case 'WKST':
-                    if (!(value instanceof Weekday)) {
-                        value = new Weekday(value);
+                    if (!(value instanceof weekday_1.default)) {
+                        value = new weekday_1.default(value);
                     }
                     break;
                 case 'BYWEEKDAY':
@@ -369,14 +371,14 @@ export default class RRule {
                         value = [value];
                     for (let j = 0; j < value.length; j++) {
                         let wday = value[j];
-                        if (wday instanceof Weekday) {
+                        if (wday instanceof weekday_1.default) {
                             // good
                         }
                         else if (wday instanceof Array) {
-                            wday = new Weekday(wday[0], wday[1]);
+                            wday = new weekday_1.default(wday[0], wday[1]);
                         }
                         else {
-                            wday = new Weekday(wday);
+                            wday = new weekday_1.default(wday);
                         }
                         strValues[j] = wday.toString();
                     }
@@ -384,7 +386,7 @@ export default class RRule {
                     break;
                 case 'DTSTART':
                 case 'UNTIL':
-                    value = dateutil.timeToUntilString(value);
+                    value = dateutil_1.default.timeToUntilString(value);
                     break;
                 default:
                     if (value instanceof Array) {
@@ -414,12 +416,12 @@ export default class RRule {
      */
     all(iterator) {
         if (iterator) {
-            return this._iter(new CallbackIterResult('all', {}, iterator));
+            return this._iter(new callbackiterresult_1.default('all', {}, iterator));
         }
         else {
             let result = this._cacheGet('all');
             if (result === false) {
-                result = this._iter(new IterResult('all', {}));
+                result = this._iter(new iterresult_1.default('all', {}));
                 this._cacheAdd('all', result);
             }
             return result;
@@ -439,11 +441,11 @@ export default class RRule {
             inc: inc
         };
         if (iterator) {
-            return this._iter(new CallbackIterResult('between', args, iterator));
+            return this._iter(new callbackiterresult_1.default('between', args, iterator));
         }
         let result = this._cacheGet('between', args);
         if (result === false) {
-            result = this._iter(new IterResult('between', args));
+            result = this._iter(new iterresult_1.default('between', args));
             this._cacheAdd('between', result, args);
         }
         return result;
@@ -458,7 +460,7 @@ export default class RRule {
         const args = { dt: dt, inc: inc };
         let result = this._cacheGet('before', args);
         if (result === false) {
-            result = this._iter(new IterResult('before', args));
+            result = this._iter(new iterresult_1.default('before', args));
             this._cacheAdd('before', result, args);
         }
         return result;
@@ -473,7 +475,7 @@ export default class RRule {
         const args = { dt: dt, inc: inc };
         let result = this._cacheGet('after', args);
         if (result === false) {
-            result = this._iter(new IterResult('after', args));
+            result = this._iter(new iterresult_1.default('after', args));
             this._cacheAdd('after', result, args);
         }
         return result;
@@ -514,8 +516,8 @@ export default class RRule {
         if (value) {
             value =
                 value instanceof Date
-                    ? dateutil.clone(value)
-                    : dateutil.cloneDates(value);
+                    ? dateutil_1.default.clone(value)
+                    : dateutil_1.default.cloneDates(value);
         }
         if (what === 'all') {
             this._cache.all = value;
@@ -564,7 +566,7 @@ export default class RRule {
         if (!cached && this._cache.all) {
             // Not in the cache, but we already know all the occurrences,
             // so we can find the correct dates from the cached ones.
-            const iterResult = new IterResult(what, args);
+            const iterResult = new iterresult_1.default(what, args);
             for (let i = 0; i < this._cache.all.length; i++) {
                 if (!iterResult.accept(this._cache.all[i]))
                     break;
@@ -573,9 +575,9 @@ export default class RRule {
             this._cacheAdd(what, cached, args);
         }
         return cached instanceof Array
-            ? dateutil.cloneDates(cached)
+            ? dateutil_1.default.cloneDates(cached)
             : cached instanceof Date
-                ? dateutil.clone(cached)
+                ? dateutil_1.default.clone(cached)
                 : cached;
     }
     /**
@@ -598,7 +600,7 @@ export default class RRule {
         let hour = dtstart.getHours();
         let minute = dtstart.getMinutes();
         let second = dtstart.getSeconds();
-        let weekday = dateutil.getWeekday(dtstart);
+        let weekday = dateutil_1.default.getWeekday(dtstart);
         // Some local variables to speed things up a bit
         const freq = this.options.freq;
         const interval = this.options.interval;
@@ -642,11 +644,11 @@ export default class RRule {
                 [RRule.MINUTELY]: ii.mtimeset,
                 [RRule.SECONDLY]: ii.stimeset
             }[freq];
-            if ((freq >= RRule.HOURLY && plb(byhour) && !contains(byhour, hour)) ||
+            if ((freq >= RRule.HOURLY && helpers_1.plb(byhour) && !helpers_1.contains(byhour, hour)) ||
                 (freq >= RRule.MINUTELY &&
-                    plb(byminute) &&
-                    !contains(byminute, minute)) ||
-                (freq >= RRule.SECONDLY && plb(bysecond) && !contains(bysecond, second))) {
+                    helpers_1.plb(byminute) &&
+                    !helpers_1.contains(byminute, minute)) ||
+                (freq >= RRule.SECONDLY && helpers_1.plb(bysecond) && !helpers_1.contains(bysecond, second))) {
                 timeset = [];
             }
             else {
@@ -678,27 +680,27 @@ export default class RRule {
             for (let j = start; j < end; j++) {
                 i = dayset[j];
                 filtered =
-                    (plb(bymonth) && !contains(bymonth, ii.mmask[i])) ||
-                        (plb(byweekno) && !ii.wnomask[i]) ||
-                        (plb(byweekday) &&
-                            !contains(byweekday, ii.wdaymask[i])) ||
-                        (plb(ii.nwdaymask) && !ii.nwdaymask[i]) ||
-                        (byeaster !== null && !contains(ii.eastermask, i)) ||
-                        ((plb(bymonthday) || plb(bynmonthday)) &&
-                            !contains(bymonthday, ii.mdaymask[i]) &&
-                            !contains(bynmonthday, ii.nmdaymask[i])) ||
-                        (plb(byyearday) &&
+                    (helpers_1.plb(bymonth) && !helpers_1.contains(bymonth, ii.mmask[i])) ||
+                        (helpers_1.plb(byweekno) && !ii.wnomask[i]) ||
+                        (helpers_1.plb(byweekday) &&
+                            !helpers_1.contains(byweekday, ii.wdaymask[i])) ||
+                        (helpers_1.plb(ii.nwdaymask) && !ii.nwdaymask[i]) ||
+                        (byeaster !== null && !helpers_1.contains(ii.eastermask, i)) ||
+                        ((helpers_1.plb(bymonthday) || helpers_1.plb(bynmonthday)) &&
+                            !helpers_1.contains(bymonthday, ii.mdaymask[i]) &&
+                            !helpers_1.contains(bynmonthday, ii.nmdaymask[i])) ||
+                        (helpers_1.plb(byyearday) &&
                             ((i < ii.yearlen &&
-                                !contains(byyearday, i + 1) &&
-                                !contains(byyearday, -ii.yearlen + i)) ||
+                                !helpers_1.contains(byyearday, i + 1) &&
+                                !helpers_1.contains(byyearday, -ii.yearlen + i)) ||
                                 (i >= ii.yearlen &&
-                                    !contains(byyearday, i + 1 - ii.yearlen) &&
-                                    !contains(byyearday, -ii.nextyearlen + i - ii.yearlen))));
+                                    !helpers_1.contains(byyearday, i + 1 - ii.yearlen) &&
+                                    !helpers_1.contains(byyearday, -ii.nextyearlen + i - ii.yearlen))));
                 if (filtered)
                     dayset[i] = null;
             }
             // Output results
-            if (plb(bysetpos) && plb(timeset)) {
+            if (helpers_1.plb(bysetpos) && helpers_1.plb(timeset)) {
                 let daypos;
                 let timepos;
                 const poslist = [];
@@ -706,11 +708,11 @@ export default class RRule {
                     pos = bysetpos[j];
                     if (pos < 0) {
                         daypos = Math.floor(pos / timeset.length);
-                        timepos = pymod(pos, timeset.length);
+                        timepos = helpers_1.pymod(pos, timeset.length);
                     }
                     else {
                         daypos = Math.floor((pos - 1) / timeset.length);
-                        timepos = pymod(pos - 1, timeset.length);
+                        timepos = helpers_1.pymod(pos - 1, timeset.length);
                     }
                     try {
                         tmp = [];
@@ -729,17 +731,17 @@ export default class RRule {
                             i = tmp[daypos];
                         }
                         const time = timeset[timepos];
-                        const date = dateutil.fromOrdinal(ii.yearordinal + i);
-                        const res = dateutil.combine(date, time);
+                        const date = dateutil_1.default.fromOrdinal(ii.yearordinal + i);
+                        const res = dateutil_1.default.combine(date, time);
                         // XXX: can this ever be in the array?
                         // - compare the actual date instead?
-                        if (!contains(poslist, res))
+                        if (!helpers_1.contains(poslist, res))
                             poslist.push(res);
                         // tslint:disable-next-line:no-empty
                     }
                     catch (e) { }
                 }
-                dateutil.sort(poslist);
+                dateutil_1.default.sort(poslist);
                 for (let j = 0; j < poslist.length; j++) {
                     const res = poslist[j];
                     if (until && res > until) {
@@ -764,10 +766,10 @@ export default class RRule {
                 for (let j = start; j < end; j++) {
                     i = dayset[j];
                     if (i !== null) {
-                        const date = dateutil.fromOrdinal(ii.yearordinal + i);
+                        const date = dateutil_1.default.fromOrdinal(ii.yearordinal + i);
                         for (k = 0; k < timeset.length; k++) {
                             const time = timeset[k];
-                            const res = dateutil.combine(date, time);
+                            const res = dateutil_1.default.combine(date, time);
                             if (until && res > until) {
                                 this._len = total;
                                 return iterResult.getValue();
@@ -793,7 +795,7 @@ export default class RRule {
             fixday = false;
             if (freq === RRule.YEARLY) {
                 year += interval;
-                if (year > dateutil.MAXYEAR) {
+                if (year > dateutil_1.default.MAXYEAR) {
                     this._len = total;
                     return iterResult.getValue();
                 }
@@ -803,14 +805,14 @@ export default class RRule {
                 month += interval;
                 if (month > 12) {
                     div = Math.floor(month / 12);
-                    mod = pymod(month, 12);
+                    mod = helpers_1.pymod(month, 12);
                     month = mod;
                     year += div;
                     if (month === 0) {
                         month = 12;
                         --year;
                     }
-                    if (year > dateutil.MAXYEAR) {
+                    if (year > dateutil_1.default.MAXYEAR) {
                         this._len = total;
                         return iterResult.getValue();
                     }
@@ -838,7 +840,7 @@ export default class RRule {
                 }
                 while (true) {
                     hour += interval;
-                    dm = divmod(hour, 24);
+                    dm = helpers_1.divmod(hour, 24);
                     div = dm.div;
                     mod = dm.mod;
                     if (div) {
@@ -846,7 +848,7 @@ export default class RRule {
                         day += div;
                         fixday = true;
                     }
-                    if (!plb(byhour) || contains(byhour, hour))
+                    if (!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour))
                         break;
                 }
                 timeset = gettimeset.call(ii, hour, minute, second);
@@ -859,13 +861,13 @@ export default class RRule {
                 }
                 while (true) {
                     minute += interval;
-                    dm = divmod(minute, 60);
+                    dm = helpers_1.divmod(minute, 60);
                     div = dm.div;
                     mod = dm.mod;
                     if (div) {
                         minute = mod;
                         hour += div;
-                        dm = divmod(hour, 24);
+                        dm = helpers_1.divmod(hour, 24);
                         div = dm.div;
                         mod = dm.mod;
                         if (div) {
@@ -875,8 +877,8 @@ export default class RRule {
                             filtered = false;
                         }
                     }
-                    if ((!plb(byhour) || contains(byhour, hour)) &&
-                        (!plb(byminute) || contains(byminute, minute))) {
+                    if ((!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.plb(byminute) || helpers_1.contains(byminute, minute))) {
                         break;
                     }
                 }
@@ -890,19 +892,19 @@ export default class RRule {
                 }
                 while (true) {
                     second += interval;
-                    dm = divmod(second, 60);
+                    dm = helpers_1.divmod(second, 60);
                     div = dm.div;
                     mod = dm.mod;
                     if (div) {
                         second = mod;
                         minute += div;
-                        dm = divmod(minute, 60);
+                        dm = helpers_1.divmod(minute, 60);
                         div = dm.div;
                         mod = dm.mod;
                         if (div) {
                             minute = mod;
                             hour += div;
-                            dm = divmod(hour, 24);
+                            dm = helpers_1.divmod(hour, 24);
                             div = dm.div;
                             mod = dm.mod;
                             if (div) {
@@ -912,16 +914,16 @@ export default class RRule {
                             }
                         }
                     }
-                    if ((!plb(byhour) || contains(byhour, hour)) &&
-                        (!plb(byminute) || contains(byminute, minute)) &&
-                        (!plb(bysecond) || contains(bysecond, second))) {
+                    if ((!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.plb(byminute) || helpers_1.contains(byminute, minute)) &&
+                        (!helpers_1.plb(bysecond) || helpers_1.contains(bysecond, second))) {
                         break;
                     }
                 }
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             if (fixday && day > 28) {
-                let daysinmonth = dateutil.monthRange(year, month - 1)[1];
+                let daysinmonth = dateutil_1.default.monthRange(year, month - 1)[1];
                 if (day > daysinmonth) {
                     while (day > daysinmonth) {
                         day -= daysinmonth;
@@ -929,12 +931,12 @@ export default class RRule {
                         if (month === 13) {
                             month = 1;
                             ++year;
-                            if (year > dateutil.MAXYEAR) {
+                            if (year > dateutil_1.default.MAXYEAR) {
                                 this._len = total;
                                 return iterResult.getValue();
                             }
                         }
-                        daysinmonth = dateutil.monthRange(year, month - 1)[1];
+                        daysinmonth = dateutil_1.default.monthRange(year, month - 1)[1];
                     }
                     ii.rebuild(year, month);
                 }
@@ -986,6 +988,7 @@ RRule.TH = Days.TH;
 RRule.FR = Days.FR;
 RRule.SA = Days.SA;
 RRule.SU = Days.SU;
+exports.default = RRule;
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -1029,41 +1032,41 @@ class Iterinfo {
     rebuild(year, month) {
         const rr = this.rrule;
         if (year !== this.lastyear) {
-            this.yearlen = dateutil.isLeapYear(year) ? 366 : 365;
-            this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365;
+            this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
+            this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
             const firstyday = new Date(year, 0, 1);
-            this.yearordinal = dateutil.toOrdinal(firstyday);
-            this.yearweekday = dateutil.getWeekday(firstyday);
-            const wday = dateutil.getWeekday(new Date(year, 0, 1));
+            this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
+            this.yearweekday = dateutil_1.default.getWeekday(firstyday);
+            const wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
             if (this.yearlen === 365) {
-                this.mmask = [].concat(M365MASK);
-                this.mdaymask = [].concat(MDAY365MASK);
-                this.nmdaymask = [].concat(NMDAY365MASK);
-                this.wdaymask = WDAYMASK.slice(wday);
-                this.mrange = [].concat(M365RANGE);
+                this.mmask = [].concat(masks_1.M365MASK);
+                this.mdaymask = [].concat(masks_1.MDAY365MASK);
+                this.nmdaymask = [].concat(masks_1.NMDAY365MASK);
+                this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                this.mrange = [].concat(masks_1.M365RANGE);
             }
             else {
-                this.mmask = [].concat(M366MASK);
-                this.mdaymask = [].concat(MDAY366MASK);
-                this.nmdaymask = [].concat(NMDAY366MASK);
-                this.wdaymask = WDAYMASK.slice(wday);
-                this.mrange = [].concat(M366RANGE);
+                this.mmask = [].concat(masks_1.M366MASK);
+                this.mdaymask = [].concat(masks_1.MDAY366MASK);
+                this.nmdaymask = [].concat(masks_1.NMDAY366MASK);
+                this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                this.mrange = [].concat(masks_1.M366RANGE);
             }
-            if (!plb(rr.options.byweekno)) {
+            if (!helpers_1.plb(rr.options.byweekno)) {
                 this.wnomask = null;
             }
             else {
-                this.wnomask = repeat(0, this.yearlen + 7);
+                this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
                 let no1wkst;
                 let firstwkst;
                 let wyearlen;
-                no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7);
+                no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
                 if (no1wkst >= 4) {
                     no1wkst = 0;
                     // Number of days in the year, plus the days we got
                     // from last year.
                     wyearlen =
-                        this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7);
+                        this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
                 }
                 else {
                     // Number of days in the year, minus the days we
@@ -1071,7 +1074,7 @@ class Iterinfo {
                     wyearlen = this.yearlen - no1wkst;
                 }
                 const div = Math.floor(wyearlen / 7);
-                const mod = pymod(wyearlen, 7);
+                const mod = helpers_1.pymod(wyearlen, 7);
                 const numweeks = Math.floor(div + mod / 4);
                 for (let j = 0; j < rr.options.byweekno.length; j++) {
                     let i;
@@ -1098,7 +1101,7 @@ class Iterinfo {
                             break;
                     }
                 }
-                if (contains(rr.options.byweekno, 1)) {
+                if (helpers_1.contains(rr.options.byweekno, 1)) {
                     // Check week number 1 of next year as well
                     // orig-TODO : Check -numweeks for next year.
                     let i = no1wkst + numweeks * 7;
@@ -1123,35 +1126,35 @@ class Iterinfo {
                     // days from last year's last week number in
                     // this year.
                     let lnumweeks;
-                    if (!contains(rr.options.byweekno, -1)) {
-                        const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1));
-                        let lno1wkst = pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
-                        const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365;
+                    if (!helpers_1.contains(rr.options.byweekno, -1)) {
+                        const lyearweekday = dateutil_1.default.getWeekday(new Date(year - 1, 0, 1));
+                        let lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                        const lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
                         if (lno1wkst >= 4) {
                             lno1wkst = 0;
                             lnumweeks = Math.floor(52 +
-                                pymod(lyearlen + pymod(lyearweekday - rr.options.wkst, 7), 7) /
+                                helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) /
                                     4);
                         }
                         else {
-                            lnumweeks = Math.floor(52 + pymod(this.yearlen - no1wkst, 7) / 4);
+                            lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
                         }
                     }
                     else {
                         lnumweeks = -1;
                     }
-                    if (contains(rr.options.byweekno, lnumweeks)) {
+                    if (helpers_1.contains(rr.options.byweekno, lnumweeks)) {
                         for (let i = 0; i < no1wkst; i++)
                             this.wnomask[i] = 1;
                     }
                 }
             }
         }
-        if (plb(rr.options.bynweekday) &&
+        if (helpers_1.plb(rr.options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             let ranges = [];
             if (rr.options.freq === RRule.YEARLY) {
-                if (plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                if (helpers_1.plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
                     for (let j = 0; j < rr.options.bymonth.length; j++) {
                         month = rr.options.bymonth[j];
                         ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -1164,10 +1167,10 @@ class Iterinfo {
             else if (rr.options.freq === RRule.MONTHLY) {
                 ranges = [this.mrange.slice(month - 1, month + 1)];
             }
-            if (plb(ranges)) {
+            if (helpers_1.plb(ranges)) {
                 // Weekly frequency won't get here, so we may not
                 // care about cross-year weekly periods.
-                this.nwdaymask = repeat(0, this.yearlen);
+                this.nwdaymask = helpers_1.repeat(0, this.yearlen);
                 for (let j = 0; j < ranges.length; j++) {
                     const rang = ranges[j];
                     const first = rang[0];
@@ -1179,11 +1182,11 @@ class Iterinfo {
                         const n = rr.options.bynweekday[k][1];
                         if (n < 0) {
                             i = last + (n + 1) * 7;
-                            i -= pymod((this.wdaymask[i]) - wday, 7);
+                            i -= helpers_1.pymod((this.wdaymask[i]) - wday, 7);
                         }
                         else {
                             i = first + (n - 1) * 7;
-                            i += pymod(7 - (this.wdaymask[i]) + wday, 7);
+                            i += helpers_1.pymod(7 - (this.wdaymask[i]) + wday, 7);
                         }
                         if (first <= i && i <= last)
                             this.nwdaymask[i] = 1;
@@ -1198,10 +1201,10 @@ class Iterinfo {
         }
     }
     ydayset(_, __, ___) {
-        return [range(this.yearlen), 0, this.yearlen];
+        return [helpers_1.range(this.yearlen), 0, this.yearlen];
     }
     mdayset(_, month, __) {
-        const set = repeat(null, this.yearlen);
+        const set = helpers_1.repeat(null, this.yearlen);
         const start = this.mrange[month - 1];
         const end = this.mrange[month];
         for (let i = start; i < end; i++)
@@ -1210,8 +1213,8 @@ class Iterinfo {
     }
     wdayset(year, month, day) {
         // We need to handle cross-year weeks here.
-        const set = repeat(null, this.yearlen + 7);
-        let i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        const set = helpers_1.repeat(null, this.yearlen + 7);
+        let i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
         const start = i;
         for (let j = 0; j < 7; j++) {
             set[i] = i;
@@ -1222,8 +1225,8 @@ class Iterinfo {
         return [set, start, i];
     }
     ddayset(year, month, day) {
-        const set = repeat(null, this.yearlen);
-        const i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        const set = helpers_1.repeat(null, this.yearlen);
+        const i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
         set[i] = i;
         return [set, i, i + 1];
     }
@@ -1234,10 +1237,10 @@ class Iterinfo {
             minute = rr.options.byminute[i];
             for (let j = 0; j < rr.options.bysecond.length; j++) {
                 second = rr.options.bysecond[j];
-                set.push(new dateutil.Time(hour, minute, second, millisecond));
+                set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
             }
         }
-        dateutil.sort(set);
+        dateutil_1.default.sort(set);
         return set;
     }
     mtimeset(hour, minute, second, millisecond) {
@@ -1245,13 +1248,13 @@ class Iterinfo {
         const rr = this.rrule;
         for (let j = 0; j < rr.options.bysecond.length; j++) {
             second = rr.options.bysecond[j];
-            set.push(new dateutil.Time(hour, minute, second, millisecond));
+            set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
         }
-        dateutil.sort(set);
+        dateutil_1.default.sort(set);
         return set;
     }
     stimeset(hour, minute, second, millisecond) {
-        return [new dateutil.Time(hour, minute, second, millisecond)];
+        return [new dateutil_1.default.Time(hour, minute, second, millisecond)];
     }
 }
 //# sourceMappingURL=rrule.js.map

@@ -1,13 +1,15 @@
-import RRule from './rrule';
-import dateutil from './dateutil';
-import { contains } from './helpers';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const rrule_1 = require("./rrule");
+const dateutil_1 = require("./dateutil");
+const helpers_1 = require("./helpers");
 /**
  *
  * @param {Boolean?} noCache
  *  The same stratagy as RRule on cache, default to false
  * @constructor
  */
-export default class RRuleSet extends RRule {
+class RRuleSet extends rrule_1.default {
     constructor(noCache = false) {
         super({}, noCache);
         this._rrule = [];
@@ -19,10 +21,10 @@ export default class RRuleSet extends RRule {
      * @param {RRule}
      */
     rrule(rrule) {
-        if (!(rrule instanceof RRule)) {
+        if (!(rrule instanceof rrule_1.default)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!contains(this._rrule.map(String), String(rrule))) {
+        if (!helpers_1.contains(this._rrule.map(String), String(rrule))) {
             this._rrule.push(rrule);
         }
     }
@@ -33,19 +35,19 @@ export default class RRuleSet extends RRule {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!contains(this._rdate.map(Number), Number(date))) {
+        if (!helpers_1.contains(this._rdate.map(Number), Number(date))) {
             this._rdate.push(date);
-            dateutil.sort(this._rdate);
+            dateutil_1.default.sort(this._rdate);
         }
     }
     /**
      * @param {RRule}
      */
     exrule(rrule) {
-        if (!(rrule instanceof RRule)) {
+        if (!(rrule instanceof rrule_1.default)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!contains(this._exrule.map(String), String(rrule))) {
+        if (!helpers_1.contains(this._exrule.map(String), String(rrule))) {
             this._exrule.push(rrule);
         }
     }
@@ -56,9 +58,9 @@ export default class RRuleSet extends RRule {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!contains(this._exdate.map(Number), Number(date))) {
+        if (!helpers_1.contains(this._exdate.map(Number), Number(date))) {
             this._exdate.push(date);
-            dateutil.sort(this._exdate);
+            dateutil_1.default.sort(this._exdate);
         }
     }
     valueOf() {
@@ -72,7 +74,7 @@ export default class RRuleSet extends RRule {
             result.push('RDATE:' +
                 this._rdate
                     .map(function (rdate) {
-                    return dateutil.timeToUntilString(rdate.valueOf());
+                    return dateutil_1.default.timeToUntilString(rdate.valueOf());
                 })
                     .join(','));
         }
@@ -85,7 +87,7 @@ export default class RRuleSet extends RRule {
             result.push('EXDATE:' +
                 this._exdate
                     .map(function (exdate) {
-                    return dateutil.timeToUntilString(exdate.valueOf());
+                    return dateutil_1.default.timeToUntilString(exdate.valueOf());
                 })
                     .join(','));
         }
@@ -142,7 +144,7 @@ export default class RRuleSet extends RRule {
             rrule._iter(iterResult);
         });
         const res = iterResult._result;
-        dateutil.sort(res);
+        dateutil_1.default.sort(res);
         switch (iterResult.method) {
             case 'all':
             case 'between':
@@ -176,4 +178,5 @@ export default class RRuleSet extends RRule {
         return rrs;
     }
 }
+exports.default = RRuleSet;
 //# sourceMappingURL=rruleset.js.map

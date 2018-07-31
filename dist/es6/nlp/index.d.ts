@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const totext_1 = require("./totext");
-const parsetext_1 = require("./parsetext");
-exports.parseText = parsetext_1.default;
-const index_1 = require("../index");
+import ToText, { GetText } from './totext';
+import parseText from './parsetext';
+import RRule from '../index';
+import { Language } from './i18n';
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -22,9 +20,6 @@ const index_1 = require("../index");
  * when those functions are used.
  *
  */
-// =============================================================================
-// fromText
-// =============================================================================
 /**
  * Will be able to convert some of the below described rules from
  * text format to a rule object.
@@ -93,32 +88,7 @@ const index_1 = require("../index");
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text, language) {
-    return new index_1.default(parsetext_1.default(text, language));
-};
-exports.fromText = fromText;
-const common = [
-    'count',
-    'until',
-    'interval',
-    'byweekday',
-    'bymonthday',
-    'bymonth'
-];
-totext_1.default.IMPLEMENTED = [];
-totext_1.default.IMPLEMENTED[index_1.default.HOURLY] = common;
-totext_1.default.IMPLEMENTED[index_1.default.MINUTELY] = common;
-totext_1.default.IMPLEMENTED[index_1.default.DAILY] = ['byhour'].concat(common);
-totext_1.default.IMPLEMENTED[index_1.default.WEEKLY] = common;
-totext_1.default.IMPLEMENTED[index_1.default.MONTHLY] = common;
-totext_1.default.IMPLEMENTED[index_1.default.YEARLY] = ['byweekno', 'byyearday'].concat(common);
-// =============================================================================
-// Export
-// =============================================================================
-const toText = function (rrule, gettext, language) {
-    return new totext_1.default(rrule, gettext, language).toString();
-};
-exports.toText = toText;
-const { isFullyConvertible } = totext_1.default;
-exports.isFullyConvertible = isFullyConvertible;
-//# sourceMappingURL=index.js.map
+declare const fromText: (text: string, language?: Language) => RRule;
+declare const toText: (rrule: RRule, gettext: GetText, language?: Language) => string;
+declare const isFullyConvertible: typeof ToText.isFullyConvertible;
+export { fromText, parseText, isFullyConvertible, toText };

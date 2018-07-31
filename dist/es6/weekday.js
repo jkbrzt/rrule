@@ -1,8 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 // =============================================================================
 // Weekday
 // =============================================================================
-export default class Weekday {
+class Weekday {
     constructor(weekday, n) {
         if (n === 0)
             throw new Error("Can't create weekday with n == 0");
@@ -29,4 +31,5 @@ export default class Weekday {
         return this.weekday === 6 ? 0 : this.weekday + 1;
     }
 }
+exports.default = Weekday;
 //# sourceMappingURL=weekday.js.map

@@ -1,5 +1,7 @@
-import ENGLISH from './i18n';
-import RRule from '../index';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const i18n_1 = require("./i18n");
+const index_1 = require("../index");
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -17,10 +19,10 @@ const contains = function (arr, val) {
  * @param {Object} language definition
  * @constructor
  */
-export default class ToText {
-    constructor(rrule, gettext, language = ENGLISH) {
+class ToText {
+    constructor(rrule, gettext, language = i18n_1.default) {
         this.text = [];
-        this.language = language || ENGLISH;
+        this.language = language || i18n_1.default;
         this.gettext =
             gettext ||
                 function (id) {
@@ -109,7 +111,7 @@ export default class ToText {
         }
         this.text = [gettext('every')];
         // @ts-ignore
-        this[RRule.FREQUENCIES[this.options.freq]]();
+        this[index_1.default.FREQUENCIES[this.options.freq]]();
         if (this.options.until) {
             this.add(gettext('until'));
             const until = this.options.until;
@@ -371,4 +373,5 @@ export default class ToText {
         }
     }
 }
+exports.default = ToText;
 //# sourceMappingURL=totext.js.map

@@ -1,3 +1,4 @@
+"use strict";
 /*!
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -13,17 +14,20 @@
  * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
  *
  */
-import RRule from './rrule';
-import RRuleSet from './rruleset';
-import RRuleStr from './rrulestr';
+Object.defineProperty(exports, "__esModule", { value: true });
+const rrule_1 = require("./rrule");
+exports.RRule = rrule_1.default;
+const rruleset_1 = require("./rruleset");
+exports.RRuleSet = rruleset_1.default;
+const rrulestr_1 = require("./rrulestr");
 // =============================================================================
 // Export
 // =============================================================================
 // Only one RRuleStr instance for all rrule string parsing work.
-const rruleStr = new RRuleStr();
+const rruleStr = new rrulestr_1.default();
 const rrulestr = function () {
     return rruleStr.parse.apply(rruleStr, arguments);
 };
-export { RRule, RRuleSet, rrulestr };
-export default RRule;
+exports.rrulestr = rrulestr;
+exports.default = rrule_1.default;
 //# sourceMappingURL=index.js.map

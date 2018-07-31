@@ -1,5 +1,7 @@
-import ENGLISH from './i18n';
-import RRule from '../index';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const i18n_1 = require("./i18n");
+const index_1 = require("../index");
 // =============================================================================
 // Parser
 // =============================================================================
@@ -72,9 +74,9 @@ class Parser {
         throw new Error('expected ' + name + ' but found ' + this.symbol);
     }
 }
-export default function parseText(text, language) {
+function parseText(text, language) {
     const options = {};
-    const ttr = new Parser((language || ENGLISH).tokens);
+    const ttr = new Parser((language || i18n_1.default).tokens);
     if (!ttr.start(text))
         return null;
     S();
@@ -89,7 +91,7 @@ export default function parseText(text, language) {
             throw new Error('Unexpected end');
         switch (ttr.symbol) {
             case 'day(s)':
-                options.freq = RRule.DAILY;
+                options.freq = index_1.default.DAILY;
                 if (ttr.nextSymbol()) {
                     AT();
                     F();
@@ -98,47 +100,47 @@ export default function parseText(text, language) {
             // FIXME Note: every 2 weekdays != every two weeks on weekdays.
             // DAILY on weekdays is not a valid rule
             case 'weekday(s)':
-                options.freq = RRule.WEEKLY;
+                options.freq = index_1.default.WEEKLY;
                 options.byweekday = [
-                    RRule.MO,
-                    RRule.TU,
-                    RRule.WE,
-                    RRule.TH,
-                    RRule.FR
+                    index_1.default.MO,
+                    index_1.default.TU,
+                    index_1.default.WE,
+                    index_1.default.TH,
+                    index_1.default.FR
                 ];
                 ttr.nextSymbol();
                 F();
                 break;
             case 'week(s)':
-                options.freq = RRule.WEEKLY;
+                options.freq = index_1.default.WEEKLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'hour(s)':
-                options.freq = RRule.HOURLY;
+                options.freq = index_1.default.HOURLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'minute(s)':
-                options.freq = RRule.MINUTELY;
+                options.freq = index_1.default.MINUTELY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'month(s)':
-                options.freq = RRule.MONTHLY;
+                options.freq = index_1.default.MONTHLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'year(s)':
-                options.freq = RRule.YEARLY;
+                options.freq = index_1.default.YEARLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
@@ -151,10 +153,10 @@ export default function parseText(text, language) {
             case 'friday':
             case 'saturday':
             case 'sunday':
-                options.freq = RRule.WEEKLY;
+                options.freq = index_1.default.WEEKLY;
                 const key = ttr.symbol.substr(0, 2).toUpperCase();
                 // @ts-ignore
-                options.byweekday = [RRule[key]];
+                options.byweekday = [index_1.default[key]];
                 if (!ttr.nextSymbol())
                     return;
                 // TODO check for duplicates
@@ -166,7 +168,7 @@ export default function parseText(text, language) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday');
                     }
                     // @ts-ignore
-                    options.byweekday.push(RRule[wkd]);
+                    options.byweekday.push(index_1.default[wkd]);
                     ttr.nextSymbol();
                 }
                 MDAYs();
@@ -184,7 +186,7 @@ export default function parseText(text, language) {
             case 'october':
             case 'november':
             case 'december':
-                options.freq = RRule.YEARLY;
+                options.freq = index_1.default.YEARLY;
                 options.bymonth = [decodeM()];
                 if (!ttr.nextSymbol())
                     return;
@@ -223,7 +225,7 @@ export default function parseText(text, language) {
                     if (!options.byweekday)
                         options.byweekday = [];
                     // @ts-ignore
-                    options.byweekday.push(RRule[wkd].nth(nth));
+                    options.byweekday.push(index_1.default[wkd].nth(nth));
                 }
                 else {
                     if (!options.bymonthday)
@@ -239,17 +241,19 @@ export default function parseText(text, language) {
                 if (!options.byweekday)
                     options.byweekday = [];
                 // @ts-ignore
-                options.byweekday.push(RRule[wkd]);
+                options.byweekday.push(index_1.default[wkd]);
             }
             else if (ttr.symbol === 'weekday(s)') {
                 ttr.nextSymbol();
-                if (!options.byweekday)
-                    options.byweekday = [];
-                options.byweekday.push(RRule.MO);
-                options.byweekday.push(RRule.TU);
-                options.byweekday.push(RRule.WE);
-                options.byweekday.push(RRule.TH);
-                options.byweekday.push(RRule.FR);
+                if (!options.byweekday) {
+                    options.byweekday = [
+                        index_1.default.MO,
+                        index_1.default.TU,
+                        index_1.default.WE,
+                        index_1.default.TH,
+                        index_1.default.FR
+                    ];
+                }
             }
             else if (ttr.symbol === 'week(s)') {
                 ttr.nextSymbol();
@@ -396,4 +400,5 @@ export default function parseText(text, language) {
         }
     }
 }
+exports.default = parseText;
 //# sourceMappingURL=parsetext.js.map

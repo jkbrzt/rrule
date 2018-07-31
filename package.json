@@ -3,6 +3,7 @@
   "version": "2.2.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
+  "license" : "SEE LICENSE IN LICENSE",
   "babel": {
     "presets": [
       "env"
@@ -16,7 +17,7 @@
     "rfc"
   ],
   "author": "Jakub Roztocil and Lars Schöning",
-  "main": "dist/index",
+  "main": "dist/rrule",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"
@@ -30,6 +31,11 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "coffee-loader": "^0.9.0",
+    "coffeescript": "^2.3.1",
+    "copy-webpack-plugin": "^4.5.2",
+    "html-webpack-plugin": "^3.2.0",
+    "jquery": "^3.3.1",
     "mocha": "^5.2.0",
     "standard": "^11.0.1",
     "webpack": "^4.16.3",

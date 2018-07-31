@@ -2,7 +2,7 @@
 
 import assert from 'assert'
 import { parse, datetime, testRecurring } from './lib/utils'
-import { RRule } from '../dist/index.js'
+import { RRule } from '../dist/rrule.js'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests

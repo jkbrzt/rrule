@@ -31,10 +31,10 @@ $ yarn add rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/index.js) manually.
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/rrule.js) manually.
 
 ```html
-<script src="rrule/dist/index.js"></script>
+<script src="rrule/dist/rrule.js"></script>
 ```
 
 #### Server Side

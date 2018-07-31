@@ -25,4 +25,4 @@ const M=new A,R=function(){return M.parse.apply(M,arguments)};Y.RRule=Y,Y.RRuleS
 *
 */
 const l=function(t,e){return new r.default(a(t,e))},h=["count","until","interval","byweekday","bymonthday","bymonth"];o.IMPLEMENTED=[],o.IMPLEMENTED[r.default.HOURLY]=h,o.IMPLEMENTED[r.default.MINUTELY]=h,o.IMPLEMENTED[r.default.DAILY]=["byhour"].concat(h),o.IMPLEMENTED[r.default.WEEKLY]=h,o.IMPLEMENTED[r.default.MONTHLY]=h,o.IMPLEMENTED[r.default.YEARLY]=["byweekno","byyearday"].concat(h);const c=function(t,e,n){return new o(t,e,n).toString()},{isFullyConvertible:u}=o}])});
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=rrule.js.map

@@ -117,7 +117,7 @@ export default class RRuleSet extends RRule {
     return JSON.stringify(this.valueOf());
   }
 
-  _iter(iterResult: IterResult): Date[] {
+  _iter(iterResult: IterResult) {
     const _exdateHash: { [k: number]: boolean } = {};
     const _exrule = this._exrule;
     const _accept = iterResult.accept;
@@ -166,16 +166,16 @@ export default class RRuleSet extends RRule {
       rrule._iter(iterResult);
     });
 
-    const res = iterResult._result;
+    const res = iterResult._result as Date[];
     dateutil.sort(res);
     switch (iterResult.method) {
       case "all":
       case "between":
         return res;
       case "before":
-        return (res.length && res[res.length - 1]) || null;
+        return (res.length && res[res.length - 1]) as Date || null;
       case "after":
-        return (res.length && res[0]) || null;
+        return (res.length && res[0]) as Date || null;
       default:
         return null;
     }

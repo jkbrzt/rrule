@@ -70,7 +70,7 @@ interface RRuleOptions extends RRuleOrigOptions {
 type CacheKeys = "before" | "after" | "between";
 
 type CacheBase = { [K in CacheKeys]: IterArgs[] };
-export type Cache = CacheBase & { all: IterArgs[] | false };
+export type Cache = CacheBase & { all: Date[] | IterArgs[] | false };
 
 type DayKeys = "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU";
 
@@ -538,11 +538,11 @@ export default class RRule {
    */
   all(iterator?: (d: Date, len: number) => boolean): Date[] {
     if (iterator) {
-      return this._iter(new CallbackIterResult("all", {}, iterator));
+      return this._iter(new CallbackIterResult("all", {}, iterator)) as Date[];
     } else {
       let result = this._cacheGet("all") as Date[] | false;
       if (result === false) {
-        result = this._iter(new IterResult("all", {}));
+        result = this._iter(new IterResult("all", {})) as Date[];
         this._cacheAdd("all", result);
       }
       return result;
@@ -660,10 +660,10 @@ export default class RRule {
     }
 
     if (what === "all") {
-      this._cache.all = value;
+      this._cache.all = value as Date[];
     } else {
       args._value = value;
-      this._cache[what].push(args);
+      this._cache[what].push(args as IterArgs);
     }
   }
 
@@ -693,14 +693,14 @@ export default class RRule {
 
     const cachedObject = this._cache[what];
     if (what === "all") {
-      cached = this._cache.all;
+      cached = this._cache.all as Date[];
     } else if (cachedObject instanceof Array) {
       // Let's see whether we've already called the
       // 'what' method with the same 'args'
       for (let item, i = 0; i < cachedObject.length; i++) {
         item = cachedObject[i];
         if (argsKeys.length && findCacheDiff(item)) continue;
-        cached = item._value;
+        cached = (item as IterArgs)._value;
         break;
       }
     }
@@ -712,7 +712,7 @@ export default class RRule {
       for (let i = 0; i < this._cache.all.length; i++) {
         if (!iterResult.accept(this._cache.all[i])) break;
       }
-      cached = iterResult.getValue();
+      cached = iterResult.getValue() as Date;
       this._cacheAdd(what, cached, args);
     }
 
@@ -731,7 +731,7 @@ export default class RRule {
     return new RRule(this.origOptions);
   }
 
-  _iter(iterResult: IterResult): Date[] {
+  _iter(iterResult: IterResult): Date | Date[] | null {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
 
@@ -1114,7 +1114,7 @@ class Iterinfo {
   public mrange: number[] | null;
   public mdaymask: number[] | null;
   public nmdaymask: number[] | null;
-  public wdaymask: number[][] | number[] | null;
+  public wdaymask: number[] | number[] | null;
   public wnomask: number[] | null;
   public nwdaymask: number[] | null;
   public eastermask: number[] | null;
@@ -1398,10 +1398,15 @@ class Iterinfo {
   }
 }
 
-function getnlp() {
+interface GetNlp {
+  _nlp: any
+  (): any
+}
+
+const getnlp: GetNlp = function (): any {
   // Lazy, runtime import to avoid circular refs.
   if (!getnlp._nlp) {
     getnlp._nlp = require("./nlp");
   }
   return getnlp._nlp;
-}
+} as GetNlp

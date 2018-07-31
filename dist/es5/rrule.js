@@ -3332,4 +3332,4 @@ const { isFullyConvertible } = totext_ToText;
 /***/ })
 /******/ ]);
 });
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=rrule.js.map

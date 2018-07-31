@@ -1,3 +1,5 @@
+RRule = rrule.RRule
+
 getFormValues = ($form) ->
     paramObj = {}
     $.each $form.serializeArray(), (_, kv) ->

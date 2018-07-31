@@ -1,7 +1,7 @@
 /* global it */
 
 import assert from 'assert'
-import { RRule } from '../../dist/index.js'
+import { RRule } from '../../dist/rrule.js'
 
 const assertDatesEqual = function (actual, expected, msg) {
   msg = msg ? ' [' + msg + '] ' : ''

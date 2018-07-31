@@ -1,4 +1,5 @@
 import RRule, { RRuleOrigOptions, Frequencies, DayKeys } from './rrule';
+import RRuleSet from './rruleset';
 export interface RRuleStrOptions {
     dtstart: any;
     cache: boolean;
@@ -41,8 +42,8 @@ export default class RRuleStr {
     _handle_WKST(rrkwargs: RRuleOrigOptions, _: any, value: DayKeys, __: any): void;
     _handle_BYWEEKDAY(rrkwargs: RRuleOrigOptions, _: any, value: string, __: any): void;
     _parseRfcRRule(line: any, options?: Partial<RRuleStrOptions>): RRule;
-    _parseRfc(s: any, options: any): RRule;
-    parse(s: string, options?: Partial<RRuleStrOptions>): RRule;
+    _parseRfc(s: string, options: Partial<RRuleStrOptions>): RRule;
+    parse(s: string, options?: Partial<RRuleStrOptions>): RRule | RRuleSet;
     _handle_BYDAY: (rrkwargs: RRuleOrigOptions, _: any, value: string, __: any) => void;
     _handle_INTERVAL: (rrkwargs: RRuleOrigOptions, name: string, value: string) => void;
     _handle_COUNT: (rrkwargs: RRuleOrigOptions, name: string, value: string) => void;

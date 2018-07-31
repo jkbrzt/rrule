@@ -181,7 +181,7 @@ export default class RRuleStr {
     return new RRule(rrkwargs, !options.cache)
   }
 
-  _parseRfc (s: any, options: any) {
+  _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     if (options.compatible) {
       options.forceset = true
       options.unfold = true
@@ -334,7 +334,7 @@ export default class RRuleStr {
           }
         }
 
-        if (options.campatiable && options.dtstart) rset.rdate(dtstart)
+        if (options.compatible && options.dtstart) rset.rdate(dtstart)
         return rset
       } else {
         return this._parseRfcRRule(rrulevals[0], {
@@ -347,7 +347,7 @@ export default class RRuleStr {
     }
   }
 
-  parse (s: string, options: Partial<RRuleStrOptions> = {}) {
+  parse (s: string, options: Partial<RRuleStrOptions> = {}): RRule | RRuleSet {
     const invalid: any[] = []
     const keys = Object.keys(options)
     const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS)

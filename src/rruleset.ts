@@ -11,10 +11,10 @@ import IterResult from './iterresult'
  */
 
 export default class RRuleSet extends RRule {
-  private _rrule: RRule[]
-  private _rdate: Date[]
-  private _exrule: RRule[]
-  private _exdate: Date[]
+  public readonly _rrule: RRule[]
+  public readonly _rdate: Date[]
+  public readonly _exrule: RRule[]
+  public readonly _exdate: Date[]
   constructor (noCache: boolean = false) {
     super({}, noCache)
 
@@ -25,6 +25,8 @@ export default class RRuleSet extends RRule {
   }
 
   /**
+   * Adds an RRule to the set
+   *
    * @param {RRule}
    */
   rrule (rrule: RRule | string) {
@@ -37,6 +39,8 @@ export default class RRuleSet extends RRule {
   }
 
   /**
+   * Adds an RDate to the set
+   *
    * @param {Date}
    */
   rdate (date: Date) {
@@ -50,6 +54,8 @@ export default class RRuleSet extends RRule {
   }
 
   /**
+   * Adds an EXRULE to the set
+   *
    * @param {RRule}
    */
   exrule (rrule: RRule) {
@@ -62,6 +68,8 @@ export default class RRuleSet extends RRule {
   }
 
   /**
+   * Adds an EXDATE to the set
+   *
    * @param {Date}
    */
   exdate (date: Date) {

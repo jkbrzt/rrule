@@ -288,7 +288,7 @@ class RRuleStr {
                         rset.exdate(dateutil_1.default.untilStringToDate(datestr));
                     }
                 }
-                if (options.campatiable && options.dtstart)
+                if (options.compatible && options.dtstart)
                     rset.rdate(dtstart);
                 return rset;
             }

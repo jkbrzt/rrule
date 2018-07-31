@@ -18,6 +18,8 @@ class RRuleSet extends rrule_1.default {
         this._exdate = [];
     }
     /**
+     * Adds an RRule to the set
+     *
      * @param {RRule}
      */
     rrule(rrule) {
@@ -29,6 +31,8 @@ class RRuleSet extends rrule_1.default {
         }
     }
     /**
+     * Adds an RDate to the set
+     *
      * @param {Date}
      */
     rdate(date) {
@@ -41,6 +45,8 @@ class RRuleSet extends rrule_1.default {
         }
     }
     /**
+     * Adds an EXRULE to the set
+     *
      * @param {RRule}
      */
     exrule(rrule) {
@@ -52,6 +58,8 @@ class RRuleSet extends rrule_1.default {
         }
     }
     /**
+     * Adds an EXDATE to the set
+     *
      * @param {Date}
      */
     exdate(date) {

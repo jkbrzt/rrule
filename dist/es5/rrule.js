@@ -2205,6 +2205,8 @@ function (_rrule_1$default) {
     return _this;
   }
   /**
+   * Adds an RRule to the set
+   *
    * @param {RRule}
    */
 
@@ -2221,6 +2223,8 @@ function (_rrule_1$default) {
       }
     }
     /**
+     * Adds an RDate to the set
+     *
      * @param {Date}
      */
 
@@ -2238,6 +2242,8 @@ function (_rrule_1$default) {
       }
     }
     /**
+     * Adds an EXRULE to the set
+     *
      * @param {RRule}
      */
 
@@ -2253,6 +2259,8 @@ function (_rrule_1$default) {
       }
     }
     /**
+     * Adds an EXDATE to the set
+     *
      * @param {Date}
      */
 
@@ -3934,7 +3942,7 @@ function () {
             }
           }
 
-          if (options.campatiable && options.dtstart) rset.rdate(dtstart);
+          if (options.compatible && options.dtstart) rset.rdate(dtstart);
           return rset;
         } else {
           return this._parseRfcRRule(rrulevals[0], {

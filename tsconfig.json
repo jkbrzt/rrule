@@ -8,17 +8,10 @@
     "noEmitOnError": true,
     "target": "es6",
     "jsx": "react",
+    "lib": ["es6"],
     "baseUrl": ".",
-    "rootDirs": [
-      "./src/",
-      "./test/",
-    ]
+    "rootDirs": ["./src/", "./test/"]
   },
-  "include": [
-    "./src/**/*",
-  ],
-  "exclude": [
-    "node_modules",
-    "./test/**/*"
-  ]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "./test/**/*"]
 }

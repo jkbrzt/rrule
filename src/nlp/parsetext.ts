@@ -24,7 +24,7 @@ class Parser {
   }
 
   isDone () {
-    return this.done && this.symbol == null
+    return this.done && this.symbol === null
   }
 
   nextSymbol () {
@@ -44,7 +44,7 @@ class Parser {
         rule = this.rules[name]
         match = rule.exec(p.text)
         if (match) {
-          if (best == null || match[0].length > best[0].length) {
+          if (best === null || match[0].length > best[0].length) {
             best = match
             bestSymbol = name
           }

@@ -114,7 +114,7 @@ class RRuleSet extends rrule_1.default {
         const _accept = iterResult.accept;
         function evalExdate(after, before) {
             _exrule.forEach(function (rrule) {
-                rrule.between(after, before, true).forEach(function (date) {
+                (rrule.between(after, before, true)).forEach(function (date) {
                     _exdateHash[Number(date)] = true;
                 });
             });

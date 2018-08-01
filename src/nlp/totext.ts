@@ -34,8 +34,8 @@ export default class ToText {
   private text: string[]
   private gettext: GetText
   private language: Language
-  private options: Options
-  private origOptions: Options
+  private options: Partial<Options>
+  private origOptions: Partial<Options>
   private bymonthday: Options['bymonthday']
   private byweekday: {
     allWeeks: ByWeekday[]

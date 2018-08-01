@@ -132,7 +132,7 @@ export default class RRuleSet extends RRule {
 
     function evalExdate (after: Date, before: Date) {
       _exrule.forEach(function (rrule) {
-        (rrule.between(after, before, true) as Date[]).forEach(function (date) {
+        (rrule.between(after, before, true)).forEach(function (date) {
           _exdateHash[Number(date)] = true
         })
       })

@@ -48,24 +48,24 @@ export enum Frequency {
 // =============================================================================
 
 export interface Options {
-  freq?: Frequency
-  dtstart?: Date
-  interval?: number
-  wkst?: Weekday | number
-  count?: number
-  until?: Date
-  bysetpos?: number | number[]
-  bymonth?: number | number[]
-  bymonthday?: number | number[]
-  bynmonthday?: number[]
-  byyearday?: number[]
-  byweekno?: number | number[]
-  byweekday?: ByWeekday | ByWeekday[]
-  bynweekday?: number[][]
-  byhour?: number | number[]
-  byminute?: number | number[]
-  bysecond?: number | number[]
-  byeaster?: number
+  freq: Frequency
+  dtstart: Date
+  interval: number
+  wkst: Weekday | number
+  count: number
+  until: Date
+  bysetpos: number | number[]
+  bymonth: number | number[]
+  bymonthday: number | number[]
+  bynmonthday: number[]
+  byyearday: number[]
+  byweekno: number | number[]
+  byweekday: ByWeekday | ByWeekday[]
+  bynweekday: number[][]
+  byhour: number | number[]
+  byminute: number | number[]
+  bysecond: number | number[]
+  byeaster: number
 }
 
 type CacheKeys = 'before' | 'after' | 'between'
@@ -98,8 +98,8 @@ const Days: DayType = {
 export default class RRule {
   public _string: any
   public _cache: Cache | null
-  public origOptions: Options
-  public options: Options
+  public origOptions: Partial<Options>
+  public options: Partial<Options>
   public timeset: Time[]
   public _len: number
 
@@ -152,7 +152,7 @@ export default class RRule {
   static readonly SA = Days.SA
   static readonly SU = Days.SU
 
-  constructor (options: Options = {}, noCache: boolean = false) {
+  constructor (options: Partial<Options> = {}, noCache: boolean = false) {
     // RFC string
     this._string = null
     this._cache = noCache
@@ -169,7 +169,7 @@ export default class RRule {
 
     this.options = {}
 
-    const invalid: any[] = []
+    const invalid: string[] = []
     const keys = Object.keys(options)
     const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
 
@@ -193,7 +193,7 @@ export default class RRule {
       if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
     }, this)
 
-    const opts: Options = this.options
+    const opts: Partial<Options> = this.options
 
     if (opts.byeaster !== null) opts.freq = RRule.YEARLY
     if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
@@ -381,7 +381,7 @@ export default class RRule {
     let value: string | string[] | number | number[] | (string | number)[]
     let attr: string[]
     const attrs = rfcString.split(';')
-    const options: Options = {}
+    const options: Partial<Options> = {}
 
     for (let i = 0; i < attrs.length; i++) {
       attr = attrs[i].split('=')
@@ -461,7 +461,7 @@ export default class RRule {
     return new RRule(RRule.parseString(str))
   }
 
-  static optionsToString (options: Options) {
+  static optionsToString (options: Partial<Options>) {
     const pairs = []
     const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
     const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
@@ -569,22 +569,23 @@ export default class RRule {
     before: Date,
     inc: boolean = false,
     iterator?: (d: Date, len: number) => boolean
-  ) {
+  ): Date[] {
     const args = {
-      before: before,
-      after: after,
-      inc: inc
+      before,
+      after,
+      inc
     }
 
     if (iterator) {
-      return this._iter(new CallbackIterResult('between', args, iterator))
+      return this._iter(new CallbackIterResult('between', args, iterator)) as Date[]
     }
+
     let result = this._cacheGet('between', args)
     if (result === false) {
       result = this._iter(new IterResult('between', args))
       this._cacheAdd('between', result, args)
     }
-    return result
+    return result as Date[]
   }
 
   /**
@@ -593,7 +594,7 @@ export default class RRule {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  before (dt: Date, inc = false): Date | null {
+  before (dt: Date, inc = false): Date {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
@@ -609,7 +610,7 @@ export default class RRule {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  after (dt: Date, inc = false): Date | null {
+  after (dt: Date, inc = false): Date {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {

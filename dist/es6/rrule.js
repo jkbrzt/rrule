@@ -436,9 +436,9 @@ class RRule {
      */
     between(after, before, inc = false, iterator) {
         const args = {
-            before: before,
-            after: after,
-            inc: inc
+            before,
+            after,
+            inc
         };
         if (iterator) {
             return this._iter(new callbackiterresult_1.default('between', args, iterator));

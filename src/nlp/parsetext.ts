@@ -1,6 +1,6 @@
 import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
-import { Options } from '../rrule'
+import { Options, WeekdayStr } from '../rrule'
 
 // =============================================================================
 // Parser
@@ -180,8 +180,7 @@ export default function parseText (text: string, language: Language) {
       case 'saturday':
       case 'sunday':
         options.freq = RRule.WEEKLY
-        const key = ttr.symbol.substr(0, 2).toUpperCase() as keyof typeof RRule
-        // @ts-ignore
+        const key: WeekdayStr = ttr.symbol.substr(0, 2).toUpperCase() as WeekdayStr
         options.byweekday = [RRule[key]]
 
         if (!ttr.nextSymbol()) return

@@ -17,6 +17,8 @@
 import RRule from './rrule'
 import RRuleSet from './rruleset'
 import RRuleStr from './rrulestr'
+export { Frequency, ByWeekday, WeekdayStr, Options } from './rrule'
+export { default as Weekday } from './weekday'
 
 // =============================================================================
 // Export

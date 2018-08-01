@@ -13,16 +13,16 @@ const getnlp = function () {
     }
     return getnlp._nlp;
 };
-var Frequencies;
-(function (Frequencies) {
-    Frequencies[Frequencies["YEARLY"] = 0] = "YEARLY";
-    Frequencies[Frequencies["MONTHLY"] = 1] = "MONTHLY";
-    Frequencies[Frequencies["WEEKLY"] = 2] = "WEEKLY";
-    Frequencies[Frequencies["DAILY"] = 3] = "DAILY";
-    Frequencies[Frequencies["HOURLY"] = 4] = "HOURLY";
-    Frequencies[Frequencies["MINUTELY"] = 5] = "MINUTELY";
-    Frequencies[Frequencies["SECONDLY"] = 6] = "SECONDLY";
-})(Frequencies = exports.Frequencies || (exports.Frequencies = {}));
+var Frequency;
+(function (Frequency) {
+    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
+    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
+    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
+    Frequency[Frequency["DAILY"] = 3] = "DAILY";
+    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
+    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
+    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
+})(Frequency = exports.Frequency || (exports.Frequency = {}));
 const Days = {
     MO: new weekday_1.default(0),
     TU: new weekday_1.default(1),
@@ -34,7 +34,7 @@ const Days = {
 };
 /**
  *
- * @param {RRuleOptions?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
+ * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
@@ -262,7 +262,7 @@ class RRule {
             value = attr[1];
             switch (key) {
                 case 'FREQ':
-                    options.freq = Frequencies[value];
+                    options.freq = Frequency[value];
                     break;
                 case 'WKST':
                     options.wkst = Days[value];

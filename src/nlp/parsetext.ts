@@ -1,6 +1,6 @@
 import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
-import { RRuleOrigOptions } from '../rrule'
+import { Options } from '../rrule'
 
 // =============================================================================
 // Parser
@@ -93,7 +93,7 @@ class Parser {
 }
 
 export default function parseText (text: string, language: Language) {
-  const options: Partial<RRuleOrigOptions> = {}
+  const options: Partial<Options> = {}
   const ttr = new Parser((language || ENGLISH).tokens)
 
   if (!ttr.start(text)) return null

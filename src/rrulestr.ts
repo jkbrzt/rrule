@@ -1,4 +1,4 @@
-import RRule, { RRuleOrigOptions, Frequencies, DayKeys } from './rrule'
+import RRule, { Options, Frequency, WeekdayStr } from './rrule'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import Weekday from './weekday'
@@ -14,7 +14,7 @@ export interface RRuleStrOptions {
   tzinfos: any
 }
 
-type FreqKey = keyof typeof Frequencies
+type FreqKey = keyof typeof Frequency
 
 /**
  * RRuleStr
@@ -23,7 +23,7 @@ type FreqKey = keyof typeof Frequencies
 
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
-  _handle_DTSTART (rrkwargs: RRuleOrigOptions, name: string, value: string, _: any) {
+  _handle_DTSTART (rrkwargs: Options, name: string, value: string, _: any) {
     // @ts-ignore
     rrkwargs[name.toLowerCase()] = dateutil.untilStringToDate(value)
   }
@@ -61,7 +61,7 @@ export default class RRuleStr {
   }
 
   _handle_int (
-    rrkwargs: RRuleOrigOptions,
+    rrkwargs: Options,
     name: string,
     value: string
   ) {
@@ -70,7 +70,7 @@ export default class RRuleStr {
   }
 
   _handle_int_list (
-    rrkwargs: RRuleOrigOptions,
+    rrkwargs: Options,
     name: string,
     value: string
   ) {
@@ -78,12 +78,12 @@ export default class RRuleStr {
     rrkwargs[name.toLowerCase()] = value.split(',').map(x => parseInt(x, 10))
   }
 
-  _handle_FREQ (rrkwargs: RRuleOrigOptions, _: any, value: FreqKey, __: any) {
+  _handle_FREQ (rrkwargs: Options, _: any, value: FreqKey, __: any) {
     // eslint-disable-line
     rrkwargs['freq'] = RRuleStr._freq_map[value]
   }
 
-  _handle_UNTIL (rrkwargs: RRuleOrigOptions, _: any, value: string, __: any) {
+  _handle_UNTIL (rrkwargs: Options, _: any, value: string, __: any) {
     // eslint-disable-line
     try {
       rrkwargs['until'] = dateutil.untilStringToDate(value)
@@ -92,13 +92,13 @@ export default class RRuleStr {
     }
   }
 
-  _handle_WKST (rrkwargs: RRuleOrigOptions, _: any, value: DayKeys, __: any) {
+  _handle_WKST (rrkwargs: Options, _: any, value: WeekdayStr, __: any) {
     // eslint-disable-line
     rrkwargs['wkst'] = RRuleStr._weekday_map[value]
   }
 
   _handle_BYWEEKDAY (
-    rrkwargs: RRuleOrigOptions,
+    rrkwargs: Options,
     _: any,
     value: string,
     __: any
@@ -108,7 +108,7 @@ export default class RRuleStr {
     let i: number
     let j: number
     let n: string | number
-    let w: DayKeys
+    let w: WeekdayStr
     let wday: string
     const l = []
     const wdays = value.split(',')
@@ -118,7 +118,7 @@ export default class RRuleStr {
       if (wday.indexOf('(') > -1) {
         // If it's of the form TH(+1), etc.
         splt = wday.split('(')
-        w = splt[0] as DayKeys
+        w = splt[0] as WeekdayStr
         n = parseInt(splt.slice(1, -1)[0], 10)
       } else {
         // # If it's of the form +1MO
@@ -126,7 +126,7 @@ export default class RRuleStr {
           if ('+-0123456789'.indexOf(wday[j]) === -1) break
         }
         n = wday.slice(0, j) || null
-        w = wday.slice(j) as DayKeys
+        w = wday.slice(j) as WeekdayStr
 
         if (n) n = parseInt(n, 10)
       }
@@ -361,7 +361,7 @@ export default class RRuleStr {
     }
 
     // Merge in default options
-    defaultKeys.forEach(function (key: keyof RRuleOrigOptions) {
+    defaultKeys.forEach(function (key: keyof Options) {
       // @ts-ignore
       if (!contains(keys, key)) options[key] = RRuleStr.DEFAULT_OPTIONS[key]
     })

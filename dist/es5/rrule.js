@@ -246,11 +246,18 @@ var rruleset_1 = __webpack_require__(7);
 
 exports.RRuleSet = rruleset_1.default;
 
-var rrulestr_1 = __webpack_require__(13); // =============================================================================
+var rrulestr_1 = __webpack_require__(13);
+
+var rrule_2 = __webpack_require__(2);
+
+exports.Frequency = rrule_2.Frequency;
+
+var weekday_1 = __webpack_require__(3);
+
+exports.Weekday = weekday_1.default; // =============================================================================
 // Export
 // =============================================================================
 // Only one RRuleStr instance for all rrule string parsing work.
-
 
 var rruleStr = new rrulestr_1.default();
 
@@ -280,9 +287,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var weekday_1 = __webpack_require__(4);
+var weekday_1 = __webpack_require__(3);
 
-var dateutil_1 = __webpack_require__(3);
+var dateutil_1 = __webpack_require__(4);
 
 var helpers_1 = __webpack_require__(0);
 
@@ -301,17 +308,17 @@ var getnlp = function getnlp() {
   return getnlp._nlp;
 };
 
-var Frequencies;
+var Frequency;
 
-(function (Frequencies) {
-  Frequencies[Frequencies["YEARLY"] = 0] = "YEARLY";
-  Frequencies[Frequencies["MONTHLY"] = 1] = "MONTHLY";
-  Frequencies[Frequencies["WEEKLY"] = 2] = "WEEKLY";
-  Frequencies[Frequencies["DAILY"] = 3] = "DAILY";
-  Frequencies[Frequencies["HOURLY"] = 4] = "HOURLY";
-  Frequencies[Frequencies["MINUTELY"] = 5] = "MINUTELY";
-  Frequencies[Frequencies["SECONDLY"] = 6] = "SECONDLY";
-})(Frequencies = exports.Frequencies || (exports.Frequencies = {}));
+(function (Frequency) {
+  Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
+  Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
+  Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
+  Frequency[Frequency["DAILY"] = 3] = "DAILY";
+  Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
+  Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
+  Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
+})(Frequency = exports.Frequency || (exports.Frequency = {}));
 
 var Days = {
   MO: new weekday_1.default(0),
@@ -324,7 +331,7 @@ var Days = {
 };
 /**
  *
- * @param {RRuleOptions?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
+ * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
@@ -1157,7 +1164,7 @@ function () {
 
         switch (key) {
           case 'FREQ':
-            options.freq = Frequencies[value];
+            options.freq = Frequency[value];
             break;
 
           case 'WKST':
@@ -1703,6 +1710,70 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']; // =============================================================================
+// Weekday
+// =============================================================================
+
+var Weekday =
+/*#__PURE__*/
+function () {
+  function Weekday(weekday, n) {
+    _classCallCheck(this, Weekday);
+
+    if (n === 0) throw new Error("Can't create weekday with n == 0");
+    this.weekday = weekday;
+    this.n = n;
+  } // __call__ - Cannot call the object directly, do it through
+  // e.g. RRule.TH.nth(-1) instead,
+
+
+  _createClass(Weekday, [{
+    key: "nth",
+    value: function nth(n) {
+      return this.n === n ? this : new Weekday(this.weekday, n);
+    } // __eq__
+
+  }, {
+    key: "equals",
+    value: function equals(other) {
+      return this.weekday === other.weekday && this.n === other.n;
+    } // __repr__
+
+  }, {
+    key: "toString",
+    value: function toString() {
+      var s = WDAYS[this.weekday];
+      if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
+      return s;
+    }
+  }, {
+    key: "getJsWeekday",
+    value: function getJsWeekday() {
+      return this.weekday === 6 ? 0 : this.weekday + 1;
+    }
+  }]);
+
+  return Weekday;
+}();
+
+exports.default = Weekday;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var Time =
 /*#__PURE__*/
@@ -1898,70 +1969,6 @@ var dateutil = {
   Time: Time
 };
 exports.default = dateutil;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']; // =============================================================================
-// Weekday
-// =============================================================================
-
-var Weekday =
-/*#__PURE__*/
-function () {
-  function Weekday(weekday, n) {
-    _classCallCheck(this, Weekday);
-
-    if (n === 0) throw new Error("Can't create weekday with n == 0");
-    this.weekday = weekday;
-    this.n = n;
-  } // __call__ - Cannot call the object directly, do it through
-  // e.g. RRule.TH.nth(-1) instead,
-
-
-  _createClass(Weekday, [{
-    key: "nth",
-    value: function nth(n) {
-      return this.n === n ? this : new Weekday(this.weekday, n);
-    } // __eq__
-
-  }, {
-    key: "equals",
-    value: function equals(other) {
-      return this.weekday === other.weekday && this.n === other.n;
-    } // __repr__
-
-  }, {
-    key: "toString",
-    value: function toString() {
-      var s = WDAYS[this.weekday];
-      if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
-      return s;
-    }
-  }, {
-    key: "getJsWeekday",
-    value: function getJsWeekday() {
-      return this.weekday === 6 ? 0 : this.weekday + 1;
-    }
-  }]);
-
-  return Weekday;
-}();
-
-exports.default = Weekday;
 
 /***/ }),
 /* 5 */
@@ -2174,7 +2181,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var rrule_1 = __webpack_require__(2);
 
-var dateutil_1 = __webpack_require__(3);
+var dateutil_1 = __webpack_require__(4);
 
 var helpers_1 = __webpack_require__(0);
 /**
@@ -3620,9 +3627,9 @@ var rrule_1 = __webpack_require__(2);
 
 var rruleset_1 = __webpack_require__(7);
 
-var dateutil_1 = __webpack_require__(3);
+var dateutil_1 = __webpack_require__(4);
 
-var weekday_1 = __webpack_require__(4);
+var weekday_1 = __webpack_require__(3);
 
 var helpers_1 = __webpack_require__(0);
 /**

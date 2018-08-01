@@ -3,7 +3,7 @@ import { Time } from './dateutil';
 import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
-export declare enum Frequencies {
+export declare enum Frequency {
     YEARLY = 0,
     MONTHLY = 1,
     WEEKLY = 2,
@@ -12,28 +12,25 @@ export declare enum Frequencies {
     MINUTELY = 5,
     SECONDLY = 6
 }
-export interface RRuleOrigOptions {
-    freq?: Frequencies | null;
-    dtstart?: Date | null;
+export interface Options {
+    freq?: Frequency;
+    dtstart?: Date;
     interval?: number;
     wkst?: Weekday | number;
-    count?: number | null;
-    until?: Date | null;
-    bysetpos?: number | number[] | null;
-    bymonth?: number[] | number | null;
-    bymonthday?: number[] | number | null;
-    bynmonthday?: number[] | null;
-    byyearday?: number[] | null;
-    byweekno?: number | number[] | null;
-    byweekday?: Weekday | number | (Weekday | number)[] | null;
-    bynweekday?: number[][] | null;
-    byhour?: number | number[] | null;
-    byminute?: number | number[] | null;
-    bysecond?: number | number[] | null;
-    byeaster?: number | null;
-}
-interface RRuleOptions extends RRuleOrigOptions {
-    wkst?: number;
+    count?: number;
+    until?: Date;
+    bysetpos?: number | number[];
+    bymonth?: number | number[];
+    bymonthday?: number | number[];
+    bynmonthday?: number[];
+    byyearday?: number[];
+    byweekno?: number | number[];
+    byweekday?: ByWeekday | ByWeekday[];
+    bynweekday?: number[][];
+    byhour?: number | number[];
+    byminute?: number | number[];
+    bysecond?: number | number[];
+    byeaster?: number;
 }
 declare type CacheKeys = 'before' | 'after' | 'between';
 declare type CacheBase = {
@@ -42,18 +39,19 @@ declare type CacheBase = {
 export declare type Cache = CacheBase & {
     all: Date[] | IterArgs[] | false;
 };
-export declare type DayKeys = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
+export declare type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
+export declare type ByWeekday = WeekdayStr | number | Weekday;
 /**
  *
- * @param {RRuleOptions?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
+ * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
 export default class RRule {
     _string: any;
     _cache: Cache | null;
-    origOptions: RRuleOptions;
-    options: RRuleOptions;
+    origOptions: Options;
+    options: Options;
     timeset: Time[];
     _len: number;
     static readonly FREQUENCIES: string[];
@@ -64,7 +62,7 @@ export default class RRule {
     static readonly HOURLY: number;
     static readonly MINUTELY: number;
     static readonly SECONDLY: number;
-    static readonly DEFAULT_OPTIONS: RRuleOrigOptions;
+    static readonly DEFAULT_OPTIONS: Options;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -72,12 +70,12 @@ export default class RRule {
     static readonly FR: Weekday;
     static readonly SA: Weekday;
     static readonly SU: Weekday;
-    constructor(options?: RRuleOrigOptions, noCache?: boolean);
-    static parseText(text: string, language: Language): Partial<RRuleOrigOptions>;
+    constructor(options?: Options, noCache?: boolean);
+    static parseText(text: string, language: Language): Partial<Options>;
     static fromText(text: string, language?: Language): RRule;
-    static parseString(rfcString: string): RRuleOrigOptions;
+    static parseString(rfcString: string): Options;
     static fromString(str: string): RRule;
-    static optionsToString(options: RRuleOptions): string;
+    static optionsToString(options: Options): string;
     /**
      * @param {Function} iterator - optional function that will be called
      *                   on each date that is added. It can return false

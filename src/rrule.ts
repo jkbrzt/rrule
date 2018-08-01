@@ -33,7 +33,7 @@ const getnlp: GetNlp = function () {
   return getnlp._nlp
 } as GetNlp
 
-export enum Frequencies {
+export enum Frequency {
   YEARLY = 0,
   MONTHLY = 1,
   WEEKLY = 2,
@@ -47,29 +47,25 @@ export enum Frequencies {
 // RRule
 // =============================================================================
 
-export interface RRuleOrigOptions {
-  freq?: Frequencies | null
-  dtstart?: Date | null
+export interface Options {
+  freq?: Frequency
+  dtstart?: Date
   interval?: number
   wkst?: Weekday | number
-  count?: number | null
-  until?: Date | null
-  bysetpos?: number | number[] | null
-  bymonth?: number[] | number | null
-  bymonthday?: number[] | number | null
-  bynmonthday?: number[] | null
-  byyearday?: number[] | null
-  byweekno?: number | number[] | null
-  byweekday?: Weekday | number | (Weekday | number)[] | null
-  bynweekday?: number[][] | null
-  byhour?: number | number[] | null
-  byminute?: number | number[] | null
-  bysecond?: number | number[] | null
-  byeaster?: number | null
-}
-
-interface RRuleOptions extends RRuleOrigOptions {
-  wkst?: number
+  count?: number
+  until?: Date
+  bysetpos?: number | number[]
+  bymonth?: number | number[]
+  bymonthday?: number | number[]
+  bynmonthday?: number[]
+  byyearday?: number[]
+  byweekno?: number | number[]
+  byweekday?: ByWeekday | ByWeekday[]
+  bynweekday?: number[][]
+  byhour?: number | number[]
+  byminute?: number | number[]
+  bysecond?: number | number[]
+  byeaster?: number
 }
 
 type CacheKeys = 'before' | 'after' | 'between'
@@ -77,9 +73,11 @@ type CacheKeys = 'before' | 'after' | 'between'
 type CacheBase = { [K in CacheKeys]: IterArgs[] }
 export type Cache = CacheBase & { all: Date[] | IterArgs[] | false }
 
-export type DayKeys = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
+export type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
 
-type DayType = { [K in DayKeys]: Weekday }
+export type ByWeekday = WeekdayStr | number | Weekday
+
+type DayType = { [K in WeekdayStr]: Weekday }
 
 const Days: DayType = {
   MO: new Weekday(0),
@@ -93,15 +91,15 @@ const Days: DayType = {
 
 /**
  *
- * @param {RRuleOptions?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
+ * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
 export default class RRule {
   public _string: any
   public _cache: Cache | null
-  public origOptions: RRuleOptions
-  public options: RRuleOptions
+  public origOptions: Options
+  public options: Options
   public timeset: Time[]
   public _len: number
 
@@ -125,7 +123,7 @@ export default class RRule {
   static readonly MINUTELY = 5
   static readonly SECONDLY = 6
 
-  static readonly DEFAULT_OPTIONS: RRuleOrigOptions = {
+  static readonly DEFAULT_OPTIONS: Options = {
     freq: null,
     dtstart: null,
     interval: 1,
@@ -154,7 +152,7 @@ export default class RRule {
   static readonly SA = Days.SA
   static readonly SU = Days.SU
 
-  constructor (options: RRuleOrigOptions = {}, noCache: boolean = false) {
+  constructor (options: Options = {}, noCache: boolean = false) {
     // RFC string
     this._string = null
     this._cache = noCache
@@ -176,7 +174,7 @@ export default class RRule {
     const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
 
     // Shallow copy for options and origOptions and check for invalid
-    keys.forEach(function (key: keyof RRuleOptions) {
+    keys.forEach(function (key: keyof Options) {
       this.origOptions[key] = options[key]
       this.options[key] = options[key]
       if (!contains(defaultKeys, key)) invalid.push(key)
@@ -191,11 +189,11 @@ export default class RRule {
     }
 
     // Merge in default options
-    defaultKeys.forEach(function (key: keyof RRuleOptions) {
+    defaultKeys.forEach(function (key: keyof Options) {
       if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
     }, this)
 
-    const opts: RRuleOrigOptions = this.options
+    const opts: Options = this.options
 
     if (opts.byeaster !== null) opts.freq = RRule.YEARLY
     if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
@@ -311,10 +309,10 @@ export default class RRule {
 
         if (typeof wday === 'number') {
           byweekday.push(wday)
-        } else if (!wday.n || opts.freq > RRule.MONTHLY) {
-          byweekday.push(wday.weekday)
+        } else if (!(wday as Weekday).n || opts.freq > RRule.MONTHLY) {
+          byweekday.push((wday as Weekday).weekday)
         } else {
-          bynweekday.push([wday.weekday, wday.n])
+          bynweekday.push([(wday as Weekday).weekday, (wday as Weekday).n])
         }
       }
       opts.byweekday = plb(byweekday) ? byweekday : null
@@ -383,15 +381,15 @@ export default class RRule {
     let value: string | string[] | number | number[] | (string | number)[]
     let attr: string[]
     const attrs = rfcString.split(';')
-    const options: RRuleOrigOptions = {}
+    const options: Options = {}
 
     for (let i = 0; i < attrs.length; i++) {
       attr = attrs[i].split('=')
       key = attr[0]
-      value = attr[1] as DayKeys
+      value = attr[1] as WeekdayStr
       switch (key) {
         case 'FREQ':
-          options.freq = Frequencies[value as keyof typeof Frequencies]
+          options.freq = Frequency[value as keyof typeof Frequency]
           break
         case 'WKST':
           options.wkst = Days[value as keyof typeof Days]
@@ -463,9 +461,9 @@ export default class RRule {
     return new RRule(RRule.parseString(str))
   }
 
-  static optionsToString (options: RRuleOptions) {
+  static optionsToString (options: Options) {
     const pairs = []
-    const keys: (keyof RRuleOptions)[] = Object.keys(options) as (keyof RRuleOptions)[]
+    const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
     const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
 
     for (let i = 0; i < keys.length; i++) {
@@ -989,11 +987,11 @@ export default class RRule {
         ii.rebuild(year, month)
       } else if (freq === RRule.WEEKLY) {
         if (wkst > weekday) {
-          day += -(weekday + 1 + (6 - wkst)) + interval * 7
+          day += -(weekday + 1 + (6 - (wkst as number))) + interval * 7
         } else {
-          day += -(weekday - wkst) + interval * 7
+          day += -(weekday - (wkst as number)) + interval * 7
         }
-        weekday = wkst
+        weekday = wkst as number
         fixday = true
       } else if (freq === RRule.DAILY) {
         day += interval
@@ -1209,13 +1207,13 @@ class Iterinfo {
         let no1wkst
         let firstwkst
         let wyearlen
-        no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7)
+        no1wkst = firstwkst = pymod(7 - this.yearweekday + (rr.options.wkst as number), 7)
         if (no1wkst >= 4) {
           no1wkst = 0
           // Number of days in the year, plus the days we got
           // from last year.
           wyearlen =
-            this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7)
+            this.yearlen + pymod(this.yearweekday - (rr.options.wkst as number), 7)
         } else {
           // Number of days in the year, minus the days we
           // left in last year.
@@ -1276,7 +1274,7 @@ class Iterinfo {
           if (!contains(rr.options.byweekno as number[], -1)) {
             const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
             let lno1wkst = pymod(
-              7 - lyearweekday.valueOf() + rr.options.wkst,
+              7 - lyearweekday.valueOf() + (rr.options.wkst as number),
               7
             )
             const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
@@ -1285,7 +1283,7 @@ class Iterinfo {
               lnumweeks = Math.floor(
                 52 +
                   pymod(
-                    lyearlen + pymod(lyearweekday - rr.options.wkst, 7),
+                    lyearlen + pymod(lyearweekday - (rr.options.wkst as number), 7),
                     7
                   ) /
                     4

@@ -1,6 +1,6 @@
 import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
-import { RRuleOrigOptions } from '../rrule'
+import { Options, ByWeekday } from '../rrule'
 import Weekday from '../weekday'
 
 // =============================================================================
@@ -34,12 +34,12 @@ export default class ToText {
   private text: string[]
   private gettext: GetText
   private language: Language
-  private options: RRuleOrigOptions
-  private origOptions: RRuleOrigOptions
-  private bymonthday: RRuleOrigOptions['bymonthday']
+  private options: Options
+  private origOptions: Options
+  private bymonthday: Options['bymonthday']
   private byweekday: {
-    allWeeks: (number | Weekday)[]
-    someWeeks: (number | Weekday)[]
+    allWeeks: ByWeekday[]
+    someWeeks: ByWeekday[]
     isWeekdays: boolean
   }
 

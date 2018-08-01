@@ -41,10 +41,10 @@ export default class ToText {
     WEEKLY(): void;
     MONTHLY(): void;
     YEARLY(): void;
-    _bymonthday(): void;
-    _byweekday(): void;
-    _byhour(): void;
-    _bymonth(): void;
+    private _bymonthday;
+    private _byweekday;
+    private _byhour;
+    private _bymonth;
     nth(n: number | string): string;
     monthtext(m: number): string;
     weekdaytext(wday: Weekday | number): string;

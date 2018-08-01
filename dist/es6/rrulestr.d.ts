@@ -1,4 +1,4 @@
-import RRule, { Options, Frequency, WeekdayStr } from './rrule';
+import RRule from './rrule';
 import RRuleSet from './rruleset';
 export interface RRuleStrOptions {
     dtstart: any;
@@ -9,52 +9,34 @@ export interface RRuleStrOptions {
     ignoretz: boolean;
     tzinfos: any;
 }
-declare type FreqKey = keyof typeof Frequency;
 /**
  * RRuleStr
  *  To parse a set of rrule strings
  */
 export default class RRuleStr {
-    _handle_DTSTART(rrkwargs: Options, name: string, value: string, _: any): void;
-    static _weekday_map: {
-        MO: number;
-        TU: number;
-        WE: number;
-        TH: number;
-        FR: number;
-        SA: number;
-        SU: number;
-    };
-    static _freq_map: {
-        YEARLY: number;
-        MONTHLY: number;
-        WEEKLY: number;
-        DAILY: number;
-        HOURLY: number;
-        MINUTELY: number;
-        SECONDLY: number;
-    };
-    static DEFAULT_OPTIONS: RRuleStrOptions;
-    _handle_int(rrkwargs: Options, name: string, value: string): void;
-    _handle_int_list(rrkwargs: Options, name: string, value: string): void;
-    _handle_FREQ(rrkwargs: Options, _: any, value: FreqKey, __: any): void;
-    _handle_UNTIL(rrkwargs: Options, _: any, value: string, __: any): void;
-    _handle_WKST(rrkwargs: Options, _: any, value: WeekdayStr, __: any): void;
-    _handle_BYWEEKDAY(rrkwargs: Options, _: any, value: string, __: any): void;
-    _parseRfcRRule(line: any, options?: Partial<RRuleStrOptions>): RRule;
-    _parseRfc(s: string, options: Partial<RRuleStrOptions>): RRule;
+    private _handle_DTSTART;
+    private static _weekday_map;
+    private static _freq_map;
+    private static DEFAULT_OPTIONS;
+    private _handle_int;
+    private _handle_int_list;
+    private _handle_FREQ;
+    private _handle_UNTIL;
+    private _handle_WKST;
+    private _handle_BYWEEKDAY;
+    private _parseRfcRRule;
+    private _parseRfc;
     parse(s: string, options?: Partial<RRuleStrOptions>): RRule | RRuleSet;
-    _handle_BYDAY: (rrkwargs: Options, _: any, value: string, __: any) => void;
-    _handle_INTERVAL: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_COUNT: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYSETPOS: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYMONTH: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYMONTHDAY: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYYEARDAY: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYEASTER: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYWEEKNO: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYHOUR: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYMINUTE: (rrkwargs: Options, name: string, value: string) => void;
-    _handle_BYSECOND: (rrkwargs: Options, name: string, value: string) => void;
+    private _handle_BYDAY;
+    private _handle_INTERVAL;
+    private _handle_COUNT;
+    private _handle_BYSETPOS;
+    private _handle_BYMONTH;
+    private _handle_BYMONTHDAY;
+    private _handle_BYYEARDAY;
+    private _handle_BYEASTER;
+    private _handle_BYWEEKNO;
+    private _handle_BYHOUR;
+    private _handle_BYMINUTE;
+    private _handle_BYSECOND;
 }
-export {};

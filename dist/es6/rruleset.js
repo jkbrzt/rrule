@@ -149,6 +149,7 @@ class RRuleSet extends rrule_1.default {
                 break;
         }
         this._rrule.forEach(function (rrule) {
+            // @ts-ignore
             rrule._iter(iterResult);
         });
         const res = iterResult._result;
@@ -168,6 +169,7 @@ class RRuleSet extends rrule_1.default {
     /**
      * Create a new RRuleSet Object completely base on current instance
      */
+    // @ts-ignore
     clone() {
         const rrs = new RRuleSet(!!this._cache);
         let i;

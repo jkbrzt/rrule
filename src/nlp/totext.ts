@@ -321,7 +321,7 @@ export default class ToText {
     }
   }
 
-  _bymonthday () {
+  private _bymonthday () {
     const gettext = this.gettext
     if (this.byweekday && this.byweekday.allWeeks) {
       this.add(gettext('on'))
@@ -338,7 +338,7 @@ export default class ToText {
     // this.add(gettext('DAY'))
   }
 
-  _byweekday () {
+  private _byweekday () {
     const gettext = this.gettext
     if (this.byweekday.allWeeks && !this.byweekday.isWeekdays) {
       this.add(gettext('on')).add(
@@ -355,7 +355,7 @@ export default class ToText {
     }
   }
 
-  _byhour () {
+  private _byhour () {
     const gettext = this.gettext
 
     this.add(gettext('at')).add(
@@ -363,7 +363,7 @@ export default class ToText {
     )
   }
 
-  _bymonth () {
+  private _bymonth () {
     this.add(
       this.list(this.options.bymonth, this.monthtext, this.gettext('and'))
     )

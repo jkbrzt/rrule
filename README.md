@@ -336,7 +336,6 @@ documentation.
     <code>rule.options.byweekday</code> isn't equal
     to <code>rule.origOptions.byweekday</code> (which is an inconsistency).
     </dd>
-
     <dt><code>rule.origOptions</code></dt>
     <dd>The original <code>options</code> argument passed to
     the constructor.</dd>

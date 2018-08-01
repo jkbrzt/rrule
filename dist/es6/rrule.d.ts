@@ -1,6 +1,6 @@
 import Weekday from './weekday';
-import { Time } from './dateutil';
-import IterResult, { IterArgs } from './iterresult';
+import dateutil from './dateutil';
+import { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
 export declare enum Frequency {
@@ -52,7 +52,7 @@ export default class RRule {
     _cache: Cache | null;
     origOptions: Partial<Options>;
     options: Partial<Options>;
-    timeset: Time[];
+    timeset: dateutil.Time[];
     _len: number;
     static readonly FREQUENCIES: string[];
     static readonly YEARLY: number;
@@ -62,7 +62,7 @@ export default class RRule {
     static readonly HOURLY: number;
     static readonly MINUTELY: number;
     static readonly SECONDLY: number;
-    static readonly DEFAULT_OPTIONS: Options;
+    private static readonly DEFAULT_OPTIONS;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -127,7 +127,7 @@ export default class RRule {
      * @param {Array,Date} value - an array of dates, one date, or null
      * @param {Object?} args - _iter arguments
      */
-    _cacheAdd(what: CacheKeys | 'all', value: Date[] | Date | null, args?: Partial<IterArgs>): void;
+    private _cacheAdd;
     /**
      * @return false - not in the cache
      *         null  - cached, but zero occurrences (before/after)
@@ -135,12 +135,12 @@ export default class RRule {
      *         []    - cached, but zero occurrences (all/between)
      *         [Date1, DateN] - cached (all/between)
      */
-    _cacheGet(what: CacheKeys | 'all', args?: Partial<IterArgs>): Date | Date[] | false;
+    private _cacheGet;
     /**
      * @return a RRule instance with the same freq and options
      *          as this one (cache is not cloned)
      */
     clone(): RRule;
-    _iter(iterResult: IterResult): Date | Date[] | null;
+    private _iter;
 }
 export {};

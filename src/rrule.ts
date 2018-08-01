@@ -1,5 +1,5 @@
 import Weekday from './weekday'
-import dateutil, { Time } from './dateutil'
+import dateutil from './dateutil'
 import { range, repeat, pymod, divmod, plb, contains } from './helpers'
 
 import {
@@ -100,7 +100,7 @@ export default class RRule {
   public _cache: Cache | null
   public origOptions: Partial<Options>
   public options: Partial<Options>
-  public timeset: Time[]
+  public timeset: dateutil.Time[]
   public _len: number
 
   // RRule class 'constants'
@@ -123,7 +123,7 @@ export default class RRule {
   static readonly MINUTELY = 5
   static readonly SECONDLY = 6
 
-  static readonly DEFAULT_OPTIONS: Options = {
+  private static readonly DEFAULT_OPTIONS: Options = {
     freq: null,
     dtstart: null,
     interval: 1,
@@ -654,7 +654,7 @@ export default class RRule {
    * @param {Array,Date} value - an array of dates, one date, or null
    * @param {Object?} args - _iter arguments
    */
-  _cacheAdd (
+  private _cacheAdd (
     what: CacheKeys | 'all',
     value: Date[] | Date | null,
     args?: Partial<IterArgs>
@@ -683,7 +683,7 @@ export default class RRule {
    *         []    - cached, but zero occurrences (all/between)
    *         [Date1, DateN] - cached (all/between)
    */
-  _cacheGet (
+  private _cacheGet (
     what: CacheKeys | 'all',
     args?: Partial<IterArgs>
   ): Date | Date[] | false {
@@ -737,11 +737,11 @@ export default class RRule {
    * @return a RRule instance with the same freq and options
    *          as this one (cache is not cloned)
    */
-  clone () {
+  clone (): RRule {
     return new RRule(this.origOptions)
   }
 
-  _iter (iterResult: IterResult): Date | Date[] | null {
+  private _iter (iterResult: IterResult): Date | Date[] | null {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
 
@@ -789,7 +789,7 @@ export default class RRule {
       [RRule.SECONDLY]: ii.ddayset
     }[freq]
 
-    let timeset: Time[]
+    let timeset: dateutil.Time[]
     let gettimeset
     if (freq < RRule.HOURLY) {
       timeset = this.timeset

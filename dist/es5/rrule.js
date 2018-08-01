@@ -1534,94 +1534,53 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-
-var Time = function () {
-    function Time(hour, minute, second, millisecond) {
-        _classCallCheck(this, Time);
-
-        this.hour = hour;
-        this.minute = minute;
-        this.second = second;
-        this.millisecond = millisecond || 0;
-    }
-
-    _createClass(Time, [{
-        key: "getHours",
-        value: function getHours() {
-            return this.hour;
-        }
-    }, {
-        key: "getMinutes",
-        value: function getMinutes() {
-            return this.minute;
-        }
-    }, {
-        key: "getSeconds",
-        value: function getSeconds() {
-            return this.second;
-        }
-    }, {
-        key: "getMilliseconds",
-        value: function getMilliseconds() {
-            return this.millisecond;
-        }
-    }, {
-        key: "getTime",
-        value: function getTime() {
-            return (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 + this.millisecond;
-        }
-    }]);
-
-    return Time;
-}();
-
-exports.Time = Time;
 /**
  * General date-related utilities.
  * Also handles several incompatibilities between JavaScript and Python
  *
  */
-var dateutil = {
-    MONTH_DAYS: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+var dateutil;
+(function (dateutil) {
+    dateutil.MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     /**
      * Number of milliseconds of one day
      */
-    ONE_DAY: 1000 * 60 * 60 * 24,
+    dateutil.ONE_DAY = 1000 * 60 * 60 * 24;
     /**
      * @see: <http://docs.python.org/library/datetime.html#datetime.MAXYEAR>
      */
-    MAXYEAR: 9999,
+    dateutil.MAXYEAR = 9999;
     /**
      * Python uses 1-Jan-1 as the base for calculating ordinals but we don't
      * want to confuse the JS engine with milliseconds > Number.MAX_NUMBER,
      * therefore we use 1-Jan-1970 instead
      */
-    ORDINAL_BASE: new Date(1970, 0, 1),
+    dateutil.ORDINAL_BASE = new Date(1970, 0, 1);
     /**
      * Python: MO-SU: 0 - 6
      * JS: SU-SAT 0 - 6
      */
-    PY_WEEKDAYS: [6, 0, 1, 2, 3, 4, 5],
+    dateutil.PY_WEEKDAYS = [6, 0, 1, 2, 3, 4, 5];
     /**
      * py_date.timetuple()[7]
      */
-    getYearDay: function getYearDay(date) {
+    dateutil.getYearDay = function (date) {
         var dateNoTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         return Math.ceil((dateNoTime.valueOf() - new Date(date.getFullYear(), 0, 1).valueOf()) / dateutil.ONE_DAY) + 1;
-    },
-    isLeapYear: function isLeapYear(year) {
+    };
+    dateutil.isLeapYear = function (year) {
         return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
-    },
+    };
     /**
      * @return {Number} the date's timezone offset in ms
      */
-    tzOffset: function tzOffset(date) {
+    dateutil.tzOffset = function (date) {
         return date.getTimezoneOffset() * 60 * 1000;
-    },
+    };
     /**
      * @see: <http://www.mcfedries.com/JavaScript/DaysBetween.asp>
      */
-    daysBetween: function daysBetween(date1, date2) {
+    dateutil.daysBetween = function (date1, date2) {
         // The number of milliseconds in one day
         // Convert both dates to milliseconds
         var date1ms = date1.getTime() - dateutil.tzOffset(date1);
@@ -1630,64 +1589,64 @@ var dateutil = {
         var differencems = date1ms - date2ms;
         // Convert back to days and return
         return Math.round(differencems / dateutil.ONE_DAY);
-    },
+    };
     /**
      * @see: <http://docs.python.org/library/datetime.html#datetime.date.toordinal>
      */
-    toOrdinal: function toOrdinal(date) {
+    dateutil.toOrdinal = function (date) {
         return dateutil.daysBetween(date, dateutil.ORDINAL_BASE);
-    },
+    };
     /**
      * @see - <http://docs.python.org/library/datetime.html#datetime.date.fromordinal>
      */
-    fromOrdinal: function fromOrdinal(ordinal) {
+    dateutil.fromOrdinal = function (ordinal) {
         var millisecsFromBase = ordinal * dateutil.ONE_DAY;
         return new Date(dateutil.ORDINAL_BASE.getTime() - dateutil.tzOffset(dateutil.ORDINAL_BASE) + millisecsFromBase + dateutil.tzOffset(new Date(millisecsFromBase)));
-    },
-    /**
-     * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
-     */
-    monthRange: function monthRange(year, month) {
-        var date = new Date(year, month, 1);
-        return [dateutil.getWeekday(date), dateutil.getMonthDays(date)];
-    },
-    getMonthDays: function getMonthDays(date) {
+    };
+    dateutil.getMonthDays = function (date) {
         var month = date.getMonth();
         return month === 1 && dateutil.isLeapYear(date.getFullYear()) ? 29 : dateutil.MONTH_DAYS[month];
-    },
+    };
     /**
      * @return {Number} python-like weekday
      */
-    getWeekday: function getWeekday(date) {
+    dateutil.getWeekday = function (date) {
         return dateutil.PY_WEEKDAYS[date.getDay()];
-    },
+    };
+    /**
+     * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
+     */
+    dateutil.monthRange = function (year, month) {
+        var date = new Date(year, month, 1);
+        return [dateutil.getWeekday(date), dateutil.getMonthDays(date)];
+    };
     /**
      * @see: <http://docs.python.org/library/datetime.html#datetime.datetime.combine>
      */
-    combine: function combine(date, time) {
+    dateutil.combine = function (date, time) {
         time = time || date;
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
-    },
-    clone: function clone(date) {
+    };
+    dateutil.clone = function (date) {
         var dolly = new Date(date.getTime());
         return dolly;
-    },
-    cloneDates: function cloneDates(dates) {
+    };
+    dateutil.cloneDates = function (dates) {
         var clones = [];
         for (var i = 0; i < dates.length; i++) {
             clones.push(dateutil.clone(dates[i]));
         }
         return clones;
-    },
+    };
     /**
      * Sorts an array of Date or dateutil.Time objects
      */
-    sort: function sort(dates) {
+    dateutil.sort = function (dates) {
         dates.sort(function (a, b) {
             return a.getTime() - b.getTime();
         });
-    },
-    timeToUntilString: function timeToUntilString(time) {
+    };
+    dateutil.timeToUntilString = function (time) {
         var comp = void 0;
         var date = new Date(time);
         var comps = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 'T', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), 'Z'];
@@ -1698,15 +1657,56 @@ var dateutil = {
             }
         }
         return comps.join('');
-    },
-    untilStringToDate: function untilStringToDate(until) {
+    };
+    dateutil.untilStringToDate = function (until) {
         var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         var bits = re.exec(until);
         if (!bits) throw new Error('Invalid UNTIL value: ' + until);
         return new Date(Date.UTC(parseInt(bits[1], 10), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10), parseInt(bits[5], 10) || 0, parseInt(bits[6], 10) || 0, parseInt(bits[7], 10) || 0));
-    },
-    Time: Time
-};
+    };
+
+    var Time = function () {
+        function Time(hour, minute, second, millisecond) {
+            _classCallCheck(this, Time);
+
+            this.hour = hour;
+            this.minute = minute;
+            this.second = second;
+            this.millisecond = millisecond || 0;
+        }
+
+        _createClass(Time, [{
+            key: "getHours",
+            value: function getHours() {
+                return this.hour;
+            }
+        }, {
+            key: "getMinutes",
+            value: function getMinutes() {
+                return this.minute;
+            }
+        }, {
+            key: "getSeconds",
+            value: function getSeconds() {
+                return this.second;
+            }
+        }, {
+            key: "getMilliseconds",
+            value: function getMilliseconds() {
+                return this.millisecond;
+            }
+        }, {
+            key: "getTime",
+            value: function getTime() {
+                return (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 + this.millisecond;
+            }
+        }]);
+
+        return Time;
+    }();
+
+    dateutil.Time = Time;
+})(dateutil = exports.dateutil || (exports.dateutil = {}));
 exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map
 
@@ -2067,6 +2067,7 @@ var RRuleSet = function (_rrule_1$default) {
                 if (!iterResult.accept(new Date(this._rdate[i].valueOf()))) break;
             }
             this._rrule.forEach(function (rrule) {
+                // @ts-ignore
                 rrule._iter(iterResult);
             });
             var res = iterResult._result;
@@ -2086,6 +2087,7 @@ var RRuleSet = function (_rrule_1$default) {
         /**
          * Create a new RRuleSet Object completely base on current instance
          */
+        // @ts-ignore
 
     }, {
         key: "clone",

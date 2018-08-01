@@ -23,13 +23,13 @@ type FreqKey = keyof typeof Frequency
 
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
-  _handle_DTSTART (rrkwargs: Options, name: string, value: string, _: any) {
+  private _handle_DTSTART (rrkwargs: Options, name: string, value: string, _: any) {
     // @ts-ignore
     rrkwargs[name.toLowerCase()] = dateutil.untilStringToDate(value)
   }
 
   // tslint:disable-next-line:variable-name
-  static _weekday_map = {
+  private static _weekday_map = {
     MO: 0,
     TU: 1,
     WE: 2,
@@ -40,7 +40,7 @@ export default class RRuleStr {
   }
 
   // tslint:disable-next-line:variable-name
-  static _freq_map = {
+  private static _freq_map = {
     YEARLY: RRule.YEARLY,
     MONTHLY: RRule.MONTHLY,
     WEEKLY: RRule.WEEKLY,
@@ -50,7 +50,7 @@ export default class RRuleStr {
     SECONDLY: RRule.SECONDLY
   }
 
-  static DEFAULT_OPTIONS: RRuleStrOptions = {
+  private static DEFAULT_OPTIONS: RRuleStrOptions = {
     dtstart: null,
     cache: false,
     unfold: false,
@@ -60,7 +60,7 @@ export default class RRuleStr {
     tzinfos: null
   }
 
-  _handle_int (
+  private _handle_int (
     rrkwargs: Options,
     name: string,
     value: string
@@ -69,7 +69,7 @@ export default class RRuleStr {
     rrkwargs[name.toLowerCase()] = parseInt(value, 10)
   }
 
-  _handle_int_list (
+  private _handle_int_list (
     rrkwargs: Options,
     name: string,
     value: string
@@ -78,12 +78,12 @@ export default class RRuleStr {
     rrkwargs[name.toLowerCase()] = value.split(',').map(x => parseInt(x, 10))
   }
 
-  _handle_FREQ (rrkwargs: Options, _: any, value: FreqKey, __: any) {
+  private _handle_FREQ (rrkwargs: Options, _: any, value: FreqKey, __: any) {
     // eslint-disable-line
     rrkwargs['freq'] = RRuleStr._freq_map[value]
   }
 
-  _handle_UNTIL (rrkwargs: Options, _: any, value: string, __: any) {
+  private _handle_UNTIL (rrkwargs: Options, _: any, value: string, __: any) {
     // eslint-disable-line
     try {
       rrkwargs['until'] = dateutil.untilStringToDate(value)
@@ -92,12 +92,12 @@ export default class RRuleStr {
     }
   }
 
-  _handle_WKST (rrkwargs: Options, _: any, value: WeekdayStr, __: any) {
+  private _handle_WKST (rrkwargs: Options, _: any, value: WeekdayStr, __: any) {
     // eslint-disable-line
     rrkwargs['wkst'] = RRuleStr._weekday_map[value]
   }
 
-  _handle_BYWEEKDAY (
+  private _handle_BYWEEKDAY (
     rrkwargs: Options,
     _: any,
     value: string,
@@ -137,7 +137,7 @@ export default class RRuleStr {
     rrkwargs['byweekday'] = l
   }
 
-  _parseRfcRRule (
+  private _parseRfcRRule (
     line: any,
     options: Partial<RRuleStrOptions> = {}
   ) {
@@ -181,7 +181,7 @@ export default class RRuleStr {
     return new RRule(rrkwargs, !options.cache)
   }
 
-  _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
+  private _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     if (options.compatible) {
       options.forceset = true
       options.unfold = true
@@ -370,31 +370,31 @@ export default class RRuleStr {
   }
 
   // tslint:disable-next-line:variable-name
-  _handle_BYDAY = this._handle_BYWEEKDAY
+  private _handle_BYDAY = this._handle_BYWEEKDAY
 
   // tslint:disable-next-line:variable-name
-  _handle_INTERVAL = this._handle_int
+  private _handle_INTERVAL = this._handle_int
 
   // tslint:disable-next-line:variable-name
-  _handle_COUNT = this._handle_int
+  private _handle_COUNT = this._handle_int
 
   // tslint:disable-next-line:variable-name
-  _handle_BYSETPOS = this._handle_int_list
+  private _handle_BYSETPOS = this._handle_int_list
 
   // tslint:disable-next-line:variable-name
-  _handle_BYMONTH = this._handle_int_list
+  private _handle_BYMONTH = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYMONTHDAY = this._handle_int_list
+  private _handle_BYMONTHDAY = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYYEARDAY = this._handle_int_list
+  private _handle_BYYEARDAY = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYEASTER = this._handle_int_list
+  private _handle_BYEASTER = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYWEEKNO = this._handle_int_list
+  private _handle_BYWEEKNO = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYHOUR = this._handle_int_list
+  private _handle_BYHOUR = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYMINUTE = this._handle_int_list
+  private _handle_BYMINUTE = this._handle_int_list
   // tslint:disable-next-line:variable-name
-  _handle_BYSECOND = this._handle_int_list
+  private _handle_BYSECOND = this._handle_int_list
 }

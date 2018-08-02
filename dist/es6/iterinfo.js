@@ -1,11 +1,13 @@
-import { WDAYMASK, M365MASK, M365RANGE, M366MASK, M366RANGE, MDAY365MASK, MDAY366MASK, NMDAY365MASK, NMDAY366MASK } from './masks';
-import dateutil from './dateutil';
-import { repeat, pymod, plb, contains, range } from './helpers';
-import RRule from './rrule';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const masks_1 = require("./masks");
+const rrule_1 = require("./rrule");
+const dateutil_1 = require("./dateutil");
+const helpers_1 = require("./helpers");
 // =============================================================================
 // Iterinfo
 // =============================================================================
-export default class Iterinfo {
+class Iterinfo {
     constructor(rrule) {
         this.rrule = rrule;
         this.lastyear = null;
@@ -23,8 +25,7 @@ export default class Iterinfo {
         this.nwdaymask = null;
         this.eastermask = null;
     }
-    easter(y, offset) {
-        offset = offset || 0;
+    easter(y, offset = 0) {
         const a = y % 19;
         const b = Math.floor(y / 100);
         const c = y % 100;
@@ -38,7 +39,7 @@ export default class Iterinfo {
         const l = Math.floor(32 + 2 * e + 2 * i - h - k) % 7;
         const m = Math.floor((a + 11 * h + 22 * l) / 451);
         const month = Math.floor((h + l - 7 * m + 114) / 31);
-        const day = (h + l - 7 * m + 114) % 31 + 1;
+        const day = ((h + l - 7 * m + 114) % 31) + 1;
         const date = Date.UTC(y, month - 1, day + offset);
         const yearStart = Date.UTC(y, 0, 1);
         return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
@@ -46,38 +47,41 @@ export default class Iterinfo {
     rebuild(year, month) {
         const rr = this.rrule;
         if (year !== this.lastyear) {
-            this.yearlen = dateutil.isLeapYear(year) ? 366 : 365;
-            this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365;
+            this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
+            this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
             const firstyday = new Date(year, 0, 1);
-            this.yearordinal = dateutil.toOrdinal(firstyday);
-            this.yearweekday = dateutil.getWeekday(firstyday);
-            const wday = dateutil.getWeekday(new Date(year, 0, 1));
+            this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
+            this.yearweekday = dateutil_1.default.getWeekday(firstyday);
+            const wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
             if (this.yearlen === 365) {
-                this.mmask = [].concat(M365MASK);
-                this.mdaymask = [].concat(MDAY365MASK);
-                this.nmdaymask = [].concat(NMDAY365MASK);
-                this.wdaymask = WDAYMASK.slice(wday);
-                this.mrange = [].concat(M365RANGE);
+                this.mmask = [].concat(masks_1.M365MASK);
+                this.mdaymask = [].concat(masks_1.MDAY365MASK);
+                this.nmdaymask = [].concat(masks_1.NMDAY365MASK);
+                this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                this.mrange = [].concat(masks_1.M365RANGE);
             }
             else {
-                this.mmask = [].concat(M366MASK);
-                this.mdaymask = [].concat(MDAY366MASK);
-                this.nmdaymask = [].concat(NMDAY366MASK);
-                this.wdaymask = WDAYMASK.slice(wday);
-                this.mrange = [].concat(M366RANGE);
+                this.mmask = [].concat(masks_1.M366MASK);
+                this.mdaymask = [].concat(masks_1.MDAY366MASK);
+                this.nmdaymask = [].concat(masks_1.NMDAY366MASK);
+                this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                this.mrange = [].concat(masks_1.M366RANGE);
             }
-            if (!plb(rr.options.byweekno)) {
+            if (!helpers_1.plb(rr.options.byweekno)) {
                 this.wnomask = null;
             }
             else {
-                this.wnomask = repeat(0, this.yearlen + 7);
-                let no1wkst, firstwkst, wyearlen;
-                no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7);
+                this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
+                let no1wkst;
+                let firstwkst;
+                let wyearlen;
+                no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
                 if (no1wkst >= 4) {
                     no1wkst = 0;
                     // Number of days in the year, plus the days we got
                     // from last year.
-                    wyearlen = this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7);
+                    wyearlen =
+                        this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
                 }
                 else {
                     // Number of days in the year, minus the days we
@@ -85,10 +89,11 @@ export default class Iterinfo {
                     wyearlen = this.yearlen - no1wkst;
                 }
                 const div = Math.floor(wyearlen / 7);
-                const mod = pymod(wyearlen, 7);
-                const numweeks = Math.floor(div + (mod / 4));
-                for (let n, i, j = 0; j < rr.options.byweekno.length; j++) {
-                    n = rr.options.byweekno[j];
+                const mod = helpers_1.pymod(wyearlen, 7);
+                const numweeks = Math.floor(div + mod / 4);
+                for (let j = 0; j < rr.options.byweekno.length; j++) {
+                    let i;
+                    let n = rr.options.byweekno[j];
                     if (n < 0) {
                         n += numweeks + 1;
                     }
@@ -111,7 +116,7 @@ export default class Iterinfo {
                             break;
                     }
                 }
-                if (contains(rr.options.byweekno, 1)) {
+                if (helpers_1.contains(rr.options.byweekno, 1)) {
                     // Check week number 1 of next year as well
                     // orig-TODO : Check -numweeks for next year.
                     let i = no1wkst + numweeks * 7;
@@ -136,33 +141,35 @@ export default class Iterinfo {
                     // days from last year's last week number in
                     // this year.
                     let lnumweeks;
-                    if (!contains(rr.options.byweekno, -1)) {
-                        const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1));
-                        let lno1wkst = pymod(7 - lyearweekday + rr.options.wkst, 7);
-                        const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365;
+                    if (!helpers_1.contains(rr.options.byweekno, -1)) {
+                        const lyearweekday = dateutil_1.default.getWeekday(new Date(year - 1, 0, 1));
+                        let lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                        const lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
                         if (lno1wkst >= 4) {
                             lno1wkst = 0;
                             lnumweeks = Math.floor(52 +
-                                pymod(lyearlen + pymod(lyearweekday - rr.options.wkst, 7), 7) / 4);
+                                helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) /
+                                    4);
                         }
                         else {
-                            lnumweeks = Math.floor(52 + pymod(this.yearlen - no1wkst, 7) / 4);
+                            lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
                         }
                     }
                     else {
                         lnumweeks = -1;
                     }
-                    if (contains(rr.options.byweekno, lnumweeks)) {
+                    if (helpers_1.contains(rr.options.byweekno, lnumweeks)) {
                         for (let i = 0; i < no1wkst; i++)
                             this.wnomask[i] = 1;
                     }
                 }
             }
         }
-        if (plb(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
+        if (helpers_1.plb(rr.options.bynweekday) &&
+            (month !== this.lastmonth || year !== this.lastyear)) {
             let ranges = [];
-            if (rr.options.freq === RRule.YEARLY) {
-                if (plb(rr.options.bymonth)) {
+            if (rr.options.freq === rrule_1.default.YEARLY) {
+                if (helpers_1.plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
                     for (let j = 0; j < rr.options.bymonth.length; j++) {
                         month = rr.options.bymonth[j];
                         ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -172,13 +179,13 @@ export default class Iterinfo {
                     ranges = [[0, this.yearlen]];
                 }
             }
-            else if (rr.options.freq === RRule.MONTHLY) {
+            else if (rr.options.freq === rrule_1.default.MONTHLY) {
                 ranges = [this.mrange.slice(month - 1, month + 1)];
             }
-            if (plb(ranges)) {
+            if (helpers_1.plb(ranges)) {
                 // Weekly frequency won't get here, so we may not
                 // care about cross-year weekly periods.
-                this.nwdaymask = repeat(0, this.yearlen);
+                this.nwdaymask = helpers_1.repeat(0, this.yearlen);
                 for (let j = 0; j < ranges.length; j++) {
                     const rang = ranges[j];
                     const first = rang[0];
@@ -190,11 +197,11 @@ export default class Iterinfo {
                         const n = rr.options.bynweekday[k][1];
                         if (n < 0) {
                             i = last + (n + 1) * 7;
-                            i -= pymod(this.wdaymask[i] - wday, 7);
+                            i -= helpers_1.pymod((this.wdaymask[i]) - wday, 7);
                         }
                         else {
                             i = first + (n - 1) * 7;
-                            i += pymod(7 - this.wdaymask[i] + wday, 7);
+                            i += helpers_1.pymod(7 - (this.wdaymask[i]) + wday, 7);
                         }
                         if (first <= i && i <= last)
                             this.nwdaymask[i] = 1;
@@ -208,11 +215,11 @@ export default class Iterinfo {
             this.eastermask = this.easter(year, rr.options.byeaster);
         }
     }
-    ydayset(year, month, day) {
-        return [range(this.yearlen), 0, this.yearlen];
+    ydayset() {
+        return [helpers_1.range(this.yearlen), 0, this.yearlen];
     }
-    mdayset(year, month, day) {
-        const set = repeat(null, this.yearlen);
+    mdayset(_, month, __) {
+        const set = helpers_1.repeat(null, this.yearlen);
         const start = this.mrange[month - 1];
         const end = this.mrange[month];
         for (let i = start; i < end; i++)
@@ -221,8 +228,8 @@ export default class Iterinfo {
     }
     wdayset(year, month, day) {
         // We need to handle cross-year weeks here.
-        const set = repeat(null, this.yearlen + 7);
-        let i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        const set = helpers_1.repeat(null, this.yearlen + 7);
+        let i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
         const start = i;
         for (let j = 0; j < 7; j++) {
             set[i] = i;
@@ -233,8 +240,8 @@ export default class Iterinfo {
         return [set, start, i];
     }
     ddayset(year, month, day) {
-        const set = repeat(null, this.yearlen);
-        const i = dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        const set = helpers_1.repeat(null, this.yearlen);
+        const i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
         set[i] = i;
         return [set, i, i + 1];
     }
@@ -245,10 +252,10 @@ export default class Iterinfo {
             minute = rr.options.byminute[i];
             for (let j = 0; j < rr.options.bysecond.length; j++) {
                 second = rr.options.bysecond[j];
-                set.push(new dateutil.Time(hour, minute, second, millisecond));
+                set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
             }
         }
-        dateutil.sort(set);
+        dateutil_1.default.sort(set);
         return set;
     }
     mtimeset(hour, minute, second, millisecond) {
@@ -256,13 +263,14 @@ export default class Iterinfo {
         const rr = this.rrule;
         for (let j = 0; j < rr.options.bysecond.length; j++) {
             second = rr.options.bysecond[j];
-            set.push(new dateutil.Time(hour, minute, second, millisecond));
+            set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
         }
-        dateutil.sort(set);
+        dateutil_1.default.sort(set);
         return set;
     }
     stimeset(hour, minute, second, millisecond) {
-        return [new dateutil.Time(hour, minute, second, millisecond)];
+        return [new dateutil_1.default.Time(hour, minute, second, millisecond)];
     }
 }
+exports.default = Iterinfo;
 //# sourceMappingURL=iterinfo.js.map

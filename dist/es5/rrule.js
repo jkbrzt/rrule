@@ -91,55 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/*!
- * rrule.js - Library for working with recurrence rules for calendar dates.
- * https://github.com/jakubroztocil/rrule
- *
- * Copyright 2010, Jakub Roztocil and Lars Schoning
- * Licenced under the BSD licence.
- * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
- *
- * Based on:
- * python-dateutil - Extensions to the standard Python datetime module.
- * Copyright (c) 2003-2011 - Gustavo Niemeyer <gustavo@niemeyer.net>
- * Copyright (c) 2012 - Tomi Pieviläinen <tomi.pievilainen@iki.fi>
- * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
- *
- */
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(1);
-exports.RRule = rrule_1.default;
-var rruleset_1 = __webpack_require__(7);
-exports.RRuleSet = rruleset_1.default;
-var rrulestr_1 = __webpack_require__(13);
-var rrule_2 = __webpack_require__(1);
-exports.Frequency = rrule_2.Frequency;
-var weekday_1 = __webpack_require__(3);
-exports.Weekday = weekday_1.default;
-// =============================================================================
-// Export
-// =============================================================================
-// Only one RRuleStr instance for all rrule string parsing work.
-var rruleStr = new rrulestr_1.default();
-var rrulestr = function rrulestr() {
-  return rruleStr.parse.apply(rruleStr, arguments);
-};
-exports.rrulestr = rrulestr;
-exports.default = rrule_1.default;
-//# sourceMappingURL=index.js.map
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -152,16 +108,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(4);
-var helpers_1 = __webpack_require__(2);
-var masks_1 = __webpack_require__(8);
+var weekday_1 = __webpack_require__(4);
+var dateutil_1 = __webpack_require__(3);
+var iterinfo_1 = __webpack_require__(8);
+var helpers_1 = __webpack_require__(1);
 var iterresult_1 = __webpack_require__(5);
-var callbackiterresult_1 = __webpack_require__(9);
+var callbackiterresult_1 = __webpack_require__(10);
 var getnlp = function getnlp() {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
-        getnlp._nlp = __webpack_require__(10);
+        getnlp._nlp = __webpack_require__(11);
     }
     return getnlp._nlp;
 };
@@ -613,7 +569,7 @@ var RRule = function () {
                 bysecond = _options.bysecond;
             // tslint:disable-next-line:no-use-before-declare
 
-            var ii = new Iterinfo(this);
+            var ii = new iterinfo_1.default(this);
             ii.rebuild(year, month);
             var getdayset = (_RRule$YEARLY$RRule$M = {}, _defineProperty(_RRule$YEARLY$RRule$M, RRule.YEARLY, ii.ydayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.MONTHLY, ii.mdayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.WEEKLY, ii.wdayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.DAILY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.HOURLY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.MINUTELY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.SECONDLY, ii.ddayset), _RRule$YEARLY$RRule$M)[freq];
             var timeset = void 0;
@@ -1091,288 +1047,10 @@ RRule.FR = Days.FR;
 RRule.SA = Days.SA;
 RRule.SU = Days.SU;
 exports.default = RRule;
-// =============================================================================
-// Iterinfo
-// =============================================================================
-
-var Iterinfo = function () {
-    function Iterinfo(rrule) {
-        _classCallCheck(this, Iterinfo);
-
-        this.rrule = rrule;
-        this.lastyear = null;
-        this.lastmonth = null;
-        this.yearlen = null;
-        this.nextyearlen = null;
-        this.yearordinal = null;
-        this.yearweekday = null;
-        this.mmask = null;
-        this.mrange = null;
-        this.mdaymask = null;
-        this.nmdaymask = null;
-        this.wdaymask = null;
-        this.wnomask = null;
-        this.nwdaymask = null;
-        this.eastermask = null;
-    }
-
-    _createClass(Iterinfo, [{
-        key: "easter",
-        value: function easter(y) {
-            var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-            var a = y % 19;
-            var b = Math.floor(y / 100);
-            var c = y % 100;
-            var d = Math.floor(b / 4);
-            var e = b % 4;
-            var f = Math.floor((b + 8) / 25);
-            var g = Math.floor((b - f + 1) / 3);
-            var h = Math.floor(19 * a + b - d - g + 15) % 30;
-            var i = Math.floor(c / 4);
-            var k = c % 4;
-            var l = Math.floor(32 + 2 * e + 2 * i - h - k) % 7;
-            var m = Math.floor((a + 11 * h + 22 * l) / 451);
-            var month = Math.floor((h + l - 7 * m + 114) / 31);
-            var day = (h + l - 7 * m + 114) % 31 + 1;
-            var date = Date.UTC(y, month - 1, day + offset);
-            var yearStart = Date.UTC(y, 0, 1);
-            return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
-        }
-    }, {
-        key: "rebuild",
-        value: function rebuild(year, month) {
-            var rr = this.rrule;
-            if (year !== this.lastyear) {
-                this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
-                this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
-                var firstyday = new Date(year, 0, 1);
-                this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
-                this.yearweekday = dateutil_1.default.getWeekday(firstyday);
-                var wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
-                if (this.yearlen === 365) {
-                    this.mmask = [].concat(masks_1.M365MASK);
-                    this.mdaymask = [].concat(masks_1.MDAY365MASK);
-                    this.nmdaymask = [].concat(masks_1.NMDAY365MASK);
-                    this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                    this.mrange = [].concat(masks_1.M365RANGE);
-                } else {
-                    this.mmask = [].concat(masks_1.M366MASK);
-                    this.mdaymask = [].concat(masks_1.MDAY366MASK);
-                    this.nmdaymask = [].concat(masks_1.NMDAY366MASK);
-                    this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                    this.mrange = [].concat(masks_1.M366RANGE);
-                }
-                if (!helpers_1.plb(rr.options.byweekno)) {
-                    this.wnomask = null;
-                } else {
-                    this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
-                    var no1wkst = void 0;
-                    var firstwkst = void 0;
-                    var wyearlen = void 0;
-                    no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
-                    if (no1wkst >= 4) {
-                        no1wkst = 0;
-                        // Number of days in the year, plus the days we got
-                        // from last year.
-                        wyearlen = this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
-                    } else {
-                        // Number of days in the year, minus the days we
-                        // left in last year.
-                        wyearlen = this.yearlen - no1wkst;
-                    }
-                    var div = Math.floor(wyearlen / 7);
-                    var mod = helpers_1.pymod(wyearlen, 7);
-                    var numweeks = Math.floor(div + mod / 4);
-                    for (var j = 0; j < rr.options.byweekno.length; j++) {
-                        var i = void 0;
-                        var n = rr.options.byweekno[j];
-                        if (n < 0) {
-                            n += numweeks + 1;
-                        }
-                        if (!(n > 0 && n <= numweeks)) {
-                            continue;
-                        }
-                        if (n > 1) {
-                            i = no1wkst + (n - 1) * 7;
-                            if (no1wkst !== firstwkst) {
-                                i -= 7 - firstwkst;
-                            }
-                        } else {
-                            i = no1wkst;
-                        }
-                        for (var k = 0; k < 7; k++) {
-                            this.wnomask[i] = 1;
-                            i++;
-                            if (this.wdaymask[i] === rr.options.wkst) break;
-                        }
-                    }
-                    if (helpers_1.contains(rr.options.byweekno, 1)) {
-                        // Check week number 1 of next year as well
-                        // orig-TODO : Check -numweeks for next year.
-                        var _i7 = no1wkst + numweeks * 7;
-                        if (no1wkst !== firstwkst) _i7 -= 7 - firstwkst;
-                        if (_i7 < this.yearlen) {
-                            // If week starts in next year, we
-                            // don't care about it.
-                            for (var _j6 = 0; _j6 < 7; _j6++) {
-                                this.wnomask[_i7] = 1;
-                                _i7 += 1;
-                                if (this.wdaymask[_i7] === rr.options.wkst) break;
-                            }
-                        }
-                    }
-                    if (no1wkst) {
-                        // Check last week number of last year as
-                        // well. If no1wkst is 0, either the year
-                        // started on week start, or week number 1
-                        // got days from last year, so there are no
-                        // days from last year's last week number in
-                        // this year.
-                        var lnumweeks = void 0;
-                        if (!helpers_1.contains(rr.options.byweekno, -1)) {
-                            var lyearweekday = dateutil_1.default.getWeekday(new Date(year - 1, 0, 1));
-                            var lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
-                            var lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
-                            if (lno1wkst >= 4) {
-                                lno1wkst = 0;
-                                lnumweeks = Math.floor(52 + helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) / 4);
-                            } else {
-                                lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
-                            }
-                        } else {
-                            lnumweeks = -1;
-                        }
-                        if (helpers_1.contains(rr.options.byweekno, lnumweeks)) {
-                            for (var _i8 = 0; _i8 < no1wkst; _i8++) {
-                                this.wnomask[_i8] = 1;
-                            }
-                        }
-                    }
-                }
-            }
-            if (helpers_1.plb(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
-                var ranges = [];
-                if (rr.options.freq === RRule.YEARLY) {
-                    if (helpers_1.plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
-                        for (var _j7 = 0; _j7 < rr.options.bymonth.length; _j7++) {
-                            month = rr.options.bymonth[_j7];
-                            ranges.push(this.mrange.slice(month - 1, month + 1));
-                        }
-                    } else {
-                        ranges = [[0, this.yearlen]];
-                    }
-                } else if (rr.options.freq === RRule.MONTHLY) {
-                    ranges = [this.mrange.slice(month - 1, month + 1)];
-                }
-                if (helpers_1.plb(ranges)) {
-                    // Weekly frequency won't get here, so we may not
-                    // care about cross-year weekly periods.
-                    this.nwdaymask = helpers_1.repeat(0, this.yearlen);
-                    for (var _j8 = 0; _j8 < ranges.length; _j8++) {
-                        var rang = ranges[_j8];
-                        var first = rang[0];
-                        var last = rang[1];
-                        last -= 1;
-                        for (var _k = 0; _k < rr.options.bynweekday.length; _k++) {
-                            var _i9 = void 0;
-                            var _wday = rr.options.bynweekday[_k][0];
-                            var _n = rr.options.bynweekday[_k][1];
-                            if (_n < 0) {
-                                _i9 = last + (_n + 1) * 7;
-                                _i9 -= helpers_1.pymod(this.wdaymask[_i9] - _wday, 7);
-                            } else {
-                                _i9 = first + (_n - 1) * 7;
-                                _i9 += helpers_1.pymod(7 - this.wdaymask[_i9] + _wday, 7);
-                            }
-                            if (first <= _i9 && _i9 <= last) this.nwdaymask[_i9] = 1;
-                        }
-                    }
-                }
-                this.lastyear = year;
-                this.lastmonth = month;
-            }
-            if (rr.options.byeaster !== null) {
-                this.eastermask = this.easter(year, rr.options.byeaster);
-            }
-        }
-    }, {
-        key: "ydayset",
-        value: function ydayset() {
-            return [helpers_1.range(this.yearlen), 0, this.yearlen];
-        }
-    }, {
-        key: "mdayset",
-        value: function mdayset(_, month, __) {
-            var set = helpers_1.repeat(null, this.yearlen);
-            var start = this.mrange[month - 1];
-            var end = this.mrange[month];
-            for (var i = start; i < end; i++) {
-                set[i] = i;
-            }return [set, start, end];
-        }
-    }, {
-        key: "wdayset",
-        value: function wdayset(year, month, day) {
-            // We need to handle cross-year weeks here.
-            var set = helpers_1.repeat(null, this.yearlen + 7);
-            var i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
-            var start = i;
-            for (var j = 0; j < 7; j++) {
-                set[i] = i;
-                ++i;
-                if (this.wdaymask[i] === this.rrule.options.wkst) break;
-            }
-            return [set, start, i];
-        }
-    }, {
-        key: "ddayset",
-        value: function ddayset(year, month, day) {
-            var set = helpers_1.repeat(null, this.yearlen);
-            var i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
-            set[i] = i;
-            return [set, i, i + 1];
-        }
-    }, {
-        key: "htimeset",
-        value: function htimeset(hour, minute, second, millisecond) {
-            var set = [];
-            var rr = this.rrule;
-            for (var i = 0; i < rr.options.byminute.length; i++) {
-                minute = rr.options.byminute[i];
-                for (var j = 0; j < rr.options.bysecond.length; j++) {
-                    second = rr.options.bysecond[j];
-                    set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
-                }
-            }
-            dateutil_1.default.sort(set);
-            return set;
-        }
-    }, {
-        key: "mtimeset",
-        value: function mtimeset(hour, minute, second, millisecond) {
-            var set = [];
-            var rr = this.rrule;
-            for (var j = 0; j < rr.options.bysecond.length; j++) {
-                second = rr.options.bysecond[j];
-                set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
-            }
-            dateutil_1.default.sort(set);
-            return set;
-        }
-    }, {
-        key: "stimeset",
-        value: function stimeset(hour, minute, second, millisecond) {
-            return [new dateutil_1.default.Time(hour, minute, second, millisecond)];
-        }
-    }]);
-
-    return Iterinfo;
-}();
 //# sourceMappingURL=rrule.js.map
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1467,70 +1145,51 @@ exports.contains = contains;
 //# sourceMappingURL=helpers.js.map
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+/*!
+ * rrule.js - Library for working with recurrence rules for calendar dates.
+ * https://github.com/jakubroztocil/rrule
+ *
+ * Copyright 2010, Jakub Roztocil and Lars Schoning
+ * Licenced under the BSD licence.
+ * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+ *
+ * Based on:
+ * python-dateutil - Extensions to the standard Python datetime module.
+ * Copyright (c) 2003-2011 - Gustavo Niemeyer <gustavo@niemeyer.net>
+ * Copyright (c) 2012 - Tomi Pieviläinen <tomi.pievilainen@iki.fi>
+ * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+ *
+ */
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+var rrule_1 = __webpack_require__(0);
+exports.RRule = rrule_1.default;
+var rruleset_1 = __webpack_require__(7);
+exports.RRuleSet = rruleset_1.default;
+var rrulestr_1 = __webpack_require__(14);
+var rrule_2 = __webpack_require__(0);
+exports.Frequency = rrule_2.Frequency;
+var weekday_1 = __webpack_require__(4);
+exports.Weekday = weekday_1.default;
 // =============================================================================
-// Weekday
+// Export
 // =============================================================================
-
-var Weekday = function () {
-    function Weekday(weekday, n) {
-        _classCallCheck(this, Weekday);
-
-        if (n === 0) throw new Error("Can't create weekday with n == 0");
-        this.weekday = weekday;
-        this.n = n;
-    }
-    // __call__ - Cannot call the object directly, do it through
-    // e.g. RRule.TH.nth(-1) instead,
-
-
-    _createClass(Weekday, [{
-        key: "nth",
-        value: function nth(n) {
-            return this.n === n ? this : new Weekday(this.weekday, n);
-        }
-        // __eq__
-
-    }, {
-        key: "equals",
-        value: function equals(other) {
-            return this.weekday === other.weekday && this.n === other.n;
-        }
-        // __repr__
-
-    }, {
-        key: "toString",
-        value: function toString() {
-            var s = WDAYS[this.weekday];
-            if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
-            return s;
-        }
-    }, {
-        key: "getJsWeekday",
-        value: function getJsWeekday() {
-            return this.weekday === 6 ? 0 : this.weekday + 1;
-        }
-    }]);
-
-    return Weekday;
-}();
-
-exports.default = Weekday;
-//# sourceMappingURL=weekday.js.map
+// Only one RRuleStr instance for all rrule string parsing work.
+var rruleStr = new rrulestr_1.default();
+var rrulestr = function rrulestr() {
+  return rruleStr.parse.apply(rruleStr, arguments);
+};
+exports.rrulestr = rrulestr;
+exports.default = rrule_1.default;
+//# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1718,6 +1377,69 @@ exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+// =============================================================================
+// Weekday
+// =============================================================================
+
+var Weekday = function () {
+    function Weekday(weekday, n) {
+        _classCallCheck(this, Weekday);
+
+        if (n === 0) throw new Error("Can't create weekday with n == 0");
+        this.weekday = weekday;
+        this.n = n;
+    }
+    // __call__ - Cannot call the object directly, do it through
+    // e.g. RRule.TH.nth(-1) instead,
+
+
+    _createClass(Weekday, [{
+        key: "nth",
+        value: function nth(n) {
+            return this.n === n ? this : new Weekday(this.weekday, n);
+        }
+        // __eq__
+
+    }, {
+        key: "equals",
+        value: function equals(other) {
+            return this.weekday === other.weekday && this.n === other.n;
+        }
+        // __repr__
+
+    }, {
+        key: "toString",
+        value: function toString() {
+            var s = WDAYS[this.weekday];
+            if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
+            return s;
+        }
+    }, {
+        key: "getJsWeekday",
+        value: function getJsWeekday() {
+            return this.weekday === 6 ? 0 : this.weekday + 1;
+        }
+    }]);
+
+    return Weekday;
+}();
+
+exports.default = Weekday;
+//# sourceMappingURL=weekday.js.map
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1900,9 +1622,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(1);
-var dateutil_1 = __webpack_require__(4);
-var helpers_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(0);
+var dateutil_1 = __webpack_require__(3);
+var helpers_1 = __webpack_require__(1);
 /**
  *
  * @param {Boolean?} noCache
@@ -2127,8 +1849,306 @@ exports.default = RRuleSet;
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = __webpack_require__(2);
+var masks_1 = __webpack_require__(9);
+var rrule_1 = __webpack_require__(0);
+var dateutil_1 = __webpack_require__(3);
+var helpers_1 = __webpack_require__(1);
+// =============================================================================
+// Iterinfo
+// =============================================================================
+
+var Iterinfo = function () {
+    function Iterinfo(rrule) {
+        _classCallCheck(this, Iterinfo);
+
+        this.rrule = rrule;
+        this.lastyear = null;
+        this.lastmonth = null;
+        this.yearlen = null;
+        this.nextyearlen = null;
+        this.yearordinal = null;
+        this.yearweekday = null;
+        this.mmask = null;
+        this.mrange = null;
+        this.mdaymask = null;
+        this.nmdaymask = null;
+        this.wdaymask = null;
+        this.wnomask = null;
+        this.nwdaymask = null;
+        this.eastermask = null;
+    }
+
+    _createClass(Iterinfo, [{
+        key: "easter",
+        value: function easter(y) {
+            var offset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+            var a = y % 19;
+            var b = Math.floor(y / 100);
+            var c = y % 100;
+            var d = Math.floor(b / 4);
+            var e = b % 4;
+            var f = Math.floor((b + 8) / 25);
+            var g = Math.floor((b - f + 1) / 3);
+            var h = Math.floor(19 * a + b - d - g + 15) % 30;
+            var i = Math.floor(c / 4);
+            var k = c % 4;
+            var l = Math.floor(32 + 2 * e + 2 * i - h - k) % 7;
+            var m = Math.floor((a + 11 * h + 22 * l) / 451);
+            var month = Math.floor((h + l - 7 * m + 114) / 31);
+            var day = (h + l - 7 * m + 114) % 31 + 1;
+            var date = Date.UTC(y, month - 1, day + offset);
+            var yearStart = Date.UTC(y, 0, 1);
+            return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
+        }
+    }, {
+        key: "rebuild",
+        value: function rebuild(year, month) {
+            var rr = this.rrule;
+            if (year !== this.lastyear) {
+                this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
+                this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
+                var firstyday = new Date(year, 0, 1);
+                this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
+                this.yearweekday = dateutil_1.default.getWeekday(firstyday);
+                var wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
+                if (this.yearlen === 365) {
+                    this.mmask = [].concat(masks_1.M365MASK);
+                    this.mdaymask = [].concat(masks_1.MDAY365MASK);
+                    this.nmdaymask = [].concat(masks_1.NMDAY365MASK);
+                    this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                    this.mrange = [].concat(masks_1.M365RANGE);
+                } else {
+                    this.mmask = [].concat(masks_1.M366MASK);
+                    this.mdaymask = [].concat(masks_1.MDAY366MASK);
+                    this.nmdaymask = [].concat(masks_1.NMDAY366MASK);
+                    this.wdaymask = masks_1.WDAYMASK.slice(wday);
+                    this.mrange = [].concat(masks_1.M366RANGE);
+                }
+                if (!helpers_1.plb(rr.options.byweekno)) {
+                    this.wnomask = null;
+                } else {
+                    this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
+                    var no1wkst = void 0;
+                    var firstwkst = void 0;
+                    var wyearlen = void 0;
+                    no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
+                    if (no1wkst >= 4) {
+                        no1wkst = 0;
+                        // Number of days in the year, plus the days we got
+                        // from last year.
+                        wyearlen = this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
+                    } else {
+                        // Number of days in the year, minus the days we
+                        // left in last year.
+                        wyearlen = this.yearlen - no1wkst;
+                    }
+                    var div = Math.floor(wyearlen / 7);
+                    var mod = helpers_1.pymod(wyearlen, 7);
+                    var numweeks = Math.floor(div + mod / 4);
+                    for (var j = 0; j < rr.options.byweekno.length; j++) {
+                        var i = void 0;
+                        var n = rr.options.byweekno[j];
+                        if (n < 0) {
+                            n += numweeks + 1;
+                        }
+                        if (!(n > 0 && n <= numweeks)) {
+                            continue;
+                        }
+                        if (n > 1) {
+                            i = no1wkst + (n - 1) * 7;
+                            if (no1wkst !== firstwkst) {
+                                i -= 7 - firstwkst;
+                            }
+                        } else {
+                            i = no1wkst;
+                        }
+                        for (var k = 0; k < 7; k++) {
+                            this.wnomask[i] = 1;
+                            i++;
+                            if (this.wdaymask[i] === rr.options.wkst) break;
+                        }
+                    }
+                    if (helpers_1.contains(rr.options.byweekno, 1)) {
+                        // Check week number 1 of next year as well
+                        // orig-TODO : Check -numweeks for next year.
+                        var _i = no1wkst + numweeks * 7;
+                        if (no1wkst !== firstwkst) _i -= 7 - firstwkst;
+                        if (_i < this.yearlen) {
+                            // If week starts in next year, we
+                            // don't care about it.
+                            for (var _j = 0; _j < 7; _j++) {
+                                this.wnomask[_i] = 1;
+                                _i += 1;
+                                if (this.wdaymask[_i] === rr.options.wkst) break;
+                            }
+                        }
+                    }
+                    if (no1wkst) {
+                        // Check last week number of last year as
+                        // well. If no1wkst is 0, either the year
+                        // started on week start, or week number 1
+                        // got days from last year, so there are no
+                        // days from last year's last week number in
+                        // this year.
+                        var lnumweeks = void 0;
+                        if (!helpers_1.contains(rr.options.byweekno, -1)) {
+                            var lyearweekday = dateutil_1.default.getWeekday(new Date(year - 1, 0, 1));
+                            var lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                            var lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
+                            if (lno1wkst >= 4) {
+                                lno1wkst = 0;
+                                lnumweeks = Math.floor(52 + helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) / 4);
+                            } else {
+                                lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
+                            }
+                        } else {
+                            lnumweeks = -1;
+                        }
+                        if (helpers_1.contains(rr.options.byweekno, lnumweeks)) {
+                            for (var _i2 = 0; _i2 < no1wkst; _i2++) {
+                                this.wnomask[_i2] = 1;
+                            }
+                        }
+                    }
+                }
+            }
+            if (helpers_1.plb(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
+                var ranges = [];
+                if (rr.options.freq === rrule_1.default.YEARLY) {
+                    if (helpers_1.plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                        for (var _j2 = 0; _j2 < rr.options.bymonth.length; _j2++) {
+                            month = rr.options.bymonth[_j2];
+                            ranges.push(this.mrange.slice(month - 1, month + 1));
+                        }
+                    } else {
+                        ranges = [[0, this.yearlen]];
+                    }
+                } else if (rr.options.freq === rrule_1.default.MONTHLY) {
+                    ranges = [this.mrange.slice(month - 1, month + 1)];
+                }
+                if (helpers_1.plb(ranges)) {
+                    // Weekly frequency won't get here, so we may not
+                    // care about cross-year weekly periods.
+                    this.nwdaymask = helpers_1.repeat(0, this.yearlen);
+                    for (var _j3 = 0; _j3 < ranges.length; _j3++) {
+                        var rang = ranges[_j3];
+                        var first = rang[0];
+                        var last = rang[1];
+                        last -= 1;
+                        for (var _k = 0; _k < rr.options.bynweekday.length; _k++) {
+                            var _i3 = void 0;
+                            var _wday = rr.options.bynweekday[_k][0];
+                            var _n = rr.options.bynweekday[_k][1];
+                            if (_n < 0) {
+                                _i3 = last + (_n + 1) * 7;
+                                _i3 -= helpers_1.pymod(this.wdaymask[_i3] - _wday, 7);
+                            } else {
+                                _i3 = first + (_n - 1) * 7;
+                                _i3 += helpers_1.pymod(7 - this.wdaymask[_i3] + _wday, 7);
+                            }
+                            if (first <= _i3 && _i3 <= last) this.nwdaymask[_i3] = 1;
+                        }
+                    }
+                }
+                this.lastyear = year;
+                this.lastmonth = month;
+            }
+            if (rr.options.byeaster !== null) {
+                this.eastermask = this.easter(year, rr.options.byeaster);
+            }
+        }
+    }, {
+        key: "ydayset",
+        value: function ydayset() {
+            return [helpers_1.range(this.yearlen), 0, this.yearlen];
+        }
+    }, {
+        key: "mdayset",
+        value: function mdayset(_, month, __) {
+            var set = helpers_1.repeat(null, this.yearlen);
+            var start = this.mrange[month - 1];
+            var end = this.mrange[month];
+            for (var i = start; i < end; i++) {
+                set[i] = i;
+            }return [set, start, end];
+        }
+    }, {
+        key: "wdayset",
+        value: function wdayset(year, month, day) {
+            // We need to handle cross-year weeks here.
+            var set = helpers_1.repeat(null, this.yearlen + 7);
+            var i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+            var start = i;
+            for (var j = 0; j < 7; j++) {
+                set[i] = i;
+                ++i;
+                if (this.wdaymask[i] === this.rrule.options.wkst) break;
+            }
+            return [set, start, i];
+        }
+    }, {
+        key: "ddayset",
+        value: function ddayset(year, month, day) {
+            var set = helpers_1.repeat(null, this.yearlen);
+            var i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+            set[i] = i;
+            return [set, i, i + 1];
+        }
+    }, {
+        key: "htimeset",
+        value: function htimeset(hour, minute, second, millisecond) {
+            var set = [];
+            var rr = this.rrule;
+            for (var i = 0; i < rr.options.byminute.length; i++) {
+                minute = rr.options.byminute[i];
+                for (var j = 0; j < rr.options.bysecond.length; j++) {
+                    second = rr.options.bysecond[j];
+                    set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
+                }
+            }
+            dateutil_1.default.sort(set);
+            return set;
+        }
+    }, {
+        key: "mtimeset",
+        value: function mtimeset(hour, minute, second, millisecond) {
+            var set = [];
+            var rr = this.rrule;
+            for (var j = 0; j < rr.options.bysecond.length; j++) {
+                second = rr.options.bysecond[j];
+                set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));
+            }
+            dateutil_1.default.sort(set);
+            return set;
+        }
+    }, {
+        key: "stimeset",
+        value: function stimeset(hour, minute, second, millisecond) {
+            return [new dateutil_1.default.Time(hour, minute, second, millisecond)];
+        }
+    }]);
+
+    return Iterinfo;
+}();
+
+exports.default = Iterinfo;
+//# sourceMappingURL=iterinfo.js.map
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var helpers_1 = __webpack_require__(1);
 // =============================================================================
 // Date masks
 // =============================================================================
@@ -2167,7 +2187,7 @@ exports.WDAYMASK = WDAYMASK;
 //# sourceMappingURL=masks.js.map
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2218,17 +2238,17 @@ exports.default = CallbackIterResult;
 //# sourceMappingURL=callbackiterresult.js.map
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var totext_1 = __webpack_require__(11);
-var parsetext_1 = __webpack_require__(12);
+var totext_1 = __webpack_require__(12);
+var parsetext_1 = __webpack_require__(13);
 exports.parseText = parsetext_1.default;
-var index_1 = __webpack_require__(0);
+var index_1 = __webpack_require__(2);
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -2343,7 +2363,7 @@ exports.isFullyConvertible = isFullyConvertible;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2355,7 +2375,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var i18n_1 = __webpack_require__(6);
-var index_1 = __webpack_require__(0);
+var index_1 = __webpack_require__(2);
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -2715,7 +2735,7 @@ exports.default = ToText;
 //# sourceMappingURL=totext.js.map
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2727,7 +2747,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var i18n_1 = __webpack_require__(6);
-var index_1 = __webpack_require__(0);
+var index_1 = __webpack_require__(2);
 // =============================================================================
 // Parser
 // =============================================================================
@@ -3114,7 +3134,7 @@ exports.default = parseText;
 //# sourceMappingURL=parsetext.js.map
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3125,11 +3145,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(1);
+var rrule_1 = __webpack_require__(0);
 var rruleset_1 = __webpack_require__(7);
-var dateutil_1 = __webpack_require__(4);
-var weekday_1 = __webpack_require__(3);
-var helpers_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(3);
+var weekday_1 = __webpack_require__(4);
+var helpers_1 = __webpack_require__(1);
 /**
  * RRuleStr
  *  To parse a set of rrule strings

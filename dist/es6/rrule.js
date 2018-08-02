@@ -40,6 +40,7 @@ const Days = {
  */
 class RRule {
     constructor(options = {}, noCache = false) {
+        this.defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         // RFC string
         this._string = null;
         this._cache = noCache
@@ -51,26 +52,32 @@ class RRule {
                 between: []
             };
         // used by toString()
-        this.origOptions = {};
-        this.options = {};
+        this.origOptions = this.initializeOptions(options);
+        this.options = this.initializeOptions(options);
+        this.parseOptions(options);
+    }
+    initializeOptions(options) {
         const invalid = [];
         const keys = Object.keys(options);
-        const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
+        const initializedOptions = {};
         // Shallow copy for options and origOptions and check for invalid
         keys.forEach(key => {
-            this.origOptions[key] = options[key];
-            this.options[key] = options[key];
-            if (!helpers_1.contains(defaultKeys, key))
+            initializedOptions[key] = options[key];
+            if (!helpers_1.contains(this.defaultKeys, key))
                 invalid.push(key);
         });
         if (invalid.length) {
             throw new Error('Invalid options: ' + invalid.join(', '));
         }
+        return initializedOptions;
+    }
+    parseOptions(options) {
+        const keys = Object.keys(options);
         if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
             throw new Error('Invalid frequency: ' + String(options.freq));
         }
         // Merge in default options
-        defaultKeys.forEach(key => {
+        this.defaultKeys.forEach(key => {
             if (!helpers_1.contains(keys, key))
                 this.options[key] = RRule.DEFAULT_OPTIONS[key];
         });

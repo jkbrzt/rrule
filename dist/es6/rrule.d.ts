@@ -72,6 +72,7 @@ export default class RRule {
     static readonly MINUTELY: Frequency;
     static readonly SECONDLY: Frequency;
     private static readonly DEFAULT_OPTIONS;
+    private defaultKeys;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -80,6 +81,8 @@ export default class RRule {
     static readonly SA: Weekday;
     static readonly SU: Weekday;
     constructor(options?: Partial<Options>, noCache?: boolean);
+    private initializeOptions;
+    private parseOptions;
     static parseText(text: string, language: Language): Partial<Options>;
     static fromText(text: string, language?: Language): RRule;
     static parseString(rfcString: string): Partial<Options>;

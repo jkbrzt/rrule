@@ -128,6 +128,7 @@ export default class RRule {
     bysecond: null,
     byeaster: null
   }
+  private defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS) as (keyof Options)[]
 
   static readonly MO = Days.MO
   static readonly TU = Days.TU
@@ -150,30 +151,39 @@ export default class RRule {
       }
 
     // used by toString()
-    this.origOptions = {}
-    this.options = {}
+    this.origOptions = this.initializeOptions(options)
+    this.options = this.initializeOptions(options)
 
+    this.parseOptions(options)
+  }
+
+  private initializeOptions (options: Partial<Options>) {
     const invalid: string[] = []
     const keys = Object.keys(options) as (keyof Options)[]
-    const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS) as (keyof Options)[]
+    const initializedOptions: Partial<Options> = {}
 
     // Shallow copy for options and origOptions and check for invalid
     keys.forEach(key => {
-      this.origOptions[key] = options[key]
-      this.options[key] = options[key]
-      if (!contains(defaultKeys, key)) invalid.push(key)
+      initializedOptions[key] = options[key]
+      if (!contains(this.defaultKeys, key)) invalid.push(key)
     })
 
     if (invalid.length) {
       throw new Error('Invalid options: ' + invalid.join(', '))
     }
 
+    return initializedOptions
+  }
+
+  private parseOptions (options: Partial<Options>) {
+    const keys = Object.keys(options) as (keyof Options)[]
+
     if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
       throw new Error('Invalid frequency: ' + String(options.freq))
     }
 
     // Merge in default options
-    defaultKeys.forEach(key => {
+    this.defaultKeys.forEach(key => {
       if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
     })
 

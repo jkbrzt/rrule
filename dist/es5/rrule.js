@@ -151,13 +151,12 @@ var Days = {
 
 var RRule = function () {
     function RRule() {
-        var _this = this;
-
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var noCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
         _classCallCheck(this, RRule);
 
+        this.defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         // RFC string
         this._string = null;
         this._cache = noCache ? null : {
@@ -167,172 +166,186 @@ var RRule = function () {
             between: []
         };
         // used by toString()
-        this.origOptions = {};
-        this.options = {};
-        var invalid = [];
-        var keys = Object.keys(options);
-        var defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
-        // Shallow copy for options and origOptions and check for invalid
-        keys.forEach(function (key) {
-            _this.origOptions[key] = options[key];
-            _this.options[key] = options[key];
-            if (!helpers_1.contains(defaultKeys, key)) invalid.push(key);
-        });
-        if (invalid.length) {
-            throw new Error('Invalid options: ' + invalid.join(', '));
-        }
-        if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
-            throw new Error('Invalid frequency: ' + String(options.freq));
-        }
-        // Merge in default options
-        defaultKeys.forEach(function (key) {
-            if (!helpers_1.contains(keys, key)) _this.options[key] = RRule.DEFAULT_OPTIONS[key];
-        });
-        var opts = this.options;
-        if (opts.byeaster !== null) opts.freq = RRule.YEARLY;
-        if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0));
-        var millisecondModulo = opts.dtstart.getTime() % 1000;
-        if (opts.wkst === null) {
-            opts.wkst = RRule.MO.weekday;
-        } else if (typeof opts.wkst === 'number') {
-            // cool, just keep it like that
-        } else {
-            opts.wkst = opts.wkst.weekday;
-        }
-        if (opts.bysetpos !== null) {
-            if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos];
-            for (var i = 0; i < opts.bysetpos.length; i++) {
-                var v = opts.bysetpos[i];
-                if (v === 0 || !(v >= -366 && v <= 366)) {
-                    throw new Error('bysetpos must be between 1 and 366,' + ' or between -366 and -1');
-                }
-            }
-        }
-        if (!(helpers_1.pybool(opts.byweekno) || helpers_1.pybool(opts.byyearday) || helpers_1.pybool(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
-            switch (opts.freq) {
-                case RRule.YEARLY:
-                    if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1;
-                    opts.bymonthday = opts.dtstart.getDate();
-                    break;
-                case RRule.MONTHLY:
-                    opts.bymonthday = opts.dtstart.getDate();
-                    break;
-                case RRule.WEEKLY:
-                    opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
-                    break;
-            }
-        }
-        // bymonth
-        if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
-            opts.bymonth = [opts.bymonth];
-        }
-        // byyearday
-        if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
-            opts.byyearday = [opts.byyearday];
-        }
-        // bymonthday
-        if (opts.bymonthday === null) {
-            opts.bymonthday = [];
-            opts.bynmonthday = [];
-        } else if (opts.bymonthday instanceof Array) {
-            var bymonthday = [];
-            var bynmonthday = [];
-            for (var _i = 0; _i < opts.bymonthday.length; _i++) {
-                var _v = opts.bymonthday[_i];
-                if (_v > 0) {
-                    bymonthday.push(_v);
-                } else if (_v < 0) {
-                    bynmonthday.push(_v);
-                }
-            }
-            opts.bymonthday = bymonthday;
-            opts.bynmonthday = bynmonthday;
-        } else {
-            if (opts.bymonthday < 0) {
-                opts.bynmonthday = [opts.bymonthday];
-                opts.bymonthday = [];
-            } else {
-                opts.bynmonthday = [];
-                opts.bymonthday = [opts.bymonthday];
-            }
-        }
-        // byweekno
-        if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
-            opts.byweekno = [opts.byweekno];
-        }
-        // byweekday / bynweekday
-        if (opts.byweekday === null) {
-            opts.bynweekday = null;
-        } else if (typeof opts.byweekday === 'number') {
-            opts.byweekday = [opts.byweekday];
-            opts.bynweekday = null;
-        } else if (opts.byweekday instanceof weekday_1.default) {
-            if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
-                opts.byweekday = [opts.byweekday.weekday];
-                opts.bynweekday = null;
-            } else {
-                opts.bynweekday = [[opts.byweekday.weekday, opts.byweekday.n]];
-                opts.byweekday = null;
-            }
-        } else {
-            var byweekday = [];
-            var bynweekday = [];
-            for (var _i2 = 0; _i2 < opts.byweekday.length; _i2++) {
-                var wday = opts.byweekday[_i2];
-                if (typeof wday === 'number') {
-                    byweekday.push(wday);
-                    continue;
-                }
-                var wd = wday;
-                if (!wd.n || opts.freq > RRule.MONTHLY) {
-                    byweekday.push(wd.weekday);
-                } else {
-                    bynweekday.push([wd.weekday, wd.n]);
-                }
-            }
-            opts.byweekday = helpers_1.pybool(byweekday) ? byweekday : null;
-            opts.bynweekday = helpers_1.pybool(bynweekday) ? bynweekday : null;
-        }
-        // byhour
-        if (opts.byhour === null) {
-            opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getHours()] : null;
-        } else if (typeof opts.byhour === 'number') {
-            opts.byhour = [opts.byhour];
-        }
-        // byminute
-        if (opts.byminute === null) {
-            opts.byminute = opts.freq < RRule.MINUTELY ? [opts.dtstart.getMinutes()] : null;
-        } else if (typeof opts.byminute === 'number') {
-            opts.byminute = [opts.byminute];
-        }
-        // bysecond
-        if (opts.bysecond === null) {
-            opts.bysecond = opts.freq < RRule.SECONDLY ? [opts.dtstart.getSeconds()] : null;
-        } else if (typeof opts.bysecond === 'number') {
-            opts.bysecond = [opts.bysecond];
-        }
-        if (opts.freq >= RRule.HOURLY) {
-            this.timeset = null;
-        } else {
-            this.timeset = [];
-            for (var _i3 = 0; _i3 < opts.byhour.length; _i3++) {
-                var hour = opts.byhour[_i3];
-                for (var j = 0; j < opts.byminute.length; j++) {
-                    var minute = opts.byminute[j];
-                    for (var k = 0; k < opts.bysecond.length; k++) {
-                        var second = opts.bysecond[k];
-                        // python:
-                        // datetime.time(hour, minute, second,
-                        // tzinfo=self._tzinfo))
-                        this.timeset.push(new dateutil_1.default.Time(hour, minute, second, millisecondModulo));
-                    }
-                }
-            }
-            dateutil_1.default.sort(this.timeset);
-        }
+        this.origOptions = this.initializeOptions(options);
+        this.options = this.initializeOptions(options);
+        this.parseOptions(options);
     }
 
     _createClass(RRule, [{
+        key: "initializeOptions",
+        value: function initializeOptions(options) {
+            var _this = this;
+
+            var invalid = [];
+            var keys = Object.keys(options);
+            var initializedOptions = {};
+            // Shallow copy for options and origOptions and check for invalid
+            keys.forEach(function (key) {
+                initializedOptions[key] = options[key];
+                if (!helpers_1.contains(_this.defaultKeys, key)) invalid.push(key);
+            });
+            if (invalid.length) {
+                throw new Error('Invalid options: ' + invalid.join(', '));
+            }
+            return initializedOptions;
+        }
+    }, {
+        key: "parseOptions",
+        value: function parseOptions(options) {
+            var _this2 = this;
+
+            var keys = Object.keys(options);
+            if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
+                throw new Error('Invalid frequency: ' + String(options.freq));
+            }
+            // Merge in default options
+            this.defaultKeys.forEach(function (key) {
+                if (!helpers_1.contains(keys, key)) _this2.options[key] = RRule.DEFAULT_OPTIONS[key];
+            });
+            var opts = this.options;
+            if (opts.byeaster !== null) opts.freq = RRule.YEARLY;
+            if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0));
+            var millisecondModulo = opts.dtstart.getTime() % 1000;
+            if (opts.wkst === null) {
+                opts.wkst = RRule.MO.weekday;
+            } else if (typeof opts.wkst === 'number') {
+                // cool, just keep it like that
+            } else {
+                opts.wkst = opts.wkst.weekday;
+            }
+            if (opts.bysetpos !== null) {
+                if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos];
+                for (var i = 0; i < opts.bysetpos.length; i++) {
+                    var v = opts.bysetpos[i];
+                    if (v === 0 || !(v >= -366 && v <= 366)) {
+                        throw new Error('bysetpos must be between 1 and 366,' + ' or between -366 and -1');
+                    }
+                }
+            }
+            if (!(helpers_1.pybool(opts.byweekno) || helpers_1.pybool(opts.byyearday) || helpers_1.pybool(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
+                switch (opts.freq) {
+                    case RRule.YEARLY:
+                        if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1;
+                        opts.bymonthday = opts.dtstart.getDate();
+                        break;
+                    case RRule.MONTHLY:
+                        opts.bymonthday = opts.dtstart.getDate();
+                        break;
+                    case RRule.WEEKLY:
+                        opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
+                        break;
+                }
+            }
+            // bymonth
+            if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
+                opts.bymonth = [opts.bymonth];
+            }
+            // byyearday
+            if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
+                opts.byyearday = [opts.byyearday];
+            }
+            // bymonthday
+            if (opts.bymonthday === null) {
+                opts.bymonthday = [];
+                opts.bynmonthday = [];
+            } else if (opts.bymonthday instanceof Array) {
+                var bymonthday = [];
+                var bynmonthday = [];
+                for (var _i = 0; _i < opts.bymonthday.length; _i++) {
+                    var _v = opts.bymonthday[_i];
+                    if (_v > 0) {
+                        bymonthday.push(_v);
+                    } else if (_v < 0) {
+                        bynmonthday.push(_v);
+                    }
+                }
+                opts.bymonthday = bymonthday;
+                opts.bynmonthday = bynmonthday;
+            } else {
+                if (opts.bymonthday < 0) {
+                    opts.bynmonthday = [opts.bymonthday];
+                    opts.bymonthday = [];
+                } else {
+                    opts.bynmonthday = [];
+                    opts.bymonthday = [opts.bymonthday];
+                }
+            }
+            // byweekno
+            if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
+                opts.byweekno = [opts.byweekno];
+            }
+            // byweekday / bynweekday
+            if (opts.byweekday === null) {
+                opts.bynweekday = null;
+            } else if (typeof opts.byweekday === 'number') {
+                opts.byweekday = [opts.byweekday];
+                opts.bynweekday = null;
+            } else if (opts.byweekday instanceof weekday_1.default) {
+                if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
+                    opts.byweekday = [opts.byweekday.weekday];
+                    opts.bynweekday = null;
+                } else {
+                    opts.bynweekday = [[opts.byweekday.weekday, opts.byweekday.n]];
+                    opts.byweekday = null;
+                }
+            } else {
+                var byweekday = [];
+                var bynweekday = [];
+                for (var _i2 = 0; _i2 < opts.byweekday.length; _i2++) {
+                    var wday = opts.byweekday[_i2];
+                    if (typeof wday === 'number') {
+                        byweekday.push(wday);
+                        continue;
+                    }
+                    var wd = wday;
+                    if (!wd.n || opts.freq > RRule.MONTHLY) {
+                        byweekday.push(wd.weekday);
+                    } else {
+                        bynweekday.push([wd.weekday, wd.n]);
+                    }
+                }
+                opts.byweekday = helpers_1.pybool(byweekday) ? byweekday : null;
+                opts.bynweekday = helpers_1.pybool(bynweekday) ? bynweekday : null;
+            }
+            // byhour
+            if (opts.byhour === null) {
+                opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getHours()] : null;
+            } else if (typeof opts.byhour === 'number') {
+                opts.byhour = [opts.byhour];
+            }
+            // byminute
+            if (opts.byminute === null) {
+                opts.byminute = opts.freq < RRule.MINUTELY ? [opts.dtstart.getMinutes()] : null;
+            } else if (typeof opts.byminute === 'number') {
+                opts.byminute = [opts.byminute];
+            }
+            // bysecond
+            if (opts.bysecond === null) {
+                opts.bysecond = opts.freq < RRule.SECONDLY ? [opts.dtstart.getSeconds()] : null;
+            } else if (typeof opts.bysecond === 'number') {
+                opts.bysecond = [opts.bysecond];
+            }
+            if (opts.freq >= RRule.HOURLY) {
+                this.timeset = null;
+            } else {
+                this.timeset = [];
+                for (var _i3 = 0; _i3 < opts.byhour.length; _i3++) {
+                    var hour = opts.byhour[_i3];
+                    for (var j = 0; j < opts.byminute.length; j++) {
+                        var minute = opts.byminute[j];
+                        for (var k = 0; k < opts.bysecond.length; k++) {
+                            var second = opts.bysecond[k];
+                            // python:
+                            // datetime.time(hour, minute, second,
+                            // tzinfo=self._tzinfo))
+                            this.timeset.push(new dateutil_1.default.Time(hour, minute, second, millisecondModulo));
+                        }
+                    }
+                }
+                dateutil_1.default.sort(this.timeset);
+            }
+        }
+    }, {
         key: "all",
 
         /**

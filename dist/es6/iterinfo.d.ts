@@ -1,5 +1,7 @@
 import RRule from './rrule';
 import dateutil from './dateutil';
+export declare type DaySet = [number[], number, number];
+export declare type GetDayset = () => [number[], number, number];
 export default class Iterinfo {
     rrule: RRule;
     lastyear: number;
@@ -20,9 +22,9 @@ export default class Iterinfo {
     easter(y: number, offset?: number): number[];
     rebuild(year: number, month: number): void;
     ydayset(): (number | number[])[];
-    mdayset(_: any, month: number, __: any): (number | any[])[];
-    wdayset(year: number, month: number, day: number): (number | any[])[];
-    ddayset(year: number, month: number, day: number): (number | any[])[];
+    mdayset(_: any, month: number, __: any): (number | number[])[];
+    wdayset(year: number, month: number, day: number): (number | number[])[];
+    ddayset(year: number, month: number, day: number): (number | number[])[];
     htimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     mtimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     stimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];

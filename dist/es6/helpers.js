@@ -75,10 +75,10 @@ exports.divmod = divmod;
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-const plb = function (obj) {
+const pybool = function (obj) {
     return obj instanceof Array && obj.length === 0 ? false : Boolean(obj);
 };
-exports.plb = plb;
+exports.pybool = pybool;
 /**
  * Return true if a value is in an array
  */

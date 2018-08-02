@@ -15,9 +15,9 @@ const range = function (start: number, end?: number): number[] {
   return rang
 }
 
-const repeat = function<T>(value: T | T[], times: number): T[] | T[][] {
+const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
-  const array: T[] | T[][] = []
+  const array: (T | T[])[] = []
 
   if (value instanceof Array) {
     for (; i < times; i++) array[i] = ([] as T[]).concat(value)
@@ -71,7 +71,7 @@ const divmod = function (a: number, b: number) {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-const plb = function (obj: any[] | any) {
+const pybool = function (obj: any[] | any) {
   return obj instanceof Array && obj.length === 0 ? false : Boolean(obj)
 }
 
@@ -82,4 +82,4 @@ const contains = function<T>(arr: T[], val: T) {
   return arr.indexOf(val) !== -1
 }
 
-export { range, repeat, split, pymod, divmod, plb, contains }
+export { range, repeat, split, pymod, divmod, pybool, contains }

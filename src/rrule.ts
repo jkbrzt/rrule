@@ -1,7 +1,7 @@
 import Weekday from './weekday'
 import dateutil from './dateutil'
-import Iterinfo from './iterinfo'
-import { pymod, divmod, plb, contains } from './helpers'
+import Iterinfo, { GetDayset, DaySet } from './iterinfo'
+import { pymod, divmod, pybool, contains } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
@@ -206,9 +206,9 @@ export default class RRule {
 
     if (
       !(
-        plb(opts.byweekno) ||
-        plb(opts.byyearday) ||
-        plb(opts.bymonthday) ||
+        pybool(opts.byweekno) ||
+        pybool(opts.byyearday) ||
+        pybool(opts.bymonthday) ||
         opts.byweekday !== null ||
         opts.byeaster !== null
       )
@@ -302,8 +302,8 @@ export default class RRule {
           bynweekday.push([wd.weekday, wd.n])
         }
       }
-      opts.byweekday = plb(byweekday) ? byweekday : null
-      opts.bynweekday = plb(bynweekday) ? bynweekday : null
+      opts.byweekday = pybool(byweekday) ? byweekday : null
+      opts.bynweekday = pybool(bynweekday) ? bynweekday : null
     }
 
     // byhour
@@ -766,11 +766,10 @@ export default class RRule {
       bysecond
     } = this.options
 
-    // tslint:disable-next-line:no-use-before-declare
     const ii = new Iterinfo(this)
     ii.rebuild(year, month)
 
-    const getdayset = {
+    const getdayset: GetDayset = {
       [RRule.YEARLY]: ii.ydayset,
       [RRule.MONTHLY]: ii.mdayset,
       [RRule.WEEKLY]: ii.wdayset,
@@ -778,7 +777,7 @@ export default class RRule {
       [RRule.HOURLY]: ii.ddayset,
       [RRule.MINUTELY]: ii.ddayset,
       [RRule.SECONDLY]: ii.ddayset
-    }[freq]
+    }[freq] as GetDayset
 
     let timeset: dateutil.Time[]
     let gettimeset
@@ -796,11 +795,11 @@ export default class RRule {
       }[freq]
 
       if (
-        (freq >= RRule.HOURLY && plb(byhour) && !contains(byhour as number[], hour)) ||
+        (freq >= RRule.HOURLY && pybool(byhour) && !contains(byhour as number[], hour)) ||
         (freq >= RRule.MINUTELY &&
-          plb(byminute) &&
+          pybool(byminute) &&
           !contains(byminute as number[], minute)) ||
-        (freq >= RRule.SECONDLY && plb(bysecond) && !contains(bysecond as number[], second))
+        (freq >= RRule.SECONDLY && pybool(bysecond) && !contains(bysecond as number[], second))
       ) {
         timeset = []
       } else {
@@ -814,56 +813,46 @@ export default class RRule {
       }
     }
 
+    let currentDay: number
     let total = 0
     let count = this.options.count
-    let i: number
-    let k: number
     let dm: { div: number, mod: number }
     let div: number
     let mod: number
-    let tmp: any[]
     let pos: number
-    let dayset: number[]
-    let start: number
-    let end: number
-    let fixday: boolean
-    let filtered: boolean
 
     while (true) {
       // Get dayset with the right frequency
-      tmp = getdayset.call(ii, year, month, day)
-      dayset = tmp[0]
-      start = tmp[1]
-      end = tmp[2]
+      const [ dayset, start, end ] = getdayset.call(ii, year, month, day) as DaySet
 
       // Do the "hard" work ;-)
-      filtered = false
-      for (let j = start; j < end; j++) {
-        i = dayset[j]
+      let filtered = false
+      for (let dayCounter = start; dayCounter < end; dayCounter++) {
+        currentDay = dayset[dayCounter]
 
         filtered =
-          (plb(bymonth) && !contains(bymonth as number[], ii.mmask[i])) ||
-          (plb(byweekno) && !ii.wnomask[i]) ||
-          (plb(byweekday) &&
-            !contains(byweekday as number[], ii.wdaymask[i])) ||
-          (plb(ii.nwdaymask) && !ii.nwdaymask[i]) ||
-          (byeaster !== null && !contains(ii.eastermask, i)) ||
-          ((plb(bymonthday) || plb(bynmonthday)) &&
-            !contains(bymonthday as number[], ii.mdaymask[i]) &&
-            !contains(bynmonthday, ii.nmdaymask[i])) ||
-          (plb(byyearday) &&
-            ((i < ii.yearlen &&
-              !contains(byyearday, i + 1) &&
-              !contains(byyearday, -ii.yearlen + i)) ||
-              (i >= ii.yearlen &&
-                !contains(byyearday, i + 1 - ii.yearlen) &&
-                !contains(byyearday, -ii.nextyearlen + i - ii.yearlen))))
+          (pybool(bymonth) && !contains(bymonth as number[], ii.mmask[currentDay])) ||
+          (pybool(byweekno) && !ii.wnomask[currentDay]) ||
+          (pybool(byweekday) &&
+            !contains(byweekday as number[], ii.wdaymask[currentDay])) ||
+          (pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+          (byeaster !== null && !contains(ii.eastermask, currentDay)) ||
+          ((pybool(bymonthday) || pybool(bynmonthday)) &&
+            !contains(bymonthday as number[], ii.mdaymask[currentDay]) &&
+            !contains(bynmonthday, ii.nmdaymask[currentDay])) ||
+          (pybool(byyearday) &&
+            ((currentDay < ii.yearlen &&
+              !contains(byyearday, currentDay + 1) &&
+              !contains(byyearday, -ii.yearlen + currentDay)) ||
+              (currentDay >= ii.yearlen &&
+                !contains(byyearday, currentDay + 1 - ii.yearlen) &&
+                !contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
 
-        if (filtered) dayset[i] = null
+        if (filtered) dayset[currentDay] = null
       }
 
       // Output results
-      if (plb(bysetpos) && plb(timeset)) {
+      if (pybool(bysetpos) && pybool(timeset)) {
         let daypos: number
         let timepos: number
         const poslist: Date[] = []
@@ -880,8 +869,8 @@ export default class RRule {
           }
 
           try {
-            tmp = []
-            for (k = start; k < end; k++) {
+            const tmp = []
+            for (let k = start; k < end; k++) {
               const val = dayset[k]
               if (val === null) continue
               tmp.push(val)
@@ -926,10 +915,10 @@ export default class RRule {
         }
       } else {
         for (let j = start; j < end; j++) {
-          i = dayset[j]
-          if (i !== null) {
-            const date = dateutil.fromOrdinal(ii.yearordinal + i)
-            for (k = 0; k < timeset.length; k++) {
+          currentDay = dayset[j]
+          if (currentDay !== null) {
+            const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
+            for (let k = 0; k < timeset.length; k++) {
               const time = timeset[k]
               const res = dateutil.combine(date, time)
               if (until && res > until) {
@@ -954,7 +943,7 @@ export default class RRule {
       }
 
       // Handle frequency and interval
-      fixday = false
+      let fixday = false
       if (freq === RRule.YEARLY) {
         year += interval
         if (year > dateutil.MAXYEAR) {
@@ -1005,7 +994,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!plb(byhour) || contains(byhour as number[], hour)) break
+          if (!pybool(byhour) || contains(byhour as number[], hour)) break
         }
         timeset = gettimeset.call(ii, hour, minute, second)
       } else if (freq === RRule.MINUTELY) {
@@ -1034,8 +1023,8 @@ export default class RRule {
             }
           }
           if (
-            (!plb(byhour) || contains(byhour as number[], hour)) &&
-            (!plb(byminute) || contains(byminute as number[], minute))
+            (!pybool(byhour) || contains(byhour as number[], hour)) &&
+            (!pybool(byminute) || contains(byminute as number[], minute))
           ) {
             break
           }
@@ -1074,9 +1063,9 @@ export default class RRule {
             }
           }
           if (
-            (!plb(byhour) || contains(byhour as number[], hour)) &&
-            (!plb(byminute) || contains(byminute as number[], minute)) &&
-            (!plb(bysecond) || contains(bysecond as number[], second))
+            (!pybool(byhour) || contains(byhour as number[], hour)) &&
+            (!pybool(byminute) || contains(byminute as number[], minute)) &&
+            (!pybool(bysecond) || contains(bysecond as number[], second))
           ) {
             break
           }

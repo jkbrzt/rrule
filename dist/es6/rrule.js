@@ -99,9 +99,9 @@ class RRule {
                 }
             }
         }
-        if (!(helpers_1.plb(opts.byweekno) ||
-            helpers_1.plb(opts.byyearday) ||
-            helpers_1.plb(opts.bymonthday) ||
+        if (!(helpers_1.pybool(opts.byweekno) ||
+            helpers_1.pybool(opts.byyearday) ||
+            helpers_1.pybool(opts.bymonthday) ||
             opts.byweekday !== null ||
             opts.byeaster !== null)) {
             switch (opts.freq) {
@@ -195,8 +195,8 @@ class RRule {
                     bynweekday.push([wd.weekday, wd.n]);
                 }
             }
-            opts.byweekday = helpers_1.plb(byweekday) ? byweekday : null;
-            opts.bynweekday = helpers_1.plb(bynweekday) ? bynweekday : null;
+            opts.byweekday = helpers_1.pybool(byweekday) ? byweekday : null;
+            opts.bynweekday = helpers_1.pybool(bynweekday) ? bynweekday : null;
         }
         // byhour
         if (opts.byhour === null) {
@@ -608,7 +608,6 @@ class RRule {
         let weekday = dateutil_1.default.getWeekday(dtstart);
         // Some local variables to speed things up a bit
         const { freq, interval, wkst, until, bymonth, byweekno, byyearday, byweekday, byeaster, bymonthday, bynmonthday, bysetpos, byhour, byminute, bysecond } = this.options;
-        // tslint:disable-next-line:no-use-before-declare
         const ii = new iterinfo_1.default(this);
         ii.rebuild(year, month);
         const getdayset = {
@@ -635,63 +634,53 @@ class RRule {
                 [RRule.MINUTELY]: ii.mtimeset,
                 [RRule.SECONDLY]: ii.stimeset
             }[freq];
-            if ((freq >= RRule.HOURLY && helpers_1.plb(byhour) && !helpers_1.contains(byhour, hour)) ||
+            if ((freq >= RRule.HOURLY && helpers_1.pybool(byhour) && !helpers_1.contains(byhour, hour)) ||
                 (freq >= RRule.MINUTELY &&
-                    helpers_1.plb(byminute) &&
+                    helpers_1.pybool(byminute) &&
                     !helpers_1.contains(byminute, minute)) ||
-                (freq >= RRule.SECONDLY && helpers_1.plb(bysecond) && !helpers_1.contains(bysecond, second))) {
+                (freq >= RRule.SECONDLY && helpers_1.pybool(bysecond) && !helpers_1.contains(bysecond, second))) {
                 timeset = [];
             }
             else {
                 timeset = gettimeset.call(ii, hour, minute, second, dtstartMillisecondModulo);
             }
         }
+        let currentDay;
         let total = 0;
         let count = this.options.count;
-        let i;
-        let k;
         let dm;
         let div;
         let mod;
-        let tmp;
         let pos;
-        let dayset;
-        let start;
-        let end;
-        let fixday;
-        let filtered;
         while (true) {
             // Get dayset with the right frequency
-            tmp = getdayset.call(ii, year, month, day);
-            dayset = tmp[0];
-            start = tmp[1];
-            end = tmp[2];
+            const [dayset, start, end] = getdayset.call(ii, year, month, day);
             // Do the "hard" work ;-)
-            filtered = false;
-            for (let j = start; j < end; j++) {
-                i = dayset[j];
+            let filtered = false;
+            for (let dayCounter = start; dayCounter < end; dayCounter++) {
+                currentDay = dayset[dayCounter];
                 filtered =
-                    (helpers_1.plb(bymonth) && !helpers_1.contains(bymonth, ii.mmask[i])) ||
-                        (helpers_1.plb(byweekno) && !ii.wnomask[i]) ||
-                        (helpers_1.plb(byweekday) &&
-                            !helpers_1.contains(byweekday, ii.wdaymask[i])) ||
-                        (helpers_1.plb(ii.nwdaymask) && !ii.nwdaymask[i]) ||
-                        (byeaster !== null && !helpers_1.contains(ii.eastermask, i)) ||
-                        ((helpers_1.plb(bymonthday) || helpers_1.plb(bynmonthday)) &&
-                            !helpers_1.contains(bymonthday, ii.mdaymask[i]) &&
-                            !helpers_1.contains(bynmonthday, ii.nmdaymask[i])) ||
-                        (helpers_1.plb(byyearday) &&
-                            ((i < ii.yearlen &&
-                                !helpers_1.contains(byyearday, i + 1) &&
-                                !helpers_1.contains(byyearday, -ii.yearlen + i)) ||
-                                (i >= ii.yearlen &&
-                                    !helpers_1.contains(byyearday, i + 1 - ii.yearlen) &&
-                                    !helpers_1.contains(byyearday, -ii.nextyearlen + i - ii.yearlen))));
+                    (helpers_1.pybool(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay])) ||
+                        (helpers_1.pybool(byweekno) && !ii.wnomask[currentDay]) ||
+                        (helpers_1.pybool(byweekday) &&
+                            !helpers_1.contains(byweekday, ii.wdaymask[currentDay])) ||
+                        (helpers_1.pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+                        (byeaster !== null && !helpers_1.contains(ii.eastermask, currentDay)) ||
+                        ((helpers_1.pybool(bymonthday) || helpers_1.pybool(bynmonthday)) &&
+                            !helpers_1.contains(bymonthday, ii.mdaymask[currentDay]) &&
+                            !helpers_1.contains(bynmonthday, ii.nmdaymask[currentDay])) ||
+                        (helpers_1.pybool(byyearday) &&
+                            ((currentDay < ii.yearlen &&
+                                !helpers_1.contains(byyearday, currentDay + 1) &&
+                                !helpers_1.contains(byyearday, -ii.yearlen + currentDay)) ||
+                                (currentDay >= ii.yearlen &&
+                                    !helpers_1.contains(byyearday, currentDay + 1 - ii.yearlen) &&
+                                    !helpers_1.contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))));
                 if (filtered)
-                    dayset[i] = null;
+                    dayset[currentDay] = null;
             }
             // Output results
-            if (helpers_1.plb(bysetpos) && helpers_1.plb(timeset)) {
+            if (helpers_1.pybool(bysetpos) && helpers_1.pybool(timeset)) {
                 let daypos;
                 let timepos;
                 const poslist = [];
@@ -706,8 +695,8 @@ class RRule {
                         timepos = helpers_1.pymod(pos - 1, timeset.length);
                     }
                     try {
-                        tmp = [];
-                        for (k = start; k < end; k++) {
+                        const tmp = [];
+                        for (let k = start; k < end; k++) {
                             const val = dayset[k];
                             if (val === null)
                                 continue;
@@ -756,10 +745,10 @@ class RRule {
             }
             else {
                 for (let j = start; j < end; j++) {
-                    i = dayset[j];
-                    if (i !== null) {
-                        const date = dateutil_1.default.fromOrdinal(ii.yearordinal + i);
-                        for (k = 0; k < timeset.length; k++) {
+                    currentDay = dayset[j];
+                    if (currentDay !== null) {
+                        const date = dateutil_1.default.fromOrdinal(ii.yearordinal + currentDay);
+                        for (let k = 0; k < timeset.length; k++) {
                             const time = timeset[k];
                             const res = dateutil_1.default.combine(date, time);
                             if (until && res > until) {
@@ -784,7 +773,7 @@ class RRule {
                 }
             }
             // Handle frequency and interval
-            fixday = false;
+            let fixday = false;
             if (freq === RRule.YEARLY) {
                 year += interval;
                 if (year > dateutil_1.default.MAXYEAR) {
@@ -840,7 +829,7 @@ class RRule {
                         day += div;
                         fixday = true;
                     }
-                    if (!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour))
+                    if (!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour))
                         break;
                 }
                 timeset = gettimeset.call(ii, hour, minute, second);
@@ -869,8 +858,8 @@ class RRule {
                             filtered = false;
                         }
                     }
-                    if ((!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.plb(byminute) || helpers_1.contains(byminute, minute))) {
+                    if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute))) {
                         break;
                     }
                 }
@@ -906,9 +895,9 @@ class RRule {
                             }
                         }
                     }
-                    if ((!helpers_1.plb(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.plb(byminute) || helpers_1.contains(byminute, minute)) &&
-                        (!helpers_1.plb(bysecond) || helpers_1.contains(bysecond, second))) {
+                    if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute)) &&
+                        (!helpers_1.pybool(bysecond) || helpers_1.contains(bysecond, second))) {
                         break;
                     }
                 }

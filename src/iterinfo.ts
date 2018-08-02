@@ -11,7 +11,10 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { plb, repeat, pymod, contains, range } from './helpers'
+import { pybool, repeat, pymod, contains, range } from './helpers'
+
+export type DaySet = [ number[], number, number ]
+export type GetDayset = () => [number[], number, number]
 
 // =============================================================================
 // Iterinfo
@@ -100,7 +103,7 @@ export default class Iterinfo {
         this.mrange = [].concat(M366RANGE)
       }
 
-      if (!plb(rr.options.byweekno)) {
+      if (!pybool(rr.options.byweekno)) {
         this.wnomask = null
       } else {
         this.wnomask = repeat(0, this.yearlen + 7) as number[]
@@ -202,12 +205,12 @@ export default class Iterinfo {
     }
 
     if (
-      plb(rr.options.bynweekday) &&
+      pybool(rr.options.bynweekday) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       let ranges: number[][] = []
       if (rr.options.freq === RRule.YEARLY) {
-        if (plb(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+        if (pybool(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
           for (let j = 0; j < rr.options.bymonth.length; j++) {
             month = rr.options.bymonth[j]
             ranges.push(this.mrange.slice(month - 1, month + 1))
@@ -218,7 +221,7 @@ export default class Iterinfo {
       } else if (rr.options.freq === RRule.MONTHLY) {
         ranges = [this.mrange.slice(month - 1, month + 1)]
       }
-      if (plb(ranges)) {
+      if (pybool(ranges)) {
         // Weekly frequency won't get here, so we may not
         // care about cross-year weekly periods.
         this.nwdaymask = repeat(0, this.yearlen) as number[]
@@ -258,16 +261,16 @@ export default class Iterinfo {
   }
 
   mdayset (_: any, month: number, __: any) {
-    const set = repeat(null, this.yearlen)
     const start = this.mrange[month - 1]
     const end = this.mrange[month]
+    const set = repeat(null, this.yearlen) as number[]
     for (let i = start; i < end; i++) set[i] = i
     return [set, start, end]
   }
 
   wdayset (year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
-    const set = repeat(null, this.yearlen + 7)
+    const set = repeat(null, this.yearlen + 7) as number[]
     let i =
       dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
     const start = i
@@ -280,7 +283,7 @@ export default class Iterinfo {
   }
 
   ddayset (year: number, month: number, day: number) {
-    const set = repeat(null, this.yearlen)
+    const set = repeat(null, this.yearlen) as number[]
     const i =
       dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
     set[i] = i

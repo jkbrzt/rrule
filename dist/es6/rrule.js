@@ -691,7 +691,7 @@ class RRule {
                 let daypos;
                 let timepos;
                 const poslist = [];
-                for (let j = 0; j < bysetpos.length; j++) {
+                for (let j = 0; j < (bysetpos).length; j++) {
                     pos = bysetpos[j];
                     if (pos < 0) {
                         daypos = Math.floor(pos / timeset.length);

@@ -110,13 +110,13 @@ export default class Iterinfo {
         let no1wkst
         let firstwkst
         let wyearlen
-        no1wkst = firstwkst = pymod(7 - this.yearweekday + (rr.options.wkst as number), 7)
+        no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7)
         if (no1wkst >= 4) {
           no1wkst = 0
           // Number of days in the year, plus the days we got
           // from last year.
           wyearlen =
-            this.yearlen + pymod(this.yearweekday - (rr.options.wkst as number), 7)
+            this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7)
         } else {
           // Number of days in the year, minus the days we
           // left in last year.
@@ -126,9 +126,9 @@ export default class Iterinfo {
         const mod = pymod(wyearlen, 7)
         const numweeks = Math.floor(div + mod / 4)
 
-        for (let j = 0; j < (rr.options.byweekno as number[]).length; j++) {
+        for (let j = 0; j < rr.options.byweekno.length; j++) {
           let i: number
-          let n = (rr.options.byweekno as number[])[j]
+          let n = rr.options.byweekno[j]
           if (n < 0) {
             n += numweeks + 1
           }
@@ -150,7 +150,7 @@ export default class Iterinfo {
           }
         }
 
-        if (contains(rr.options.byweekno as number[], 1)) {
+        if (contains(rr.options.byweekno, 1)) {
           // Check week number 1 of next year as well
           // orig-TODO : Check -numweeks for next year.
           let i = no1wkst + numweeks * 7
@@ -174,10 +174,10 @@ export default class Iterinfo {
           // days from last year's last week number in
           // this year.
           let lnumweeks
-          if (!contains(rr.options.byweekno as number[], -1)) {
+          if (!contains(rr.options.byweekno, -1)) {
             const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
             let lno1wkst = pymod(
-              7 - lyearweekday.valueOf() + (rr.options.wkst as number),
+              7 - lyearweekday.valueOf() + rr.options.wkst,
               7
             )
             const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
@@ -186,7 +186,7 @@ export default class Iterinfo {
               lnumweeks = Math.floor(
                 52 +
                   pymod(
-                    lyearlen + pymod(lyearweekday - (rr.options.wkst as number), 7),
+                    lyearlen + pymod(lyearweekday - rr.options.wkst, 7),
                     7
                   ) /
                     4
@@ -197,7 +197,7 @@ export default class Iterinfo {
           } else {
             lnumweeks = -1
           }
-          if (contains(rr.options.byweekno as number[], lnumweeks)) {
+          if (contains(rr.options.byweekno, lnumweeks)) {
             for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
           }
         }
@@ -237,10 +237,10 @@ export default class Iterinfo {
             const n = rr.options.bynweekday[k][1]
             if (n < 0) {
               i = last + (n + 1) * 7
-              i -= pymod((this.wdaymask[i]) - wday, 7)
+              i -= pymod(this.wdaymask[i] - wday, 7)
             } else {
               i = first + (n - 1) * 7
-              i += pymod(7 - (this.wdaymask[i]) + wday, 7)
+              i += pymod(7 - this.wdaymask[i] + wday, 7)
             }
             if (first <= i && i <= last) this.nwdaymask[i] = 1
           }
@@ -293,10 +293,10 @@ export default class Iterinfo {
   htimeset (hour: number, minute: number, second: number, millisecond: number) {
     const set = []
     const rr = this.rrule
-    for (let i = 0; i < (rr.options.byminute as number[]).length; i++) {
-      minute = (rr.options.byminute as number[])[i]
-      for (let j = 0; j < (rr.options.bysecond as number[]).length; j++) {
-        second = (rr.options.bysecond as number[])[j]
+    for (let i = 0; i < rr.options.byminute.length; i++) {
+      minute = (rr.options.byminute)[i]
+      for (let j = 0; j < rr.options.bysecond.length; j++) {
+        second = rr.options.bysecond[j]
         set.push(new dateutil.Time(hour, minute, second, millisecond))
       }
     }
@@ -307,8 +307,8 @@ export default class Iterinfo {
   mtimeset (hour: number, minute: number, second: number, millisecond: number) {
     const set = []
     const rr = this.rrule
-    for (let j = 0; j < (rr.options.bysecond as number[]).length; j++) {
-      second = (rr.options.bysecond as number[])[j]
+    for (let j = 0; j < rr.options.bysecond.length; j++) {
+      second = rr.options.bysecond[j]
       set.push(new dateutil.Time(hour, minute, second, millisecond))
     }
     dateutil.sort(set)

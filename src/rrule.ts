@@ -57,6 +57,27 @@ export interface Options {
   byeaster: number
 }
 
+interface ParsedOptions {
+  freq: Frequency
+  dtstart: Date
+  interval: number
+  wkst: number
+  count: number
+  until: Date
+  bysetpos: number[]
+  bymonth: number[]
+  bymonthday: number[]
+  bynmonthday: number[]
+  byyearday: number[]
+  byweekno: number[]
+  byweekday: number[]
+  bynweekday: number[][]
+  byhour: number[]
+  byminute: number[]
+  bysecond: number[]
+  byeaster: number
+}
+
 type CacheKeys = 'before' | 'after' | 'between'
 type CacheBase = { [K in CacheKeys]: IterArgs[] }
 export type Cache = CacheBase & { all: Date[] | Partial<IterArgs>[] | false }
@@ -84,7 +105,7 @@ export default class RRule {
   public _string: any
   public _cache: Cache | null
   public origOptions: Partial<Options>
-  public options: Partial<Options>
+  public options: ParsedOptions
   public timeset: dateutil.Time[]
   public _len: number
 
@@ -173,7 +194,7 @@ export default class RRule {
     return initializedOptions
   }
 
-  private parseOptions (options: Partial<Options>) {
+  private parseOptions (options: Partial<Options>): ParsedOptions {
     const opts: Partial<Options> = this.initializeOptions(options)
     const keys = Object.keys(options) as (keyof Options)[]
 
@@ -358,7 +379,7 @@ export default class RRule {
       dateutil.sort(this.timeset)
     }
 
-    return opts
+    return opts as ParsedOptions
   }
 
   static parseText (text: string, language: Language) {
@@ -804,11 +825,11 @@ export default class RRule {
       }[freq]
 
       if (
-        (freq >= RRule.HOURLY && pybool(byhour) && !contains(byhour as number[], hour)) ||
+        (freq >= RRule.HOURLY && pybool(byhour) && !contains(byhour, hour)) ||
         (freq >= RRule.MINUTELY &&
           pybool(byminute) &&
-          !contains(byminute as number[], minute)) ||
-        (freq >= RRule.SECONDLY && pybool(bysecond) && !contains(bysecond as number[], second))
+          !contains(byminute, minute)) ||
+        (freq >= RRule.SECONDLY && pybool(bysecond) && !contains(bysecond, second))
       ) {
         timeset = []
       } else {
@@ -840,14 +861,14 @@ export default class RRule {
         currentDay = dayset[dayCounter]
 
         filtered =
-          (pybool(bymonth) && !contains(bymonth as number[], ii.mmask[currentDay])) ||
+          (pybool(bymonth) && !contains(bymonth, ii.mmask[currentDay])) ||
           (pybool(byweekno) && !ii.wnomask[currentDay]) ||
           (pybool(byweekday) &&
-            !contains(byweekday as number[], ii.wdaymask[currentDay])) ||
+            !contains(byweekday, ii.wdaymask[currentDay])) ||
           (pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
           (byeaster !== null && !contains(ii.eastermask, currentDay)) ||
           ((pybool(bymonthday) || pybool(bynmonthday)) &&
-            !contains(bymonthday as number[], ii.mdaymask[currentDay]) &&
+            !contains(bymonthday, ii.mdaymask[currentDay]) &&
             !contains(bynmonthday, ii.nmdaymask[currentDay])) ||
           (pybool(byyearday) &&
             ((currentDay < ii.yearlen &&
@@ -866,8 +887,8 @@ export default class RRule {
         let timepos: number
         const poslist: Date[] = []
 
-        for (let j = 0; j < (bysetpos as number[]).length; j++) {
-          pos = (bysetpos as number[])[j]
+        for (let j = 0; j < (bysetpos).length; j++) {
+          pos = bysetpos[j]
 
           if (pos < 0) {
             daypos = Math.floor(pos / timeset.length)
@@ -979,11 +1000,11 @@ export default class RRule {
         ii.rebuild(year, month)
       } else if (freq === RRule.WEEKLY) {
         if (wkst > weekday) {
-          day += -(weekday + 1 + (6 - (wkst as number))) + interval * 7
+          day += -(weekday + 1 + (6 - wkst)) + interval * 7
         } else {
-          day += -(weekday - (wkst as number)) + interval * 7
+          day += -(weekday - wkst) + interval * 7
         }
-        weekday = wkst as number
+        weekday = wkst
         fixday = true
       } else if (freq === RRule.DAILY) {
         day += interval
@@ -1003,7 +1024,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!pybool(byhour) || contains(byhour as number[], hour)) break
+          if (!pybool(byhour) || contains(byhour, hour)) break
         }
         timeset = gettimeset.call(ii, hour, minute, second)
       } else if (freq === RRule.MINUTELY) {
@@ -1032,8 +1053,8 @@ export default class RRule {
             }
           }
           if (
-            (!pybool(byhour) || contains(byhour as number[], hour)) &&
-            (!pybool(byminute) || contains(byminute as number[], minute))
+            (!pybool(byhour) || contains(byhour, hour)) &&
+            (!pybool(byminute) || contains(byminute, minute))
           ) {
             break
           }
@@ -1072,9 +1093,9 @@ export default class RRule {
             }
           }
           if (
-            (!pybool(byhour) || contains(byhour as number[], hour)) &&
-            (!pybool(byminute) || contains(byminute as number[], minute)) &&
-            (!pybool(bysecond) || contains(bysecond as number[], second))
+            (!pybool(byhour) || contains(byhour, hour)) &&
+            (!pybool(byminute) || contains(byminute, minute)) &&
+            (!pybool(bysecond) || contains(bysecond, second))
           ) {
             break
           }

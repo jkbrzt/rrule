@@ -32,6 +32,26 @@ export interface Options {
     bysecond: number | number[];
     byeaster: number;
 }
+interface ParsedOptions {
+    freq: Frequency;
+    dtstart: Date;
+    interval: number;
+    wkst: number;
+    count: number;
+    until: Date;
+    bysetpos: number[];
+    bymonth: number[];
+    bymonthday: number[];
+    bynmonthday: number[];
+    byyearday: number[];
+    byweekno: number[];
+    byweekday: number[];
+    bynweekday: number[][];
+    byhour: number[];
+    byminute: number[];
+    bysecond: number[];
+    byeaster: number;
+}
 declare type CacheKeys = 'before' | 'after' | 'between';
 declare type CacheBase = {
     [K in CacheKeys]: IterArgs[];
@@ -60,7 +80,7 @@ export default class RRule {
     _string: any;
     _cache: Cache | null;
     origOptions: Partial<Options>;
-    options: Partial<Options>;
+    options: ParsedOptions;
     timeset: dateutil.Time[];
     _len: number;
     static readonly FREQUENCIES: (keyof typeof Frequency)[];

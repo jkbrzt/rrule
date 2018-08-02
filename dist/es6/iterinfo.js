@@ -197,11 +197,11 @@ class Iterinfo {
                         const n = rr.options.bynweekday[k][1];
                         if (n < 0) {
                             i = last + (n + 1) * 7;
-                            i -= helpers_1.pymod((this.wdaymask[i]) - wday, 7);
+                            i -= helpers_1.pymod(this.wdaymask[i] - wday, 7);
                         }
                         else {
                             i = first + (n - 1) * 7;
-                            i += helpers_1.pymod(7 - (this.wdaymask[i]) + wday, 7);
+                            i += helpers_1.pymod(7 - this.wdaymask[i] + wday, 7);
                         }
                         if (first <= i && i <= last)
                             this.nwdaymask[i] = 1;
@@ -249,7 +249,7 @@ class Iterinfo {
         const set = [];
         const rr = this.rrule;
         for (let i = 0; i < rr.options.byminute.length; i++) {
-            minute = rr.options.byminute[i];
+            minute = (rr.options.byminute)[i];
             for (let j = 0; j < rr.options.bysecond.length; j++) {
                 second = rr.options.bysecond[j];
                 set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));

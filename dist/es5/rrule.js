@@ -219,7 +219,7 @@ var RRule = function () {
                     }
                 }
             }
-            if (!(helpers_1.pybool(opts.byweekno) || helpers_1.pybool(opts.byyearday) || helpers_1.pybool(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
+            if (!(Boolean(opts.byweekno) || helpers_1.notEmpty(opts.byweekno) || helpers_1.notEmpty(opts.byyearday) || Boolean(opts.bymonthday) || helpers_1.notEmpty(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
                 switch (opts.freq) {
                     case RRule.YEARLY:
                         if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1;
@@ -301,8 +301,8 @@ var RRule = function () {
                         bynweekday.push([wd.weekday, wd.n]);
                     }
                 }
-                opts.byweekday = helpers_1.pybool(byweekday) ? byweekday : null;
-                opts.bynweekday = helpers_1.pybool(bynweekday) ? bynweekday : null;
+                opts.byweekday = helpers_1.notEmpty(byweekday) ? byweekday : null;
+                opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
             }
             // byhour
             if (opts.byhour === null) {
@@ -593,7 +593,7 @@ var RRule = function () {
                 var _RRule$YEARLY$RRule$M2;
 
                 gettimeset = (_RRule$YEARLY$RRule$M2 = {}, _defineProperty(_RRule$YEARLY$RRule$M2, RRule.YEARLY, ii.ydayset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.MONTHLY, ii.mdayset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.WEEKLY, ii.wdayset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.DAILY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.HOURLY, ii.htimeset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.MINUTELY, ii.mtimeset), _defineProperty(_RRule$YEARLY$RRule$M2, RRule.SECONDLY, ii.stimeset), _RRule$YEARLY$RRule$M2)[freq];
-                if (freq >= RRule.HOURLY && helpers_1.pybool(byhour) && !helpers_1.contains(byhour, hour) || freq >= RRule.MINUTELY && helpers_1.pybool(byminute) && !helpers_1.contains(byminute, minute) || freq >= RRule.SECONDLY && helpers_1.pybool(bysecond) && !helpers_1.contains(bysecond, second)) {
+                if (freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.contains(byhour, hour) || freq >= RRule.MINUTELY && helpers_1.notEmpty(byminute) && !helpers_1.contains(byminute, minute) || freq >= RRule.SECONDLY && helpers_1.notEmpty(bysecond) && !helpers_1.contains(bysecond, second)) {
                     timeset = [];
                 } else {
                     timeset = gettimeset.call(ii, hour, minute, second, dtstartMillisecondModulo);
@@ -619,11 +619,11 @@ var RRule = function () {
                 var filtered = false;
                 for (var dayCounter = start; dayCounter < end; dayCounter++) {
                     currentDay = dayset[dayCounter];
-                    filtered = helpers_1.pybool(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay]) || helpers_1.pybool(byweekno) && !ii.wnomask[currentDay] || helpers_1.pybool(byweekday) && !helpers_1.contains(byweekday, ii.wdaymask[currentDay]) || helpers_1.pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay] || byeaster !== null && !helpers_1.contains(ii.eastermask, currentDay) || (helpers_1.pybool(bymonthday) || helpers_1.pybool(bynmonthday)) && !helpers_1.contains(bymonthday, ii.mdaymask[currentDay]) && !helpers_1.contains(bynmonthday, ii.nmdaymask[currentDay]) || helpers_1.pybool(byyearday) && (currentDay < ii.yearlen && !helpers_1.contains(byyearday, currentDay + 1) && !helpers_1.contains(byyearday, -ii.yearlen + currentDay) || currentDay >= ii.yearlen && !helpers_1.contains(byyearday, currentDay + 1 - ii.yearlen) && !helpers_1.contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen));
+                    filtered = helpers_1.notEmpty(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay]) || helpers_1.notEmpty(byweekno) && !ii.wnomask[currentDay] || helpers_1.notEmpty(byweekday) && !helpers_1.contains(byweekday, ii.wdaymask[currentDay]) || helpers_1.notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay] || byeaster !== null && !helpers_1.contains(ii.eastermask, currentDay) || (helpers_1.notEmpty(bymonthday) || helpers_1.notEmpty(bynmonthday)) && !helpers_1.contains(bymonthday, ii.mdaymask[currentDay]) && !helpers_1.contains(bynmonthday, ii.nmdaymask[currentDay]) || helpers_1.notEmpty(byyearday) && (currentDay < ii.yearlen && !helpers_1.contains(byyearday, currentDay + 1) && !helpers_1.contains(byyearday, -ii.yearlen + currentDay) || currentDay >= ii.yearlen && !helpers_1.contains(byyearday, currentDay + 1 - ii.yearlen) && !helpers_1.contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen));
                     if (filtered) dayset[currentDay] = null;
                 }
                 // Output results
-                if (helpers_1.pybool(bysetpos) && helpers_1.pybool(timeset)) {
+                if (helpers_1.notEmpty(bysetpos) && helpers_1.notEmpty(timeset)) {
                     var daypos = void 0;
                     var timepos = void 0;
                     var poslist = [];
@@ -759,7 +759,7 @@ var RRule = function () {
                             day += div;
                             fixday = true;
                         }
-                        if (!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) break;
+                        if (!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) break;
                     }
                     timeset = gettimeset.call(ii, hour, minute, second);
                 } else if (freq === RRule.MINUTELY) {
@@ -785,7 +785,7 @@ var RRule = function () {
                                 filtered = false;
                             }
                         }
-                        if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) && (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute))) {
+                        if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) && (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute))) {
                             break;
                         }
                     }
@@ -819,7 +819,7 @@ var RRule = function () {
                                 }
                             }
                         }
-                        if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) && (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute)) && (!helpers_1.pybool(bysecond) || helpers_1.contains(bysecond, second))) {
+                        if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) && (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute)) && (!helpers_1.notEmpty(bysecond) || helpers_1.contains(bysecond, second))) {
                             break;
                         }
                     }
@@ -1142,10 +1142,10 @@ exports.divmod = divmod;
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-var pybool = function pybool(obj) {
-    return obj instanceof Array && obj.length === 0 ? false : Boolean(obj);
+var notEmpty = function notEmpty(obj) {
+    return !!obj && obj.length !== 0;
 };
-exports.pybool = pybool;
+exports.notEmpty = notEmpty;
 /**
  * Return true if a value is in an array
  */
@@ -1941,7 +1941,7 @@ var Iterinfo = function () {
                     this.wdaymask = masks_1.WDAYMASK.slice(wday);
                     this.mrange = [].concat(masks_1.M366RANGE);
                 }
-                if (!helpers_1.pybool(rr.options.byweekno)) {
+                if (!helpers_1.notEmpty(rr.options.byweekno)) {
                     this.wnomask = null;
                 } else {
                     this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
@@ -2029,10 +2029,10 @@ var Iterinfo = function () {
                     }
                 }
             }
-            if (helpers_1.pybool(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
+            if (helpers_1.notEmpty(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
                 var ranges = [];
                 if (rr.options.freq === rrule_1.default.YEARLY) {
-                    if (helpers_1.pybool(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                    if (helpers_1.notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
                         for (var _j2 = 0; _j2 < rr.options.bymonth.length; _j2++) {
                             month = rr.options.bymonth[_j2];
                             ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -2043,7 +2043,7 @@ var Iterinfo = function () {
                 } else if (rr.options.freq === rrule_1.default.MONTHLY) {
                     ranges = [this.mrange.slice(month - 1, month + 1)];
                 }
-                if (helpers_1.pybool(ranges)) {
+                if (helpers_1.notEmpty(ranges)) {
                     // Weekly frequency won't get here, so we may not
                     // care about cross-year weekly periods.
                     this.nwdaymask = helpers_1.repeat(0, this.yearlen);

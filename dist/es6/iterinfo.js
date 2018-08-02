@@ -67,7 +67,7 @@ class Iterinfo {
                 this.wdaymask = masks_1.WDAYMASK.slice(wday);
                 this.mrange = [].concat(masks_1.M366RANGE);
             }
-            if (!helpers_1.pybool(rr.options.byweekno)) {
+            if (!helpers_1.notEmpty(rr.options.byweekno)) {
                 this.wnomask = null;
             }
             else {
@@ -165,11 +165,11 @@ class Iterinfo {
                 }
             }
         }
-        if (helpers_1.pybool(rr.options.bynweekday) &&
+        if (helpers_1.notEmpty(rr.options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             let ranges = [];
             if (rr.options.freq === rrule_1.default.YEARLY) {
-                if (helpers_1.pybool(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                if (helpers_1.notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
                     for (let j = 0; j < rr.options.bymonth.length; j++) {
                         month = rr.options.bymonth[j];
                         ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -182,7 +182,7 @@ class Iterinfo {
             else if (rr.options.freq === rrule_1.default.MONTHLY) {
                 ranges = [this.mrange.slice(month - 1, month + 1)];
             }
-            if (helpers_1.pybool(ranges)) {
+            if (helpers_1.notEmpty(ranges)) {
                 // Weekly frequency won't get here, so we may not
                 // care about cross-year weekly periods.
                 this.nwdaymask = helpers_1.repeat(0, this.yearlen);

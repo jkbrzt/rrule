@@ -71,8 +71,8 @@ const divmod = function (a: number, b: number) {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-const pybool = function (obj: any[] | any) {
-  return obj instanceof Array && obj.length === 0 ? false : Boolean(obj)
+const notEmpty = function (obj: any[]) {
+  return !!obj && obj.length !== 0
 }
 
 /**
@@ -82,4 +82,4 @@ const contains = function<T>(arr: T[], val: T) {
   return arr.indexOf(val) !== -1
 }
 
-export { range, repeat, split, pymod, divmod, pybool, contains }
+export { range, repeat, split, pymod, divmod, notEmpty, contains }

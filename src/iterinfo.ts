@@ -11,7 +11,7 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { pybool, repeat, pymod, contains, range } from './helpers'
+import { notEmpty, repeat, pymod, contains, range } from './helpers'
 
 export type DaySet = [ number[], number, number ]
 export type GetDayset = () => [number[], number, number]
@@ -103,7 +103,7 @@ export default class Iterinfo {
         this.mrange = [].concat(M366RANGE)
       }
 
-      if (!pybool(rr.options.byweekno)) {
+      if (!notEmpty(rr.options.byweekno)) {
         this.wnomask = null
       } else {
         this.wnomask = repeat(0, this.yearlen + 7) as number[]
@@ -205,12 +205,12 @@ export default class Iterinfo {
     }
 
     if (
-      pybool(rr.options.bynweekday) &&
+      notEmpty(rr.options.bynweekday) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       let ranges: number[][] = []
       if (rr.options.freq === RRule.YEARLY) {
-        if (pybool(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+        if (notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
           for (let j = 0; j < rr.options.bymonth.length; j++) {
             month = rr.options.bymonth[j]
             ranges.push(this.mrange.slice(month - 1, month + 1))
@@ -221,7 +221,7 @@ export default class Iterinfo {
       } else if (rr.options.freq === RRule.MONTHLY) {
         ranges = [this.mrange.slice(month - 1, month + 1)]
       }
-      if (pybool(ranges)) {
+      if (notEmpty(ranges)) {
         // Weekly frequency won't get here, so we may not
         // care about cross-year weekly periods.
         this.nwdaymask = repeat(0, this.yearlen) as number[]

@@ -36,9 +36,9 @@ declare const divmod: (a: number, b: number) => {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-declare const pybool: (obj: any) => boolean;
+declare const notEmpty: (obj: any[]) => boolean;
 /**
  * Return true if a value is in an array
  */
 declare const contains: <T>(arr: T[], val: T) => boolean;
-export { range, repeat, split, pymod, divmod, pybool, contains };
+export { range, repeat, split, pymod, divmod, notEmpty, contains };

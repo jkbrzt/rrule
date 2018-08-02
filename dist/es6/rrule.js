@@ -105,9 +105,11 @@ class RRule {
                 }
             }
         }
-        if (!(helpers_1.pybool(opts.byweekno) ||
-            helpers_1.pybool(opts.byyearday) ||
-            helpers_1.pybool(opts.bymonthday) ||
+        if (!(Boolean(opts.byweekno) ||
+            helpers_1.notEmpty(opts.byweekno) ||
+            helpers_1.notEmpty(opts.byyearday) ||
+            Boolean(opts.bymonthday) ||
+            helpers_1.notEmpty(opts.bymonthday) ||
             opts.byweekday !== null ||
             opts.byeaster !== null)) {
             switch (opts.freq) {
@@ -201,8 +203,8 @@ class RRule {
                     bynweekday.push([wd.weekday, wd.n]);
                 }
             }
-            opts.byweekday = helpers_1.pybool(byweekday) ? byweekday : null;
-            opts.bynweekday = helpers_1.pybool(bynweekday) ? bynweekday : null;
+            opts.byweekday = helpers_1.notEmpty(byweekday) ? byweekday : null;
+            opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
         }
         // byhour
         if (opts.byhour === null) {
@@ -641,11 +643,11 @@ class RRule {
                 [RRule.MINUTELY]: ii.mtimeset,
                 [RRule.SECONDLY]: ii.stimeset
             }[freq];
-            if ((freq >= RRule.HOURLY && helpers_1.pybool(byhour) && !helpers_1.contains(byhour, hour)) ||
+            if ((freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.contains(byhour, hour)) ||
                 (freq >= RRule.MINUTELY &&
-                    helpers_1.pybool(byminute) &&
+                    helpers_1.notEmpty(byminute) &&
                     !helpers_1.contains(byminute, minute)) ||
-                (freq >= RRule.SECONDLY && helpers_1.pybool(bysecond) && !helpers_1.contains(bysecond, second))) {
+                (freq >= RRule.SECONDLY && helpers_1.notEmpty(bysecond) && !helpers_1.contains(bysecond, second))) {
                 timeset = [];
             }
             else {
@@ -667,16 +669,16 @@ class RRule {
             for (let dayCounter = start; dayCounter < end; dayCounter++) {
                 currentDay = dayset[dayCounter];
                 filtered =
-                    (helpers_1.pybool(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay])) ||
-                        (helpers_1.pybool(byweekno) && !ii.wnomask[currentDay]) ||
-                        (helpers_1.pybool(byweekday) &&
+                    (helpers_1.notEmpty(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay])) ||
+                        (helpers_1.notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
+                        (helpers_1.notEmpty(byweekday) &&
                             !helpers_1.contains(byweekday, ii.wdaymask[currentDay])) ||
-                        (helpers_1.pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+                        (helpers_1.notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
                         (byeaster !== null && !helpers_1.contains(ii.eastermask, currentDay)) ||
-                        ((helpers_1.pybool(bymonthday) || helpers_1.pybool(bynmonthday)) &&
+                        ((helpers_1.notEmpty(bymonthday) || helpers_1.notEmpty(bynmonthday)) &&
                             !helpers_1.contains(bymonthday, ii.mdaymask[currentDay]) &&
                             !helpers_1.contains(bynmonthday, ii.nmdaymask[currentDay])) ||
-                        (helpers_1.pybool(byyearday) &&
+                        (helpers_1.notEmpty(byyearday) &&
                             ((currentDay < ii.yearlen &&
                                 !helpers_1.contains(byyearday, currentDay + 1) &&
                                 !helpers_1.contains(byyearday, -ii.yearlen + currentDay)) ||
@@ -687,7 +689,7 @@ class RRule {
                     dayset[currentDay] = null;
             }
             // Output results
-            if (helpers_1.pybool(bysetpos) && helpers_1.pybool(timeset)) {
+            if (helpers_1.notEmpty(bysetpos) && helpers_1.notEmpty(timeset)) {
                 let daypos;
                 let timepos;
                 const poslist = [];
@@ -836,7 +838,7 @@ class RRule {
                         day += div;
                         fixday = true;
                     }
-                    if (!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour))
+                    if (!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour))
                         break;
                 }
                 timeset = gettimeset.call(ii, hour, minute, second);
@@ -865,8 +867,8 @@ class RRule {
                             filtered = false;
                         }
                     }
-                    if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute))) {
+                    if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute))) {
                         break;
                     }
                 }
@@ -902,9 +904,9 @@ class RRule {
                             }
                         }
                     }
-                    if ((!helpers_1.pybool(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.pybool(byminute) || helpers_1.contains(byminute, minute)) &&
-                        (!helpers_1.pybool(bysecond) || helpers_1.contains(bysecond, second))) {
+                    if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) &&
+                        (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute)) &&
+                        (!helpers_1.notEmpty(bysecond) || helpers_1.contains(bysecond, second))) {
                         break;
                     }
                 }

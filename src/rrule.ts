@@ -1,7 +1,7 @@
 import Weekday from './weekday'
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
-import { pymod, divmod, pybool, contains } from './helpers'
+import { pymod, divmod, notEmpty, contains } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
@@ -234,9 +234,11 @@ export default class RRule {
 
     if (
       !(
-        pybool(opts.byweekno) ||
-        pybool(opts.byyearday) ||
-        pybool(opts.bymonthday) ||
+        Boolean(opts.byweekno as number) ||
+        notEmpty(opts.byweekno as number[]) ||
+        notEmpty(opts.byyearday) ||
+        Boolean(opts.bymonthday) ||
+        notEmpty(opts.bymonthday as number[]) ||
         opts.byweekday !== null ||
         opts.byeaster !== null
       )
@@ -330,8 +332,8 @@ export default class RRule {
           bynweekday.push([wd.weekday, wd.n])
         }
       }
-      opts.byweekday = pybool(byweekday) ? byweekday : null
-      opts.bynweekday = pybool(bynweekday) ? bynweekday : null
+      opts.byweekday = notEmpty(byweekday) ? byweekday : null
+      opts.bynweekday = notEmpty(bynweekday) ? bynweekday : null
     }
 
     // byhour
@@ -825,11 +827,11 @@ export default class RRule {
       }[freq]
 
       if (
-        (freq >= RRule.HOURLY && pybool(byhour) && !contains(byhour, hour)) ||
+        (freq >= RRule.HOURLY && notEmpty(byhour) && !contains(byhour, hour)) ||
         (freq >= RRule.MINUTELY &&
-          pybool(byminute) &&
+          notEmpty(byminute) &&
           !contains(byminute, minute)) ||
-        (freq >= RRule.SECONDLY && pybool(bysecond) && !contains(bysecond, second))
+        (freq >= RRule.SECONDLY && notEmpty(bysecond) && !contains(bysecond, second))
       ) {
         timeset = []
       } else {
@@ -861,16 +863,16 @@ export default class RRule {
         currentDay = dayset[dayCounter]
 
         filtered =
-          (pybool(bymonth) && !contains(bymonth, ii.mmask[currentDay])) ||
-          (pybool(byweekno) && !ii.wnomask[currentDay]) ||
-          (pybool(byweekday) &&
+          (notEmpty(bymonth) && !contains(bymonth, ii.mmask[currentDay])) ||
+          (notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
+          (notEmpty(byweekday) &&
             !contains(byweekday, ii.wdaymask[currentDay])) ||
-          (pybool(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+          (notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
           (byeaster !== null && !contains(ii.eastermask, currentDay)) ||
-          ((pybool(bymonthday) || pybool(bynmonthday)) &&
+          ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
             !contains(bymonthday, ii.mdaymask[currentDay]) &&
             !contains(bynmonthday, ii.nmdaymask[currentDay])) ||
-          (pybool(byyearday) &&
+          (notEmpty(byyearday) &&
             ((currentDay < ii.yearlen &&
               !contains(byyearday, currentDay + 1) &&
               !contains(byyearday, -ii.yearlen + currentDay)) ||
@@ -882,7 +884,7 @@ export default class RRule {
       }
 
       // Output results
-      if (pybool(bysetpos) && pybool(timeset)) {
+      if (notEmpty(bysetpos) && notEmpty(timeset)) {
         let daypos: number
         let timepos: number
         const poslist: Date[] = []
@@ -1024,7 +1026,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!pybool(byhour) || contains(byhour, hour)) break
+          if (!notEmpty(byhour) || contains(byhour, hour)) break
         }
         timeset = gettimeset.call(ii, hour, minute, second)
       } else if (freq === RRule.MINUTELY) {
@@ -1053,8 +1055,8 @@ export default class RRule {
             }
           }
           if (
-            (!pybool(byhour) || contains(byhour, hour)) &&
-            (!pybool(byminute) || contains(byminute, minute))
+            (!notEmpty(byhour) || contains(byhour, hour)) &&
+            (!notEmpty(byminute) || contains(byminute, minute))
           ) {
             break
           }
@@ -1093,9 +1095,9 @@ export default class RRule {
             }
           }
           if (
-            (!pybool(byhour) || contains(byhour, hour)) &&
-            (!pybool(byminute) || contains(byminute, minute)) &&
-            (!pybool(bysecond) || contains(bysecond, second))
+            (!notEmpty(byhour) || contains(byhour, hour)) &&
+            (!notEmpty(byminute) || contains(byminute, minute)) &&
+            (!notEmpty(bysecond) || contains(bysecond, second))
           ) {
             break
           }

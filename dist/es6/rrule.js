@@ -186,12 +186,14 @@ class RRule {
                 const wday = opts.byweekday[i];
                 if (typeof wday === 'number') {
                     byweekday.push(wday);
+                    continue;
                 }
-                else if (!wday.n || opts.freq > RRule.MONTHLY) {
-                    byweekday.push(wday.weekday);
+                const wd = wday;
+                if (!wd.n || opts.freq > RRule.MONTHLY) {
+                    byweekday.push(wd.weekday);
                 }
                 else {
-                    bynweekday.push([wday.weekday, wday.n]);
+                    bynweekday.push([wd.weekday, wd.n]);
                 }
             }
             opts.byweekday = helpers_1.plb(byweekday) ? byweekday : null;
@@ -750,8 +752,9 @@ class RRule {
                     }
                     else if (res >= dtstart) {
                         ++total;
-                        if (!iterResult.accept(res))
+                        if (!iterResult.accept(res)) {
                             return iterResult.getValue();
+                        }
                         if (count) {
                             --count;
                             if (!count) {

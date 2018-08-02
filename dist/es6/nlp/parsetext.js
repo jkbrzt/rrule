@@ -155,7 +155,6 @@ function parseText(text, language) {
             case 'sunday':
                 options.freq = index_1.default.WEEKLY;
                 const key = ttr.symbol.substr(0, 2).toUpperCase();
-                // @ts-ignore
                 options.byweekday = [index_1.default[key]];
                 if (!ttr.nextSymbol())
                     return;

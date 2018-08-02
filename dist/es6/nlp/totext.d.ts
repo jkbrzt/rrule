@@ -11,7 +11,7 @@ export declare type GetText = (id: string | number | Weekday) => string;
  * @constructor
  */
 export default class ToText {
-    static IMPLEMENTED: any[];
+    static IMPLEMENTED: string[][];
     private rrule;
     private text;
     private gettext;

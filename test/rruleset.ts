@@ -1,5 +1,3 @@
-/* global describe */
-
 import { parse, datetime, testRecurring } from './lib/utils'
 import { RRule, RRuleSet } from '../src'
 

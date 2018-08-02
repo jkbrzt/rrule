@@ -417,10 +417,13 @@ var RRule = function () {
                 var wday = opts.byweekday[_i2];
                 if (typeof wday === 'number') {
                     byweekday.push(wday);
-                } else if (!wday.n || opts.freq > RRule.MONTHLY) {
-                    byweekday.push(wday.weekday);
+                    continue;
+                }
+                var wd = wday;
+                if (!wd.n || opts.freq > RRule.MONTHLY) {
+                    byweekday.push(wd.weekday);
                 } else {
-                    bynweekday.push([wday.weekday, wday.n]);
+                    bynweekday.push([wd.weekday, wd.n]);
                 }
             }
             opts.byweekday = helpers_1.plb(byweekday) ? byweekday : null;
@@ -792,7 +795,9 @@ var RRule = function () {
                             return iterResult.getValue();
                         } else if (_res >= dtstart) {
                             ++total;
-                            if (!iterResult.accept(_res)) return iterResult.getValue();
+                            if (!iterResult.accept(_res)) {
+                                return iterResult.getValue();
+                            }
                             if (count) {
                                 --count;
                                 if (!count) {
@@ -2889,7 +2894,6 @@ function parseText(text, language) {
             case 'sunday':
                 options.freq = index_1.default.WEEKLY;
                 var key = ttr.symbol.substr(0, 2).toUpperCase();
-                // @ts-ignore
                 options.byweekday = [index_1.default[key]];
                 if (!ttr.nextSymbol()) return;
                 // TODO check for duplicates
@@ -3167,9 +3171,8 @@ var RRuleStr = function () {
 
     _createClass(RRuleStr, [{
         key: "_handle_DTSTART",
-        value: function _handle_DTSTART(rrkwargs, name, value, _) {
-            // @ts-ignore
-            rrkwargs[name.toLowerCase()] = dateutil_1.default.untilStringToDate(value);
+        value: function _handle_DTSTART(rrkwargs, _, value, __) {
+            rrkwargs['dtstart'] = dateutil_1.default.untilStringToDate(value);
         }
     }, {
         key: "_handle_int",
@@ -3188,13 +3191,11 @@ var RRuleStr = function () {
     }, {
         key: "_handle_FREQ",
         value: function _handle_FREQ(rrkwargs, _, value, __) {
-            // eslint-disable-line
             rrkwargs['freq'] = RRuleStr._freq_map[value];
         }
     }, {
         key: "_handle_UNTIL",
         value: function _handle_UNTIL(rrkwargs, _, value, __) {
-            // eslint-disable-line
             try {
                 rrkwargs['until'] = dateutil_1.default.untilStringToDate(value);
             } catch (error) {
@@ -3204,7 +3205,6 @@ var RRuleStr = function () {
     }, {
         key: "_handle_WKST",
         value: function _handle_WKST(rrkwargs, _, value, __) {
-            // eslint-disable-line
             rrkwargs['wkst'] = RRuleStr._weekday_map[value];
         }
     }, {
@@ -3317,8 +3317,6 @@ var RRuleStr = function () {
             var name = void 0;
             var value = void 0;
             var parts = void 0;
-            var parms = void 0;
-            var parm = void 0;
             var dtstart = void 0;
             var rset = void 0;
             var j = void 0;
@@ -3344,35 +3342,35 @@ var RRuleStr = function () {
                         name = parts[0];
                         value = parts[1];
                     }
-                    parms = name.split(';');
+                    var parms = name.split(';');
                     if (!parms) throw new Error('empty property name');
                     name = parms[0];
                     parms = parms.slice(1);
                     if (name === 'RRULE') {
                         for (j = 0; j < parms.length; j++) {
-                            parm = parms[j];
+                            var parm = parms[j];
                             throw new Error('unsupported RRULE parm: ' + parm);
                         }
                         rrulevals.push(value);
                     } else if (name === 'RDATE') {
                         for (j = 0; j < parms.length; j++) {
-                            parm = parms[j];
-                            if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                                throw new Error('unsupported RDATE parm: ' + parm);
+                            var _parm = parms[j];
+                            if (_parm !== 'VALUE=DATE-TIME' && _parm !== 'VALUE=DATE') {
+                                throw new Error('unsupported RDATE parm: ' + _parm);
                             }
                         }
                         rdatevals.push(value);
                     } else if (name === 'EXRULE') {
                         for (j = 0; j < parms.length; j++) {
-                            parm = parms[j];
-                            throw new Error('unsupported EXRULE parm: ' + parm);
+                            var _parm2 = parms[j];
+                            throw new Error('unsupported EXRULE parm: ' + _parm2);
                         }
                         exrulevals.push(value);
                     } else if (name === 'EXDATE') {
                         for (j = 0; j < parms.length; j++) {
-                            parm = parms[j];
-                            if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                                throw new Error('unsupported EXDATE parm: ' + parm);
+                            var _parm3 = parms[j];
+                            if (_parm3 !== 'VALUE=DATE-TIME' && _parm3 !== 'VALUE=DATE') {
+                                throw new Error('unsupported EXDATE parm: ' + _parm3);
                             }
                         }
                         exdatevals.push(value);
@@ -3440,7 +3438,6 @@ var RRuleStr = function () {
             }
             // Merge in default options
             defaultKeys.forEach(function (key) {
-                // @ts-ignore
                 if (!helpers_1.contains(keys, key)) options[key] = RRuleStr.DEFAULT_OPTIONS[key];
             });
             return this._parseRfc(s, options);

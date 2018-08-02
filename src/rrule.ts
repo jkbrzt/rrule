@@ -71,7 +71,7 @@ export interface Options {
 type CacheKeys = 'before' | 'after' | 'between'
 
 type CacheBase = { [K in CacheKeys]: IterArgs[] }
-export type Cache = CacheBase & { all: Date[] | IterArgs[] | false }
+export type Cache = CacheBase & { all: Date[] | Partial<IterArgs>[] | false }
 
 export type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
 
@@ -309,10 +309,14 @@ export default class RRule {
 
         if (typeof wday === 'number') {
           byweekday.push(wday)
-        } else if (!(wday as Weekday).n || opts.freq > RRule.MONTHLY) {
-          byweekday.push((wday as Weekday).weekday)
+          continue
+        }
+
+        const wd = wday as Weekday
+        if (!wd.n || opts.freq > RRule.MONTHLY) {
+          byweekday.push(wd.weekday)
         } else {
-          bynweekday.push([(wday as Weekday).weekday, (wday as Weekday).n])
+          bynweekday.push([wd.weekday, wd.n])
         }
       }
       opts.byweekday = plb(byweekday) ? byweekday : null
@@ -690,11 +694,11 @@ export default class RRule {
     if (!this._cache) return false
 
     let cached: Date | Date[] | false = false
-    const argsKeys = args ? Object.keys(args) : []
-    const findCacheDiff = function (item: any) {
+    const argsKeys = args ? Object.keys(args) as (keyof IterArgs)[] : []
+    const findCacheDiff = function (item: IterArgs) {
       for (let i = 0; i < argsKeys.length; i++) {
         const key = argsKeys[i]
-        if (String(args[key as keyof IterArgs]) !== String(item[key])) {
+        if (String(args[key]) !== String(item[key])) {
           return true
         }
       }
@@ -708,9 +712,9 @@ export default class RRule {
       // Let's see whether we've already called the
       // 'what' method with the same 'args'
       for (let i = 0; i < cachedObject.length; i++) {
-        const item = cachedObject[i]
+        const item = cachedObject[i] as IterArgs
         if (argsKeys.length && findCacheDiff(item)) continue
-        cached = (item as IterArgs)._value
+        cached = item._value
         break
       }
     }
@@ -827,15 +831,15 @@ export default class RRule {
     let count = this.options.count
     let i: number
     let k: number
-    let dm
-    let div
-    let mod
-    let tmp
-    let pos
-    let dayset
+    let dm: { div: number, mod: number }
+    let div: number
+    let mod: number
+    let tmp: any[]
+    let pos: number
+    let dayset: number[]
     let start: number
     let end: number
-    let fixday
+    let fixday: boolean
     let filtered: boolean
 
     while (true) {
@@ -921,7 +925,9 @@ export default class RRule {
             return iterResult.getValue() as Date[]
           } else if (res >= dtstart) {
             ++total
-            if (!iterResult.accept(res)) return iterResult.getValue() as Date[]
+            if (!iterResult.accept(res)) {
+              return iterResult.getValue() as Date[]
+            }
             if (count) {
               --count
               if (!count) {
@@ -1120,20 +1126,20 @@ export default class RRule {
 
 class Iterinfo {
   public rrule: RRule
-  public lastyear: number | null
-  public lastmonth: number | null
-  public yearlen: number | null
-  public nextyearlen: number | null
-  public yearordinal: number | null
-  public yearweekday: number | null
-  public mmask: number[] | null
-  public mrange: number[] | null
-  public mdaymask: number[] | null
-  public nmdaymask: number[] | null
-  public wdaymask: number[] | number[] | null
-  public wnomask: number[] | null
-  public nwdaymask: number[] | null
-  public eastermask: number[] | null
+  public lastyear: number
+  public lastmonth: number
+  public yearlen: number
+  public nextyearlen: number
+  public yearordinal: number
+  public yearweekday: number
+  public mmask: number[]
+  public mrange: number[]
+  public mdaymask: number[]
+  public nmdaymask: number[]
+  public wdaymask: number[]
+  public wnomask: number[]
+  public nwdaymask: number[]
+  public eastermask: number[]
 
   constructor (rrule: RRule) {
     this.rrule = rrule

@@ -3,7 +3,7 @@ export interface IterArgs {
     before: Date;
     after: Date;
     dt: Date;
-    _value: any;
+    _value: Date | Date[];
 }
 /**
  * This class helps us to emulate python's generators, sorta.
@@ -13,7 +13,7 @@ export default class IterResult {
     readonly args: Partial<IterArgs>;
     readonly minDate: Date | null;
     readonly maxDate: Date | null;
-    _result: (Date | IterArgs)[];
+    _result: (Date | Partial<IterArgs>)[];
     constructor(method: string, args: Partial<IterArgs>);
     /**
      * Possibly adds a date into the result.
@@ -23,18 +23,18 @@ export default class IterResult {
      * @return {Boolean} true if it makes sense to continue the iteration
      *                   false if we're done.
      */
-    accept(date: Date | IterArgs): boolean;
+    accept(date: Date | Partial<IterArgs>): boolean;
     /**
      *
      * @param {Date} date that is part of the result.
      * @return {Boolean} whether we are interested in more values.
      */
-    add(date: Date | IterArgs): boolean;
+    add(date: Date | Partial<IterArgs>): boolean;
     /**
      * 'before' and 'after' return only one date, whereas 'all'
      * and 'between' an array.
      * @return {Date,Array?}
      */
-    getValue(): Date | IterArgs | (Date | IterArgs)[];
+    getValue(): Date | Partial<IterArgs> | (Date | Partial<IterArgs>)[];
     clone(): IterResult;
 }

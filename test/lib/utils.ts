@@ -1,5 +1,3 @@
-/* global it */
-
 import { expect } from 'chai'
 import { RRule, RRuleSet } from '../../src'
 
@@ -42,7 +40,7 @@ export const datetimeUTC = function (y: number, m: number, d: number, h: number 
  */
 export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
-  let [ _, y, m, d, h, i, s ] = parts // eslint-disable-line
+  let [ _, y, m, d, h, i, s ] = parts
   const year = Number(y)
   const month = Number(m[0] === '0' ? m[1] : m) - 1
   const day = Number(d[0] === '0' ? d[1] : d)
@@ -57,7 +55,7 @@ interface TestRecurring {
   skip: (...args: any[]) => void
 }
 
-export const testRecurring: TestRecurring = function (msg: string, testObj: any, expectedDates: Date | Date[]) {
+export const testRecurring = function (msg: string, testObj: any, expectedDates: Date | Date[]) {
   let rule: any
   let method: string
   let args: any
@@ -109,7 +107,7 @@ export const testRecurring: TestRecurring = function (msg: string, testObj: any,
     if (ctx.ALSO_TEST_STRING_FUNCTIONS) {
       // Test toString()/fromString()
       const str = rule.toString()
-      const rrule2 = RRule.fromString(str /*, rule.options.dtstart */)
+      const rrule2 = RRule.fromString(str)
       const string2 = rrule2.toString()
       expect(str).to.equal(string2, 'toString() == fromString(toString()).toString()')
       if (method === 'all') {

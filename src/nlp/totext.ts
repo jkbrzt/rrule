@@ -29,7 +29,7 @@ export type GetText = (id: string | number | Weekday) => string
  * @constructor
  */
 export default class ToText {
-  static IMPLEMENTED: any[]
+  static IMPLEMENTED: string[][]
   private rrule: RRule
   private text: string[]
   private gettext: GetText

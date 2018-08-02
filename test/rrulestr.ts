@@ -1,5 +1,3 @@
-/* global describe */
-
 import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr } from '../src'
 

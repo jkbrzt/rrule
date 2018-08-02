@@ -5,7 +5,7 @@ import Weekday from './weekday'
 import { contains, split } from './helpers'
 
 export interface RRuleStrOptions {
-  dtstart: any
+  dtstart: Date
   cache: boolean
   unfold: boolean
   forceset: boolean
@@ -23,9 +23,8 @@ type FreqKey = keyof typeof Frequency
 
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
-  private _handle_DTSTART (rrkwargs: Options, name: string, value: string, _: any) {
-    // @ts-ignore
-    rrkwargs[name.toLowerCase()] = dateutil.untilStringToDate(value)
+  private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
+    rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
   }
 
   // tslint:disable-next-line:variable-name
@@ -79,12 +78,10 @@ export default class RRuleStr {
   }
 
   private _handle_FREQ (rrkwargs: Options, _: any, value: FreqKey, __: any) {
-    // eslint-disable-line
     rrkwargs['freq'] = RRuleStr._freq_map[value]
   }
 
   private _handle_UNTIL (rrkwargs: Options, _: any, value: string, __: any) {
-    // eslint-disable-line
     try {
       rrkwargs['until'] = dateutil.untilStringToDate(value)
     } catch (error) {
@@ -93,7 +90,6 @@ export default class RRuleStr {
   }
 
   private _handle_WKST (rrkwargs: Options, _: any, value: WeekdayStr, __: any) {
-    // eslint-disable-line
     rrkwargs['wkst'] = RRuleStr._weekday_map[value]
   }
 
@@ -138,7 +134,7 @@ export default class RRuleStr {
   }
 
   private _parseRfcRRule (
-    line: any,
+    line: string,
     options: Partial<RRuleStrOptions> = {}
   ) {
     options.dtstart = options.dtstart || null
@@ -221,8 +217,6 @@ export default class RRuleStr {
     let name: string
     let value: string
     let parts: string[]
-    let parms: any
-    let parm: any
     let dtstart: Date
     let rset: RRuleSet
     let j: number
@@ -253,20 +247,20 @@ export default class RRuleStr {
           name = parts[0]
           value = parts[1]
         }
-        parms = name.split(';')
+        let parms = name.split(';')
         if (!parms) throw new Error('empty property name')
         name = parms[0]
         parms = parms.slice(1)
 
         if (name === 'RRULE') {
           for (j = 0; j < parms.length; j++) {
-            parm = parms[j]
+            const parm = parms[j]
             throw new Error('unsupported RRULE parm: ' + parm)
           }
           rrulevals.push(value)
         } else if (name === 'RDATE') {
           for (j = 0; j < parms.length; j++) {
-            parm = parms[j]
+            const parm = parms[j]
             if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
               throw new Error('unsupported RDATE parm: ' + parm)
             }
@@ -274,13 +268,13 @@ export default class RRuleStr {
           rdatevals.push(value)
         } else if (name === 'EXRULE') {
           for (j = 0; j < parms.length; j++) {
-            parm = parms[j]
+            const parm = parms[j]
             throw new Error('unsupported EXRULE parm: ' + parm)
           }
           exrulevals.push(value)
         } else if (name === 'EXDATE') {
           for (j = 0; j < parms.length; j++) {
-            parm = parms[j]
+            const parm = parms[j]
             if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
               throw new Error('unsupported EXDATE parm: ' + parm)
             }
@@ -348,9 +342,9 @@ export default class RRuleStr {
   }
 
   parse (s: string, options: Partial<RRuleStrOptions> = {}): RRule | RRuleSet {
-    const invalid: any[] = []
-    const keys = Object.keys(options)
-    const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS)
+    const invalid: string[] = []
+    const keys = Object.keys(options) as (keyof typeof options)[]
+    const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS) as (keyof typeof RRuleStr.DEFAULT_OPTIONS)[]
 
     keys.forEach(function (key) {
       if (!contains(defaultKeys, key)) invalid.push(key)
@@ -361,8 +355,7 @@ export default class RRuleStr {
     }
 
     // Merge in default options
-    defaultKeys.forEach(function (key: keyof Options) {
-      // @ts-ignore
+    defaultKeys.forEach(function (key) {
       if (!contains(keys, key)) options[key] = RRuleStr.DEFAULT_OPTIONS[key]
     })
 

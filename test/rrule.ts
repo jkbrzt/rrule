@@ -1,7 +1,6 @@
 import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
-// @ts-ignore
-import { RRule, rrulestr } from '../src/index'
+import { RRule, rrulestr, Frequency } from '../src/index'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -3527,10 +3526,9 @@ describe('RRule', function () {
   )
 
   it('testAfterBefore', function () {
-    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freqStr) {
+    'YEARLY,MONTHLY,DAILY,HOURLY,MINUTELY,SECONDLY'.split(',').forEach(function (freqStr: keyof typeof Frequency) {
       const date = new Date(1356991200001)
       const rr = new RRule({
-        // @ts-ignore
         freq: RRule[freqStr],
         dtstart: date
       })

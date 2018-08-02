@@ -7,7 +7,7 @@ export interface IterArgs {
   before: Date
   after: Date
   dt: Date
-  _value: any
+  _value: Date | Date[]
 }
 
 /**
@@ -18,7 +18,7 @@ export default class IterResult {
   public readonly args: Partial<IterArgs>
   public readonly minDate: Date | null
   public readonly maxDate: Date | null
-  public _result: (Date | IterArgs)[]
+  public _result: (Date | Partial<IterArgs>)[]
 
   constructor (method: string, args: Partial<IterArgs>) {
     this.method = method
@@ -47,7 +47,7 @@ export default class IterResult {
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept (date: Date | IterArgs) {
+  accept (date: Date | Partial<IterArgs>) {
     const tooEarly = this.minDate && date < this.minDate
     const tooLate = this.maxDate && date > this.maxDate
 
@@ -70,7 +70,7 @@ export default class IterResult {
    * @param {Date} date that is part of the result.
    * @return {Boolean} whether we are interested in more values.
    */
-  add (date: Date | IterArgs) {
+  add (date: Date | Partial<IterArgs>) {
     this._result.push(date)
     return true
   }

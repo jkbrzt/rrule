@@ -37,7 +37,7 @@ declare type CacheBase = {
     [K in CacheKeys]: IterArgs[];
 };
 export declare type Cache = CacheBase & {
-    all: Date[] | IterArgs[] | false;
+    all: Date[] | Partial<IterArgs>[] | false;
 };
 export declare type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
 export declare type ByWeekday = WeekdayStr | number | Weekday;

@@ -152,9 +152,7 @@ export default class RRule {
 
     // used by toString()
     this.origOptions = this.initializeOptions(options)
-    this.options = this.initializeOptions(options)
-
-    this.parseOptions(options)
+    this.options = this.parseOptions(options)
   }
 
   private initializeOptions (options: Partial<Options>) {
@@ -176,6 +174,7 @@ export default class RRule {
   }
 
   private parseOptions (options: Partial<Options>) {
+    const opts: Partial<Options> = this.initializeOptions(options)
     const keys = Object.keys(options) as (keyof Options)[]
 
     if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
@@ -184,10 +183,8 @@ export default class RRule {
 
     // Merge in default options
     this.defaultKeys.forEach(key => {
-      if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
+      if (!contains(keys, key)) opts[key] = RRule.DEFAULT_OPTIONS[key]
     })
-
-    const opts: Partial<Options> = this.options
 
     if (opts.byeaster !== null) opts.freq = RRule.YEARLY
     if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
@@ -360,6 +357,8 @@ export default class RRule {
       }
       dateutil.sort(this.timeset)
     }
+
+    return opts
   }
 
   static parseText (text: string, language: Language) {

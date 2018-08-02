@@ -53,8 +53,7 @@ class RRule {
             };
         // used by toString()
         this.origOptions = this.initializeOptions(options);
-        this.options = this.initializeOptions(options);
-        this.parseOptions(options);
+        this.options = this.parseOptions(options);
     }
     initializeOptions(options) {
         const invalid = [];
@@ -72,6 +71,7 @@ class RRule {
         return initializedOptions;
     }
     parseOptions(options) {
+        const opts = this.initializeOptions(options);
         const keys = Object.keys(options);
         if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
             throw new Error('Invalid frequency: ' + String(options.freq));
@@ -79,9 +79,8 @@ class RRule {
         // Merge in default options
         this.defaultKeys.forEach(key => {
             if (!helpers_1.contains(keys, key))
-                this.options[key] = RRule.DEFAULT_OPTIONS[key];
+                opts[key] = RRule.DEFAULT_OPTIONS[key];
         });
-        const opts = this.options;
         if (opts.byeaster !== null)
             opts.freq = RRule.YEARLY;
         if (!opts.dtstart)
@@ -248,6 +247,7 @@ class RRule {
             }
             dateutil_1.default.sort(this.timeset);
         }
+        return opts;
     }
     static parseText(text, language) {
         return getnlp().parseText(text, language);

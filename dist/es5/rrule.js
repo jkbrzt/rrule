@@ -167,8 +167,7 @@ var RRule = function () {
         };
         // used by toString()
         this.origOptions = this.initializeOptions(options);
-        this.options = this.initializeOptions(options);
-        this.parseOptions(options);
+        this.options = this.parseOptions(options);
     }
 
     _createClass(RRule, [{
@@ -192,17 +191,15 @@ var RRule = function () {
     }, {
         key: "parseOptions",
         value: function parseOptions(options) {
-            var _this2 = this;
-
+            var opts = this.initializeOptions(options);
             var keys = Object.keys(options);
             if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
                 throw new Error('Invalid frequency: ' + String(options.freq));
             }
             // Merge in default options
             this.defaultKeys.forEach(function (key) {
-                if (!helpers_1.contains(keys, key)) _this2.options[key] = RRule.DEFAULT_OPTIONS[key];
+                if (!helpers_1.contains(keys, key)) opts[key] = RRule.DEFAULT_OPTIONS[key];
             });
-            var opts = this.options;
             if (opts.byeaster !== null) opts.freq = RRule.YEARLY;
             if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0));
             var millisecondModulo = opts.dtstart.getTime() % 1000;
@@ -344,6 +341,7 @@ var RRule = function () {
                 }
                 dateutil_1.default.sort(this.timeset);
             }
+            return opts;
         }
     }, {
         key: "all",

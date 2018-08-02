@@ -57,12 +57,12 @@ class RRule {
         const keys = Object.keys(options);
         const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         // Shallow copy for options and origOptions and check for invalid
-        keys.forEach(function (key) {
+        keys.forEach(key => {
             this.origOptions[key] = options[key];
             this.options[key] = options[key];
             if (!helpers_1.contains(defaultKeys, key))
                 invalid.push(key);
-        }, this);
+        });
         if (invalid.length) {
             throw new Error('Invalid options: ' + invalid.join(', '));
         }
@@ -70,10 +70,10 @@ class RRule {
             throw new Error('Invalid frequency: ' + String(options.freq));
         }
         // Merge in default options
-        defaultKeys.forEach(function (key) {
+        defaultKeys.forEach(key => {
             if (!helpers_1.contains(keys, key))
                 this.options[key] = RRule.DEFAULT_OPTIONS[key];
-        }, this);
+        });
         const opts = this.options;
         if (opts.byeaster !== null)
             opts.freq = RRule.YEARLY;
@@ -89,12 +89,11 @@ class RRule {
         else {
             opts.wkst = opts.wkst.weekday;
         }
-        let v;
         if (opts.bysetpos !== null) {
             if (typeof opts.bysetpos === 'number')
                 opts.bysetpos = [opts.bysetpos];
             for (let i = 0; i < opts.bysetpos.length; i++) {
-                v = opts.bysetpos[i];
+                const v = opts.bysetpos[i];
                 if (v === 0 || !(v >= -366 && v <= 366)) {
                     throw new Error('bysetpos must be between 1 and 366,' + ' or between -366 and -1');
                 }
@@ -136,7 +135,7 @@ class RRule {
             const bymonthday = [];
             const bynmonthday = [];
             for (let i = 0; i < opts.bymonthday.length; i++) {
-                v = opts.bymonthday[i];
+                const v = opts.bymonthday[i];
                 if (v > 0) {
                     bymonthday.push(v);
                 }
@@ -253,15 +252,12 @@ class RRule {
         rfcString = rfcString.replace(/^\s+|\s+$/, '');
         if (!rfcString.length)
             return null;
-        let key;
-        let value;
-        let attr;
         const attrs = rfcString.split(';');
         const options = {};
         for (let i = 0; i < attrs.length; i++) {
-            attr = attrs[i].split('=');
-            key = attr[0];
-            value = attr[1];
+            const attr = attrs[i].split('=');
+            const key = attr[0];
+            const value = attr[1];
             switch (key) {
                 case 'FREQ':
                     options.freq = Frequency[value];
@@ -279,20 +275,27 @@ class RRule {
                 case 'BYHOUR':
                 case 'BYMINUTE':
                 case 'BYSECOND':
+                    let num;
                     if (value.indexOf(',') !== -1) {
-                        value = value.split(',');
-                        for (let j = 0; j < value.length; j++) {
-                            if (/^[+-]?\d+$/.test(value[j].toString())) {
-                                value[j] = Number(value[j]);
+                        const values = value.split(',');
+                        num = values.map(val => {
+                            if (/^[+-]?\d+$/.test(val.toString())) {
+                                return Number(val);
                             }
-                        }
+                            else {
+                                return val;
+                            }
+                        });
                     }
                     else if (/^[+-]?\d+$/.test(value)) {
-                        value = Number(value);
+                        num = Number(value);
                     }
-                    key = key.toLowerCase();
+                    else {
+                        num = value;
+                    }
+                    const optionKey = key.toLowerCase();
                     // @ts-ignore
-                    options[key] = value;
+                    options[optionKey] = num;
                     break;
                 case 'BYDAY': // => byweekday
                     let n;
@@ -943,13 +946,13 @@ RRule.FREQUENCIES = [
     'MINUTELY',
     'SECONDLY'
 ];
-RRule.YEARLY = 0;
-RRule.MONTHLY = 1;
-RRule.WEEKLY = 2;
-RRule.DAILY = 3;
-RRule.HOURLY = 4;
-RRule.MINUTELY = 5;
-RRule.SECONDLY = 6;
+RRule.YEARLY = Frequency.YEARLY;
+RRule.MONTHLY = Frequency.MONTHLY;
+RRule.WEEKLY = Frequency.WEEKLY;
+RRule.DAILY = Frequency.DAILY;
+RRule.HOURLY = Frequency.HOURLY;
+RRule.MINUTELY = Frequency.MINUTELY;
+RRule.SECONDLY = Frequency.SECONDLY;
 RRule.DEFAULT_OPTIONS = {
     freq: null,
     dtstart: null,

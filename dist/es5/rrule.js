@@ -149,6 +149,8 @@ var Days = {
 
 var RRule = function () {
     function RRule() {
+        var _this = this;
+
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         var noCache = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -170,10 +172,10 @@ var RRule = function () {
         var defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         // Shallow copy for options and origOptions and check for invalid
         keys.forEach(function (key) {
-            this.origOptions[key] = options[key];
-            this.options[key] = options[key];
+            _this.origOptions[key] = options[key];
+            _this.options[key] = options[key];
             if (!helpers_1.contains(defaultKeys, key)) invalid.push(key);
-        }, this);
+        });
         if (invalid.length) {
             throw new Error('Invalid options: ' + invalid.join(', '));
         }
@@ -182,8 +184,8 @@ var RRule = function () {
         }
         // Merge in default options
         defaultKeys.forEach(function (key) {
-            if (!helpers_1.contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key];
-        }, this);
+            if (!helpers_1.contains(keys, key)) _this.options[key] = RRule.DEFAULT_OPTIONS[key];
+        });
         var opts = this.options;
         if (opts.byeaster !== null) opts.freq = RRule.YEARLY;
         if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0));
@@ -195,11 +197,10 @@ var RRule = function () {
         } else {
             opts.wkst = opts.wkst.weekday;
         }
-        var v = void 0;
         if (opts.bysetpos !== null) {
             if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos];
             for (var i = 0; i < opts.bysetpos.length; i++) {
-                v = opts.bysetpos[i];
+                var v = opts.bysetpos[i];
                 if (v === 0 || !(v >= -366 && v <= 366)) {
                     throw new Error('bysetpos must be between 1 and 366,' + ' or between -366 and -1');
                 }
@@ -235,11 +236,11 @@ var RRule = function () {
             var bymonthday = [];
             var bynmonthday = [];
             for (var _i = 0; _i < opts.bymonthday.length; _i++) {
-                v = opts.bymonthday[_i];
-                if (v > 0) {
-                    bymonthday.push(v);
-                } else if (v < 0) {
-                    bynmonthday.push(v);
+                var _v = opts.bymonthday[_i];
+                if (_v > 0) {
+                    bymonthday.push(_v);
+                } else if (_v < 0) {
+                    bynmonthday.push(_v);
                 }
             }
             opts.bymonthday = bymonthday;
@@ -852,15 +853,12 @@ var RRule = function () {
         value: function parseString(rfcString) {
             rfcString = rfcString.replace(/^\s+|\s+$/, '');
             if (!rfcString.length) return null;
-            var key = void 0;
-            var value = void 0;
-            var attr = void 0;
             var attrs = rfcString.split(';');
             var options = {};
             for (var i = 0; i < attrs.length; i++) {
-                attr = attrs[i].split('=');
-                key = attr[0];
-                value = attr[1];
+                var attr = attrs[i].split('=');
+                var key = attr[0];
+                var value = attr[1];
                 switch (key) {
                     case 'FREQ':
                         options.freq = Frequency[value];
@@ -878,19 +876,24 @@ var RRule = function () {
                     case 'BYHOUR':
                     case 'BYMINUTE':
                     case 'BYSECOND':
+                        var num = void 0;
                         if (value.indexOf(',') !== -1) {
-                            value = value.split(',');
-                            for (var j = 0; j < value.length; j++) {
-                                if (/^[+-]?\d+$/.test(value[j].toString())) {
-                                    value[j] = Number(value[j]);
+                            var values = value.split(',');
+                            num = values.map(function (val) {
+                                if (/^[+-]?\d+$/.test(val.toString())) {
+                                    return Number(val);
+                                } else {
+                                    return val;
                                 }
-                            }
+                            });
                         } else if (/^[+-]?\d+$/.test(value)) {
-                            value = Number(value);
+                            num = Number(value);
+                        } else {
+                            num = value;
                         }
-                        key = key.toLowerCase();
+                        var optionKey = key.toLowerCase();
                         // @ts-ignore
-                        options[key] = value;
+                        options[optionKey] = num;
                         break;
                     case 'BYDAY':
                         // => byweekday
@@ -899,8 +902,8 @@ var RRule = function () {
                         var day = void 0;
                         var days = value.split(',');
                         options.byweekday = [];
-                        for (var _j4 = 0; _j4 < days.length; _j4++) {
-                            day = days[_j4];
+                        for (var j = 0; j < days.length; j++) {
+                            day = days[j];
                             if (day.length === 2) {
                                 // MO, TU, ...
                                 wday = Days[day]; // wday instanceof Weekday
@@ -987,8 +990,8 @@ var RRule = function () {
                         break;
                     default:
                         if (value instanceof Array) {
-                            for (var _j5 = 0; _j5 < value.length; _j5++) {
-                                strValues[_j5] = String(value[_j5]);
+                            for (var _j4 = 0; _j4 < value.length; _j4++) {
+                                strValues[_j4] = String(value[_j4]);
                             }
                             value = strValues;
                         } else {
@@ -1012,13 +1015,13 @@ var RRule = function () {
 
 
 RRule.FREQUENCIES = ['YEARLY', 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTELY', 'SECONDLY'];
-RRule.YEARLY = 0;
-RRule.MONTHLY = 1;
-RRule.WEEKLY = 2;
-RRule.DAILY = 3;
-RRule.HOURLY = 4;
-RRule.MINUTELY = 5;
-RRule.SECONDLY = 6;
+RRule.YEARLY = Frequency.YEARLY;
+RRule.MONTHLY = Frequency.MONTHLY;
+RRule.WEEKLY = Frequency.WEEKLY;
+RRule.DAILY = Frequency.DAILY;
+RRule.HOURLY = Frequency.HOURLY;
+RRule.MINUTELY = Frequency.MINUTELY;
+RRule.SECONDLY = Frequency.SECONDLY;
 RRule.DEFAULT_OPTIONS = {
     freq: null,
     dtstart: null,

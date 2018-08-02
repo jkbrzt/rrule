@@ -58,17 +58,10 @@ export interface Options {
 }
 
 type CacheKeys = 'before' | 'after' | 'between'
-
 type CacheBase = { [K in CacheKeys]: IterArgs[] }
 export type Cache = CacheBase & { all: Date[] | Partial<IterArgs>[] | false }
 
-export type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
-
-export type ByWeekday = WeekdayStr | number | Weekday
-
-type DayType = { [K in WeekdayStr]: Weekday }
-
-const Days: DayType = {
+const Days = {
   MO: new Weekday(0),
   TU: new Weekday(1),
   WE: new Weekday(2),
@@ -77,6 +70,9 @@ const Days: DayType = {
   SA: new Weekday(5),
   SU: new Weekday(6)
 }
+
+export type WeekdayStr = keyof typeof Days
+export type ByWeekday = WeekdayStr | number | Weekday
 
 /**
  *
@@ -94,7 +90,7 @@ export default class RRule {
 
   // RRule class 'constants'
 
-  static readonly FREQUENCIES = [
+  static readonly FREQUENCIES: (keyof typeof Frequency)[] = [
     'YEARLY',
     'MONTHLY',
     'WEEKLY',
@@ -104,13 +100,13 @@ export default class RRule {
     'SECONDLY'
   ]
 
-  static readonly YEARLY = 0
-  static readonly MONTHLY = 1
-  static readonly WEEKLY = 2
-  static readonly DAILY = 3
-  static readonly HOURLY = 4
-  static readonly MINUTELY = 5
-  static readonly SECONDLY = 6
+  static readonly YEARLY = Frequency.YEARLY
+  static readonly MONTHLY = Frequency.MONTHLY
+  static readonly WEEKLY = Frequency.WEEKLY
+  static readonly DAILY = Frequency.DAILY
+  static readonly HOURLY = Frequency.HOURLY
+  static readonly MINUTELY = Frequency.MINUTELY
+  static readonly SECONDLY = Frequency.SECONDLY
 
   private static readonly DEFAULT_OPTIONS: Options = {
     freq: null,
@@ -155,19 +151,18 @@ export default class RRule {
 
     // used by toString()
     this.origOptions = {}
-
     this.options = {}
 
     const invalid: string[] = []
-    const keys = Object.keys(options)
-    const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS)
+    const keys = Object.keys(options) as (keyof Options)[]
+    const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS) as (keyof Options)[]
 
     // Shallow copy for options and origOptions and check for invalid
-    keys.forEach(function (key: keyof Options) {
+    keys.forEach(key => {
       this.origOptions[key] = options[key]
       this.options[key] = options[key]
       if (!contains(defaultKeys, key)) invalid.push(key)
-    }, this)
+    })
 
     if (invalid.length) {
       throw new Error('Invalid options: ' + invalid.join(', '))
@@ -178,9 +173,9 @@ export default class RRule {
     }
 
     // Merge in default options
-    defaultKeys.forEach(function (key: keyof Options) {
+    defaultKeys.forEach(key => {
       if (!contains(keys, key)) this.options[key] = RRule.DEFAULT_OPTIONS[key]
-    }, this)
+    })
 
     const opts: Partial<Options> = this.options
 
@@ -196,12 +191,11 @@ export default class RRule {
       opts.wkst = opts.wkst.weekday
     }
 
-    let v
     if (opts.bysetpos !== null) {
       if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos]
 
       for (let i = 0; i < opts.bysetpos.length; i++) {
-        v = opts.bysetpos[i]
+        const v = opts.bysetpos[i]
         if (v === 0 || !(v >= -366 && v <= 366)) {
           throw new Error(
             'bysetpos must be between 1 and 366,' + ' or between -366 and -1'
@@ -251,7 +245,7 @@ export default class RRule {
       const bynmonthday = []
 
       for (let i = 0; i < opts.bymonthday.length; i++) {
-        v = opts.bymonthday[i]
+        const v = opts.bymonthday[i]
         if (v > 0) {
           bymonthday.push(v)
         } else if (v < 0) {
@@ -370,16 +364,13 @@ export default class RRule {
     rfcString = rfcString.replace(/^\s+|\s+$/, '')
     if (!rfcString.length) return null
 
-    let key: string
-    let value: string | string[] | number | number[] | (string | number)[]
-    let attr: string[]
     const attrs = rfcString.split(';')
     const options: Partial<Options> = {}
 
     for (let i = 0; i < attrs.length; i++) {
-      attr = attrs[i].split('=')
-      key = attr[0]
-      value = attr[1] as WeekdayStr
+      const attr = attrs[i].split('=')
+      const key = attr[0]
+      const value = attr[1]
       switch (key) {
         case 'FREQ':
           options.freq = Frequency[value as keyof typeof Frequency]
@@ -397,19 +388,24 @@ export default class RRule {
         case 'BYHOUR':
         case 'BYMINUTE':
         case 'BYSECOND':
+          let num: number | string | (number | string)[]
           if (value.indexOf(',') !== -1) {
-            value = value.split(',')
-            for (let j = 0; j < value.length; j++) {
-              if (/^[+-]?\d+$/.test(value[j].toString())) {
-                value[j] = Number(value[j])
+            const values = value.split(',')
+            num = values.map(val => {
+              if (/^[+-]?\d+$/.test(val.toString())) {
+                return Number(val)
+              } else {
+                return val
               }
-            }
+            })
           } else if (/^[+-]?\d+$/.test(value)) {
-            value = Number(value)
+            num = Number(value)
+          } else {
+            num = value
           }
-          key = key.toLowerCase()
+          const optionKey = key.toLowerCase()
           // @ts-ignore
-          options[key] = value
+          options[optionKey] = num
           break
         case 'BYDAY': // => byweekday
           let n: number

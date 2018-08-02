@@ -39,7 +39,16 @@ declare type CacheBase = {
 export declare type Cache = CacheBase & {
     all: Date[] | Partial<IterArgs>[] | false;
 };
-export declare type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
+declare const Days: {
+    MO: Weekday;
+    TU: Weekday;
+    WE: Weekday;
+    TH: Weekday;
+    FR: Weekday;
+    SA: Weekday;
+    SU: Weekday;
+};
+export declare type WeekdayStr = keyof typeof Days;
 export declare type ByWeekday = WeekdayStr | number | Weekday;
 /**
  *
@@ -54,14 +63,14 @@ export default class RRule {
     options: Partial<Options>;
     timeset: dateutil.Time[];
     _len: number;
-    static readonly FREQUENCIES: string[];
-    static readonly YEARLY: number;
-    static readonly MONTHLY: number;
-    static readonly WEEKLY: number;
-    static readonly DAILY: number;
-    static readonly HOURLY: number;
-    static readonly MINUTELY: number;
-    static readonly SECONDLY: number;
+    static readonly FREQUENCIES: (keyof typeof Frequency)[];
+    static readonly YEARLY: Frequency;
+    static readonly MONTHLY: Frequency;
+    static readonly WEEKLY: Frequency;
+    static readonly DAILY: Frequency;
+    static readonly HOURLY: Frequency;
+    static readonly MINUTELY: Frequency;
+    static readonly SECONDLY: Frequency;
     private static readonly DEFAULT_OPTIONS;
     static readonly MO: Weekday;
     static readonly TU: Weekday;

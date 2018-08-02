@@ -44,7 +44,7 @@ $ yarn add rrule
 ```
 
 ```es6
-import { RRule, RRuleSet, rrulestr } from 'rrule/es6'
+import { RRule, RRuleSet, rrulestr } from 'rrule'
 ```
 
 #### Usage

@@ -260,13 +260,13 @@ function parseText(text, language) {
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number');
                 }
-                options.byweekno = [n[0]];
+                options.byweekno = [parseInt(n[0], 10)];
                 while (ttr.accept('comma')) {
                     n = ttr.accept('number');
                     if (!n) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday');
                     }
-                    options.byweekno.push(n[0]);
+                    options.byweekno.push(parseInt(n[0], 10));
                 }
             }
             else if (m) {
@@ -290,13 +290,13 @@ function parseText(text, language) {
             if (!n) {
                 throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour');
             }
-            options.byhour = [n[0]];
+            options.byhour = [parseInt(n[0], 10)];
             while (ttr.accept('comma')) {
                 n = ttr.accept('number');
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour');
                 }
-                options.byhour.push(n[0]);
+                options.byhour.push(parseInt(n[0], 10));
             }
         } while (ttr.accept('comma') || ttr.accept('at'));
     }
@@ -393,7 +393,7 @@ function parseText(text, language) {
             options.until = new Date(date);
         }
         else if (ttr.accept('for')) {
-            options.count = ttr.value[0];
+            options.count = parseInt(ttr.value[0], 10);
             ttr.expect('number');
             // ttr.expect('times')
         }

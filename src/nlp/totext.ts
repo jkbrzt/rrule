@@ -451,7 +451,7 @@ export default class ToText {
         return o.toString()
       }
     const self = this
-    const realCallback = function (arg: any) {
+    const realCallback = function (arg: string | number | Weekday) {
       return callback.call(self, arg)
     }
 

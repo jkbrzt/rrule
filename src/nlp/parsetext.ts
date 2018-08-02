@@ -10,7 +10,7 @@ class Parser {
   private readonly rules: { [k: string]: RegExp }
   public text: string
   public symbol: string | null
-  public value: any
+  public value: RegExpExecArray
   private done = true
 
   constructor (rules: { [k: string]: RegExp }) {
@@ -85,6 +85,10 @@ class Parser {
     return false
   }
 
+  acceptNumber () {
+    return this.accept('number') as RegExpExecArray
+  }
+
   expect (name: string) {
     if (this.accept(name)) return true
 
@@ -104,7 +108,7 @@ export default function parseText (text: string, language: Language) {
   function S () {
     // every [n]
     ttr.expect('every')
-    let n = ttr.accept('number')
+    let n = ttr.acceptNumber()
     if (n) options.interval = parseInt(n[0], 10)
     if (ttr.isDone()) throw new Error('Unexpected end')
 
@@ -286,17 +290,17 @@ export default function parseText (text: string, language: Language) {
         }
       } else if (ttr.symbol === 'week(s)') {
         ttr.nextSymbol()
-        let n = ttr.accept('number')
+        let n = ttr.acceptNumber()
         if (!n) {
           throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number')
         }
-        options.byweekno = [n[0]]
+        options.byweekno = [parseInt(n[0], 10)]
         while (ttr.accept('comma')) {
-          n = ttr.accept('number')
+          n = ttr.acceptNumber()
           if (!n) {
             throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
           }
-          options.byweekno.push(n[0])
+          options.byweekno.push(parseInt(n[0], 10))
         }
       } else if (m) {
         ttr.nextSymbol()
@@ -315,17 +319,17 @@ export default function parseText (text: string, language: Language) {
     if (!at) return
 
     do {
-      let n = ttr.accept('number')
+      let n = ttr.acceptNumber()
       if (!n) {
         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour')
       }
-      options.byhour = [n[0]]
+      options.byhour = [parseInt(n[0], 10)]
       while (ttr.accept('comma')) {
-        n = ttr.accept('number')
+        n = ttr.acceptNumber()
         if (!n) {
           throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour')
         }
-        options.byhour.push(n[0])
+        options.byhour.push(parseInt(n[0], 10))
       }
     } while (ttr.accept('comma') || ttr.accept('at'))
   }
@@ -430,7 +434,7 @@ export default function parseText (text: string, language: Language) {
       if (!date) throw new Error('Cannot parse until date:' + ttr.text)
       options.until = new Date(date)
     } else if (ttr.accept('for')) {
-      options.count = ttr.value[0]
+      options.count = parseInt(ttr.value[0], 10)
       ttr.expect('number')
       // ttr.expect('times')
     }

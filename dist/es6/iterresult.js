@@ -1,7 +1,4 @@
 "use strict";
-// =============================================================================
-// Results
-// =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * This class helps us to emulate python's generators, sorta.

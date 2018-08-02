@@ -11,30 +11,20 @@ const helpers_1 = require("./helpers");
  */
 class RRuleStr {
     constructor() {
-        // tslint:disable-next-line:variable-name
+        // tslint:disable:variable-name
         this._handle_BYDAY = this._handle_BYWEEKDAY;
-        // tslint:disable-next-line:variable-name
         this._handle_INTERVAL = this._handle_int;
-        // tslint:disable-next-line:variable-name
         this._handle_COUNT = this._handle_int;
-        // tslint:disable-next-line:variable-name
         this._handle_BYSETPOS = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMONTH = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMONTHDAY = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYYEARDAY = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYEASTER = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYWEEKNO = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYHOUR = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMINUTE = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYSECOND = this._handle_int_list;
+        // tslint:enable:variable-name
     }
     // tslint:disable-next-line:variable-name
     _handle_DTSTART(rrkwargs, _, value, __) {

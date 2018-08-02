@@ -1,3 +1,4 @@
+import { Cache } from './rrule';
 export interface IterArgs {
     inc: boolean;
     before: Date;
@@ -9,12 +10,12 @@ export interface IterArgs {
  * This class helps us to emulate python's generators, sorta.
  */
 export default class IterResult {
-    readonly method: string;
+    readonly method: keyof Cache;
     readonly args: Partial<IterArgs>;
     readonly minDate: Date | null;
     readonly maxDate: Date | null;
     _result: (Date | Partial<IterArgs>)[];
-    constructor(method: string, args: Partial<IterArgs>);
+    constructor(method: keyof Cache, args: Partial<IterArgs>);
     /**
      * Possibly adds a date into the result.
      *
@@ -35,6 +36,6 @@ export default class IterResult {
      * and 'between' an array.
      * @return {Date,Array?}
      */
-    getValue(): Date | Partial<IterArgs> | (Date | Partial<IterArgs>)[];
+    getValue(): Date | Date[];
     clone(): IterResult;
 }

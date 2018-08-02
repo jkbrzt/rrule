@@ -1,3 +1,5 @@
+import { Cache } from './rrule'
+
 // =============================================================================
 // Results
 // =============================================================================
@@ -14,13 +16,13 @@ export interface IterArgs {
  * This class helps us to emulate python's generators, sorta.
  */
 export default class IterResult {
-  public readonly method: string
+  public readonly method: keyof Cache
   public readonly args: Partial<IterArgs>
   public readonly minDate: Date | null
   public readonly maxDate: Date | null
   public _result: (Date | Partial<IterArgs>)[]
 
-  constructor (method: string, args: Partial<IterArgs>) {
+  constructor (method: keyof Cache, args: Partial<IterArgs>) {
     this.method = method
     this.args = args
     this.minDate = null
@@ -85,10 +87,10 @@ export default class IterResult {
     switch (this.method) {
       case 'all':
       case 'between':
-        return res
+        return res as Date[]
       case 'before':
       case 'after':
-        return res.length ? res[res.length - 1] : null
+        return res.length ? res[res.length - 1] as Date : null
     }
   }
 

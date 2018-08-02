@@ -763,21 +763,23 @@ export default class RRule {
     let weekday = dateutil.getWeekday(dtstart)
 
     // Some local variables to speed things up a bit
-    const freq = this.options.freq
-    const interval = this.options.interval
-    const wkst = this.options.wkst
-    const until = this.options.until
-    const bymonth = this.options.bymonth
-    const byweekno = this.options.byweekno
-    const byyearday = this.options.byyearday
-    const byweekday = this.options.byweekday
-    const byeaster = this.options.byeaster
-    const bymonthday = this.options.bymonthday
-    const bynmonthday = this.options.bynmonthday
-    const bysetpos = this.options.bysetpos
-    const byhour = this.options.byhour
-    const byminute = this.options.byminute
-    const bysecond = this.options.bysecond
+    const {
+      freq,
+      interval,
+      wkst,
+      until,
+      bymonth,
+      byweekno,
+      byyearday,
+      byweekday,
+      byeaster,
+      bymonthday,
+      bynmonthday,
+      bysetpos,
+      byhour,
+      byminute,
+      bysecond
+    } = this.options
 
     // tslint:disable-next-line:no-use-before-declare
     const ii = new Iterinfo(this)
@@ -1360,7 +1362,7 @@ class Iterinfo {
     }
   }
 
-  ydayset (_: any, __: any, ___: any) {
+  ydayset () {
     return [range(this.yearlen), 0, this.yearlen]
   }
 

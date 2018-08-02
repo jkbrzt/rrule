@@ -91,106 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// =============================================================================
-// Helper functions
-// =============================================================================
-
-Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * Simplified version of python's range()
- */
-var range = function range(start, end) {
-    if (arguments.length === 1) {
-        end = start;
-        start = 0;
-    }
-    var rang = [];
-    for (var i = start; i < end; i++) {
-        rang.push(i);
-    }return rang;
-};
-exports.range = range;
-var repeat = function repeat(value, times) {
-    var i = 0;
-    var array = [];
-    if (value instanceof Array) {
-        for (; i < times; i++) {
-            array[i] = [].concat(value);
-        }
-    } else {
-        for (; i < times; i++) {
-            array[i] = value;
-        }
-    }
-    return array;
-};
-exports.repeat = repeat;
-/**
- * Python like split
- */
-var split = function split(str, sep, num) {
-    var splits = str.split(sep);
-    return num ? splits.slice(0, num).concat([splits.slice(num).join(sep)]) : splits;
-};
-exports.split = split;
-/**
- * closure/goog/math/math.js:modulo
- * Copyright 2006 The Closure Library Authors.
- * The % operator in JavaScript returns the remainder of a / b, but differs from
- * some other languages in that the result will have the same sign as the
- * dividend. For example, -1 % 8 == -1, whereas in some other languages
- * (such as Python) the result would be 7. This function emulates the more
- * correct modulo behavior, which is useful for certain applications such as
- * calculating an offset index in a circular list.
- *
- * @param {number} a The dividend.
- * @param {number} b The divisor.
- * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
- *     or b < x <= 0, depending on the sign of b).
- */
-var pymod = function pymod(a, b) {
-    var r = a % b;
-    // If r and b differ in sign, add b to wrap the result to the correct sign.
-    return r * b < 0 ? r + b : r;
-};
-exports.pymod = pymod;
-/**
- * @see: <http://docs.python.org/library/functions.html#divmod>
- */
-var divmod = function divmod(a, b) {
-    return { div: Math.floor(a / b), mod: pymod(a, b) };
-};
-exports.divmod = divmod;
-/**
- * Python-like boolean
- * @return {Boolean} value of an object/primitive, taking into account
- * the fact that in Python an empty list's/tuple's
- * boolean value is False, whereas in JS it's true
- */
-var plb = function plb(obj) {
-    return obj instanceof Array && obj.length === 0 ? false : Boolean(obj);
-};
-exports.plb = plb;
-/**
- * Return true if a value is in an array
- */
-var contains = function contains(arr, val) {
-    return arr.indexOf(val) !== -1;
-};
-exports.contains = contains;
-//# sourceMappingURL=helpers.js.map
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -212,12 +117,12 @@ exports.contains = contains;
  */
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(1);
 exports.RRule = rrule_1.default;
 var rruleset_1 = __webpack_require__(7);
 exports.RRuleSet = rruleset_1.default;
 var rrulestr_1 = __webpack_require__(13);
-var rrule_2 = __webpack_require__(2);
+var rrule_2 = __webpack_require__(1);
 exports.Frequency = rrule_2.Frequency;
 var weekday_1 = __webpack_require__(3);
 exports.Weekday = weekday_1.default;
@@ -234,7 +139,7 @@ exports.default = rrule_1.default;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -249,7 +154,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 Object.defineProperty(exports, "__esModule", { value: true });
 var weekday_1 = __webpack_require__(3);
 var dateutil_1 = __webpack_require__(4);
-var helpers_1 = __webpack_require__(0);
+var helpers_1 = __webpack_require__(2);
 var masks_1 = __webpack_require__(8);
 var iterresult_1 = __webpack_require__(5);
 var callbackiterresult_1 = __webpack_require__(9);
@@ -690,22 +595,24 @@ var RRule = function () {
             var second = dtstart.getSeconds();
             var weekday = dateutil_1.default.getWeekday(dtstart);
             // Some local variables to speed things up a bit
-            var freq = this.options.freq;
-            var interval = this.options.interval;
-            var wkst = this.options.wkst;
-            var until = this.options.until;
-            var bymonth = this.options.bymonth;
-            var byweekno = this.options.byweekno;
-            var byyearday = this.options.byyearday;
-            var byweekday = this.options.byweekday;
-            var byeaster = this.options.byeaster;
-            var bymonthday = this.options.bymonthday;
-            var bynmonthday = this.options.bynmonthday;
-            var bysetpos = this.options.bysetpos;
-            var byhour = this.options.byhour;
-            var byminute = this.options.byminute;
-            var bysecond = this.options.bysecond;
+            var _options = this.options,
+                freq = _options.freq,
+                interval = _options.interval,
+                wkst = _options.wkst,
+                until = _options.until,
+                bymonth = _options.bymonth,
+                byweekno = _options.byweekno,
+                byyearday = _options.byyearday,
+                byweekday = _options.byweekday,
+                byeaster = _options.byeaster,
+                bymonthday = _options.bymonthday,
+                bynmonthday = _options.bynmonthday,
+                bysetpos = _options.bysetpos,
+                byhour = _options.byhour,
+                byminute = _options.byminute,
+                bysecond = _options.bysecond;
             // tslint:disable-next-line:no-use-before-declare
+
             var ii = new Iterinfo(this);
             ii.rebuild(year, month);
             var getdayset = (_RRule$YEARLY$RRule$M = {}, _defineProperty(_RRule$YEARLY$RRule$M, RRule.YEARLY, ii.ydayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.MONTHLY, ii.mdayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.WEEKLY, ii.wdayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.DAILY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.HOURLY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.MINUTELY, ii.ddayset), _defineProperty(_RRule$YEARLY$RRule$M, RRule.SECONDLY, ii.ddayset), _RRule$YEARLY$RRule$M)[freq];
@@ -1391,7 +1298,7 @@ var Iterinfo = function () {
         }
     }, {
         key: "ydayset",
-        value: function ydayset(_, __, ___) {
+        value: function ydayset() {
             return [helpers_1.range(this.yearlen), 0, this.yearlen];
         }
     }, {
@@ -1463,6 +1370,101 @@ var Iterinfo = function () {
     return Iterinfo;
 }();
 //# sourceMappingURL=rrule.js.map
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// =============================================================================
+// Helper functions
+// =============================================================================
+
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Simplified version of python's range()
+ */
+var range = function range(start, end) {
+    if (arguments.length === 1) {
+        end = start;
+        start = 0;
+    }
+    var rang = [];
+    for (var i = start; i < end; i++) {
+        rang.push(i);
+    }return rang;
+};
+exports.range = range;
+var repeat = function repeat(value, times) {
+    var i = 0;
+    var array = [];
+    if (value instanceof Array) {
+        for (; i < times; i++) {
+            array[i] = [].concat(value);
+        }
+    } else {
+        for (; i < times; i++) {
+            array[i] = value;
+        }
+    }
+    return array;
+};
+exports.repeat = repeat;
+/**
+ * Python like split
+ */
+var split = function split(str, sep, num) {
+    var splits = str.split(sep);
+    return num ? splits.slice(0, num).concat([splits.slice(num).join(sep)]) : splits;
+};
+exports.split = split;
+/**
+ * closure/goog/math/math.js:modulo
+ * Copyright 2006 The Closure Library Authors.
+ * The % operator in JavaScript returns the remainder of a / b, but differs from
+ * some other languages in that the result will have the same sign as the
+ * dividend. For example, -1 % 8 == -1, whereas in some other languages
+ * (such as Python) the result would be 7. This function emulates the more
+ * correct modulo behavior, which is useful for certain applications such as
+ * calculating an offset index in a circular list.
+ *
+ * @param {number} a The dividend.
+ * @param {number} b The divisor.
+ * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
+ *     or b < x <= 0, depending on the sign of b).
+ */
+var pymod = function pymod(a, b) {
+    var r = a % b;
+    // If r and b differ in sign, add b to wrap the result to the correct sign.
+    return r * b < 0 ? r + b : r;
+};
+exports.pymod = pymod;
+/**
+ * @see: <http://docs.python.org/library/functions.html#divmod>
+ */
+var divmod = function divmod(a, b) {
+    return { div: Math.floor(a / b), mod: pymod(a, b) };
+};
+exports.divmod = divmod;
+/**
+ * Python-like boolean
+ * @return {Boolean} value of an object/primitive, taking into account
+ * the fact that in Python an empty list's/tuple's
+ * boolean value is False, whereas in JS it's true
+ */
+var plb = function plb(obj) {
+    return obj instanceof Array && obj.length === 0 ? false : Boolean(obj);
+};
+exports.plb = plb;
+/**
+ * Return true if a value is in an array
+ */
+var contains = function contains(arr, val) {
+    return arr.indexOf(val) !== -1;
+};
+exports.contains = contains;
+//# sourceMappingURL=helpers.js.map
 
 /***/ }),
 /* 3 */
@@ -1721,9 +1723,6 @@ exports.default = dateutil;
 
 "use strict";
 
-// =============================================================================
-// Results
-// =============================================================================
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1901,9 +1900,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(1);
 var dateutil_1 = __webpack_require__(4);
-var helpers_1 = __webpack_require__(0);
+var helpers_1 = __webpack_require__(2);
 /**
  *
  * @param {Boolean?} noCache
@@ -2129,7 +2128,7 @@ exports.default = RRuleSet;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = __webpack_require__(0);
+var helpers_1 = __webpack_require__(2);
 // =============================================================================
 // Date masks
 // =============================================================================
@@ -2184,7 +2183,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var iterresult_1 = __webpack_require__(5);
-var helpers_1 = __webpack_require__(0);
 /**
  * IterResult subclass that calls a callback function on each add,
  * and stops iterating when the callback returns false.
@@ -2195,11 +2193,6 @@ var CallbackIterResult = function (_iterresult_1$default) {
 
     function CallbackIterResult(method, args, iterator) {
         _classCallCheck(this, CallbackIterResult);
-
-        var allowedMethods = ['all', 'between'];
-        if (!helpers_1.contains(allowedMethods, method)) {
-            throw new Error('Invalid method "' + method + '". Only all and between works with iterator.');
-        }
 
         var _this = _possibleConstructorReturn(this, (CallbackIterResult.__proto__ || Object.getPrototypeOf(CallbackIterResult)).call(this, method, args));
 
@@ -2235,7 +2228,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var totext_1 = __webpack_require__(11);
 var parsetext_1 = __webpack_require__(12);
 exports.parseText = parsetext_1.default;
-var index_1 = __webpack_require__(1);
+var index_1 = __webpack_require__(0);
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -2362,7 +2355,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var i18n_1 = __webpack_require__(6);
-var index_1 = __webpack_require__(1);
+var index_1 = __webpack_require__(0);
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -2734,7 +2727,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var i18n_1 = __webpack_require__(6);
-var index_1 = __webpack_require__(1);
+var index_1 = __webpack_require__(0);
 // =============================================================================
 // Parser
 // =============================================================================
@@ -3127,11 +3120,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(1);
 var rruleset_1 = __webpack_require__(7);
 var dateutil_1 = __webpack_require__(4);
 var weekday_1 = __webpack_require__(3);
-var helpers_1 = __webpack_require__(0);
+var helpers_1 = __webpack_require__(2);
 /**
  * RRuleStr
  *  To parse a set of rrule strings
@@ -3141,30 +3134,20 @@ var RRuleStr = function () {
     function RRuleStr() {
         _classCallCheck(this, RRuleStr);
 
-        // tslint:disable-next-line:variable-name
+        // tslint:disable:variable-name
         this._handle_BYDAY = this._handle_BYWEEKDAY;
-        // tslint:disable-next-line:variable-name
         this._handle_INTERVAL = this._handle_int;
-        // tslint:disable-next-line:variable-name
         this._handle_COUNT = this._handle_int;
-        // tslint:disable-next-line:variable-name
         this._handle_BYSETPOS = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMONTH = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMONTHDAY = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYYEARDAY = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYEASTER = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYWEEKNO = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYHOUR = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYMINUTE = this._handle_int_list;
-        // tslint:disable-next-line:variable-name
         this._handle_BYSECOND = this._handle_int_list;
+        // tslint:enable:variable-name
     }
     // tslint:disable-next-line:variable-name
 

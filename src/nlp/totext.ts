@@ -421,7 +421,7 @@ export default class ToText {
     return this
   }
 
-  list (arr: any, callback: GetText, finalDelim?: string, delim: string = ',') {
+  list (arr: ByWeekday | ByWeekday[], callback: GetText, finalDelim?: string, delim: string = ',') {
     if (!(arr instanceof Array)) {
       arr = [arr]
     }
@@ -451,7 +451,7 @@ export default class ToText {
         return o.toString()
       }
     const self = this
-    const realCallback = function (arg: string | number | Weekday) {
+    const realCallback = function (arg: ByWeekday) {
       return callback.call(self, arg)
     }
 

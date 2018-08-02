@@ -68,6 +68,9 @@ class Parser {
         }
         return false;
     }
+    acceptNumber() {
+        return this.accept('number');
+    }
     expect(name) {
         if (this.accept(name))
             return true;
@@ -84,7 +87,7 @@ function parseText(text, language) {
     function S() {
         // every [n]
         ttr.expect('every');
-        let n = ttr.accept('number');
+        let n = ttr.acceptNumber();
         if (n)
             options.interval = parseInt(n[0], 10);
         if (ttr.isDone())
@@ -256,13 +259,13 @@ function parseText(text, language) {
             }
             else if (ttr.symbol === 'week(s)') {
                 ttr.nextSymbol();
-                let n = ttr.accept('number');
+                let n = ttr.acceptNumber();
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number');
                 }
                 options.byweekno = [parseInt(n[0], 10)];
                 while (ttr.accept('comma')) {
-                    n = ttr.accept('number');
+                    n = ttr.acceptNumber();
                     if (!n) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday');
                     }
@@ -286,13 +289,13 @@ function parseText(text, language) {
         if (!at)
             return;
         do {
-            let n = ttr.accept('number');
+            let n = ttr.acceptNumber();
             if (!n) {
                 throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour');
             }
             options.byhour = [parseInt(n[0], 10)];
             while (ttr.accept('comma')) {
-                n = ttr.accept('number');
+                n = ttr.acceptNumber();
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour');
                 }

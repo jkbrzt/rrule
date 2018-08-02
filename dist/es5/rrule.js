@@ -2805,6 +2805,11 @@ var Parser = function () {
             return false;
         }
     }, {
+        key: "acceptNumber",
+        value: function acceptNumber() {
+            return this.accept('number');
+        }
+    }, {
         key: "expect",
         value: function expect(name) {
             if (this.accept(name)) return true;
@@ -2824,7 +2829,7 @@ function parseText(text, language) {
     function S() {
         // every [n]
         ttr.expect('every');
-        var n = ttr.accept('number');
+        var n = ttr.acceptNumber();
         if (n) options.interval = parseInt(n[0], 10);
         if (ttr.isDone()) throw new Error('Unexpected end');
         switch (ttr.symbol) {
@@ -2970,13 +2975,13 @@ function parseText(text, language) {
                 }
             } else if (ttr.symbol === 'week(s)') {
                 ttr.nextSymbol();
-                var n = ttr.accept('number');
+                var n = ttr.acceptNumber();
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number');
                 }
                 options.byweekno = [parseInt(n[0], 10)];
                 while (ttr.accept('comma')) {
-                    n = ttr.accept('number');
+                    n = ttr.acceptNumber();
                     if (!n) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday');
                     }
@@ -2996,13 +3001,13 @@ function parseText(text, language) {
         var at = ttr.accept('at');
         if (!at) return;
         do {
-            var n = ttr.accept('number');
+            var n = ttr.acceptNumber();
             if (!n) {
                 throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour');
             }
             options.byhour = [parseInt(n[0], 10)];
             while (ttr.accept('comma')) {
-                n = ttr.accept('number');
+                n = ttr.acceptNumber();
                 if (!n) {
                     throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour');
                 }

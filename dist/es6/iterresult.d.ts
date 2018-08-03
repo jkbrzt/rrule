@@ -1,4 +1,4 @@
-import { Cache } from './rrule';
+import { Cache } from './types';
 export interface IterArgs {
     inc: boolean;
     before: Date;

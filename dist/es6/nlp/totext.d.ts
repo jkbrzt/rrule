@@ -1,6 +1,6 @@
 import { Language } from './i18n';
 import RRule from '../index';
-import { ByWeekday } from '../rrule';
+import { ByWeekday } from '../types';
 import Weekday from '../weekday';
 export declare type GetText = (id: string | number | Weekday) => string;
 /**

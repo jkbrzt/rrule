@@ -1,6 +1,6 @@
 import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
-import { Options, ByWeekday } from '../rrule'
+import { Options, ByWeekday } from '../types'
 import Weekday from '../weekday'
 
 // =============================================================================

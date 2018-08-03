@@ -14,7 +14,7 @@ import dateutil from './dateutil'
 import { notEmpty, repeat, pymod, contains, range } from './helpers'
 
 export type DaySet = [ number[], number, number ]
-export type GetDayset = () => [number[], number, number]
+export type GetDayset = () => DaySet
 
 // =============================================================================
 // Iterinfo

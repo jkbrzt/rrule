@@ -6,6 +6,7 @@ const iterinfo_1 = require("./iterinfo");
 const helpers_1 = require("./helpers");
 const iterresult_1 = require("./iterresult");
 const callbackiterresult_1 = require("./callbackiterresult");
+const types_1 = require("./types");
 const getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -13,25 +14,9 @@ const getnlp = function () {
     }
     return getnlp._nlp;
 };
-var Frequency;
-(function (Frequency) {
-    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
-    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
-    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
-    Frequency[Frequency["DAILY"] = 3] = "DAILY";
-    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
-    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
-    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
-})(Frequency = exports.Frequency || (exports.Frequency = {}));
-const Days = {
-    MO: new weekday_1.default(0),
-    TU: new weekday_1.default(1),
-    WE: new weekday_1.default(2),
-    TH: new weekday_1.default(3),
-    FR: new weekday_1.default(4),
-    SA: new weekday_1.default(5),
-    SU: new weekday_1.default(6)
-};
+// =============================================================================
+// RRule
+// =============================================================================
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -269,10 +254,10 @@ class RRule {
             const value = attr[1];
             switch (key) {
                 case 'FREQ':
-                    options.freq = Frequency[value];
+                    options.freq = types_1.Frequency[value];
                     break;
                 case 'WKST':
-                    options.wkst = Days[value];
+                    options.wkst = types_1.Days[value];
                     break;
                 case 'COUNT':
                 case 'INTERVAL':
@@ -316,7 +301,7 @@ class RRule {
                         day = days[j];
                         if (day.length === 2) {
                             // MO, TU, ...
-                            wday = Days[day]; // wday instanceof Weekday
+                            wday = types_1.Days[day]; // wday instanceof Weekday
                             options.byweekday.push(wday);
                         }
                         else {
@@ -324,7 +309,7 @@ class RRule {
                             const parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
                             n = Number(parts[1]);
                             const wdaypart = parts[2];
-                            wday = Days[wdaypart].weekday;
+                            wday = types_1.Days[wdaypart].weekday;
                             options.byweekday.push(new weekday_1.default(wday, n));
                         }
                     }
@@ -944,18 +929,18 @@ RRule.FREQUENCIES = [
     'MINUTELY',
     'SECONDLY'
 ];
-RRule.YEARLY = Frequency.YEARLY;
-RRule.MONTHLY = Frequency.MONTHLY;
-RRule.WEEKLY = Frequency.WEEKLY;
-RRule.DAILY = Frequency.DAILY;
-RRule.HOURLY = Frequency.HOURLY;
-RRule.MINUTELY = Frequency.MINUTELY;
-RRule.SECONDLY = Frequency.SECONDLY;
+RRule.YEARLY = types_1.Frequency.YEARLY;
+RRule.MONTHLY = types_1.Frequency.MONTHLY;
+RRule.WEEKLY = types_1.Frequency.WEEKLY;
+RRule.DAILY = types_1.Frequency.DAILY;
+RRule.HOURLY = types_1.Frequency.HOURLY;
+RRule.MINUTELY = types_1.Frequency.MINUTELY;
+RRule.SECONDLY = types_1.Frequency.SECONDLY;
 RRule.DEFAULT_OPTIONS = {
     freq: null,
     dtstart: null,
     interval: 1,
-    wkst: Days.MO,
+    wkst: types_1.Days.MO,
     count: null,
     until: null,
     bysetpos: null,
@@ -971,12 +956,12 @@ RRule.DEFAULT_OPTIONS = {
     bysecond: null,
     byeaster: null
 };
-RRule.MO = Days.MO;
-RRule.TU = Days.TU;
-RRule.WE = Days.WE;
-RRule.TH = Days.TH;
-RRule.FR = Days.FR;
-RRule.SA = Days.SA;
-RRule.SU = Days.SU;
+RRule.MO = types_1.Days.MO;
+RRule.TU = types_1.Days.TU;
+RRule.WE = types_1.Days.WE;
+RRule.TH = types_1.Days.TH;
+RRule.FR = types_1.Days.FR;
+RRule.SA = types_1.Days.SA;
+RRule.SU = types_1.Days.SU;
 exports.default = RRule;
 //# sourceMappingURL=rrule.js.map

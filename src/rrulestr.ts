@@ -1,4 +1,5 @@
-import RRule, { Options, Frequency, WeekdayStr } from './rrule'
+import RRule from './rrule'
+import { Options, Frequency, WeekdayStr } from './types'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import Weekday from './weekday'

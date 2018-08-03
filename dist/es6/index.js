@@ -20,8 +20,8 @@ exports.RRule = rrule_1.default;
 const rruleset_1 = require("./rruleset");
 exports.RRuleSet = rruleset_1.default;
 const rrulestr_1 = require("./rrulestr");
-var rrule_2 = require("./rrule");
-exports.Frequency = rrule_2.Frequency;
+var types_1 = require("./types");
+exports.Frequency = types_1.Frequency;
 var weekday_1 = require("./weekday");
 exports.Weekday = weekday_1.default;
 // =============================================================================

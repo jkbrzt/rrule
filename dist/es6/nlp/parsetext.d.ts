@@ -1,3 +1,3 @@
 import { Language } from './i18n';
-import { Options } from '../rrule';
+import { Options } from '../types';
 export default function parseText(text: string, language: Language): Partial<Options>;

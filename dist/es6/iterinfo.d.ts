@@ -1,7 +1,7 @@
 import RRule from './rrule';
 import dateutil from './dateutil';
 export declare type DaySet = [number[], number, number];
-export declare type GetDayset = () => [number[], number, number];
+export declare type GetDayset = () => DaySet;
 export default class Iterinfo {
     rrule: RRule;
     lastyear: number;

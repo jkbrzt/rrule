@@ -84,13 +84,7 @@ export namespace dateutil {
    * @see - <http://docs.python.org/library/datetime.html#datetime.date.fromordinal>
    */
   export const fromOrdinal = function (ordinal: number) {
-    const millisecsFromBase = ordinal * ONE_DAY
-    return new Date(
-      ORDINAL_BASE.getTime() -
-        tzOffset(ORDINAL_BASE) +
-        millisecsFromBase +
-        tzOffset(new Date(millisecsFromBase))
-    )
+    return new Date(ORDINAL_BASE.getTime() + (ordinal * ONE_DAY))
   }
 
   export const getMonthDays = function (date: Date) {

@@ -11,6 +11,7 @@ const index_1 = require("../index");
 const contains = function (arr, val) {
     return arr.indexOf(val) !== -1;
 };
+const defaultGetText = id => id.toString();
 /**
  *
  * @param {RRule} rrule
@@ -20,14 +21,10 @@ const contains = function (arr, val) {
  * @constructor
  */
 class ToText {
-    constructor(rrule, gettext, language = i18n_1.default) {
+    constructor(rrule, gettext = defaultGetText, language = i18n_1.default) {
         this.text = [];
         this.language = language || i18n_1.default;
-        this.gettext =
-            gettext ||
-                function (id) {
-                    return id.toString();
-                };
+        this.gettext = gettext;
         this.rrule = rrule;
         this.options = rrule.options;
         this.origOptions = rrule.origOptions;
@@ -261,7 +258,7 @@ class ToText {
                 .add(this.plural(this.options.byweekno.length)
                 ? gettext('weeks')
                 : gettext('week'))
-                .add(this.list(this.options.byweekno, null, gettext('and')));
+                .add(this.list(this.options.byweekno, undefined, gettext('and')));
         }
     }
     _bymonthday() {
@@ -290,7 +287,7 @@ class ToText {
     }
     _byhour() {
         const gettext = this.gettext;
-        this.add(gettext('at')).add(this.list(this.origOptions.byhour, null, gettext('and')));
+        this.add(gettext('at')).add(this.list(this.origOptions.byhour, undefined, gettext('and')));
     }
     _bymonth() {
         this.add(this.list(this.options.bymonth, this.monthtext, this.gettext('and')));
@@ -363,7 +360,7 @@ class ToText {
                 };
         const self = this;
         const realCallback = function (arg) {
-            return callback.call(self, arg);
+            return callback && callback.call(self, arg);
         };
         if (finalDelim) {
             return delimJoin(arr.map(realCallback), delim, finalDelim);

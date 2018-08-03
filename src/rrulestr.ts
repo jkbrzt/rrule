@@ -6,13 +6,13 @@ import Weekday from './weekday'
 import { contains, split } from './helpers'
 
 export interface RRuleStrOptions {
-  dtstart: Date
+  dtstart: Date | null
   cache: boolean
   unfold: boolean
   forceset: boolean
   compatible: boolean
   ignoretz: boolean
-  tzinfos: any
+  tzinfos: any | null
 }
 
 type FreqKey = keyof typeof Frequency
@@ -104,7 +104,7 @@ export default class RRuleStr {
     let splt: string[]
     let i: number
     let j: number
-    let n: string | number
+    let n: string | number | null
     let w: WeekdayStr
     let wday: string
     const l = []
@@ -299,6 +299,7 @@ export default class RRuleStr {
         for (j = 0; j < rrulevals.length; j++) {
           rset.rrule(
             this._parseRfcRRule(rrulevals[j], {
+              // @ts-ignore
               dtstart: options.dtstart || dtstart,
               ignoretz: options.ignoretz,
               tzinfos: options.tzinfos
@@ -315,6 +316,7 @@ export default class RRuleStr {
         for (j = 0; j < exrulevals.length; j++) {
           rset.exrule(
             this._parseRfcRRule(exrulevals[j], {
+              // @ts-ignore
               dtstart: options.dtstart || dtstart,
               ignoretz: options.ignoretz,
               tzinfos: options.tzinfos
@@ -329,10 +331,12 @@ export default class RRuleStr {
           }
         }
 
+        // @ts-ignore
         if (options.compatible && options.dtstart) rset.rdate(dtstart)
         return rset
       } else {
         return this._parseRfcRRule(rrulevals[0], {
+          // @ts-ignore
           dtstart: options.dtstart || dtstart,
           cache: options.cache,
           ignoretz: options.ignoretz,

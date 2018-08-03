@@ -1,12 +1,14 @@
+export declare const isBlank: (value: any) => boolean;
 /**
  * Simplified version of python's range()
  */
-declare const range: (start: number, end?: number) => number[];
-declare const repeat: <T>(value: T | T[], times: number) => (T | T[])[];
+export declare const range: (start: number, end?: number) => number[];
+export declare const clone: <T>(array: T[]) => T[];
+export declare const repeat: <T>(value: T | T[], times: number) => (T | T[])[];
 /**
  * Python like split
  */
-declare const split: (str: string, sep: string, num: number) => string[];
+export declare const split: (str: string, sep: string, num: number) => string[];
 /**
  * closure/goog/math/math.js:modulo
  * Copyright 2006 The Closure Library Authors.
@@ -22,11 +24,11 @@ declare const split: (str: string, sep: string, num: number) => string[];
  * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
  *     or b < x <= 0, depending on the sign of b).
  */
-declare const pymod: (a: number, b: number) => number;
+export declare const pymod: (a: number, b: number) => number;
 /**
  * @see: <http://docs.python.org/library/functions.html#divmod>
  */
-declare const divmod: (a: number, b: number) => {
+export declare const divmod: (a: number, b: number) => {
     div: number;
     mod: number;
 };
@@ -36,9 +38,8 @@ declare const divmod: (a: number, b: number) => {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-declare const notEmpty: (obj: any[]) => boolean;
+export declare const notEmpty: (obj: any[]) => boolean;
 /**
  * Return true if a value is in an array
  */
-declare const contains: <T>(arr: T[], val: T) => boolean;
-export { range, repeat, split, pymod, divmod, notEmpty, contains };
+export declare const contains: <T>(arr: T[], val: T) => boolean;

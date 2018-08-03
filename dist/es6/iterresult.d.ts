@@ -4,7 +4,7 @@ export interface IterArgs {
     before: Date;
     after: Date;
     dt: Date;
-    _value: Date | Date[];
+    _value: Date | Date[] | null;
 }
 /**
  * This class helps us to emulate python's generators, sorta.
@@ -36,6 +36,6 @@ export default class IterResult {
      * and 'between' an array.
      * @return {Date,Array?}
      */
-    getValue(): Date | Date[];
+    getValue(): Date | Date[] | null;
     clone(): IterResult;
 }

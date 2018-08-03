@@ -11,9 +11,9 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { notEmpty, repeat, pymod, contains, range, clone } from './helpers'
+import { notEmpty, repeat, pymod, contains, range, clone, isBlank } from './helpers'
 
-export type DaySet = [ number[], number, number ]
+export type DaySet = [ (number | null)[], number, number ]
 export type GetDayset = () => DaySet
 
 // =============================================================================
@@ -22,20 +22,20 @@ export type GetDayset = () => DaySet
 
 export default class Iterinfo {
   public rrule: RRule
-  public lastyear: number
-  public lastmonth: number
-  public yearlen: 365 | 366 = 365
-  public nextyearlen: 365 | 366 = 365
-  public yearordinal: number
-  public yearweekday: number
-  public mmask: number[]
-  public mrange: number[]
-  public mdaymask: number[]
-  public nmdaymask: number[]
-  public wdaymask: number[]
-  public wnomask: number[]
-  public nwdaymask: number[]
-  public eastermask: number[]
+  public lastyear: number | null
+  public lastmonth: number | null
+  public yearlen: 365 | 366 | null = 365
+  public nextyearlen: 365 | 366 | null = 365
+  public yearordinal: number | null
+  public yearweekday: number | null
+  public mmask: number[] | null
+  public mrange: number[] | null
+  public mdaymask: number[] | null
+  public nmdaymask: number[] | null
+  public wdaymask: number[] | null
+  public wnomask: number[] | null
+  public nwdaymask: number[] | null
+  public eastermask: number[] | null
 
   constructor (rrule: RRule) {
     this.rrule = rrule
@@ -90,13 +90,13 @@ export default class Iterinfo {
       const wday = dateutil.getWeekday(new Date(year, 0, 1))
 
       if (this.yearlen === 365) {
-        this.mmask = clone(M365MASK)
+        this.mmask = clone(M365MASK) as number[]
         this.mdaymask = clone(MDAY365MASK)
         this.nmdaymask = clone(NMDAY365MASK)
         this.wdaymask = WDAYMASK.slice(wday)
         this.mrange = clone(M365RANGE)
       } else {
-        this.mmask = clone(M366MASK)
+        this.mmask = clone(M366MASK) as number[]
         this.mdaymask = clone(MDAY366MASK)
         this.nmdaymask = clone(NMDAY366MASK)
         this.wdaymask = WDAYMASK.slice(wday)
@@ -205,7 +205,7 @@ export default class Iterinfo {
     }
 
     if (
-      notEmpty(rr.options.bynweekday) &&
+      notEmpty(rr.options.bynweekday!) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       let ranges: number[][] = []
@@ -213,34 +213,34 @@ export default class Iterinfo {
         if (notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
           for (let j = 0; j < rr.options.bymonth.length; j++) {
             month = rr.options.bymonth[j]
-            ranges.push(this.mrange.slice(month - 1, month + 1))
+            ranges.push(this.mrange!.slice(month - 1, month + 1))
           }
         } else {
-          ranges = [[0, this.yearlen]]
+          ranges = [[0, this.yearlen!]]
         }
       } else if (rr.options.freq === RRule.MONTHLY) {
-        ranges = [this.mrange.slice(month - 1, month + 1)]
+        ranges = [this.mrange!.slice(month - 1, month + 1)]
       }
       if (notEmpty(ranges)) {
         // Weekly frequency won't get here, so we may not
         // care about cross-year weekly periods.
-        this.nwdaymask = repeat(0, this.yearlen) as number[]
+        this.nwdaymask = repeat(0, this.yearlen!) as number[]
 
         for (let j = 0; j < ranges.length; j++) {
           const rang = ranges[j]
           const first = rang[0]
           let last = rang[1]
           last -= 1
-          for (let k = 0; k < rr.options.bynweekday.length; k++) {
+          for (let k = 0; k < rr.options.bynweekday!.length; k++) {
             let i
-            const wday = rr.options.bynweekday[k][0]
-            const n = rr.options.bynweekday[k][1]
+            const wday = rr.options.bynweekday![k][0]
+            const n = rr.options.bynweekday![k][1]
             if (n < 0) {
               i = last + (n + 1) * 7
-              i -= pymod(this.wdaymask[i] - wday, 7)
+              i -= pymod(this.wdaymask![i] - wday, 7)
             } else {
               i = first + (n - 1) * 7
-              i += pymod(7 - this.wdaymask[i] + wday, 7)
+              i += pymod(7 - this.wdaymask![i] + wday, 7)
             }
             if (first <= i && i <= last) this.nwdaymask[i] = 1
           }
@@ -251,41 +251,41 @@ export default class Iterinfo {
       this.lastmonth = month
     }
 
-    if (rr.options.byeaster !== null) {
-      this.eastermask = this.easter(year, rr.options.byeaster)
+    if (!isBlank(rr.options.byeaster)) {
+      this.eastermask = this.easter(year, rr.options.byeaster!)
     }
   }
 
   ydayset () {
-    return [range(this.yearlen), 0, this.yearlen]
+    return [range(this.yearlen!), 0, this.yearlen]
   }
 
   mdayset (_: any, month: number, __: any) {
-    const start = this.mrange[month - 1]
-    const end = this.mrange[month]
-    const set = repeat(null, this.yearlen) as number[]
+    const start = this.mrange![month - 1]
+    const end = this.mrange![month]
+    const set = repeat(null, this.yearlen!) as (number | null)[]
     for (let i = start; i < end; i++) set[i] = i
     return [set, start, end]
   }
 
   wdayset (year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
-    const set = repeat(null, this.yearlen + 7) as number[]
+    const set = repeat(null, this.yearlen! + 7) as (number | null)[]
     let i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
+      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal!
     const start = i
     for (let j = 0; j < 7; j++) {
       set[i] = i
       ++i
-      if (this.wdaymask[i] === this.rrule.options.wkst) break
+      if (this.wdaymask![i] === this.rrule.options.wkst) break
     }
     return [set, start, i]
   }
 
   ddayset (year: number, month: number, day: number) {
-    const set = repeat(null, this.yearlen) as number[]
+    const set = repeat(null, this.yearlen!) as (number | null)[]
     const i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
+      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal!
     set[i] = i
     return [set, i, i + 1]
   }

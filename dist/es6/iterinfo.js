@@ -9,6 +9,8 @@ const helpers_1 = require("./helpers");
 // =============================================================================
 class Iterinfo {
     constructor(rrule) {
+        this.yearlen = 365;
+        this.nextyearlen = 365;
         this.rrule = rrule;
         this.lastyear = null;
         this.lastmonth = null;
@@ -54,18 +56,18 @@ class Iterinfo {
             this.yearweekday = dateutil_1.default.getWeekday(firstyday);
             const wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
             if (this.yearlen === 365) {
-                this.mmask = [].concat(masks_1.M365MASK);
-                this.mdaymask = [].concat(masks_1.MDAY365MASK);
-                this.nmdaymask = [].concat(masks_1.NMDAY365MASK);
+                this.mmask = helpers_1.clone(masks_1.M365MASK);
+                this.mdaymask = helpers_1.clone(masks_1.MDAY365MASK);
+                this.nmdaymask = helpers_1.clone(masks_1.NMDAY365MASK);
                 this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                this.mrange = [].concat(masks_1.M365RANGE);
+                this.mrange = helpers_1.clone(masks_1.M365RANGE);
             }
             else {
-                this.mmask = [].concat(masks_1.M366MASK);
-                this.mdaymask = [].concat(masks_1.MDAY366MASK);
-                this.nmdaymask = [].concat(masks_1.NMDAY366MASK);
+                this.mmask = helpers_1.clone(masks_1.M366MASK);
+                this.mdaymask = helpers_1.clone(masks_1.MDAY366MASK);
+                this.nmdaymask = helpers_1.clone(masks_1.NMDAY366MASK);
                 this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                this.mrange = [].concat(masks_1.M366RANGE);
+                this.mrange = helpers_1.clone(masks_1.M366RANGE);
             }
             if (!helpers_1.notEmpty(rr.options.byweekno)) {
                 this.wnomask = null;
@@ -211,7 +213,7 @@ class Iterinfo {
             this.lastyear = year;
             this.lastmonth = month;
         }
-        if (rr.options.byeaster !== null) {
+        if (!helpers_1.isBlank(rr.options.byeaster)) {
             this.eastermask = this.easter(year, rr.options.byeaster);
         }
     }

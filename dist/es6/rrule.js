@@ -20,7 +20,7 @@ const getnlp = function () {
 // RRule
 // =============================================================================
 exports.DEFAULT_OPTIONS = {
-    freq: null,
+    freq: types_1.Frequency.YEARLY,
     dtstart: null,
     interval: 1,
     wkst: types_1.Days.MO,
@@ -74,7 +74,7 @@ class RRule {
         return parsestring_1.parseString(rfcString);
     }
     static fromString(str) {
-        return new RRule(RRule.parseString(str));
+        return new RRule(RRule.parseString(str) || undefined);
     }
     static optionsToString(options) {
         const pairs = [];
@@ -86,7 +86,7 @@ class RRule {
             let key = keys[i].toUpperCase();
             let value = options[keys[i]];
             let strValues = [];
-            if (value === null || (value instanceof Array && !value.length))
+            if (helpers_1.isBlank(value) || (value instanceof Array && !value.length))
                 continue;
             switch (key) {
                 case 'FREQ':
@@ -436,7 +436,7 @@ class RRule {
                         const tmp = [];
                         for (let k = start; k < end; k++) {
                             const val = dayset[k];
-                            if (val === null)
+                            if (helpers_1.isBlank(val))
                                 continue;
                             tmp.push(val);
                         }
@@ -570,6 +570,7 @@ class RRule {
                     if (!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour))
                         break;
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             else if (freq === RRule.MINUTELY) {
@@ -601,6 +602,7 @@ class RRule {
                         break;
                     }
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             else if (freq === RRule.SECONDLY) {
@@ -639,6 +641,7 @@ class RRule {
                         break;
                     }
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             if (fixday && day > 28) {

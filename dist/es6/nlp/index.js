@@ -4,6 +4,7 @@ const totext_1 = require("./totext");
 const parsetext_1 = require("./parsetext");
 exports.parseText = parsetext_1.default;
 const index_1 = require("../index");
+const i18n_1 = require("./i18n");
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -93,8 +94,8 @@ const index_1 = require("../index");
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text, language) {
-    return new index_1.default(parsetext_1.default(text, language));
+const fromText = function (text, language = i18n_1.default) {
+    return new index_1.default(parsetext_1.default(text, language) || undefined);
 };
 exports.fromText = fromText;
 const common = [

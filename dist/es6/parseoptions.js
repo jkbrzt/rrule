@@ -23,20 +23,20 @@ exports.initializeOptions = initializeOptions;
 function parseOptions(options) {
     const opts = initializeOptions(options);
     const keys = Object.keys(options);
-    if (!rrule_1.default.FREQUENCIES[options.freq] && options.byeaster === null) {
-        throw new Error('Invalid frequency: ' + String(options.freq));
-    }
     // Merge in default options
     rrule_1.defaultKeys.forEach(key => {
         if (!helpers_1.contains(keys, key))
             opts[key] = rrule_1.DEFAULT_OPTIONS[key];
     });
-    if (opts.byeaster !== null)
+    if (!rrule_1.default.FREQUENCIES[opts.freq] && helpers_1.isBlank(opts.byeaster)) {
+        throw new Error('Invalid frequency: ' + String(opts.freq));
+    }
+    if (!helpers_1.isBlank(opts.byeaster))
         opts.freq = rrule_1.default.YEARLY;
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
     const millisecondModulo = opts.dtstart.getTime() % 1000;
-    if (opts.wkst === null) {
+    if (helpers_1.isBlank(opts.wkst)) {
         opts.wkst = rrule_1.default.MO.weekday;
     }
     else if (typeof opts.wkst === 'number') {
@@ -45,7 +45,7 @@ function parseOptions(options) {
     else {
         opts.wkst = opts.wkst.weekday;
     }
-    if (opts.bysetpos !== null) {
+    if (!helpers_1.isBlank(opts.bysetpos)) {
         if (typeof opts.bysetpos === 'number')
             opts.bysetpos = [opts.bysetpos];
         for (let i = 0; i < opts.bysetpos.length; i++) {
@@ -77,15 +77,15 @@ function parseOptions(options) {
         }
     }
     // bymonth
-    if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
+    if (!helpers_1.isBlank(opts.bymonth) && !(opts.bymonth instanceof Array)) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
+    if (!helpers_1.isBlank(opts.byyearday) && !(opts.byyearday instanceof Array) && typeof opts.byyearday === 'number') {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
-    if (opts.bymonthday === null) {
+    if (helpers_1.isBlank(opts.bymonthday)) {
         opts.bymonthday = [];
         opts.bynmonthday = [];
     }
@@ -115,11 +115,11 @@ function parseOptions(options) {
         }
     }
     // byweekno
-    if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
+    if (!helpers_1.isBlank(opts.byweekno) && !(opts.byweekno instanceof Array)) {
         opts.byweekno = [opts.byweekno];
     }
     // byweekday / bynweekday
-    if (opts.byweekday === null) {
+    if (helpers_1.isBlank(opts.byweekday)) {
         opts.bynweekday = null;
     }
     else if (typeof opts.byweekday === 'number') {
@@ -157,14 +157,14 @@ function parseOptions(options) {
         opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
     }
     // byhour
-    if (opts.byhour === null) {
+    if (helpers_1.isBlank(opts.byhour)) {
         opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getHours()] : null;
     }
     else if (typeof opts.byhour === 'number') {
         opts.byhour = [opts.byhour];
     }
     // byminute
-    if (opts.byminute === null) {
+    if (helpers_1.isBlank(opts.byminute)) {
         opts.byminute =
             opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getMinutes()] : null;
     }
@@ -172,7 +172,7 @@ function parseOptions(options) {
         opts.byminute = [opts.byminute];
     }
     // bysecond
-    if (opts.bysecond === null) {
+    if (helpers_1.isBlank(opts.bysecond)) {
         opts.bysecond =
             opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getSeconds()] : null;
     }

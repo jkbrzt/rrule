@@ -1,9 +1,9 @@
-declare const M365MASK: any[];
-declare const M366MASK: any[];
-declare const MDAY366MASK: any[];
-declare const MDAY365MASK: any[];
-declare const NMDAY366MASK: any[];
-declare const NMDAY365MASK: any[];
+declare const M365MASK: (number | number[])[];
+declare const M366MASK: (number | number[])[];
+declare const MDAY366MASK: number[];
+declare const MDAY365MASK: number[];
+declare const NMDAY366MASK: number[];
+declare const NMDAY365MASK: number[];
 declare const M366RANGE: number[];
 declare const M365RANGE: number[];
 declare const WDAYMASK: number[];

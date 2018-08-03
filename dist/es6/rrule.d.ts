@@ -16,7 +16,7 @@ export default class RRule {
     _cache: Cache | null;
     origOptions: Partial<Options>;
     options: ParsedOptions;
-    timeset: dateutil.Time[];
+    timeset: dateutil.Time[] | null;
     _len: number;
     static readonly FREQUENCIES: (keyof typeof Frequency)[];
     static readonly YEARLY: Frequency;
@@ -34,9 +34,9 @@ export default class RRule {
     static readonly SA: Weekday;
     static readonly SU: Weekday;
     constructor(options?: Partial<Options>, noCache?: boolean);
-    static parseText(text: string, language: Language): Partial<Options>;
+    static parseText(text: string, language: Language): Partial<Options> | null;
     static fromText(text: string, language?: Language): RRule;
-    static parseString(rfcString: string): Partial<Options>;
+    static parseString(rfcString: string): Partial<Options> | null;
     static fromString(str: string): RRule;
     static optionsToString(options: Partial<Options>): string;
     /**

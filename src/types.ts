@@ -13,26 +13,27 @@ export enum Frequency {
 
 export interface Options {
   freq: Frequency
-  dtstart: Date
+  dtstart: Date | null
   interval: number
-  wkst: Weekday | number
-  count: number
-  until: Date
-  bysetpos: number | number[]
-  bymonth: number | number[]
-  bymonthday: number | number[]
-  bynmonthday: number[]
-  byyearday: number[]
-  byweekno: number | number[]
-  byweekday: ByWeekday | ByWeekday[]
-  bynweekday: number[][]
-  byhour: number | number[]
-  byminute: number | number[]
-  bysecond: number | number[]
-  byeaster: number
+  wkst: Weekday | number | null
+  count: number | null
+  until: Date | null
+  bysetpos: number | number[] | null
+  bymonth: number | number[] | null
+  bymonthday: number | number[] | null
+  bynmonthday: number[] | null
+  byyearday: number | number[] | null
+  byweekno: number | number[] | null
+  byweekday: ByWeekday | ByWeekday[] | null
+  bynweekday: number[][] | null
+  byhour: number | number[] | null
+  byminute: number | number[] | null
+  bysecond: number | number[] | null
+  byeaster: number | null
 }
 
 export interface ParsedOptions extends Options {
+  dtstart: Date
   wkst: number
   bysetpos: number[]
   bymonth: number[]

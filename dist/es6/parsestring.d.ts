@@ -1,2 +1,2 @@
 import { Options } from './types';
-export declare function parseString(rfcString: string): Partial<Options>;
+export declare function parseString(rfcString: string): Partial<Options> | null;

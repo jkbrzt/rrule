@@ -2,10 +2,14 @@
 // Helper functions
 // =============================================================================
 
+export const isBlank = function (value: any) {
+  return value === null || typeof value === 'undefined'
+}
+
 /**
  * Simplified version of python's range()
  */
-export const range = function (start: number, end?: number): number[] {
+export const range = function (start: number, end: number = start): number[] {
   if (arguments.length === 1) {
     end = start
     start = 0
@@ -76,7 +80,7 @@ export const divmod = function (a: number, b: number) {
  * boolean value is False, whereas in JS it's true
  */
 export const notEmpty = function (obj: any[]) {
-  return !!obj && obj.length !== 0
+  return !isBlank(obj) && obj.length !== 0
 }
 
 /**

@@ -64,7 +64,7 @@ export function parseString (rfcString: string) {
             options.byweekday.push(wday)
           } else {
             // -1MO, +3FR, 1SO, ...
-            const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)
+            const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
             n = Number(parts[1])
             const wdaypart = parts[2] as keyof typeof Days
             wday = Days[wdaypart].weekday

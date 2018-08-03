@@ -21,7 +21,7 @@ export default class ToText {
     private origOptions;
     private bymonthday;
     private byweekday;
-    constructor(rrule: RRule, gettext: GetText, language?: Language);
+    constructor(rrule: RRule, gettext?: GetText, language?: Language);
     /**
      * Test whether the rrule can be fully converted to text.
      * @param {RRule} rrule
@@ -51,5 +51,5 @@ export default class ToText {
     weekdaytext(wday: Weekday | number): string;
     plural(n: number): boolean;
     add(s: string): this;
-    list(arr: ByWeekday | ByWeekday[], callback: GetText, finalDelim?: string, delim?: string): string;
+    list(arr: ByWeekday | ByWeekday[], callback?: GetText, finalDelim?: string, delim?: string): string;
 }

@@ -32,13 +32,8 @@ export interface Options {
   byeaster: number
 }
 
-export interface ParsedOptions {
-  freq: Frequency
-  dtstart: Date
-  interval: number
+export interface ParsedOptions extends Options {
   wkst: number
-  count: number
-  until: Date
   bysetpos: number[]
   bymonth: number[]
   bymonthday: number[]
@@ -46,11 +41,9 @@ export interface ParsedOptions {
   byyearday: number[]
   byweekno: number[]
   byweekday: number[]
-  bynweekday: number[][]
   byhour: number[]
   byminute: number[]
   bysecond: number[]
-  byeaster: number
 }
 
 export type CacheKeys = 'before' | 'after' | 'between'

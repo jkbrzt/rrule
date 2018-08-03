@@ -28,7 +28,7 @@ const extractTime = function (date: Date) {
  * datetime.datetime
  */
 export const datetime = function (y: number, m: number, d: number, h: number = 0, i: number = 0, s: number = 0) {
-  return new Date(y, m - 1, d, h, i, s)
+  return new Date(Date.UTC(y, m - 1, d, h, i, s))
 }
 
 export const datetimeUTC = function (y: number, m: number, d: number, h: number = 0, i: number = 0, s: number = 0) {
@@ -47,7 +47,7 @@ export const parse = function (str: string) {
   const hour = Number(h[0] === '0' ? h[1] : h)
   const minute = Number(i[0] === '0' ? i[1] : i)
   const second = Number(s[0] === '0' ? s[1] : s)
-  return new Date(year, month, day, hour, minute, second)
+  return new Date(Date.UTC(year, month, day, hour, minute, second))
 }
 
 interface TestRecurring {

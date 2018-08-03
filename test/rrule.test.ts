@@ -103,14 +103,14 @@ describe('RRule', function () {
   testRecurring('missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',
     new RRule({
       freq: RRule.MONTHLY,
-      dtstart: new Date(2013, 0, 1),
+      dtstart: new Date(Date.UTC(2013, 0, 1)),
       count: 3,
       bymonthday: [28]
     }),
     [
-      new Date(2013, 0, 28),
-      new Date(2013, 1, 28),
-      new Date(2013, 2, 28)
+      new Date(Date.UTC(2013, 0, 28)),
+      new Date(Date.UTC(2013, 1, 28)),
+      new Date(Date.UTC(2013, 2, 28))
     ]
   )
 
@@ -3577,5 +3577,17 @@ describe('RRule', function () {
       expect(rr.toText()).to.be.ok
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })
+  })
+
+  it('calculates daily recurrences correctly across DST boundaries', () => {
+    const rrule = RRule.fromString('DTSTART=20181101T110000Z;UNTIL=20181106T110000Z;FREQ=DAILY')
+    expect(rrule.all()).to.deep.equal([
+      new Date('2018-11-01T11:00:00.000Z'),
+      new Date('2018-11-02T11:00:00.000Z'),
+      new Date('2018-11-03T11:00:00.000Z'),
+      new Date('2018-11-04T11:00:00.000Z'),
+      new Date('2018-11-05T11:00:00.000Z'),
+      new Date('2018-11-06T11:00:00.000Z')
+    ])
   })
 })

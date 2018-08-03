@@ -148,9 +148,9 @@ export default class ToText {
     if (this.options.until) {
       this.add(gettext('until'))
       const until = this.options.until
-      this.add(this.language.monthNames[until.getMonth()])
-        .add(until.getDate() + ',')
-        .add(until.getFullYear().toString())
+      this.add(this.language.monthNames[until.getUTCMonth()])
+        .add(until.getUTCDate() + ',')
+        .add(until.getUTCFullYear().toString())
     } else if (this.options.count) {
       this.add(gettext('for'))
         .add(this.options.count.toString())

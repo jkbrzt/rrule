@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/es6",
+    "declaration": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "noEmitOnError": true,
+    "target": "es6",
+    "jsx": "react",
+    "baseUrl": ".",
+    "rootDirs": [
+      "./src/",
+      "./test/",
+    ]
+  },
+  "include": [
+    "./src/**/*",
+    "./test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}

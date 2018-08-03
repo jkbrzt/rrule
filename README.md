@@ -31,10 +31,10 @@ $ yarn add rrule
 ```
 
 Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/index.js) manually.
+[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) manually.
 
 ```html
-<script src="rrule/dist/index.js"></script>
+<script src="rrule/dist/es5/rrule.js"></script>
 ```
 
 #### Server Side
@@ -43,10 +43,8 @@ Alternatively, download
 $ yarn add rrule
 ```
 
-```javascript
-var RRule = require('rrule').RRule
-var RRuleSet = require('rrule').RRuleSet
-var rrulestr = require('rrule').rrulestr
+```es6
+import { RRule, RRuleSet, rrulestr } from 'rrule'
 ```
 
 #### Usage
@@ -54,7 +52,7 @@ var rrulestr = require('rrule').rrulestr
 **RRule:**
 ```js
 // Create a rule:
-var rule = new RRule({
+const rule = new RRule({
   freq: RRule.WEEKLY,
   interval: 5,
   byweekday: [RRule.MO, RRule.FR],
@@ -88,7 +86,7 @@ rule.toText()
 
 **RRuleSet:**
 ```js
-var rruleSet = new RRuleSet()
+const rruleSet = new RRuleSet()
 
 // Add a rrule to rruleSet
 rruleSet.rrule(new RRule({
@@ -338,7 +336,6 @@ documentation.
     <code>rule.options.byweekday</code> isn't equal
     to <code>rule.origOptions.byweekday</code> (which is an inconsistency).
     </dd>
-
     <dt><code>rule.origOptions</code></dt>
     <dd>The original <code>options</code> argument passed to
     the constructor.</dd>

@@ -11,7 +11,7 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { notEmpty, repeat, pymod, contains, range } from './helpers'
+import { notEmpty, repeat, pymod, contains, range, clone } from './helpers'
 
 export type DaySet = [ number[], number, number ]
 export type GetDayset = () => DaySet
@@ -90,17 +90,17 @@ export default class Iterinfo {
       const wday = dateutil.getWeekday(new Date(year, 0, 1))
 
       if (this.yearlen === 365) {
-        this.mmask = [].concat(M365MASK)
-        this.mdaymask = [].concat(MDAY365MASK)
-        this.nmdaymask = [].concat(NMDAY365MASK)
+        this.mmask = clone(M365MASK)
+        this.mdaymask = clone(MDAY365MASK)
+        this.nmdaymask = clone(NMDAY365MASK)
         this.wdaymask = WDAYMASK.slice(wday)
-        this.mrange = [].concat(M365RANGE)
+        this.mrange = clone(M365RANGE)
       } else {
-        this.mmask = [].concat(M366MASK)
-        this.mdaymask = [].concat(MDAY366MASK)
-        this.nmdaymask = [].concat(NMDAY366MASK)
+        this.mmask = clone(M366MASK)
+        this.mdaymask = clone(MDAY366MASK)
+        this.nmdaymask = clone(NMDAY366MASK)
         this.wdaymask = WDAYMASK.slice(wday)
-        this.mrange = [].concat(M366RANGE)
+        this.mrange = clone(M366RANGE)
       }
 
       if (!notEmpty(rr.options.byweekno)) {

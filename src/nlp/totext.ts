@@ -57,8 +57,8 @@ export default class ToText {
     this.origOptions = rrule.origOptions
 
     if (this.origOptions.bymonthday) {
-      const bymonthday = [].concat(this.options.bymonthday)
-      const bynmonthday = [].concat(this.options.bynmonthday)
+      const bymonthday = ([] as number[]).concat(this.options.bymonthday)
+      const bynmonthday = ([] as number[]).concat(this.options.bynmonthday)
 
       bymonthday.sort()
       bynmonthday.sort()

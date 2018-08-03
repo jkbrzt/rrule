@@ -3,6 +3,8 @@ import dateutil from './dateutil';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
 import { Cache, ParsedOptions, Options, Frequency } from './types';
+export declare const DEFAULT_OPTIONS: Options;
+export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -24,8 +26,6 @@ export default class RRule {
     static readonly HOURLY: Frequency;
     static readonly MINUTELY: Frequency;
     static readonly SECONDLY: Frequency;
-    private static readonly DEFAULT_OPTIONS;
-    private defaultKeys;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -34,8 +34,6 @@ export default class RRule {
     static readonly SA: Weekday;
     static readonly SU: Weekday;
     constructor(options?: Partial<Options>, noCache?: boolean);
-    private initializeOptions;
-    private parseOptions;
     static parseText(text: string, language: Language): Partial<Options>;
     static fromText(text: string, language?: Language): RRule;
     static parseString(rfcString: string): Partial<Options>;

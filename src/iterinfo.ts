@@ -107,9 +107,9 @@ export default class Iterinfo {
         this.wnomask = null
       } else {
         this.wnomask = repeat(0, this.yearlen + 7) as number[]
-        let no1wkst
-        let firstwkst
-        let wyearlen
+        let no1wkst: number
+        let firstwkst: number
+        let wyearlen: number
         no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7)
         if (no1wkst >= 4) {
           no1wkst = 0
@@ -173,7 +173,7 @@ export default class Iterinfo {
           // got days from last year, so there are no
           // days from last year's last week number in
           // this year.
-          let lnumweeks
+          let lnumweeks: number
           if (!contains(rr.options.byweekno, -1)) {
             const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
             let lno1wkst = pymod(

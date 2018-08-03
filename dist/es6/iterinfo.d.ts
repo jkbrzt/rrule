@@ -4,12 +4,12 @@ export declare type DaySet = [(number | null)[], number, number];
 export declare type GetDayset = () => DaySet;
 export default class Iterinfo {
     rrule: RRule;
-    lastyear: number | null;
-    lastmonth: number | null;
-    yearlen: 365 | 366 | null;
-    nextyearlen: 365 | 366 | null;
-    yearordinal: number | null;
-    yearweekday: number | null;
+    lastyear: number;
+    lastmonth: number;
+    yearlen: 365 | 366;
+    nextyearlen: 365 | 366;
+    yearordinal: number;
+    yearweekday: number;
     mmask: number[] | null;
     mrange: number[] | null;
     mdaymask: number[] | null;
@@ -21,7 +21,7 @@ export default class Iterinfo {
     constructor(rrule: RRule);
     easter(y: number, offset?: number): number[];
     rebuild(year: number, month: number): void;
-    ydayset(): (number | number[] | null)[];
+    ydayset(): (number | number[])[];
     mdayset(_: any, month: number, __: any): (number | (number | null)[])[];
     wdayset(year: number, month: number, day: number): (number | (number | null)[])[];
     ddayset(year: number, month: number, day: number): (number | (number | null)[])[];

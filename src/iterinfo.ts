@@ -22,12 +22,12 @@ export type GetDayset = () => DaySet
 
 export default class Iterinfo {
   public rrule: RRule
-  public lastyear: number | null
-  public lastmonth: number | null
-  public yearlen: 365 | 366 | null = 365
-  public nextyearlen: 365 | 366 | null = 365
-  public yearordinal: number | null
-  public yearweekday: number | null
+  public lastyear: number
+  public lastmonth: number
+  public yearlen: 365 | 366 = 365
+  public nextyearlen: 365 | 366 = 365
+  public yearordinal: number
+  public yearweekday: number
   public mmask: number[] | null
   public mrange: number[] | null
   public mdaymask: number[] | null
@@ -39,12 +39,6 @@ export default class Iterinfo {
 
   constructor (rrule: RRule) {
     this.rrule = rrule
-    this.lastyear = null
-    this.lastmonth = null
-    this.yearlen = null
-    this.nextyearlen = null
-    this.yearordinal = null
-    this.yearweekday = null
     this.mmask = null
     this.mrange = null
     this.mdaymask = null
@@ -216,7 +210,7 @@ export default class Iterinfo {
             ranges.push(this.mrange!.slice(month - 1, month + 1))
           }
         } else {
-          ranges = [[0, this.yearlen!]]
+          ranges = [[0, this.yearlen]]
         }
       } else if (rr.options.freq === RRule.MONTHLY) {
         ranges = [this.mrange!.slice(month - 1, month + 1)]
@@ -224,7 +218,7 @@ export default class Iterinfo {
       if (notEmpty(ranges)) {
         // Weekly frequency won't get here, so we may not
         // care about cross-year weekly periods.
-        this.nwdaymask = repeat(0, this.yearlen!) as number[]
+        this.nwdaymask = repeat(0, this.yearlen) as number[]
 
         for (let j = 0; j < ranges.length; j++) {
           const rang = ranges[j]
@@ -257,22 +251,22 @@ export default class Iterinfo {
   }
 
   ydayset () {
-    return [range(this.yearlen!), 0, this.yearlen]
+    return [range(this.yearlen), 0, this.yearlen]
   }
 
   mdayset (_: any, month: number, __: any) {
     const start = this.mrange![month - 1]
     const end = this.mrange![month]
-    const set = repeat(null, this.yearlen!) as (number | null)[]
+    const set = repeat(null, this.yearlen) as (number | null)[]
     for (let i = start; i < end; i++) set[i] = i
     return [set, start, end]
   }
 
   wdayset (year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
-    const set = repeat(null, this.yearlen! + 7) as (number | null)[]
+    const set = repeat(null, this.yearlen + 7) as (number | null)[]
     let i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal!
+      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
     const start = i
     for (let j = 0; j < 7; j++) {
       set[i] = i
@@ -283,9 +277,9 @@ export default class Iterinfo {
   }
 
   ddayset (year: number, month: number, day: number) {
-    const set = repeat(null, this.yearlen!) as (number | null)[]
+    const set = repeat(null, this.yearlen) as (number | null)[]
     const i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal!
+      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
     set[i] = i
     return [set, i, i + 1]
   }

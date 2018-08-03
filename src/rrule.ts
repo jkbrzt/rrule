@@ -520,12 +520,12 @@ export default class RRule {
             !contains(bymonthday, ii.mdaymask![currentDay]) &&
             !contains(bynmonthday, ii.nmdaymask![currentDay])) ||
           (notEmpty(byyearday) &&
-            ((currentDay < ii.yearlen! &&
+            ((currentDay < ii.yearlen &&
               !contains(byyearday, currentDay + 1) &&
-              !contains(byyearday, -ii.yearlen! + currentDay)) ||
-              (currentDay >= ii.yearlen! &&
-                !contains(byyearday, currentDay + 1 - ii.yearlen!) &&
-                !contains(byyearday, -ii.nextyearlen! + currentDay - ii.yearlen!))))
+              !contains(byyearday, -ii.yearlen + currentDay)) ||
+              (currentDay >= ii.yearlen &&
+                !contains(byyearday, currentDay + 1 - ii.yearlen) &&
+                !contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
 
         if (filtered) dayset[currentDay] = null
       }
@@ -563,7 +563,7 @@ export default class RRule {
             }
 
             const time = timeset![timepos]
-            const date = dateutil.fromOrdinal(ii.yearordinal! + i)
+            const date = dateutil.fromOrdinal(ii.yearordinal + i)
             const res = dateutil.combine(date, time)
             // XXX: can this ever be in the array?
             // - compare the actual date instead?
@@ -596,7 +596,7 @@ export default class RRule {
         for (let j = start; j < end; j++) {
           currentDay = dayset[j] as number
           if (currentDay !== null) {
-            const date = dateutil.fromOrdinal(ii.yearordinal! + currentDay)
+            const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
             for (let k = 0; k < timeset!.length; k++) {
               const time = timeset![k]
               const res = dateutil.combine(date, time)

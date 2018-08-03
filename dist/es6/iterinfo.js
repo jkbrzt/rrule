@@ -12,12 +12,6 @@ class Iterinfo {
         this.yearlen = 365;
         this.nextyearlen = 365;
         this.rrule = rrule;
-        this.lastyear = null;
-        this.lastmonth = null;
-        this.yearlen = null;
-        this.nextyearlen = null;
-        this.yearordinal = null;
-        this.yearweekday = null;
         this.mmask = null;
         this.mrange = null;
         this.mdaymask = null;

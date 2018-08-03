@@ -3590,4 +3590,29 @@ describe('RRule', function () {
       new Date('2018-11-06T11:00:00.000Z')
     ])
   })
+
+  it('calculates weekly recurrences correctly across DST boundaries', () => {
+    const rrule = RRule.fromString('FREQ=WEEKLY;DTSTART=20181031T180000Z;UNTIL=20181115T050000Z')
+    expect(rrule.all()).to.deep.equal([
+      new Date('2018-10-31T18:00:00.000Z'),
+      new Date('2018-11-07T18:00:00.000Z'),
+      new Date('2018-11-14T18:00:00.000Z')
+    ])
+  })
+
+  it('calculates byweekday recurrences correctly across DST boundaries', () => {
+    let rule = new RRule({
+      freq: RRule.WEEKLY,
+      dtstart: new Date(Date.UTC(2018, 9, 0, 0, 0, 0)),
+      interval: 1,
+      byweekday: [RRule.SU, RRule.WE],
+      until: new Date(Date.UTC(2018, 9, 9, 0, 0, 0))
+    })
+
+    expect(rule.all()).to.deep.equal([
+      new Date('2018-09-30T00:00:00.000Z'),
+      new Date('2018-10-03T00:00:00.000Z'),
+      new Date('2018-10-07T00:00:00.000Z')
+    ])
+  })
 })

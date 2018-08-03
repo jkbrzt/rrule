@@ -75,11 +75,7 @@ const dateutil = {
    * @see - <http://docs.python.org/library/datetime.html#datetime.date.fromordinal>
    */
   fromOrdinal: function (ordinal) {
-    const millisecsFromBase = ordinal * dateutil.ONE_DAY
-    return new Date(dateutil.ORDINAL_BASE.getTime() -
-      dateutil.tzOffset(dateutil.ORDINAL_BASE) +
-      millisecsFromBase +
-      dateutil.tzOffset(new Date(millisecsFromBase)))
+   return new Date(dateutil.ORDINAL_BASE.getTime() + (ordinal * dateutil.ONE_DAY))
   },
 
   /**

@@ -20,7 +20,7 @@ const M365MASK = [
   ...repeat(11, 30),
   ...repeat(12, 31),
   ...repeat(1, 7)
-] as number[]
+]
 
 const M366MASK = [
   ...repeat(1, 31),
@@ -36,7 +36,7 @@ const M366MASK = [
   ...repeat(11, 30),
   ...repeat(12, 31),
   ...repeat(1, 7)
-] as number[]
+]
 
 const M28 = range(1, 29)
 const M29 = range(1, 30)

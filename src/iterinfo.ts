@@ -24,8 +24,8 @@ export default class Iterinfo {
   public rrule: RRule
   public lastyear: number
   public lastmonth: number
-  public yearlen: number
-  public nextyearlen: number
+  public yearlen: 365 | 366 = 365
+  public nextyearlen: 365 | 366 = 365
   public yearordinal: number
   public yearweekday: number
   public mmask: number[]

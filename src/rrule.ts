@@ -245,11 +245,11 @@ export default class RRule {
     ) {
       switch (opts.freq) {
         case RRule.YEARLY:
-          if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1
-          opts.bymonthday = opts.dtstart.getDate()
+          if (!opts.bymonth) opts.bymonth = opts.dtstart.getUTCMonth() + 1
+          opts.bymonthday = opts.dtstart.getUTCDate()
           break
         case RRule.MONTHLY:
-          opts.bymonthday = opts.dtstart.getDate()
+          opts.bymonthday = opts.dtstart.getUTCDate()
           break
         case RRule.WEEKLY:
           opts.byweekday = [dateutil.getWeekday(opts.dtstart)]
@@ -338,7 +338,7 @@ export default class RRule {
 
     // byhour
     if (opts.byhour === null) {
-      opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getHours()] : null
+      opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
     } else if (typeof opts.byhour === 'number') {
       opts.byhour = [opts.byhour]
     }
@@ -346,7 +346,7 @@ export default class RRule {
     // byminute
     if (opts.byminute === null) {
       opts.byminute =
-        opts.freq < RRule.MINUTELY ? [opts.dtstart.getMinutes()] : null
+        opts.freq < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null
     } else if (typeof opts.byminute === 'number') {
       opts.byminute = [opts.byminute]
     }
@@ -354,7 +354,7 @@ export default class RRule {
     // bysecond
     if (opts.bysecond === null) {
       opts.bysecond =
-        opts.freq < RRule.SECONDLY ? [opts.dtstart.getSeconds()] : null
+        opts.freq < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null
     } else if (typeof opts.bysecond === 'number') {
       opts.bysecond = [opts.bysecond]
     }
@@ -771,12 +771,12 @@ export default class RRule {
     const dtstart = this.options.dtstart
     const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000
 
-    let year = dtstart.getFullYear()
-    let month = dtstart.getMonth() + 1
-    let day = dtstart.getDate()
-    let hour = dtstart.getHours()
-    let minute = dtstart.getMinutes()
-    let second = dtstart.getSeconds()
+    let year = dtstart.getUTCFullYear()
+    let month = dtstart.getUTCMonth() + 1
+    let day = dtstart.getUTCDate()
+    let hour = dtstart.getUTCHours()
+    let minute = dtstart.getUTCMinutes()
+    let second = dtstart.getUTCSeconds()
     let weekday = dateutil.getWeekday(dtstart)
 
     // Some local variables to speed things up a bit

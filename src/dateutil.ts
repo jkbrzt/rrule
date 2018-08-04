@@ -36,13 +36,13 @@ export namespace dateutil {
    */
   export const getYearDay = function (date: Date) {
     const dateNoTime = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate()
     )
     return (
       Math.ceil(
-        (dateNoTime.valueOf() - new Date(date.getFullYear(), 0, 1).valueOf()) /
+        (dateNoTime.valueOf() - new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
           ONE_DAY
       ) + 1
     )
@@ -88,8 +88,8 @@ export namespace dateutil {
   }
 
   export const getMonthDays = function (date: Date) {
-    const month = date.getMonth()
-    return month === 1 && isLeapYear(date.getFullYear())
+    const month = date.getUTCMonth()
+    return month === 1 && isLeapYear(date.getUTCFullYear())
       ? 29
       : MONTH_DAYS[month]
   }
@@ -98,7 +98,7 @@ export namespace dateutil {
    * @return {Number} python-like weekday
    */
   export const getWeekday = function (date: Date) {
-    return PY_WEEKDAYS[date.getDay()]
+    return PY_WEEKDAYS[date.getUTCDay()]
   }
 
   /**
@@ -114,15 +114,15 @@ export namespace dateutil {
    */
   export const combine = function (date: Date, time: Date | Time) {
     time = time || date
-    return new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
+    return new Date(Date.UTC(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate(),
       time.getHours(),
       time.getMinutes(),
       time.getSeconds(),
       time.getMilliseconds()
-    )
+    ))
   }
 
   export const clone = function (date: Date | Time) {

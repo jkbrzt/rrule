@@ -31,8 +31,8 @@ var dateutil;
      * py_date.timetuple()[7]
      */
     dateutil.getYearDay = function (date) {
-        const dateNoTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        return (Math.ceil((dateNoTime.valueOf() - new Date(date.getFullYear(), 0, 1).valueOf()) /
+        const dateNoTime = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+        return (Math.ceil((dateNoTime.valueOf() - new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
             dateutil.ONE_DAY) + 1);
     };
     dateutil.isLeapYear = function (year) {
@@ -70,8 +70,8 @@ var dateutil;
         return new Date(dateutil.ORDINAL_BASE.getTime() + (ordinal * dateutil.ONE_DAY));
     };
     dateutil.getMonthDays = function (date) {
-        const month = date.getMonth();
-        return month === 1 && dateutil.isLeapYear(date.getFullYear())
+        const month = date.getUTCMonth();
+        return month === 1 && dateutil.isLeapYear(date.getUTCFullYear())
             ? 29
             : dateutil.MONTH_DAYS[month];
     };
@@ -79,7 +79,7 @@ var dateutil;
      * @return {Number} python-like weekday
      */
     dateutil.getWeekday = function (date) {
-        return dateutil.PY_WEEKDAYS[date.getDay()];
+        return dateutil.PY_WEEKDAYS[date.getUTCDay()];
     };
     /**
      * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
@@ -93,7 +93,7 @@ var dateutil;
      */
     dateutil.combine = function (date, time) {
         time = time || date;
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
+        return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds()));
     };
     dateutil.clone = function (date) {
         const dolly = new Date(date.getTime());

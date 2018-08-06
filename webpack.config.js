@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const paths = {
   demo: {
@@ -15,10 +16,11 @@ const paths = {
 
 const rruleConfig = {
   entry: {
-    index: path.join(paths.es6, "index.js")
+    rrule: path.join(paths.es6, "index.js"),
+    'rrule.min': path.join(paths.es6, "index.js")
   },
   output: {
-    filename: "rrule.js",
+    filename: "[name].js",
     path: paths.es5,
     library: "rrule",
     libraryTarget: "umd",
@@ -39,7 +41,12 @@ const rruleConfig = {
     extensions: [".js"]
   },
   optimization: {
-    minimize: false
+    minimize: true,
+    minimizer: [
+      new UglifyJsPlugin({
+        include: /\.min\.js$/
+      })
+    ]
   }
 };
 

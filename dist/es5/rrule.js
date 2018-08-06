@@ -3265,8 +3265,6 @@ var RRuleStr = function () {
 
             options.dtstart = options.dtstart || null;
             options.cache = options.cache || false;
-            options.ignoretz = options.ignoretz || false;
-            options.tzinfos = options.tzinfos || null;
             var name = void 0;
             var value = void 0;
             var parts = void 0;
@@ -3286,10 +3284,7 @@ var RRuleStr = function () {
                 value = parts[1].toUpperCase();
                 try {
                     // @ts-ignore
-                    this['_handle_' + name](rrkwargs, name, value, {
-                        ignoretz: options.ignoretz,
-                        tzinfos: options.tzinfos
-                    });
+                    this["_handle_" + name](rrkwargs, name, value);
                 } catch (error) {
                     throw new Error("unknown parameter '" + name + "':" + value);
                 }
@@ -3344,9 +3339,7 @@ var RRuleStr = function () {
             if (!options.forceset && lines.length === 1 && (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
                 return this._parseRfcRRule(lines[0], {
                     cache: options.cache,
-                    dtstart: options.dtstart,
-                    ignoretz: options.ignoretz,
-                    tzinfos: options.tzinfos
+                    dtstart: options.dtstart
                 });
             } else {
                 for (var _i = 0; _i < lines.length; _i++) {
@@ -3402,9 +3395,7 @@ var RRuleStr = function () {
                     rset = new rruleset_1.default(!options.cache);
                     for (j = 0; j < rrulevals.length; j++) {
                         rset.rrule(this._parseRfcRRule(rrulevals[j], {
-                            dtstart: options.dtstart || dtstart,
-                            ignoretz: options.ignoretz,
-                            tzinfos: options.tzinfos
+                            dtstart: options.dtstart || dtstart
                         }));
                     }
                     for (j = 0; j < rdatevals.length; j++) {
@@ -3416,9 +3407,7 @@ var RRuleStr = function () {
                     }
                     for (j = 0; j < exrulevals.length; j++) {
                         rset.exrule(this._parseRfcRRule(exrulevals[j], {
-                            dtstart: options.dtstart || dtstart,
-                            ignoretz: options.ignoretz,
-                            tzinfos: options.tzinfos
+                            dtstart: options.dtstart || dtstart
                         }));
                     }
                     for (j = 0; j < exdatevals.length; j++) {
@@ -3433,9 +3422,7 @@ var RRuleStr = function () {
                 } else {
                     return this._parseRfcRRule(rrulevals[0], {
                         dtstart: options.dtstart || dtstart,
-                        cache: options.cache,
-                        ignoretz: options.ignoretz,
-                        tzinfos: options.tzinfos
+                        cache: options.cache
                     });
                 }
             }
@@ -3491,9 +3478,7 @@ RRuleStr.DEFAULT_OPTIONS = {
     cache: false,
     unfold: false,
     forceset: false,
-    compatible: false,
-    ignoretz: false,
-    tzinfos: null
+    compatible: false
 };
 exports.default = RRuleStr;
 //# sourceMappingURL=rrulestr.js.map

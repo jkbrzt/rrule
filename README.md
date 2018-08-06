@@ -596,18 +596,15 @@ If set to True, the parser will operate in RFC-compatible mode. Right now it
 means that unfold will be turned on, and if a DTSTART is found, it will be
 considered the first recurrence instance, as documented in the RFC.
 
-`ignoretz`
-If set to True, the date parser will ignore timezone information available in
-the DTSTART property, or the UNTIL attribute.
-
-`tzinfos`
-If set, it will be passed to the datetime string parser to resolve unknown
-timezone settings. For more information about what could be used here, check
-the parser documentation.
-
 * * * * *
 
 ### Differences From iCalendar RFC
+
+* *Timezones:* `RRule` does not implement the `TZID` keyword in the RFC. It
+only correctly supports "floating" times or UTC timezones. While it will work
+the same regardless of the host system's timezone, for best results, only pass
+in JS `Date` objects that are represented in UTC to avoid unexpected timezone
+offsets being applied.
 
 * `RRule` has no `byday` keyword. The equivalent keyword has been replaced by
 the `byweekday` keyword, to remove the ambiguity present in the original
@@ -639,18 +636,24 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 ### Development
 
-rrule.js uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+rrule.js is implemented in Typescript. It uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
 
-To build, run:
+To run the code, checkout this repository and run:
 
 ```
-$ yarn build
+$ yarn
 ```
 
 To run the tests, run:
 
 ```
 $ yarn test
+```
+
+To build files for distribution, run:
+
+```
+$ yarn build
 ```
 
 ### Changelog

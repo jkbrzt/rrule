@@ -59,7 +59,7 @@
     ]
   },
   "files": [
-    "lib",
+    "dist",
     "README.md"
   ]
 }

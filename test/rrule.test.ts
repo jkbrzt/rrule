@@ -683,7 +683,7 @@ describe('RRule', function () {
     ]
   )
 
-  testRecurring.skip('testYearlyBetweenIncLargeSpan',
+  testRecurring('testYearlyBetweenIncLargeSpan',
     {
       rrule: new RRule({
         freq: RRule.YEARLY,

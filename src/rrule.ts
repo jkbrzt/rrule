@@ -418,12 +418,12 @@ export default class RRule {
     const dtstart = this.options.dtstart
     const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000
 
-    let year = dtstart.getFullYear()
-    let month = dtstart.getMonth() + 1
-    let day = dtstart.getDate()
-    let hour = dtstart.getHours()
-    let minute = dtstart.getMinutes()
-    let second = dtstart.getSeconds()
+    let year = dtstart.getUTCFullYear()
+    let month = dtstart.getUTCMonth() + 1
+    let day = dtstart.getUTCDate()
+    let hour = dtstart.getUTCHours()
+    let minute = dtstart.getUTCMinutes()
+    let second = dtstart.getUTCSeconds()
     let weekday = dateutil.getWeekday(dtstart)
 
     // Some local variables to speed things up a bit

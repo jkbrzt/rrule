@@ -200,8 +200,8 @@ var dateutil;
      * py_date.timetuple()[7]
      */
     dateutil.getYearDay = function (date) {
-        var dateNoTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        return Math.ceil((dateNoTime.valueOf() - new Date(date.getFullYear(), 0, 1).valueOf()) / dateutil.ONE_DAY) + 1;
+        var dateNoTime = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+        return Math.ceil((dateNoTime.valueOf() - new Date(date.getUTCFullYear(), 0, 1).valueOf()) / dateutil.ONE_DAY) + 1;
     };
     dateutil.isLeapYear = function (year) {
         return year % 4 === 0 && year % 100 !== 0 || year % 400 === 0;
@@ -238,14 +238,14 @@ var dateutil;
         return new Date(dateutil.ORDINAL_BASE.getTime() + ordinal * dateutil.ONE_DAY);
     };
     dateutil.getMonthDays = function (date) {
-        var month = date.getMonth();
-        return month === 1 && dateutil.isLeapYear(date.getFullYear()) ? 29 : dateutil.MONTH_DAYS[month];
+        var month = date.getUTCMonth();
+        return month === 1 && dateutil.isLeapYear(date.getUTCFullYear()) ? 29 : dateutil.MONTH_DAYS[month];
     };
     /**
      * @return {Number} python-like weekday
      */
     dateutil.getWeekday = function (date) {
-        return dateutil.PY_WEEKDAYS[date.getDay()];
+        return dateutil.PY_WEEKDAYS[date.getUTCDay()];
     };
     /**
      * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
@@ -259,7 +259,7 @@ var dateutil;
      */
     dateutil.combine = function (date, time) {
         time = time || date;
-        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds());
+        return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), time.getHours(), time.getMinutes(), time.getSeconds(), time.getMilliseconds()));
     };
     dateutil.clone = function (date) {
         var dolly = new Date(date.getTime());
@@ -743,12 +743,12 @@ var RRule = function () {
                  */
             var dtstart = this.options.dtstart;
             var dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000;
-            var year = dtstart.getFullYear();
-            var month = dtstart.getMonth() + 1;
-            var day = dtstart.getDate();
-            var hour = dtstart.getHours();
-            var minute = dtstart.getMinutes();
-            var second = dtstart.getSeconds();
+            var year = dtstart.getUTCFullYear();
+            var month = dtstart.getUTCMonth() + 1;
+            var day = dtstart.getUTCDate();
+            var hour = dtstart.getUTCHours();
+            var minute = dtstart.getUTCMinutes();
+            var second = dtstart.getUTCSeconds();
             var weekday = dateutil_1.default.getWeekday(dtstart);
             // Some local variables to speed things up a bit
             var _options = this.options,
@@ -2078,11 +2078,11 @@ function parseOptions(options) {
     if (!(Boolean(opts.byweekno) || helpers_1.notEmpty(opts.byweekno) || helpers_1.notEmpty(opts.byyearday) || Boolean(opts.bymonthday) || helpers_1.notEmpty(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
         switch (opts.freq) {
             case rrule_1.default.YEARLY:
-                if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1;
-                opts.bymonthday = opts.dtstart.getDate();
+                if (!opts.bymonth) opts.bymonth = opts.dtstart.getUTCMonth() + 1;
+                opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
             case rrule_1.default.MONTHLY:
-                opts.bymonthday = opts.dtstart.getDate();
+                opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
             case rrule_1.default.WEEKLY:
                 opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
@@ -2162,19 +2162,19 @@ function parseOptions(options) {
     }
     // byhour
     if (helpers_1.isBlank(opts.byhour)) {
-        opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getHours()] : null;
+        opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     } else if (typeof opts.byhour === 'number') {
         opts.byhour = [opts.byhour];
     }
     // byminute
     if (helpers_1.isBlank(opts.byminute)) {
-        opts.byminute = opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getMinutes()] : null;
+        opts.byminute = opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     } else if (typeof opts.byminute === 'number') {
         opts.byminute = [opts.byminute];
     }
     // bysecond
     if (helpers_1.isBlank(opts.bysecond)) {
-        opts.bysecond = opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getSeconds()] : null;
+        opts.bysecond = opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     } else if (typeof opts.bysecond === 'number') {
         opts.bysecond = [opts.bysecond];
     }
@@ -2541,7 +2541,7 @@ var ToText = function () {
             if (this.options.until) {
                 this.add(gettext('until'));
                 var until = this.options.until;
-                this.add(this.language.monthNames[until.getMonth()]).add(until.getDate() + ',').add(until.getFullYear().toString());
+                this.add(this.language.monthNames[until.getUTCMonth()]).add(until.getUTCDate() + ',').add(until.getUTCFullYear().toString());
             } else if (this.options.count) {
                 this.add(gettext('for')).add(this.options.count.toString()).add(this.plural(this.options.count) ? gettext('times') : gettext('time'));
             }
@@ -3326,8 +3326,6 @@ var RRuleStr = function () {
 
             options.dtstart = options.dtstart || null;
             options.cache = options.cache || false;
-            options.ignoretz = options.ignoretz || false;
-            options.tzinfos = options.tzinfos || null;
             var name = void 0;
             var value = void 0;
             var parts = void 0;
@@ -3347,10 +3345,7 @@ var RRuleStr = function () {
                 value = parts[1].toUpperCase();
                 try {
                     // @ts-ignore
-                    this['_handle_' + name](rrkwargs, name, value, {
-                        ignoretz: options.ignoretz,
-                        tzinfos: options.tzinfos
-                    });
+                    this["_handle_" + name](rrkwargs, name, value);
                 } catch (error) {
                     throw new Error("unknown parameter '" + name + "':" + value);
                 }
@@ -3405,9 +3400,7 @@ var RRuleStr = function () {
             if (!options.forceset && lines.length === 1 && (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
                 return this._parseRfcRRule(lines[0], {
                     cache: options.cache,
-                    dtstart: options.dtstart,
-                    ignoretz: options.ignoretz,
-                    tzinfos: options.tzinfos
+                    dtstart: options.dtstart
                 });
             } else {
                 for (var _i = 0; _i < lines.length; _i++) {
@@ -3464,9 +3457,7 @@ var RRuleStr = function () {
                     for (j = 0; j < rrulevals.length; j++) {
                         rset.rrule(this._parseRfcRRule(rrulevals[j], {
                             // @ts-ignore
-                            dtstart: options.dtstart || dtstart,
-                            ignoretz: options.ignoretz,
-                            tzinfos: options.tzinfos
+                            dtstart: options.dtstart || dtstart
                         }));
                     }
                     for (j = 0; j < rdatevals.length; j++) {
@@ -3479,9 +3470,7 @@ var RRuleStr = function () {
                     for (j = 0; j < exrulevals.length; j++) {
                         rset.exrule(this._parseRfcRRule(exrulevals[j], {
                             // @ts-ignore
-                            dtstart: options.dtstart || dtstart,
-                            ignoretz: options.ignoretz,
-                            tzinfos: options.tzinfos
+                            dtstart: options.dtstart || dtstart
                         }));
                     }
                     for (j = 0; j < exdatevals.length; j++) {
@@ -3498,9 +3487,7 @@ var RRuleStr = function () {
                     return this._parseRfcRRule(rrulevals[0], {
                         // @ts-ignore
                         dtstart: options.dtstart || dtstart,
-                        cache: options.cache,
-                        ignoretz: options.ignoretz,
-                        tzinfos: options.tzinfos
+                        cache: options.cache
                     });
                 }
             }
@@ -3556,9 +3543,7 @@ RRuleStr.DEFAULT_OPTIONS = {
     cache: false,
     unfold: false,
     forceset: false,
-    compatible: false,
-    ignoretz: false,
-    tzinfos: null
+    compatible: false
 };
 exports.default = RRuleStr;
 //# sourceMappingURL=rrulestr.js.map

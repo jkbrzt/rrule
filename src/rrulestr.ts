@@ -11,8 +11,6 @@ export interface RRuleStrOptions {
   unfold: boolean
   forceset: boolean
   compatible: boolean
-  ignoretz: boolean
-  tzinfos: any | null
 }
 
 type FreqKey = keyof typeof Frequency
@@ -55,9 +53,7 @@ export default class RRuleStr {
     cache: false,
     unfold: false,
     forceset: false,
-    compatible: false,
-    ignoretz: false,
-    tzinfos: null
+    compatible: false
   }
 
   private _handle_int (
@@ -140,8 +136,6 @@ export default class RRuleStr {
   ) {
     options.dtstart = options.dtstart || null
     options.cache = options.cache || false
-    options.ignoretz = options.ignoretz || false
-    options.tzinfos = options.tzinfos || null
 
     let name: string
     let value: string
@@ -166,10 +160,7 @@ export default class RRuleStr {
 
       try {
         // @ts-ignore
-        this['_handle_' + name](rrkwargs, name, value, {
-          ignoretz: options.ignoretz,
-          tzinfos: options.tzinfos
-        })
+        this[`_handle_${name}`](rrkwargs, name, value)
       } catch (error) {
         throw new Error("unknown parameter '" + name + "':" + value)
       }
@@ -232,9 +223,7 @@ export default class RRuleStr {
     ) {
       return this._parseRfcRRule(lines[0], {
         cache: options.cache,
-        dtstart: options.dtstart,
-        ignoretz: options.ignoretz,
-        tzinfos: options.tzinfos
+        dtstart: options.dtstart
       })
     } else {
       for (let i = 0; i < lines.length; i++) {
@@ -300,9 +289,7 @@ export default class RRuleStr {
           rset.rrule(
             this._parseRfcRRule(rrulevals[j], {
               // @ts-ignore
-              dtstart: options.dtstart || dtstart,
-              ignoretz: options.ignoretz,
-              tzinfos: options.tzinfos
+              dtstart: options.dtstart || dtstart
             })
           )
         }
@@ -317,9 +304,7 @@ export default class RRuleStr {
           rset.exrule(
             this._parseRfcRRule(exrulevals[j], {
               // @ts-ignore
-              dtstart: options.dtstart || dtstart,
-              ignoretz: options.ignoretz,
-              tzinfos: options.tzinfos
+              dtstart: options.dtstart || dtstart
             })
           )
         }
@@ -338,9 +323,7 @@ export default class RRuleStr {
         return this._parseRfcRRule(rrulevals[0], {
           // @ts-ignore
           dtstart: options.dtstart || dtstart,
-          cache: options.cache,
-          ignoretz: options.ignoretz,
-          tzinfos: options.tzinfos
+          cache: options.cache
         })
       }
     }

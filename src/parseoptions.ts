@@ -73,11 +73,11 @@ export function parseOptions (options: Partial<Options>) {
   ) {
     switch (opts.freq) {
       case RRule.YEARLY:
-        if (!opts.bymonth) opts.bymonth = opts.dtstart.getMonth() + 1
-        opts.bymonthday = opts.dtstart.getDate()
+        if (!opts.bymonth) opts.bymonth = opts.dtstart.getUTCMonth() + 1
+        opts.bymonthday = opts.dtstart.getUTCDate()
         break
       case RRule.MONTHLY:
-        opts.bymonthday = opts.dtstart.getDate()
+        opts.bymonthday = opts.dtstart.getUTCDate()
         break
       case RRule.WEEKLY:
         opts.byweekday = [dateutil.getWeekday(opts.dtstart)]
@@ -166,7 +166,7 @@ export function parseOptions (options: Partial<Options>) {
 
   // byhour
   if (isBlank(opts.byhour)) {
-    opts.byhour = opts.freq! < RRule.HOURLY ? [opts.dtstart.getHours()] : null
+    opts.byhour = opts.freq! < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
   } else if (typeof opts.byhour === 'number') {
     opts.byhour = [opts.byhour]
   }
@@ -174,7 +174,7 @@ export function parseOptions (options: Partial<Options>) {
   // byminute
   if (isBlank(opts.byminute)) {
     opts.byminute =
-      opts.freq! < RRule.MINUTELY ? [opts.dtstart.getMinutes()] : null
+      opts.freq! < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null
   } else if (typeof opts.byminute === 'number') {
     opts.byminute = [opts.byminute]
   }
@@ -182,7 +182,7 @@ export function parseOptions (options: Partial<Options>) {
   // bysecond
   if (isBlank(opts.bysecond)) {
     opts.bysecond =
-      opts.freq! < RRule.SECONDLY ? [opts.dtstart.getSeconds()] : null
+      opts.freq! < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null
   } else if (typeof opts.bysecond === 'number') {
     opts.bysecond = [opts.bysecond]
   }

@@ -1,6 +1,6 @@
 {
   "name": "rrule",
-  "version": "2.2.8",
+  "version": "2.4.0",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "SEE LICENSE IN LICENSE",
@@ -26,7 +26,7 @@
   "scripts": {
     "build": "yarn lint && tsc && webpack",
     "lint": "yarn tslint --project . --fix --config tslint.json",
-    "test": "yarn lint && TZ=UTC TS_NODE_PROJECT=tsconfig.test.json mocha --compilers ts:ts-node/register"
+    "test": "yarn lint && TS_NODE_PROJECT=tsconfig.test.json mocha --require ts-node/register **/*.test.ts"
   },
   "devDependencies": {
     "@types/assert": "^0.0.31",

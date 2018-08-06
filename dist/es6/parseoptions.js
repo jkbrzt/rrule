@@ -65,11 +65,11 @@ function parseOptions(options) {
         switch (opts.freq) {
             case rrule_1.default.YEARLY:
                 if (!opts.bymonth)
-                    opts.bymonth = opts.dtstart.getMonth() + 1;
-                opts.bymonthday = opts.dtstart.getDate();
+                    opts.bymonth = opts.dtstart.getUTCMonth() + 1;
+                opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
             case rrule_1.default.MONTHLY:
-                opts.bymonthday = opts.dtstart.getDate();
+                opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
             case rrule_1.default.WEEKLY:
                 opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
@@ -158,7 +158,7 @@ function parseOptions(options) {
     }
     // byhour
     if (helpers_1.isBlank(opts.byhour)) {
-        opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getHours()] : null;
+        opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
     else if (typeof opts.byhour === 'number') {
         opts.byhour = [opts.byhour];
@@ -166,7 +166,7 @@ function parseOptions(options) {
     // byminute
     if (helpers_1.isBlank(opts.byminute)) {
         opts.byminute =
-            opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getMinutes()] : null;
+            opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     }
     else if (typeof opts.byminute === 'number') {
         opts.byminute = [opts.byminute];
@@ -174,7 +174,7 @@ function parseOptions(options) {
     // bysecond
     if (helpers_1.isBlank(opts.bysecond)) {
         opts.bysecond =
-            opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getSeconds()] : null;
+            opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     }
     else if (typeof opts.bysecond === 'number') {
         opts.bysecond = [opts.bysecond];

@@ -30,11 +30,14 @@ to natural language.
 $ yarn add rrule
 ```
 
-Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) manually.
+Alternatively, download manually:
+
+ * [rrule.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.min.js) (bundled, minified)
+ * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) (bundled, not minified)
+ * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es6/rrule.js) (es6 source with optional TypeScript types)
 
 ```html
-<script src="rrule/dist/es5/rrule.js"></script>
+<script src="rrule/dist/es5/rrule.min.js"></script>
 ```
 
 #### Server Side
@@ -596,18 +599,15 @@ If set to True, the parser will operate in RFC-compatible mode. Right now it
 means that unfold will be turned on, and if a DTSTART is found, it will be
 considered the first recurrence instance, as documented in the RFC.
 
-`ignoretz`
-If set to True, the date parser will ignore timezone information available in
-the DTSTART property, or the UNTIL attribute.
-
-`tzinfos`
-If set, it will be passed to the datetime string parser to resolve unknown
-timezone settings. For more information about what could be used here, check
-the parser documentation.
-
 * * * * *
 
 ### Differences From iCalendar RFC
+
+* *Timezones:* `RRule` does not implement the `TZID` keyword in the RFC. It
+only correctly supports "floating" times or UTC timezones. While it will work
+the same regardless of the host system's timezone, for best results, only pass
+in JS `Date` objects that are represented in UTC to avoid unexpected timezone
+offsets being applied.
 
 * `RRule` has no `byday` keyword. The equivalent keyword has been replaced by
 the `byweekday` keyword, to remove the ambiguity present in the original
@@ -639,12 +639,12 @@ RFC documents that `byweekno` is only valid on yearly frequencies, for example).
 
 ### Development
 
-rrule.js uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
+rrule.js is implemented in Typescript. It uses [JavaScript Standard Style](https://github.com/feross/standard) coding style.
 
-To build, run:
+To run the code, checkout this repository and run:
 
 ```
-$ yarn build
+$ yarn
 ```
 
 To run the tests, run:
@@ -653,8 +653,19 @@ To run the tests, run:
 $ yarn test
 ```
 
+To build files for distribution, run:
+
+```
+$ yarn build
+```
+
 ### Changelog
 
+* 2.3.0 (2018-08-06)
+    * Converted to [Typescript](https://www.typescriptlang.org/)
+    * Add es5 and es6 distributions
+    * Fixed a bug where recurrences in DST were 1 hour off if the host system used DST
+    * Fixed numeric handling of weekday strings
 * 2.2.8 (2018-02-16)
     * Added `fromText()` and `toText()` support for rules with `RRule.MINUTELY` frequency.
     * Added support for `VALUE=DATE` as a `RDATE` param.

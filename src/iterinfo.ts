@@ -204,7 +204,7 @@ export default class Iterinfo {
     ) {
       let ranges: number[][] = []
       if (rr.options.freq === RRule.YEARLY) {
-        if (notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+        if (notEmpty(rr.options.bymonth)) {
           for (let j = 0; j < rr.options.bymonth.length; j++) {
             month = rr.options.bymonth[j]
             ranges.push(this.mrange!.slice(month - 1, month + 1))

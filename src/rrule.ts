@@ -394,7 +394,7 @@ export default class RRule {
       this._cacheAdd(what, cached, args)
     }
 
-    return cached instanceof Array
+    return isArray(cached)
       ? dateutil.cloneDates(cached)
       : cached instanceof Date
         ? dateutil.clone(cached)

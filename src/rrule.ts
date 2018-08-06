@@ -1,7 +1,7 @@
 import Weekday from './weekday'
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
-import { pymod, divmod, notEmpty, contains, isBlank } from './helpers'
+import { pymod, divmod, notEmpty, contains, isPresent, isNumber, isArray } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
@@ -141,14 +141,14 @@ export default class RRule {
       let value: any = options[keys[i]]
       let strValues = []
 
-      if (isBlank(value) || (value instanceof Array && !value.length)) continue
+      if (!isPresent(value) || (isArray(value) && !value.length)) continue
 
       switch (key) {
         case 'FREQ':
           value = RRule.FREQUENCIES[options.freq!]
           break
         case 'WKST':
-          if (!(value instanceof Weekday)) {
+          if (isNumber(value)) {
             value = new Weekday(value)
           }
           break
@@ -165,13 +165,13 @@ export default class RRule {
 
           */
           key = 'BYDAY'
-          if (!(value instanceof Array)) value = [value]
+          if (!isArray(value)) value = [value]
 
           for (let j = 0; j < value.length; j++) {
             let wday: Weekday | number[] | number = value[j]
             if (wday instanceof Weekday) {
               // good
-            } else if (wday instanceof Array) {
+            } else if (isArray(wday)) {
               wday = new Weekday(wday[0], wday[1])
             } else {
               wday = new Weekday(wday)
@@ -185,7 +185,7 @@ export default class RRule {
           value = dateutil.timeToUntilString(value)
           break
         default:
-          if (value instanceof Array) {
+          if (isArray(value)) {
             for (let j = 0; j < value.length; j++) {
               strValues[j] = String(value[j])
             }
@@ -372,7 +372,7 @@ export default class RRule {
     const cachedObject = this._cache[what]
     if (what === 'all') {
       cached = this._cache.all as Date[]
-    } else if (cachedObject instanceof Array) {
+    } else if (isArray(cachedObject)) {
       // Let's see whether we've already called the
       // 'what' method with the same 'args'
       for (let i = 0; i < cachedObject.length; i++) {
@@ -531,38 +531,38 @@ export default class RRule {
       }
 
       // Output results
-      if (notEmpty(bysetpos) && notEmpty(timeset!)) {
+      if (notEmpty(bysetpos) && notEmpty(timeset)) {
         let daypos: number
         let timepos: number
         const poslist: Date[] = []
 
-        for (let j = 0; j < (bysetpos).length; j++) {
+        for (let j = 0; j < bysetpos.length; j++) {
           pos = bysetpos[j]
 
           if (pos < 0) {
-            daypos = Math.floor(pos / timeset!.length)
-            timepos = pymod(pos, timeset!.length)
+            daypos = Math.floor(pos / timeset.length)
+            timepos = pymod(pos, timeset.length)
           } else {
-            daypos = Math.floor((pos - 1) / timeset!.length)
-            timepos = pymod(pos - 1, timeset!.length)
+            daypos = Math.floor((pos - 1) / timeset.length)
+            timepos = pymod(pos - 1, timeset.length)
           }
 
           try {
             const tmp = []
             for (let k = start; k < end; k++) {
               const val = dayset[k]
-              if (isBlank(val)) continue
+              if (!isPresent(val)) continue
               tmp.push(val)
             }
             let i: number
             if (daypos < 0) {
               // we're trying to emulate python's aList[-n]
-              i = tmp.slice(daypos)[0] as number
+              i = tmp.slice(daypos)[0]
             } else {
-              i = tmp[daypos] as number
+              i = tmp[daypos]
             }
 
-            const time = timeset![timepos]
+            const time = timeset[timepos]
             const date = dateutil.fromOrdinal(ii.yearordinal + i)
             const res = dateutil.combine(date, time)
             // XXX: can this ever be in the array?

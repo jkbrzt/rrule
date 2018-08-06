@@ -2,8 +2,16 @@
 // Helper functions
 // =============================================================================
 
-export const isBlank = function (value: any) {
-  return value === null || typeof value === 'undefined'
+export const isPresent = function <T>(value?: T | null | undefined): value is T {
+  return value !== null && typeof value !== 'undefined'
+}
+
+export const isNumber = function (value?: any): value is number {
+  return typeof value === 'number'
+}
+
+export const isArray = function <T>(value?: any): value is Array<T> {
+  return isPresent(value) && value instanceof Array
 }
 
 /**
@@ -27,7 +35,7 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
   const array: (T | T[])[] = []
 
-  if (value instanceof Array) {
+  if (isArray<T>(value)) {
     for (; i < times; i++) array[i] = ([] as T[]).concat(value)
   } else {
     for (; i < times; i++) array[i] = value
@@ -79,8 +87,8 @@ export const divmod = function (a: number, b: number) {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-export const notEmpty = function (obj: any[]) {
-  return !isBlank(obj) && obj.length !== 0
+export const notEmpty = function <T>(obj: T[] | null | undefined): obj is T[] {
+  return isPresent(obj) && obj.length !== 0
 }
 
 /**

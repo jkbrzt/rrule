@@ -11,7 +11,7 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { notEmpty, repeat, pymod, contains, range, clone, isBlank } from './helpers'
+import { notEmpty, repeat, pymod, contains, range, clone, isPresent } from './helpers'
 
 export type DaySet = [ (number | null)[], number, number ]
 export type GetDayset = () => DaySet
@@ -245,8 +245,8 @@ export default class Iterinfo {
       this.lastmonth = month
     }
 
-    if (!isBlank(rr.options.byeaster)) {
-      this.eastermask = this.easter(year, rr.options.byeaster!)
+    if (isPresent(rr.options.byeaster)) {
+      this.eastermask = this.easter(year, rr.options.byeaster)
     }
   }
 

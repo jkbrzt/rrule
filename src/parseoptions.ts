@@ -1,5 +1,5 @@
 import { Options, ParsedOptions } from './types'
-import { contains, notEmpty, isBlank } from './helpers'
+import { contains, notEmpty, isPresent, isNumber, isArray } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import Weekday from './weekday'
@@ -23,7 +23,7 @@ export function initializeOptions (options: Partial<Options>) {
 }
 
 export function parseOptions (options: Partial<Options>) {
-  const opts: Partial<Options> = initializeOptions(options)
+  const opts = initializeOptions(options)
   const keys = Object.keys(options) as (keyof Options)[]
 
   // Merge in default options
@@ -31,27 +31,28 @@ export function parseOptions (options: Partial<Options>) {
     if (!contains(keys, key)) opts[key] = DEFAULT_OPTIONS[key]
   })
 
-  if (!RRule.FREQUENCIES[opts.freq!] && isBlank(opts.byeaster)) {
-    throw new Error('Invalid frequency: ' + String(opts.freq))
+  if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
+
+  if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
+    throw new Error(`Invalid frequency: ${opts.freq}`)
   }
 
-  if (!isBlank(opts.byeaster)) opts.freq = RRule.YEARLY
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
   const millisecondModulo = opts.dtstart.getTime() % 1000
-  if (isBlank(opts.wkst)) {
+  if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday
-  } else if (typeof opts.wkst === 'number') {
+  } else if (isNumber(opts.wkst)) {
     // cool, just keep it like that
   } else {
-    opts.wkst = opts.wkst!.weekday
+    opts.wkst = opts.wkst.weekday
   }
 
-  if (!isBlank(opts.bysetpos)) {
-    if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos]
+  if (isPresent(opts.bysetpos)) {
+    if (isNumber(opts.bysetpos)) opts.bysetpos = [opts.bysetpos]
 
-    for (let i = 0; i < opts.bysetpos!.length; i++) {
-      const v = opts.bysetpos![i]
+    for (let i = 0; i < opts.bysetpos.length; i++) {
+      const v = opts.bysetpos[i]
       if (v === 0 || !(v >= -366 && v <= 366)) {
         throw new Error(
           'bysetpos must be between 1 and 366,' + ' or between -366 and -1'
@@ -64,7 +65,7 @@ export function parseOptions (options: Partial<Options>) {
     !(
       Boolean(opts.byweekno as number) ||
       notEmpty(opts.byweekno as number[]) ||
-      notEmpty(opts.byyearday! as number[]) ||
+      notEmpty(opts.byyearday as number[]) ||
       Boolean(opts.bymonthday) ||
       notEmpty(opts.bymonthday as number[]) ||
       opts.byweekday !== null ||
@@ -86,19 +87,19 @@ export function parseOptions (options: Partial<Options>) {
   }
 
   // bymonth
-  if (!isBlank(opts.bymonth) && !(opts.bymonth instanceof Array)) {
-    opts.bymonth = [opts.bymonth!]
+  if (isPresent(opts.bymonth) && !isArray(opts.bymonth)) {
+    opts.bymonth = [opts.bymonth]
   }
   // byyearday
-  if (!isBlank(opts.byyearday) && !(opts.byyearday instanceof Array) && typeof opts.byyearday === 'number') {
+  if (isPresent(opts.byyearday) && !isArray(opts.byyearday) && isNumber(opts.byyearday)) {
     opts.byyearday = [opts.byyearday]
   }
 
   // bymonthday
-  if (isBlank(opts.bymonthday)) {
+  if (!isPresent(opts.bymonthday)) {
     opts.bymonthday = []
     opts.bynmonthday = []
-  } else if (opts.bymonthday instanceof Array) {
+  } else if (isArray(opts.bymonthday)) {
     const bymonthday = []
     const bynmonthday = []
 
@@ -112,29 +113,27 @@ export function parseOptions (options: Partial<Options>) {
     }
     opts.bymonthday = bymonthday
     opts.bynmonthday = bynmonthday
+  } else if (opts.bymonthday < 0) {
+    opts.bynmonthday = [opts.bymonthday]
+    opts.bymonthday = []
   } else {
-    if (opts.bymonthday! < 0) {
-      opts.bynmonthday = [opts.bymonthday!]
-      opts.bymonthday = []
-    } else {
-      opts.bynmonthday = []
-      opts.bymonthday = [opts.bymonthday!]
-    }
+    opts.bynmonthday = []
+    opts.bymonthday = [opts.bymonthday]
   }
 
   // byweekno
-  if (!isBlank(opts.byweekno) && !(opts.byweekno instanceof Array)) {
-    opts.byweekno = [opts.byweekno!]
+  if (isPresent(opts.byweekno) && !isArray(opts.byweekno)) {
+    opts.byweekno = [opts.byweekno]
   }
 
   // byweekday / bynweekday
-  if (isBlank(opts.byweekday)) {
+  if (!isPresent(opts.byweekday)) {
     opts.bynweekday = null
-  } else if (typeof opts.byweekday === 'number') {
+  } else if (isNumber(opts.byweekday)) {
     opts.byweekday = [opts.byweekday]
     opts.bynweekday = null
   } else if (opts.byweekday instanceof Weekday) {
-    if (!opts.byweekday.n || opts.freq! > RRule.MONTHLY) {
+    if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
       opts.byweekday = [opts.byweekday.weekday]
       opts.bynweekday = null
     } else {
@@ -145,16 +144,16 @@ export function parseOptions (options: Partial<Options>) {
     const byweekday = []
     const bynweekday = []
 
-    for (let i = 0; i < opts.byweekday!.length; i++) {
-      const wday = opts.byweekday![i]
+    for (let i = 0; i < opts.byweekday.length; i++) {
+      const wday = opts.byweekday[i]
 
-      if (typeof wday === 'number') {
+      if (isNumber(wday)) {
         byweekday.push(wday)
         continue
       }
 
       const wd = wday as Weekday
-      if (!wd.n || opts.freq! > RRule.MONTHLY) {
+      if (!wd.n || opts.freq > RRule.MONTHLY) {
         byweekday.push(wd.weekday)
       } else {
         bynweekday.push([wd.weekday, wd.n])
@@ -165,30 +164,30 @@ export function parseOptions (options: Partial<Options>) {
   }
 
   // byhour
-  if (isBlank(opts.byhour)) {
-    opts.byhour = opts.freq! < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
-  } else if (typeof opts.byhour === 'number') {
+  if (!isPresent(opts.byhour)) {
+    opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
+  } else if (isNumber(opts.byhour)) {
     opts.byhour = [opts.byhour]
   }
 
   // byminute
-  if (isBlank(opts.byminute)) {
+  if (!isPresent(opts.byminute)) {
     opts.byminute =
-      opts.freq! < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null
-  } else if (typeof opts.byminute === 'number') {
+      opts.freq < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null
+  } else if (isNumber(opts.byminute)) {
     opts.byminute = [opts.byminute]
   }
 
   // bysecond
-  if (isBlank(opts.bysecond)) {
+  if (!isPresent(opts.bysecond)) {
     opts.bysecond =
-      opts.freq! < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null
-  } else if (typeof opts.bysecond === 'number') {
+      opts.freq < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null
+  } else if (isNumber(opts.bysecond)) {
     opts.bysecond = [opts.bysecond]
   }
 
   let timeset: dateutil.Time[] | null
-  if (opts.freq! >= RRule.HOURLY) {
+  if (opts.freq >= RRule.HOURLY) {
     timeset = null
   } else {
     timeset = []

@@ -2,6 +2,7 @@ import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
 import { Options, ByWeekday } from '../types'
 import Weekday from '../weekday'
+import { isArray, isNumber } from '../helpers'
 
 // =============================================================================
 // Helper functions
@@ -67,7 +68,7 @@ export default class ToText {
     }
 
     if (this.origOptions.byweekday) {
-      const byweekday = !(this.origOptions.byweekday instanceof Array)
+      const byweekday = !isArray(this.origOptions.byweekday)
         ? [this.origOptions.byweekday]
         : this.origOptions.byweekday
       const days = String(byweekday)
@@ -403,7 +404,7 @@ export default class ToText {
 
   weekdaytext (wday: Weekday | number) {
     const weekday =
-      typeof wday === 'number' ? (wday + 1) % 7 : wday.getJsWeekday()
+      isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday()
     return (
       ((wday as Weekday).n ? this.nth((wday as Weekday).n!) + ' ' : '') + this.language.dayNames[weekday]
     )
@@ -420,7 +421,7 @@ export default class ToText {
   }
 
   list (arr: ByWeekday | ByWeekday[], callback?: GetText, finalDelim?: string, delim: string = ',') {
-    if (!(arr instanceof Array)) {
+    if (!isArray(arr)) {
       arr = [arr]
     }
     const delimJoin = function (

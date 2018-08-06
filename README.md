@@ -30,11 +30,14 @@ to natural language.
 $ yarn add rrule
 ```
 
-Alternatively, download
-[rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) manually.
+Alternatively, download manually:
+
+ * [rrule.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.min.js) (bundled, minified)
+ * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) (bundled, not minified)
+ * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es6/rrule.js) (es6 source with optional TypeScript types)
 
 ```html
-<script src="rrule/dist/es5/rrule.js"></script>
+<script src="rrule/dist/es5/rrule.min.js"></script>
 ```
 
 #### Server Side
@@ -658,6 +661,11 @@ $ yarn build
 
 ### Changelog
 
+* 2.3.0 (2018-08-06)
+    * Converted to [Typescript](https://www.typescriptlang.org/)
+    * Add es5 and es6 distributions
+    * Fixed a bug where recurrences in DST were 1 hour off if the host system used DST
+    * Fixed numeric handling of weekday strings
 * 2.2.8 (2018-02-16)
     * Added `fromText()` and `toText()` support for rules with `RRule.MINUTELY` frequency.
     * Added support for `VALUE=DATE` as a `RDATE` param.

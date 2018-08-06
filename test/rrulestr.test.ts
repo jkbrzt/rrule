@@ -228,7 +228,7 @@ describe('rrulestr', function () {
     ]
   )
 
-  testRecurring.skip('testStrKeywords',
+  testRecurring('testStrKeywords',
     rrulestr(
       'DTSTART:19970902T030000Z\n' +
       'RRULE:FREQ=YEARLY;COUNT=3;INTERVAL=3;' +

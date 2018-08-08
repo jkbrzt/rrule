@@ -1,75 +1,11 @@
 import Weekday from './weekday';
 import dateutil from './dateutil';
-import IterResult, { IterArgs } from './iterresult';
+import IterResult from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
-export declare enum Frequency {
-    YEARLY = 0,
-    MONTHLY = 1,
-    WEEKLY = 2,
-    DAILY = 3,
-    HOURLY = 4,
-    MINUTELY = 5,
-    SECONDLY = 6
-}
-export interface Options {
-    freq: Frequency;
-    dtstart: Date;
-    interval: number;
-    wkst: Weekday | number;
-    count: number;
-    until: Date;
-    bysetpos: number | number[];
-    bymonth: number | number[];
-    bymonthday: number | number[];
-    bynmonthday: number[];
-    byyearday: number[];
-    byweekno: number | number[];
-    byweekday: ByWeekday | ByWeekday[];
-    bynweekday: number[][];
-    byhour: number | number[];
-    byminute: number | number[];
-    bysecond: number | number[];
-    byeaster: number;
-}
-interface ParsedOptions {
-    freq: Frequency;
-    dtstart: Date;
-    interval: number;
-    wkst: number;
-    count: number;
-    until: Date;
-    bysetpos: number[];
-    bymonth: number[];
-    bymonthday: number[];
-    bynmonthday: number[];
-    byyearday: number[];
-    byweekno: number[];
-    byweekday: number[];
-    bynweekday: number[][];
-    byhour: number[];
-    byminute: number[];
-    bysecond: number[];
-    byeaster: number;
-}
-declare type CacheKeys = 'before' | 'after' | 'between';
-declare type CacheBase = {
-    [K in CacheKeys]: IterArgs[];
-};
-export declare type Cache = CacheBase & {
-    all: Date[] | Partial<IterArgs>[] | false;
-};
-declare const Days: {
-    MO: Weekday;
-    TU: Weekday;
-    WE: Weekday;
-    TH: Weekday;
-    FR: Weekday;
-    SA: Weekday;
-    SU: Weekday;
-};
-export declare type WeekdayStr = keyof typeof Days;
-export declare type ByWeekday = WeekdayStr | number | Weekday;
+import { Cache, ParsedOptions, Options, Frequency } from './types';
+export declare const DEFAULT_OPTIONS: Options;
+export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -81,7 +17,7 @@ export default class RRule {
     _cache: Cache | null;
     origOptions: Partial<Options>;
     options: ParsedOptions;
-    timeset: dateutil.Time[];
+    timeset: dateutil.Time[] | null;
     _len: number;
     static readonly FREQUENCIES: (keyof typeof Frequency)[];
     static readonly YEARLY: Frequency;
@@ -91,8 +27,6 @@ export default class RRule {
     static readonly HOURLY: Frequency;
     static readonly MINUTELY: Frequency;
     static readonly SECONDLY: Frequency;
-    private static readonly DEFAULT_OPTIONS;
-    private defaultKeys;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -101,11 +35,9 @@ export default class RRule {
     static readonly SA: Weekday;
     static readonly SU: Weekday;
     constructor(options?: Partial<Options>, noCache?: boolean);
-    private initializeOptions;
-    private parseOptions;
-    static parseText(text: string, language: Language): Partial<Options>;
+    static parseText(text: string, language: Language): Partial<Options> | null;
     static fromText(text: string, language?: Language): RRule;
-    static parseString(rfcString: string): Partial<Options>;
+    static parseString(rfcString: string): Partial<Options> | null;
     static fromString(str: string): RRule;
     static optionsToString(options: Partial<Options>): string;
     /**
@@ -175,4 +107,3 @@ export default class RRule {
     clone(): RRule;
     _iter(iterResult: IterResult): Date | Date[] | null;
 }
-export {};

@@ -1,6 +1,4 @@
 import IterResult, { IterArgs } from './iterresult'
-import { contains } from './helpers'
-import { Cache } from './rrule'
 
 type Iterator = (d: Date, len: number) => boolean
 

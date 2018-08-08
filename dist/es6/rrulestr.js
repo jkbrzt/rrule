@@ -239,6 +239,7 @@ class RRuleStr {
                 rset = new rruleset_1.default(!options.cache);
                 for (j = 0; j < rrulevals.length; j++) {
                     rset.rrule(this._parseRfcRRule(rrulevals[j], {
+                        // @ts-ignore
                         dtstart: options.dtstart || dtstart
                     }));
                 }
@@ -251,6 +252,7 @@ class RRuleStr {
                 }
                 for (j = 0; j < exrulevals.length; j++) {
                     rset.exrule(this._parseRfcRRule(exrulevals[j], {
+                        // @ts-ignore
                         dtstart: options.dtstart || dtstart
                     }));
                 }
@@ -261,12 +263,14 @@ class RRuleStr {
                         rset.exdate(dateutil_1.default.untilStringToDate(datestr));
                     }
                 }
+                // @ts-ignore
                 if (options.compatible && options.dtstart)
                     rset.rdate(dtstart);
                 return rset;
             }
             else {
                 return this._parseRfcRRule(rrulevals[0], {
+                    // @ts-ignore
                     dtstart: options.dtstart || dtstart,
                     cache: options.cache
                 });

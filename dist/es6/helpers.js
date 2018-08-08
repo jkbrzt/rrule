@@ -3,10 +3,19 @@
 // Helper functions
 // =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isPresent = function (value) {
+    return value !== null && typeof value !== 'undefined';
+};
+exports.isNumber = function (value) {
+    return typeof value === 'number';
+};
+exports.isArray = function (value) {
+    return exports.isPresent(value) && value instanceof Array;
+};
 /**
  * Simplified version of python's range()
  */
-const range = function (start, end) {
+exports.range = function (start, end = start) {
     if (arguments.length === 1) {
         end = start;
         start = 0;
@@ -16,11 +25,13 @@ const range = function (start, end) {
         rang.push(i);
     return rang;
 };
-exports.range = range;
-const repeat = function (value, times) {
+exports.clone = function (array) {
+    return [].concat(array);
+};
+exports.repeat = function (value, times) {
     let i = 0;
     const array = [];
-    if (value instanceof Array) {
+    if (exports.isArray(value)) {
         for (; i < times; i++)
             array[i] = [].concat(value);
     }
@@ -30,17 +41,15 @@ const repeat = function (value, times) {
     }
     return array;
 };
-exports.repeat = repeat;
 /**
  * Python like split
  */
-const split = function (str, sep, num) {
+exports.split = function (str, sep, num) {
     const splits = str.split(sep);
     return num
         ? splits.slice(0, num).concat([splits.slice(num).join(sep)])
         : splits;
 };
-exports.split = split;
 /**
  * closure/goog/math/math.js:modulo
  * Copyright 2006 The Closure Library Authors.
@@ -56,34 +65,30 @@ exports.split = split;
  * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
  *     or b < x <= 0, depending on the sign of b).
  */
-const pymod = function (a, b) {
+exports.pymod = function (a, b) {
     const r = a % b;
     // If r and b differ in sign, add b to wrap the result to the correct sign.
     return r * b < 0 ? r + b : r;
 };
-exports.pymod = pymod;
 /**
  * @see: <http://docs.python.org/library/functions.html#divmod>
  */
-const divmod = function (a, b) {
-    return { div: Math.floor(a / b), mod: pymod(a, b) };
+exports.divmod = function (a, b) {
+    return { div: Math.floor(a / b), mod: exports.pymod(a, b) };
 };
-exports.divmod = divmod;
 /**
  * Python-like boolean
  * @return {Boolean} value of an object/primitive, taking into account
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-const notEmpty = function (obj) {
-    return !!obj && obj.length !== 0;
+exports.notEmpty = function (obj) {
+    return exports.isPresent(obj) && obj.length !== 0;
 };
-exports.notEmpty = notEmpty;
 /**
  * Return true if a value is in an array
  */
-const contains = function (arr, val) {
+exports.contains = function (arr, val) {
     return arr.indexOf(val) !== -1;
 };
-exports.contains = contains;
 //# sourceMappingURL=helpers.js.map

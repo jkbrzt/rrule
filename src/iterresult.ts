@@ -1,4 +1,4 @@
-import { Cache } from './rrule'
+import { Cache } from './types'
 
 // =============================================================================
 // Results
@@ -9,7 +9,7 @@ export interface IterArgs {
   before: Date
   after: Date
   dt: Date
-  _value: Date | Date[]
+  _value: Date | Date[] | null
 }
 
 /**
@@ -31,13 +31,13 @@ export default class IterResult {
 
     if (method === 'between') {
       this.maxDate = args.inc
-        ? args.before
-        : new Date(args.before.getTime() - 1)
-      this.minDate = args.inc ? args.after : new Date(args.after.getTime() + 1)
+        ? args.before!
+        : new Date(args.before!.getTime() - 1)
+      this.minDate = args.inc ? args.after! : new Date(args.after!.getTime() + 1)
     } else if (method === 'before') {
-      this.maxDate = args.inc ? args.dt : new Date(args.dt.getTime() - 1)
+      this.maxDate = args.inc ? args.dt! : new Date(args.dt!.getTime() - 1)
     } else if (method === 'after') {
-      this.minDate = args.inc ? args.dt : new Date(args.dt.getTime() + 1)
+      this.minDate = args.inc ? args.dt! : new Date(args.dt!.getTime() + 1)
     }
   }
 

@@ -1,7 +1,7 @@
 import RRule from './rrule';
 import RRuleSet from './rruleset';
 export interface RRuleStrOptions {
-    dtstart: Date;
+    dtstart: Date | null;
     cache: boolean;
     unfold: boolean;
     forceset: boolean;

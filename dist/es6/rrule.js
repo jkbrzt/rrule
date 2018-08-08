@@ -6,6 +6,9 @@ const iterinfo_1 = require("./iterinfo");
 const helpers_1 = require("./helpers");
 const iterresult_1 = require("./iterresult");
 const callbackiterresult_1 = require("./callbackiterresult");
+const types_1 = require("./types");
+const parseoptions_1 = require("./parseoptions");
+const parsestring_1 = require("./parsestring");
 const getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -13,25 +16,30 @@ const getnlp = function () {
     }
     return getnlp._nlp;
 };
-var Frequency;
-(function (Frequency) {
-    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
-    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
-    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
-    Frequency[Frequency["DAILY"] = 3] = "DAILY";
-    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
-    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
-    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
-})(Frequency = exports.Frequency || (exports.Frequency = {}));
-const Days = {
-    MO: new weekday_1.default(0),
-    TU: new weekday_1.default(1),
-    WE: new weekday_1.default(2),
-    TH: new weekday_1.default(3),
-    FR: new weekday_1.default(4),
-    SA: new weekday_1.default(5),
-    SU: new weekday_1.default(6)
+// =============================================================================
+// RRule
+// =============================================================================
+exports.DEFAULT_OPTIONS = {
+    freq: types_1.Frequency.YEARLY,
+    dtstart: null,
+    interval: 1,
+    wkst: types_1.Days.MO,
+    count: null,
+    until: null,
+    bysetpos: null,
+    bymonth: null,
+    bymonthday: null,
+    bynmonthday: null,
+    byyearday: null,
+    byweekno: null,
+    byweekday: null,
+    bynweekday: null,
+    byhour: null,
+    byminute: null,
+    bysecond: null,
+    byeaster: null
 };
+exports.defaultKeys = Object.keys(exports.DEFAULT_OPTIONS);
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -40,7 +48,6 @@ const Days = {
  */
 class RRule {
     constructor(options = {}, noCache = false) {
-        this.defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
         // RFC string
         this._string = null;
         this._cache = noCache
@@ -52,204 +59,10 @@ class RRule {
                 between: []
             };
         // used by toString()
-        this.origOptions = this.initializeOptions(options);
-        this.options = this.parseOptions(options);
-    }
-    initializeOptions(options) {
-        const invalid = [];
-        const keys = Object.keys(options);
-        const initializedOptions = {};
-        // Shallow copy for options and origOptions and check for invalid
-        keys.forEach(key => {
-            initializedOptions[key] = options[key];
-            if (!helpers_1.contains(this.defaultKeys, key))
-                invalid.push(key);
-        });
-        if (invalid.length) {
-            throw new Error('Invalid options: ' + invalid.join(', '));
-        }
-        return initializedOptions;
-    }
-    parseOptions(options) {
-        const opts = this.initializeOptions(options);
-        const keys = Object.keys(options);
-        if (!RRule.FREQUENCIES[options.freq] && options.byeaster === null) {
-            throw new Error('Invalid frequency: ' + String(options.freq));
-        }
-        // Merge in default options
-        this.defaultKeys.forEach(key => {
-            if (!helpers_1.contains(keys, key))
-                opts[key] = RRule.DEFAULT_OPTIONS[key];
-        });
-        if (opts.byeaster !== null)
-            opts.freq = RRule.YEARLY;
-        if (!opts.dtstart)
-            opts.dtstart = new Date(new Date().setMilliseconds(0));
-        const millisecondModulo = opts.dtstart.getTime() % 1000;
-        if (opts.wkst === null) {
-            opts.wkst = RRule.MO.weekday;
-        }
-        else if (typeof opts.wkst === 'number') {
-            // cool, just keep it like that
-        }
-        else {
-            opts.wkst = opts.wkst.weekday;
-        }
-        if (opts.bysetpos !== null) {
-            if (typeof opts.bysetpos === 'number')
-                opts.bysetpos = [opts.bysetpos];
-            for (let i = 0; i < opts.bysetpos.length; i++) {
-                const v = opts.bysetpos[i];
-                if (v === 0 || !(v >= -366 && v <= 366)) {
-                    throw new Error('bysetpos must be between 1 and 366,' + ' or between -366 and -1');
-                }
-            }
-        }
-        if (!(Boolean(opts.byweekno) ||
-            helpers_1.notEmpty(opts.byweekno) ||
-            helpers_1.notEmpty(opts.byyearday) ||
-            Boolean(opts.bymonthday) ||
-            helpers_1.notEmpty(opts.bymonthday) ||
-            opts.byweekday !== null ||
-            opts.byeaster !== null)) {
-            switch (opts.freq) {
-                case RRule.YEARLY:
-                    if (!opts.bymonth)
-                        opts.bymonth = opts.dtstart.getUTCMonth() + 1;
-                    opts.bymonthday = opts.dtstart.getUTCDate();
-                    break;
-                case RRule.MONTHLY:
-                    opts.bymonthday = opts.dtstart.getUTCDate();
-                    break;
-                case RRule.WEEKLY:
-                    opts.byweekday = [dateutil_1.default.getWeekday(opts.dtstart)];
-                    break;
-            }
-        }
-        // bymonth
-        if (opts.bymonth !== null && !(opts.bymonth instanceof Array)) {
-            opts.bymonth = [opts.bymonth];
-        }
-        // byyearday
-        if (opts.byyearday !== null && !(opts.byyearday instanceof Array)) {
-            opts.byyearday = [opts.byyearday];
-        }
-        // bymonthday
-        if (opts.bymonthday === null) {
-            opts.bymonthday = [];
-            opts.bynmonthday = [];
-        }
-        else if (opts.bymonthday instanceof Array) {
-            const bymonthday = [];
-            const bynmonthday = [];
-            for (let i = 0; i < opts.bymonthday.length; i++) {
-                const v = opts.bymonthday[i];
-                if (v > 0) {
-                    bymonthday.push(v);
-                }
-                else if (v < 0) {
-                    bynmonthday.push(v);
-                }
-            }
-            opts.bymonthday = bymonthday;
-            opts.bynmonthday = bynmonthday;
-        }
-        else {
-            if (opts.bymonthday < 0) {
-                opts.bynmonthday = [opts.bymonthday];
-                opts.bymonthday = [];
-            }
-            else {
-                opts.bynmonthday = [];
-                opts.bymonthday = [opts.bymonthday];
-            }
-        }
-        // byweekno
-        if (opts.byweekno !== null && !(opts.byweekno instanceof Array)) {
-            opts.byweekno = [opts.byweekno];
-        }
-        // byweekday / bynweekday
-        if (opts.byweekday === null) {
-            opts.bynweekday = null;
-        }
-        else if (typeof opts.byweekday === 'number') {
-            opts.byweekday = [opts.byweekday];
-            opts.bynweekday = null;
-        }
-        else if (opts.byweekday instanceof weekday_1.default) {
-            if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
-                opts.byweekday = [opts.byweekday.weekday];
-                opts.bynweekday = null;
-            }
-            else {
-                opts.bynweekday = [[opts.byweekday.weekday, opts.byweekday.n]];
-                opts.byweekday = null;
-            }
-        }
-        else {
-            const byweekday = [];
-            const bynweekday = [];
-            for (let i = 0; i < opts.byweekday.length; i++) {
-                const wday = opts.byweekday[i];
-                if (typeof wday === 'number') {
-                    byweekday.push(wday);
-                    continue;
-                }
-                const wd = wday;
-                if (!wd.n || opts.freq > RRule.MONTHLY) {
-                    byweekday.push(wd.weekday);
-                }
-                else {
-                    bynweekday.push([wd.weekday, wd.n]);
-                }
-            }
-            opts.byweekday = helpers_1.notEmpty(byweekday) ? byweekday : null;
-            opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
-        }
-        // byhour
-        if (opts.byhour === null) {
-            opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
-        }
-        else if (typeof opts.byhour === 'number') {
-            opts.byhour = [opts.byhour];
-        }
-        // byminute
-        if (opts.byminute === null) {
-            opts.byminute =
-                opts.freq < RRule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
-        }
-        else if (typeof opts.byminute === 'number') {
-            opts.byminute = [opts.byminute];
-        }
-        // bysecond
-        if (opts.bysecond === null) {
-            opts.bysecond =
-                opts.freq < RRule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
-        }
-        else if (typeof opts.bysecond === 'number') {
-            opts.bysecond = [opts.bysecond];
-        }
-        if (opts.freq >= RRule.HOURLY) {
-            this.timeset = null;
-        }
-        else {
-            this.timeset = [];
-            for (let i = 0; i < opts.byhour.length; i++) {
-                const hour = opts.byhour[i];
-                for (let j = 0; j < opts.byminute.length; j++) {
-                    const minute = opts.byminute[j];
-                    for (let k = 0; k < opts.bysecond.length; k++) {
-                        const second = opts.bysecond[k];
-                        // python:
-                        // datetime.time(hour, minute, second,
-                        // tzinfo=self._tzinfo))
-                        this.timeset.push(new dateutil_1.default.Time(hour, minute, second, millisecondModulo));
-                    }
-                }
-            }
-            dateutil_1.default.sort(this.timeset);
-        }
-        return opts;
+        this.origOptions = parseoptions_1.initializeOptions(options);
+        const { parsedOptions, timeset } = parseoptions_1.parseOptions(options);
+        this.options = parsedOptions;
+        this.timeset = timeset;
     }
     static parseText(text, language) {
         return getnlp().parseText(text, language);
@@ -258,113 +71,29 @@ class RRule {
         return getnlp().fromText(text, language);
     }
     static parseString(rfcString) {
-        rfcString = rfcString.replace(/^\s+|\s+$/, '');
-        if (!rfcString.length)
-            return null;
-        const attrs = rfcString.split(';');
-        const options = {};
-        for (let i = 0; i < attrs.length; i++) {
-            const attr = attrs[i].split('=');
-            const key = attr[0];
-            const value = attr[1];
-            switch (key) {
-                case 'FREQ':
-                    options.freq = Frequency[value];
-                    break;
-                case 'WKST':
-                    options.wkst = Days[value];
-                    break;
-                case 'COUNT':
-                case 'INTERVAL':
-                case 'BYSETPOS':
-                case 'BYMONTH':
-                case 'BYMONTHDAY':
-                case 'BYYEARDAY':
-                case 'BYWEEKNO':
-                case 'BYHOUR':
-                case 'BYMINUTE':
-                case 'BYSECOND':
-                    let num;
-                    if (value.indexOf(',') !== -1) {
-                        const values = value.split(',');
-                        num = values.map(val => {
-                            if (/^[+-]?\d+$/.test(val.toString())) {
-                                return Number(val);
-                            }
-                            else {
-                                return val;
-                            }
-                        });
-                    }
-                    else if (/^[+-]?\d+$/.test(value)) {
-                        num = Number(value);
-                    }
-                    else {
-                        num = value;
-                    }
-                    const optionKey = key.toLowerCase();
-                    // @ts-ignore
-                    options[optionKey] = num;
-                    break;
-                case 'BYDAY': // => byweekday
-                    let n;
-                    let wday;
-                    let day;
-                    const days = value.split(',');
-                    options.byweekday = [];
-                    for (let j = 0; j < days.length; j++) {
-                        day = days[j];
-                        if (day.length === 2) {
-                            // MO, TU, ...
-                            wday = Days[day]; // wday instanceof Weekday
-                            options.byweekday.push(wday);
-                        }
-                        else {
-                            // -1MO, +3FR, 1SO, ...
-                            const parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
-                            n = Number(parts[1]);
-                            const wdaypart = parts[2];
-                            wday = Days[wdaypart].weekday;
-                            options.byweekday.push(new weekday_1.default(wday, n));
-                        }
-                    }
-                    break;
-                case 'DTSTART':
-                    options.dtstart = dateutil_1.default.untilStringToDate(value);
-                    break;
-                case 'UNTIL':
-                    options.until = dateutil_1.default.untilStringToDate(value);
-                    break;
-                case 'BYEASTER':
-                    options.byeaster = Number(value);
-                    break;
-                default:
-                    throw new Error("Unknown RRULE property '" + key + "'");
-            }
-        }
-        return options;
+        return parsestring_1.parseString(rfcString);
     }
     static fromString(str) {
-        return new RRule(RRule.parseString(str));
+        return new RRule(RRule.parseString(str) || undefined);
     }
     static optionsToString(options) {
         const pairs = [];
         const keys = Object.keys(options);
-        const defaultKeys = Object.keys(RRule.DEFAULT_OPTIONS);
+        const defaultKeys = Object.keys(exports.DEFAULT_OPTIONS);
         for (let i = 0; i < keys.length; i++) {
             if (!helpers_1.contains(defaultKeys, keys[i]))
                 continue;
             let key = keys[i].toUpperCase();
             let value = options[keys[i]];
             let strValues = [];
-            if (value === null || (value instanceof Array && !value.length))
+            if (!helpers_1.isPresent(value) || (helpers_1.isArray(value) && !value.length))
                 continue;
             switch (key) {
                 case 'FREQ':
                     value = RRule.FREQUENCIES[options.freq];
                     break;
                 case 'WKST':
-                    if (!(value instanceof weekday_1.default)) {
+                    if (helpers_1.isNumber(value)) {
                         value = new weekday_1.default(value);
                     }
                     break;
@@ -381,14 +110,14 @@ class RRule {
           
                     */
                     key = 'BYDAY';
-                    if (!(value instanceof Array))
+                    if (!helpers_1.isArray(value))
                         value = [value];
                     for (let j = 0; j < value.length; j++) {
                         let wday = value[j];
                         if (wday instanceof weekday_1.default) {
                             // good
                         }
-                        else if (wday instanceof Array) {
+                        else if (helpers_1.isArray(wday)) {
                             wday = new weekday_1.default(wday[0], wday[1]);
                         }
                         else {
@@ -403,7 +132,7 @@ class RRule {
                     value = dateutil_1.default.timeToUntilString(value);
                     break;
                 default:
-                    if (value instanceof Array) {
+                    if (helpers_1.isArray(value)) {
                         for (let j = 0; j < value.length; j++) {
                             strValues[j] = String(value[j]);
                         }
@@ -566,7 +295,7 @@ class RRule {
         if (what === 'all') {
             cached = this._cache.all;
         }
-        else if (cachedObject instanceof Array) {
+        else if (helpers_1.isArray(cachedObject)) {
             // Let's see whether we've already called the
             // 'what' method with the same 'args'
             for (let i = 0; i < cachedObject.length; i++) {
@@ -588,7 +317,7 @@ class RRule {
             cached = iterResult.getValue();
             this._cacheAdd(what, cached, args);
         }
-        return cached instanceof Array
+        return helpers_1.isArray(cached)
             ? dateutil_1.default.cloneDates(cached)
             : cached instanceof Date
                 ? dateutil_1.default.clone(cached)
@@ -693,7 +422,7 @@ class RRule {
                 let daypos;
                 let timepos;
                 const poslist = [];
-                for (let j = 0; j < (bysetpos).length; j++) {
+                for (let j = 0; j < bysetpos.length; j++) {
                     pos = bysetpos[j];
                     if (pos < 0) {
                         daypos = Math.floor(pos / timeset.length);
@@ -707,7 +436,7 @@ class RRule {
                         const tmp = [];
                         for (let k = start; k < end; k++) {
                             const val = dayset[k];
-                            if (val === null)
+                            if (!helpers_1.isPresent(val))
                                 continue;
                             tmp.push(val);
                         }
@@ -841,6 +570,7 @@ class RRule {
                     if (!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour))
                         break;
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             else if (freq === RRule.MINUTELY) {
@@ -872,6 +602,7 @@ class RRule {
                         break;
                     }
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             else if (freq === RRule.SECONDLY) {
@@ -910,6 +641,7 @@ class RRule {
                         break;
                     }
                 }
+                // @ts-ignore
                 timeset = gettimeset.call(ii, hour, minute, second);
             }
             if (fixday && day > 28) {
@@ -944,39 +676,19 @@ RRule.FREQUENCIES = [
     'MINUTELY',
     'SECONDLY'
 ];
-RRule.YEARLY = Frequency.YEARLY;
-RRule.MONTHLY = Frequency.MONTHLY;
-RRule.WEEKLY = Frequency.WEEKLY;
-RRule.DAILY = Frequency.DAILY;
-RRule.HOURLY = Frequency.HOURLY;
-RRule.MINUTELY = Frequency.MINUTELY;
-RRule.SECONDLY = Frequency.SECONDLY;
-RRule.DEFAULT_OPTIONS = {
-    freq: null,
-    dtstart: null,
-    interval: 1,
-    wkst: Days.MO,
-    count: null,
-    until: null,
-    bysetpos: null,
-    bymonth: null,
-    bymonthday: null,
-    bynmonthday: null,
-    byyearday: null,
-    byweekno: null,
-    byweekday: null,
-    bynweekday: null,
-    byhour: null,
-    byminute: null,
-    bysecond: null,
-    byeaster: null
-};
-RRule.MO = Days.MO;
-RRule.TU = Days.TU;
-RRule.WE = Days.WE;
-RRule.TH = Days.TH;
-RRule.FR = Days.FR;
-RRule.SA = Days.SA;
-RRule.SU = Days.SU;
+RRule.YEARLY = types_1.Frequency.YEARLY;
+RRule.MONTHLY = types_1.Frequency.MONTHLY;
+RRule.WEEKLY = types_1.Frequency.WEEKLY;
+RRule.DAILY = types_1.Frequency.DAILY;
+RRule.HOURLY = types_1.Frequency.HOURLY;
+RRule.MINUTELY = types_1.Frequency.MINUTELY;
+RRule.SECONDLY = types_1.Frequency.SECONDLY;
+RRule.MO = types_1.Days.MO;
+RRule.TU = types_1.Days.TU;
+RRule.WE = types_1.Days.WE;
+RRule.TH = types_1.Days.TH;
+RRule.FR = types_1.Days.FR;
+RRule.SA = types_1.Days.SA;
+RRule.SU = types_1.Days.SU;
 exports.default = RRule;
 //# sourceMappingURL=rrule.js.map

@@ -42,7 +42,7 @@ export default class RRuleSet extends RRule {
      *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
      */
     toString(): string;
-    _iter(iterResult: IterResult): Date | Date[];
+    _iter(iterResult: IterResult): Date | Date[] | null;
     /**
      * Create a new RRuleSet Object completely base on current instance
      */

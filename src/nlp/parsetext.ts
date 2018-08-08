@@ -1,6 +1,6 @@
 import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
-import { Options, WeekdayStr } from '../rrule'
+import { Options, WeekdayStr } from '../types'
 
 // =============================================================================
 // Parser
@@ -10,7 +10,7 @@ class Parser {
   private readonly rules: { [k: string]: RegExp }
   public text: string
   public symbol: string | null
-  public value: RegExpExecArray
+  public value: RegExpExecArray | null
   private done = true
 
   constructor (rules: { [k: string]: RegExp }) {
@@ -28,7 +28,7 @@ class Parser {
   }
 
   nextSymbol () {
-    let best: RegExpExecArray
+    let best: RegExpExecArray | null
     let bestSymbol: string
     const p = this
 
@@ -37,12 +37,11 @@ class Parser {
     do {
       if (this.done) return false
 
-      let match: RegExpExecArray
       let rule: RegExp
       best = null
       for (let name in this.rules) {
         rule = this.rules[name]
-        match = rule.exec(p.text)
+        const match = rule.exec(p.text)
         if (match) {
           if (best === null || match[0].length > best[0].length) {
             best = match
@@ -63,8 +62,10 @@ class Parser {
         this.value = null
         return
       }
+    // @ts-ignore
     } while (bestSymbol === 'SKIP')
 
+    // @ts-ignore
     this.symbol = bestSymbol
     this.value = best
     return true
@@ -96,9 +97,9 @@ class Parser {
   }
 }
 
-export default function parseText (text: string, language: Language) {
+export default function parseText (text: string, language: Language = ENGLISH) {
   const options: Partial<Options> = {}
-  const ttr = new Parser((language || ENGLISH).tokens)
+  const ttr = new Parser(language.tokens)
 
   if (!ttr.start(text)) return null
 
@@ -395,7 +396,7 @@ export default function parseText (text: string, language: Language) {
         ttr.nextSymbol()
         return ttr.accept('last') ? -3 : 3
       case 'nth':
-        const v = parseInt(ttr.value[1], 10)
+        const v = parseInt(ttr.value![1], 10)
         if (v < -366 || v > 366) throw new Error('Nth out of range: ' + v)
 
         ttr.nextSymbol()
@@ -434,7 +435,7 @@ export default function parseText (text: string, language: Language) {
       if (!date) throw new Error('Cannot parse until date:' + ttr.text)
       options.until = new Date(date)
     } else if (ttr.accept('for')) {
-      options.count = parseInt(ttr.value[0], 10)
+      options.count = parseInt(ttr.value![0], 10)
       ttr.expect('number')
       // ttr.expect('times')
     }

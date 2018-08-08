@@ -27,12 +27,11 @@ class Parser {
         do {
             if (this.done)
                 return false;
-            let match;
             let rule;
             best = null;
             for (let name in this.rules) {
                 rule = this.rules[name];
-                match = rule.exec(p.text);
+                const match = rule.exec(p.text);
                 if (match) {
                     if (best === null || match[0].length > best[0].length) {
                         best = match;
@@ -51,7 +50,9 @@ class Parser {
                 this.value = null;
                 return;
             }
+            // @ts-ignore
         } while (bestSymbol === 'SKIP');
+        // @ts-ignore
         this.symbol = bestSymbol;
         this.value = best;
         return true;
@@ -77,9 +78,9 @@ class Parser {
         throw new Error('expected ' + name + ' but found ' + this.symbol);
     }
 }
-function parseText(text, language) {
+function parseText(text, language = i18n_1.default) {
     const options = {};
-    const ttr = new Parser((language || i18n_1.default).tokens);
+    const ttr = new Parser(language.tokens);
     if (!ttr.start(text))
         return null;
     S();

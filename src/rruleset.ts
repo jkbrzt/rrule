@@ -155,7 +155,7 @@ export default class RRuleSet extends RRule {
     }
 
     if (iterResult.method === 'between') {
-      evalExdate(iterResult.args.after, iterResult.args.before)
+      evalExdate(iterResult.args.after!, iterResult.args.before!)
       iterResult.accept = function (date) {
         const dt = Number(date)
         if (!_exdateHash[dt]) {

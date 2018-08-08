@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const i18n_1 = require("./i18n");
 const index_1 = require("../index");
+const helpers_1 = require("../helpers");
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -11,6 +12,7 @@ const index_1 = require("../index");
 const contains = function (arr, val) {
     return arr.indexOf(val) !== -1;
 };
+const defaultGetText = id => id.toString();
 /**
  *
  * @param {RRule} rrule
@@ -20,14 +22,10 @@ const contains = function (arr, val) {
  * @constructor
  */
 class ToText {
-    constructor(rrule, gettext, language = i18n_1.default) {
+    constructor(rrule, gettext = defaultGetText, language = i18n_1.default) {
         this.text = [];
         this.language = language || i18n_1.default;
-        this.gettext =
-            gettext ||
-                function (id) {
-                    return id.toString();
-                };
+        this.gettext = gettext;
         this.rrule = rrule;
         this.options = rrule.options;
         this.origOptions = rrule.origOptions;
@@ -43,7 +41,7 @@ class ToText {
                 this.bymonthday = null;
         }
         if (this.origOptions.byweekday) {
-            const byweekday = !(this.origOptions.byweekday instanceof Array)
+            const byweekday = !helpers_1.isArray(this.origOptions.byweekday)
                 ? [this.origOptions.byweekday]
                 : this.origOptions.byweekday;
             const days = String(byweekday);
@@ -261,7 +259,7 @@ class ToText {
                 .add(this.plural(this.options.byweekno.length)
                 ? gettext('weeks')
                 : gettext('week'))
-                .add(this.list(this.options.byweekno, null, gettext('and')));
+                .add(this.list(this.options.byweekno, undefined, gettext('and')));
         }
     }
     _bymonthday() {
@@ -290,7 +288,7 @@ class ToText {
     }
     _byhour() {
         const gettext = this.gettext;
-        this.add(gettext('at')).add(this.list(this.origOptions.byhour, null, gettext('and')));
+        this.add(gettext('at')).add(this.list(this.origOptions.byhour, undefined, gettext('and')));
     }
     _bymonth() {
         this.add(this.list(this.options.bymonth, this.monthtext, this.gettext('and')));
@@ -326,7 +324,7 @@ class ToText {
         return this.language.monthNames[m - 1];
     }
     weekdaytext(wday) {
-        const weekday = typeof wday === 'number' ? (wday + 1) % 7 : wday.getJsWeekday();
+        const weekday = helpers_1.isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
         return ((wday.n ? this.nth(wday.n) + ' ' : '') + this.language.dayNames[weekday]);
     }
     plural(n) {
@@ -338,7 +336,7 @@ class ToText {
         return this;
     }
     list(arr, callback, finalDelim, delim = ',') {
-        if (!(arr instanceof Array)) {
+        if (!helpers_1.isArray(arr)) {
             arr = [arr];
         }
         const delimJoin = function (array, delimiter, finalDelimiter) {
@@ -363,7 +361,7 @@ class ToText {
                 };
         const self = this;
         const realCallback = function (arg) {
-            return callback.call(self, arg);
+            return callback && callback.call(self, arg);
         };
         if (finalDelim) {
             return delimJoin(arr.map(realCallback), delim, finalDelim);

@@ -1,7 +1,7 @@
 import ToText, { GetText } from './totext'
 import parseText from './parsetext'
 import RRule from '../index'
-import { Language } from './i18n'
+import ENGLISH, { Language } from './i18n'
 
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
@@ -94,8 +94,8 @@ import { Language } from './i18n'
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text: string, language?: Language) {
-  return new RRule(parseText(text, language))
+const fromText = function (text: string, language: Language = ENGLISH) {
+  return new RRule(parseText(text, language) || undefined)
 }
 
 const common = [
@@ -119,7 +119,7 @@ ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
 // Export
 // =============================================================================
 
-const toText = function (rrule: RRule, gettext: GetText, language?: Language) {
+const toText = function (rrule: RRule, gettext?: GetText, language?: Language) {
   return new ToText(rrule, gettext, language).toString()
 }
 

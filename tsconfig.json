@@ -8,6 +8,7 @@
     "noEmitOnError": true,
     "target": "es6",
     "jsx": "react",
+    "strictNullChecks": true,
     "baseUrl": ".",
     "rootDirs": ["./src/", "./test/"]
   },

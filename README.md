@@ -661,10 +661,14 @@ $ yarn build
 
 ### Changelog
 
+* 2.3.3 (2018-08-08)
+    * Fixed typescript error (#244)
+* 2.3.2 (2018-08-07)
+    * Fixed deploy on npm (#239)
 * 2.3.0 (2018-08-06)
-    * Converted to [Typescript](https://www.typescriptlang.org/)
+    * Converted to [Typescript](https://www.typescriptlang.org/) (#229)
     * Add es5 and es6 distributions
-    * Fixed a bug where recurrences in DST were 1 hour off if the host system used DST
+    * Fixed a bug where recurrences in DST were 1 hour off if the host system used DST (#233)
     * Fixed numeric handling of weekday strings
 * 2.2.8 (2018-02-16)
     * Added `fromText()` and `toText()` support for rules with `RRule.MINUTELY` frequency.

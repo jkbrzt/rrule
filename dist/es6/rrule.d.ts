@@ -1,6 +1,6 @@
 import Weekday from './weekday';
 import dateutil from './dateutil';
-import { IterArgs } from './iterresult';
+import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
 export declare enum Frequency {
@@ -173,6 +173,6 @@ export default class RRule {
      *          as this one (cache is not cloned)
      */
     clone(): RRule;
-    private _iter;
+    _iter(iterResult: IterResult): Date | Date[] | null;
 }
 export {};

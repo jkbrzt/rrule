@@ -1803,7 +1803,6 @@ var RRuleSet = function (_rrule_1$default) {
                 if (!iterResult.accept(new Date(this._rdate[i].valueOf()))) break;
             }
             this._rrule.forEach(function (rrule) {
-                // @ts-ignore
                 rrule._iter(iterResult);
             });
             var res = iterResult._result;
@@ -1823,7 +1822,6 @@ var RRuleSet = function (_rrule_1$default) {
         /**
          * Create a new RRuleSet Object completely base on current instance
          */
-        // @ts-ignore
 
     }, {
         key: "clone",

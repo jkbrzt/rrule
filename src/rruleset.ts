@@ -125,7 +125,7 @@ export default class RRuleSet extends RRule {
     return JSON.stringify(this.valueOf())
   }
 
-  private _iter (iterResult: IterResult) {
+  _iter (iterResult: IterResult) {
     const _exdateHash: { [k: number]: boolean } = {}
     const _exrule = this._exrule
     const _accept = iterResult.accept
@@ -171,7 +171,6 @@ export default class RRuleSet extends RRule {
     }
 
     this._rrule.forEach(function (rrule) {
-      // @ts-ignore
       rrule._iter(iterResult)
     })
 
@@ -193,7 +192,6 @@ export default class RRuleSet extends RRule {
   /**
    * Create a new RRuleSet Object completely base on current instance
    */
-  // @ts-ignore
   clone (): RRuleSet {
     const rrs = new RRuleSet(!!this._cache)
     let i

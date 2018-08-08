@@ -1,5 +1,6 @@
 import Weekday from './weekday';
 import dateutil from './dateutil';
+import IterResult from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
 import { Cache, ParsedOptions, Options, Frequency } from './types';
@@ -104,5 +105,5 @@ export default class RRule {
      *          as this one (cache is not cloned)
      */
     clone(): RRule;
-    private _iter;
+    _iter(iterResult: IterResult): Date | Date[] | null;
 }

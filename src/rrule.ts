@@ -409,7 +409,7 @@ export default class RRule {
     return new RRule(this.origOptions)
   }
 
-  private _iter (iterResult: IterResult): Date | Date[] | null {
+  _iter (iterResult: IterResult): Date | Date[] | null {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
 

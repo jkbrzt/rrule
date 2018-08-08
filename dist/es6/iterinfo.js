@@ -165,7 +165,7 @@ class Iterinfo {
             (month !== this.lastmonth || year !== this.lastyear)) {
             let ranges = [];
             if (rr.options.freq === rrule_1.default.YEARLY) {
-                if (helpers_1.notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                if (helpers_1.notEmpty(rr.options.bymonth)) {
                     for (let j = 0; j < rr.options.bymonth.length; j++) {
                         month = rr.options.bymonth[j];
                         ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -207,7 +207,7 @@ class Iterinfo {
             this.lastyear = year;
             this.lastmonth = month;
         }
-        if (!helpers_1.isBlank(rr.options.byeaster)) {
+        if (helpers_1.isPresent(rr.options.byeaster)) {
             this.eastermask = this.easter(year, rr.options.byeaster);
         }
     }

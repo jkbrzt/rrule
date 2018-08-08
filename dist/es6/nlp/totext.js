@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const i18n_1 = require("./i18n");
 const index_1 = require("../index");
+const helpers_1 = require("../helpers");
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -40,7 +41,7 @@ class ToText {
                 this.bymonthday = null;
         }
         if (this.origOptions.byweekday) {
-            const byweekday = !(this.origOptions.byweekday instanceof Array)
+            const byweekday = !helpers_1.isArray(this.origOptions.byweekday)
                 ? [this.origOptions.byweekday]
                 : this.origOptions.byweekday;
             const days = String(byweekday);
@@ -323,7 +324,7 @@ class ToText {
         return this.language.monthNames[m - 1];
     }
     weekdaytext(wday) {
-        const weekday = typeof wday === 'number' ? (wday + 1) % 7 : wday.getJsWeekday();
+        const weekday = helpers_1.isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
         return ((wday.n ? this.nth(wday.n) + ' ' : '') + this.language.dayNames[weekday]);
     }
     plural(n) {
@@ -335,7 +336,7 @@ class ToText {
         return this;
     }
     list(arr, callback, finalDelim, delim = ',') {
-        if (!(arr instanceof Array)) {
+        if (!helpers_1.isArray(arr)) {
             arr = [arr];
         }
         const delimJoin = function (array, delimiter, finalDelimiter) {

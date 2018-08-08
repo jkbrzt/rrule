@@ -1,4 +1,6 @@
-export declare const isBlank: (value: any) => boolean;
+export declare const isPresent: <T>(value?: T | null | undefined) => value is T;
+export declare const isNumber: (value?: any) => value is number;
+export declare const isArray: <T>(value?: any) => value is T[];
 /**
  * Simplified version of python's range()
  */
@@ -38,7 +40,7 @@ export declare const divmod: (a: number, b: number) => {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-export declare const notEmpty: (obj: any[]) => boolean;
+export declare const notEmpty: <T>(obj: T[] | null | undefined) => obj is T[];
 /**
  * Return true if a value is in an array
  */

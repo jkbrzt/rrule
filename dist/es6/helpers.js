@@ -3,8 +3,14 @@
 // Helper functions
 // =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isBlank = function (value) {
-    return value === null || typeof value === 'undefined';
+exports.isPresent = function (value) {
+    return value !== null && typeof value !== 'undefined';
+};
+exports.isNumber = function (value) {
+    return typeof value === 'number';
+};
+exports.isArray = function (value) {
+    return exports.isPresent(value) && value instanceof Array;
 };
 /**
  * Simplified version of python's range()
@@ -25,7 +31,7 @@ exports.clone = function (array) {
 exports.repeat = function (value, times) {
     let i = 0;
     const array = [];
-    if (value instanceof Array) {
+    if (exports.isArray(value)) {
         for (; i < times; i++)
             array[i] = [].concat(value);
     }
@@ -77,7 +83,7 @@ exports.divmod = function (a, b) {
  * boolean value is False, whereas in JS it's true
  */
 exports.notEmpty = function (obj) {
-    return !exports.isBlank(obj) && obj.length !== 0;
+    return exports.isPresent(obj) && obj.length !== 0;
 };
 /**
  * Return true if a value is in an array

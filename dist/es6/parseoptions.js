@@ -28,25 +28,25 @@ function parseOptions(options) {
         if (!helpers_1.contains(keys, key))
             opts[key] = rrule_1.DEFAULT_OPTIONS[key];
     });
-    if (!rrule_1.default.FREQUENCIES[opts.freq] && helpers_1.isBlank(opts.byeaster)) {
-        throw new Error('Invalid frequency: ' + String(opts.freq));
-    }
-    if (!helpers_1.isBlank(opts.byeaster))
+    if (helpers_1.isPresent(opts.byeaster))
         opts.freq = rrule_1.default.YEARLY;
+    if (!(helpers_1.isPresent(opts.freq) && rrule_1.default.FREQUENCIES[opts.freq])) {
+        throw new Error(`Invalid frequency: ${opts.freq}`);
+    }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
     const millisecondModulo = opts.dtstart.getTime() % 1000;
-    if (helpers_1.isBlank(opts.wkst)) {
+    if (!helpers_1.isPresent(opts.wkst)) {
         opts.wkst = rrule_1.default.MO.weekday;
     }
-    else if (typeof opts.wkst === 'number') {
+    else if (helpers_1.isNumber(opts.wkst)) {
         // cool, just keep it like that
     }
     else {
         opts.wkst = opts.wkst.weekday;
     }
-    if (!helpers_1.isBlank(opts.bysetpos)) {
-        if (typeof opts.bysetpos === 'number')
+    if (helpers_1.isPresent(opts.bysetpos)) {
+        if (helpers_1.isNumber(opts.bysetpos))
             opts.bysetpos = [opts.bysetpos];
         for (let i = 0; i < opts.bysetpos.length; i++) {
             const v = opts.bysetpos[i];
@@ -77,19 +77,19 @@ function parseOptions(options) {
         }
     }
     // bymonth
-    if (!helpers_1.isBlank(opts.bymonth) && !(opts.bymonth instanceof Array)) {
+    if (helpers_1.isPresent(opts.bymonth) && !helpers_1.isArray(opts.bymonth)) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if (!helpers_1.isBlank(opts.byyearday) && !(opts.byyearday instanceof Array) && typeof opts.byyearday === 'number') {
+    if (helpers_1.isPresent(opts.byyearday) && !helpers_1.isArray(opts.byyearday) && helpers_1.isNumber(opts.byyearday)) {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
-    if (helpers_1.isBlank(opts.bymonthday)) {
+    if (!helpers_1.isPresent(opts.bymonthday)) {
         opts.bymonthday = [];
         opts.bynmonthday = [];
     }
-    else if (opts.bymonthday instanceof Array) {
+    else if (helpers_1.isArray(opts.bymonthday)) {
         const bymonthday = [];
         const bynmonthday = [];
         for (let i = 0; i < opts.bymonthday.length; i++) {
@@ -104,25 +104,23 @@ function parseOptions(options) {
         opts.bymonthday = bymonthday;
         opts.bynmonthday = bynmonthday;
     }
+    else if (opts.bymonthday < 0) {
+        opts.bynmonthday = [opts.bymonthday];
+        opts.bymonthday = [];
+    }
     else {
-        if (opts.bymonthday < 0) {
-            opts.bynmonthday = [opts.bymonthday];
-            opts.bymonthday = [];
-        }
-        else {
-            opts.bynmonthday = [];
-            opts.bymonthday = [opts.bymonthday];
-        }
+        opts.bynmonthday = [];
+        opts.bymonthday = [opts.bymonthday];
     }
     // byweekno
-    if (!helpers_1.isBlank(opts.byweekno) && !(opts.byweekno instanceof Array)) {
+    if (helpers_1.isPresent(opts.byweekno) && !helpers_1.isArray(opts.byweekno)) {
         opts.byweekno = [opts.byweekno];
     }
     // byweekday / bynweekday
-    if (helpers_1.isBlank(opts.byweekday)) {
+    if (!helpers_1.isPresent(opts.byweekday)) {
         opts.bynweekday = null;
     }
-    else if (typeof opts.byweekday === 'number') {
+    else if (helpers_1.isNumber(opts.byweekday)) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
@@ -141,7 +139,7 @@ function parseOptions(options) {
         const bynweekday = [];
         for (let i = 0; i < opts.byweekday.length; i++) {
             const wday = opts.byweekday[i];
-            if (typeof wday === 'number') {
+            if (helpers_1.isNumber(wday)) {
                 byweekday.push(wday);
                 continue;
             }
@@ -157,26 +155,26 @@ function parseOptions(options) {
         opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
     }
     // byhour
-    if (helpers_1.isBlank(opts.byhour)) {
+    if (!helpers_1.isPresent(opts.byhour)) {
         opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
-    else if (typeof opts.byhour === 'number') {
+    else if (helpers_1.isNumber(opts.byhour)) {
         opts.byhour = [opts.byhour];
     }
     // byminute
-    if (helpers_1.isBlank(opts.byminute)) {
+    if (!helpers_1.isPresent(opts.byminute)) {
         opts.byminute =
             opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     }
-    else if (typeof opts.byminute === 'number') {
+    else if (helpers_1.isNumber(opts.byminute)) {
         opts.byminute = [opts.byminute];
     }
     // bysecond
-    if (helpers_1.isBlank(opts.bysecond)) {
+    if (!helpers_1.isPresent(opts.bysecond)) {
         opts.bysecond =
             opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     }
-    else if (typeof opts.bysecond === 'number') {
+    else if (helpers_1.isNumber(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
     }
     let timeset;

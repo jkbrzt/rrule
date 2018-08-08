@@ -86,14 +86,14 @@ class RRule {
             let key = keys[i].toUpperCase();
             let value = options[keys[i]];
             let strValues = [];
-            if (helpers_1.isBlank(value) || (value instanceof Array && !value.length))
+            if (!helpers_1.isPresent(value) || (helpers_1.isArray(value) && !value.length))
                 continue;
             switch (key) {
                 case 'FREQ':
                     value = RRule.FREQUENCIES[options.freq];
                     break;
                 case 'WKST':
-                    if (!(value instanceof weekday_1.default)) {
+                    if (helpers_1.isNumber(value)) {
                         value = new weekday_1.default(value);
                     }
                     break;
@@ -110,14 +110,14 @@ class RRule {
           
                     */
                     key = 'BYDAY';
-                    if (!(value instanceof Array))
+                    if (!helpers_1.isArray(value))
                         value = [value];
                     for (let j = 0; j < value.length; j++) {
                         let wday = value[j];
                         if (wday instanceof weekday_1.default) {
                             // good
                         }
-                        else if (wday instanceof Array) {
+                        else if (helpers_1.isArray(wday)) {
                             wday = new weekday_1.default(wday[0], wday[1]);
                         }
                         else {
@@ -132,7 +132,7 @@ class RRule {
                     value = dateutil_1.default.timeToUntilString(value);
                     break;
                 default:
-                    if (value instanceof Array) {
+                    if (helpers_1.isArray(value)) {
                         for (let j = 0; j < value.length; j++) {
                             strValues[j] = String(value[j]);
                         }
@@ -295,7 +295,7 @@ class RRule {
         if (what === 'all') {
             cached = this._cache.all;
         }
-        else if (cachedObject instanceof Array) {
+        else if (helpers_1.isArray(cachedObject)) {
             // Let's see whether we've already called the
             // 'what' method with the same 'args'
             for (let i = 0; i < cachedObject.length; i++) {
@@ -317,7 +317,7 @@ class RRule {
             cached = iterResult.getValue();
             this._cacheAdd(what, cached, args);
         }
-        return cached instanceof Array
+        return helpers_1.isArray(cached)
             ? dateutil_1.default.cloneDates(cached)
             : cached instanceof Date
                 ? dateutil_1.default.clone(cached)
@@ -422,7 +422,7 @@ class RRule {
                 let daypos;
                 let timepos;
                 const poslist = [];
-                for (let j = 0; j < (bysetpos).length; j++) {
+                for (let j = 0; j < bysetpos.length; j++) {
                     pos = bysetpos[j];
                     if (pos < 0) {
                         daypos = Math.floor(pos / timeset.length);
@@ -436,7 +436,7 @@ class RRule {
                         const tmp = [];
                         for (let k = start; k < end; k++) {
                             const val = dayset[k];
-                            if (helpers_1.isBlank(val))
+                            if (!helpers_1.isPresent(val))
                                 continue;
                             tmp.push(val);
                         }

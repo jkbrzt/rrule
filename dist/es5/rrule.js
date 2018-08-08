@@ -100,6 +100,108 @@ return /******/ (function(modules) { // webpackBootstrap
 
 "use strict";
 
+// =============================================================================
+// Helper functions
+// =============================================================================
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isPresent = function (value) {
+    return value !== null && typeof value !== 'undefined';
+};
+exports.isNumber = function (value) {
+    return typeof value === 'number';
+};
+exports.isArray = function (value) {
+    return exports.isPresent(value) && value instanceof Array;
+};
+/**
+ * Simplified version of python's range()
+ */
+exports.range = function (start) {
+    var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : start;
+
+    if (arguments.length === 1) {
+        end = start;
+        start = 0;
+    }
+    var rang = [];
+    for (var i = start; i < end; i++) {
+        rang.push(i);
+    }return rang;
+};
+exports.clone = function (array) {
+    return [].concat(array);
+};
+exports.repeat = function (value, times) {
+    var i = 0;
+    var array = [];
+    if (exports.isArray(value)) {
+        for (; i < times; i++) {
+            array[i] = [].concat(value);
+        }
+    } else {
+        for (; i < times; i++) {
+            array[i] = value;
+        }
+    }
+    return array;
+};
+/**
+ * Python like split
+ */
+exports.split = function (str, sep, num) {
+    var splits = str.split(sep);
+    return num ? splits.slice(0, num).concat([splits.slice(num).join(sep)]) : splits;
+};
+/**
+ * closure/goog/math/math.js:modulo
+ * Copyright 2006 The Closure Library Authors.
+ * The % operator in JavaScript returns the remainder of a / b, but differs from
+ * some other languages in that the result will have the same sign as the
+ * dividend. For example, -1 % 8 == -1, whereas in some other languages
+ * (such as Python) the result would be 7. This function emulates the more
+ * correct modulo behavior, which is useful for certain applications such as
+ * calculating an offset index in a circular list.
+ *
+ * @param {number} a The dividend.
+ * @param {number} b The divisor.
+ * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
+ *     or b < x <= 0, depending on the sign of b).
+ */
+exports.pymod = function (a, b) {
+    var r = a % b;
+    // If r and b differ in sign, add b to wrap the result to the correct sign.
+    return r * b < 0 ? r + b : r;
+};
+/**
+ * @see: <http://docs.python.org/library/functions.html#divmod>
+ */
+exports.divmod = function (a, b) {
+    return { div: Math.floor(a / b), mod: exports.pymod(a, b) };
+};
+/**
+ * Python-like boolean
+ * @return {Boolean} value of an object/primitive, taking into account
+ * the fact that in Python an empty list's/tuple's
+ * boolean value is False, whereas in JS it's true
+ */
+exports.notEmpty = function (obj) {
+    return exports.isPresent(obj) && obj.length !== 0;
+};
+/**
+ * Return true if a value is in an array
+ */
+exports.contains = function (arr, val) {
+    return arr.indexOf(val) !== -1;
+};
+//# sourceMappingURL=helpers.js.map
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -158,7 +260,7 @@ exports.default = Weekday;
 //# sourceMappingURL=weekday.js.map
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -295,7 +397,7 @@ var dateutil;
     dateutil.untilStringToDate = function (until) {
         var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         var bits = re.exec(until);
-        if (!bits) throw new Error('Invalid UNTIL value: ' + until);
+        if (!bits) throw new Error("Invalid UNTIL value: " + until);
         return new Date(Date.UTC(parseInt(bits[1], 10), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10), parseInt(bits[5], 10) || 0, parseInt(bits[6], 10) || 0, parseInt(bits[7], 10) || 0));
     };
 
@@ -345,102 +447,6 @@ exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map
 
 /***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// =============================================================================
-// Helper functions
-// =============================================================================
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isBlank = function (value) {
-    return value === null || typeof value === 'undefined';
-};
-/**
- * Simplified version of python's range()
- */
-exports.range = function (start) {
-    var end = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : start;
-
-    if (arguments.length === 1) {
-        end = start;
-        start = 0;
-    }
-    var rang = [];
-    for (var i = start; i < end; i++) {
-        rang.push(i);
-    }return rang;
-};
-exports.clone = function (array) {
-    return [].concat(array);
-};
-exports.repeat = function (value, times) {
-    var i = 0;
-    var array = [];
-    if (value instanceof Array) {
-        for (; i < times; i++) {
-            array[i] = [].concat(value);
-        }
-    } else {
-        for (; i < times; i++) {
-            array[i] = value;
-        }
-    }
-    return array;
-};
-/**
- * Python like split
- */
-exports.split = function (str, sep, num) {
-    var splits = str.split(sep);
-    return num ? splits.slice(0, num).concat([splits.slice(num).join(sep)]) : splits;
-};
-/**
- * closure/goog/math/math.js:modulo
- * Copyright 2006 The Closure Library Authors.
- * The % operator in JavaScript returns the remainder of a / b, but differs from
- * some other languages in that the result will have the same sign as the
- * dividend. For example, -1 % 8 == -1, whereas in some other languages
- * (such as Python) the result would be 7. This function emulates the more
- * correct modulo behavior, which is useful for certain applications such as
- * calculating an offset index in a circular list.
- *
- * @param {number} a The dividend.
- * @param {number} b The divisor.
- * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
- *     or b < x <= 0, depending on the sign of b).
- */
-exports.pymod = function (a, b) {
-    var r = a % b;
-    // If r and b differ in sign, add b to wrap the result to the correct sign.
-    return r * b < 0 ? r + b : r;
-};
-/**
- * @see: <http://docs.python.org/library/functions.html#divmod>
- */
-exports.divmod = function (a, b) {
-    return { div: Math.floor(a / b), mod: exports.pymod(a, b) };
-};
-/**
- * Python-like boolean
- * @return {Boolean} value of an object/primitive, taking into account
- * the fact that in Python an empty list's/tuple's
- * boolean value is False, whereas in JS it's true
- */
-exports.notEmpty = function (obj) {
-    return !exports.isBlank(obj) && obj.length !== 0;
-};
-/**
- * Return true if a value is in an array
- */
-exports.contains = function (arr, val) {
-    return arr.indexOf(val) !== -1;
-};
-//# sourceMappingURL=helpers.js.map
-
-/***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -456,10 +462,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(0);
-var dateutil_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(1);
+var dateutil_1 = __webpack_require__(2);
 var iterinfo_1 = __webpack_require__(9);
-var helpers_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
 var iterresult_1 = __webpack_require__(7);
 var callbackiterresult_1 = __webpack_require__(11);
 var types_1 = __webpack_require__(5);
@@ -701,7 +707,7 @@ var RRule = function () {
             var cachedObject = this._cache[what];
             if (what === 'all') {
                 cached = this._cache.all;
-            } else if (cachedObject instanceof Array) {
+            } else if (helpers_1.isArray(cachedObject)) {
                 // Let's see whether we've already called the
                 // 'what' method with the same 'args'
                 for (var i = 0; i < cachedObject.length; i++) {
@@ -721,7 +727,7 @@ var RRule = function () {
                 cached = iterResult.getValue();
                 this._cacheAdd(what, cached, args);
             }
-            return cached instanceof Array ? dateutil_1.default.cloneDates(cached) : cached instanceof Date ? dateutil_1.default.clone(cached) : cached;
+            return helpers_1.isArray(cached) ? dateutil_1.default.cloneDates(cached) : cached instanceof Date ? dateutil_1.default.clone(cached) : cached;
         }
         /**
          * @return a RRule instance with the same freq and options
@@ -826,7 +832,7 @@ var RRule = function () {
                             var tmp = [];
                             for (var k = start; k < end; k++) {
                                 var val = dayset[k];
-                                if (helpers_1.isBlank(val)) continue;
+                                if (!helpers_1.isPresent(val)) continue;
                                 tmp.push(val);
                             }
                             var i = void 0;
@@ -1066,13 +1072,13 @@ var RRule = function () {
                 var key = keys[i].toUpperCase();
                 var value = options[keys[i]];
                 var strValues = [];
-                if (helpers_1.isBlank(value) || value instanceof Array && !value.length) continue;
+                if (!helpers_1.isPresent(value) || helpers_1.isArray(value) && !value.length) continue;
                 switch (key) {
                     case 'FREQ':
                         value = RRule.FREQUENCIES[options.freq];
                         break;
                     case 'WKST':
-                        if (!(value instanceof weekday_1.default)) {
+                        if (helpers_1.isNumber(value)) {
                             value = new weekday_1.default(value);
                         }
                         break;
@@ -1087,12 +1093,12 @@ var RRule = function () {
                                    Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
                                    */
                         key = 'BYDAY';
-                        if (!(value instanceof Array)) value = [value];
+                        if (!helpers_1.isArray(value)) value = [value];
                         for (var j = 0; j < value.length; j++) {
                             var wday = value[j];
                             if (wday instanceof weekday_1.default) {
                                 // good
-                            } else if (wday instanceof Array) {
+                            } else if (helpers_1.isArray(wday)) {
                                 wday = new weekday_1.default(wday[0], wday[1]);
                             } else {
                                 wday = new weekday_1.default(wday);
@@ -1106,7 +1112,7 @@ var RRule = function () {
                         value = dateutil_1.default.timeToUntilString(value);
                         break;
                     default:
-                        if (value instanceof Array) {
+                        if (helpers_1.isArray(value)) {
                             for (var _j3 = 0; _j3 < value.length; _j3++) {
                                 strValues[_j3] = String(value[_j3]);
                             }
@@ -1179,7 +1185,7 @@ exports.RRuleSet = rruleset_1.default;
 var rrulestr_1 = __webpack_require__(17);
 var types_1 = __webpack_require__(5);
 exports.Frequency = types_1.Frequency;
-var weekday_1 = __webpack_require__(0);
+var weekday_1 = __webpack_require__(1);
 exports.Weekday = weekday_1.default;
 // =============================================================================
 // Export
@@ -1201,7 +1207,7 @@ exports.default = rrule_1.default;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(0);
+var weekday_1 = __webpack_require__(1);
 var Frequency;
 (function (Frequency) {
     Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
@@ -1407,8 +1413,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(1);
-var helpers_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
 /**
  *
  * @param {Boolean?} noCache
@@ -1577,7 +1583,6 @@ var RRuleSet = function (_rrule_1$default) {
                 if (!iterResult.accept(new Date(this._rdate[i].valueOf()))) break;
             }
             this._rrule.forEach(function (rrule) {
-                // @ts-ignore
                 rrule._iter(iterResult);
             });
             var res = iterResult._result;
@@ -1597,7 +1602,6 @@ var RRuleSet = function (_rrule_1$default) {
         /**
          * Create a new RRuleSet Object completely base on current instance
          */
-        // @ts-ignore
 
     }, {
         key: "clone",
@@ -1640,8 +1644,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 Object.defineProperty(exports, "__esModule", { value: true });
 var masks_1 = __webpack_require__(10);
 var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(1);
-var helpers_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -1801,7 +1805,7 @@ var Iterinfo = function () {
             if (helpers_1.notEmpty(rr.options.bynweekday) && (month !== this.lastmonth || year !== this.lastyear)) {
                 var ranges = [];
                 if (rr.options.freq === rrule_1.default.YEARLY) {
-                    if (helpers_1.notEmpty(rr.options.bymonth) && rr.options.bymonth instanceof Array) {
+                    if (helpers_1.notEmpty(rr.options.bymonth)) {
                         for (var _j2 = 0; _j2 < rr.options.bymonth.length; _j2++) {
                             month = rr.options.bymonth[_j2];
                             ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -1839,7 +1843,7 @@ var Iterinfo = function () {
                 this.lastyear = year;
                 this.lastmonth = month;
             }
-            if (!helpers_1.isBlank(rr.options.byeaster)) {
+            if (helpers_1.isPresent(rr.options.byeaster)) {
                 this.eastermask = this.easter(year, rr.options.byeaster);
             }
         }
@@ -1930,7 +1934,7 @@ exports.default = Iterinfo;
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
 // =============================================================================
 // Date masks
 // =============================================================================
@@ -2027,10 +2031,10 @@ exports.default = CallbackIterResult;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var helpers_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
 var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(1);
-var weekday_1 = __webpack_require__(0);
+var dateutil_1 = __webpack_require__(2);
+var weekday_1 = __webpack_require__(1);
 function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
@@ -2053,21 +2057,21 @@ function parseOptions(options) {
     rrule_1.defaultKeys.forEach(function (key) {
         if (!helpers_1.contains(keys, key)) opts[key] = rrule_1.DEFAULT_OPTIONS[key];
     });
-    if (!rrule_1.default.FREQUENCIES[opts.freq] && helpers_1.isBlank(opts.byeaster)) {
-        throw new Error('Invalid frequency: ' + String(opts.freq));
+    if (helpers_1.isPresent(opts.byeaster)) opts.freq = rrule_1.default.YEARLY;
+    if (!(helpers_1.isPresent(opts.freq) && rrule_1.default.FREQUENCIES[opts.freq])) {
+        throw new Error("Invalid frequency: " + opts.freq);
     }
-    if (!helpers_1.isBlank(opts.byeaster)) opts.freq = rrule_1.default.YEARLY;
     if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0));
     var millisecondModulo = opts.dtstart.getTime() % 1000;
-    if (helpers_1.isBlank(opts.wkst)) {
+    if (!helpers_1.isPresent(opts.wkst)) {
         opts.wkst = rrule_1.default.MO.weekday;
-    } else if (typeof opts.wkst === 'number') {
+    } else if (helpers_1.isNumber(opts.wkst)) {
         // cool, just keep it like that
     } else {
         opts.wkst = opts.wkst.weekday;
     }
-    if (!helpers_1.isBlank(opts.bysetpos)) {
-        if (typeof opts.bysetpos === 'number') opts.bysetpos = [opts.bysetpos];
+    if (helpers_1.isPresent(opts.bysetpos)) {
+        if (helpers_1.isNumber(opts.bysetpos)) opts.bysetpos = [opts.bysetpos];
         for (var i = 0; i < opts.bysetpos.length; i++) {
             var v = opts.bysetpos[i];
             if (v === 0 || !(v >= -366 && v <= 366)) {
@@ -2090,18 +2094,18 @@ function parseOptions(options) {
         }
     }
     // bymonth
-    if (!helpers_1.isBlank(opts.bymonth) && !(opts.bymonth instanceof Array)) {
+    if (helpers_1.isPresent(opts.bymonth) && !helpers_1.isArray(opts.bymonth)) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if (!helpers_1.isBlank(opts.byyearday) && !(opts.byyearday instanceof Array) && typeof opts.byyearday === 'number') {
+    if (helpers_1.isPresent(opts.byyearday) && !helpers_1.isArray(opts.byyearday) && helpers_1.isNumber(opts.byyearday)) {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
-    if (helpers_1.isBlank(opts.bymonthday)) {
+    if (!helpers_1.isPresent(opts.bymonthday)) {
         opts.bymonthday = [];
         opts.bynmonthday = [];
-    } else if (opts.bymonthday instanceof Array) {
+    } else if (helpers_1.isArray(opts.bymonthday)) {
         var bymonthday = [];
         var bynmonthday = [];
         for (var _i = 0; _i < opts.bymonthday.length; _i++) {
@@ -2114,23 +2118,21 @@ function parseOptions(options) {
         }
         opts.bymonthday = bymonthday;
         opts.bynmonthday = bynmonthday;
+    } else if (opts.bymonthday < 0) {
+        opts.bynmonthday = [opts.bymonthday];
+        opts.bymonthday = [];
     } else {
-        if (opts.bymonthday < 0) {
-            opts.bynmonthday = [opts.bymonthday];
-            opts.bymonthday = [];
-        } else {
-            opts.bynmonthday = [];
-            opts.bymonthday = [opts.bymonthday];
-        }
+        opts.bynmonthday = [];
+        opts.bymonthday = [opts.bymonthday];
     }
     // byweekno
-    if (!helpers_1.isBlank(opts.byweekno) && !(opts.byweekno instanceof Array)) {
+    if (helpers_1.isPresent(opts.byweekno) && !helpers_1.isArray(opts.byweekno)) {
         opts.byweekno = [opts.byweekno];
     }
     // byweekday / bynweekday
-    if (helpers_1.isBlank(opts.byweekday)) {
+    if (!helpers_1.isPresent(opts.byweekday)) {
         opts.bynweekday = null;
-    } else if (typeof opts.byweekday === 'number') {
+    } else if (helpers_1.isNumber(opts.byweekday)) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     } else if (opts.byweekday instanceof weekday_1.default) {
@@ -2146,7 +2148,7 @@ function parseOptions(options) {
         var bynweekday = [];
         for (var _i2 = 0; _i2 < opts.byweekday.length; _i2++) {
             var wday = opts.byweekday[_i2];
-            if (typeof wday === 'number') {
+            if (helpers_1.isNumber(wday)) {
                 byweekday.push(wday);
                 continue;
             }
@@ -2161,21 +2163,21 @@ function parseOptions(options) {
         opts.bynweekday = helpers_1.notEmpty(bynweekday) ? bynweekday : null;
     }
     // byhour
-    if (helpers_1.isBlank(opts.byhour)) {
+    if (!helpers_1.isPresent(opts.byhour)) {
         opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
-    } else if (typeof opts.byhour === 'number') {
+    } else if (helpers_1.isNumber(opts.byhour)) {
         opts.byhour = [opts.byhour];
     }
     // byminute
-    if (helpers_1.isBlank(opts.byminute)) {
+    if (!helpers_1.isPresent(opts.byminute)) {
         opts.byminute = opts.freq < rrule_1.default.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
-    } else if (typeof opts.byminute === 'number') {
+    } else if (helpers_1.isNumber(opts.byminute)) {
         opts.byminute = [opts.byminute];
     }
     // bysecond
-    if (helpers_1.isBlank(opts.bysecond)) {
+    if (!helpers_1.isPresent(opts.bysecond)) {
         opts.bysecond = opts.freq < rrule_1.default.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
-    } else if (typeof opts.bysecond === 'number') {
+    } else if (helpers_1.isNumber(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
     }
     var timeset = void 0;
@@ -2212,8 +2214,8 @@ exports.parseOptions = parseOptions;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var types_1 = __webpack_require__(5);
-var weekday_1 = __webpack_require__(0);
-var dateutil_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(1);
+var dateutil_1 = __webpack_require__(2);
 function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length) return null;
@@ -2442,6 +2444,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 Object.defineProperty(exports, "__esModule", { value: true });
 var i18n_1 = __webpack_require__(6);
 var index_1 = __webpack_require__(4);
+var helpers_1 = __webpack_require__(0);
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -2487,7 +2490,7 @@ var ToText = function () {
             if (!this.bymonthday.length) this.bymonthday = null;
         }
         if (this.origOptions.byweekday) {
-            var byweekday = !(this.origOptions.byweekday instanceof Array) ? [this.origOptions.byweekday] : this.origOptions.byweekday;
+            var byweekday = !helpers_1.isArray(this.origOptions.byweekday) ? [this.origOptions.byweekday] : this.origOptions.byweekday;
             var days = String(byweekday);
             this.byweekday = {
                 allWeeks: byweekday.filter(function (weekday) {
@@ -2732,7 +2735,7 @@ var ToText = function () {
     }, {
         key: "weekdaytext",
         value: function weekdaytext(wday) {
-            var weekday = typeof wday === 'number' ? (wday + 1) % 7 : wday.getJsWeekday();
+            var weekday = helpers_1.isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
             return (wday.n ? this.nth(wday.n) + ' ' : '') + this.language.dayNames[weekday];
         }
     }, {
@@ -2752,7 +2755,7 @@ var ToText = function () {
         value: function list(arr, callback, finalDelim) {
             var delim = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : ',';
 
-            if (!(arr instanceof Array)) {
+            if (!helpers_1.isArray(arr)) {
                 arr = [arr];
             }
             var delimJoin = function delimJoin(array, delimiter, finalDelimiter) {
@@ -3218,9 +3221,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 Object.defineProperty(exports, "__esModule", { value: true });
 var rrule_1 = __webpack_require__(3);
 var rruleset_1 = __webpack_require__(8);
-var dateutil_1 = __webpack_require__(1);
-var weekday_1 = __webpack_require__(0);
-var helpers_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(2);
+var weekday_1 = __webpack_require__(1);
+var helpers_1 = __webpack_require__(0);
 /**
  * RRuleStr
  *  To parse a set of rrule strings

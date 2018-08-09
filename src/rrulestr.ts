@@ -23,7 +23,16 @@ type FreqKey = keyof typeof Frequency
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
   private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
+    console.log('dtstart', value)
+    const parms = /^(;[^:]+):?(.*)/.exec(value)!
+    console.log(parms)
     rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
+    if (parms.length > 0) {
+      const [ key, timezone ] = parms[0].split('=')
+      if (key.toUpperCase() === 'TZID') {
+        rrkwargs['tzid'] = timezone
+      }
+    }
   }
 
   // tslint:disable-next-line:variable-name
@@ -145,6 +154,7 @@ export default class RRuleStr {
       try {
         // @ts-ignore
         this[`_handle_${name}`](rrkwargs, name, value)
+        console.log('handling',name, value)
       } catch (error) {
         throw new Error("unknown parameter '" + name + "':" + value)
       }
@@ -159,7 +169,7 @@ export default class RRuleStr {
       options.unfold = true
     }
 
-    s = s && s.toUpperCase().trim()
+    s = s && s.trim()
     if (!s) throw new Error('Invalid empty string')
 
     let i = 0
@@ -194,6 +204,7 @@ export default class RRuleStr {
     let value: string
     let parts: string[]
     let dtstart: Date
+    let tzid: string
     let rset: RRuleSet
     let j: number
     let k: number
@@ -223,7 +234,7 @@ export default class RRuleStr {
         }
         let parms = name.split(';')
         if (!parms) throw new Error('empty property name')
-        name = parms[0]
+        name = parms[0].toUpperCase()
         parms = parms.slice(1)
 
         if (name === 'RRULE') {

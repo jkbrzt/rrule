@@ -1,5 +1,6 @@
 import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr } from '../src'
+import { expect } from 'chai'
 
 describe('rrulestr', function () {
   // Enable additional toString() / fromString() tests
@@ -253,4 +254,13 @@ describe('rrulestr', function () {
       datetimeUTC(1998, 12, 31, 9, 0)
     ]
   )
+
+  it.only('parses TZID', () => {
+    const rrule = rrulestr(
+      'DTSTART;TZID=America/New_York:19970902T090000\n' +
+      'RRULE:FREQ=DAILY'
+    )
+
+    expect(rrule.options.tzid).to.equal('America/New_York')
+  })
 })

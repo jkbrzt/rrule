@@ -1,4 +1,4 @@
-== Thanks for contributing to `rrule`!
+### Thanks for contributing to `rrule`!
 
 To submit a pull request, please verify that you have done the following:
 

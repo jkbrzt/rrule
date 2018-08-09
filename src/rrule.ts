@@ -48,6 +48,7 @@ export const DEFAULT_OPTIONS: Options = {
   wkst: Days.MO,
   count: null,
   until: null,
+  tzid: null,
   bysetpos: null,
   bymonth: null,
   bymonthday: null,

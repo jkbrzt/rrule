@@ -21,7 +21,7 @@ var dateutil;
      * want to confuse the JS engine with milliseconds > Number.MAX_NUMBER,
      * therefore we use 1-Jan-1970 instead
      */
-    dateutil.ORDINAL_BASE = new Date(1970, 0, 1);
+    dateutil.ORDINAL_BASE = new Date(Date.UTC(1970, 0, 1));
     /**
      * Python: MO-SU: 0 - 6
      * JS: SU-SAT 0 - 6
@@ -32,7 +32,8 @@ var dateutil;
      */
     dateutil.getYearDay = function (date) {
         const dateNoTime = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-        return (Math.ceil((dateNoTime.valueOf() - new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
+        return (Math.ceil((dateNoTime.valueOf() -
+            new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
             dateutil.ONE_DAY) + 1);
     };
     dateutil.isLeapYear = function (year) {
@@ -67,7 +68,7 @@ var dateutil;
      * @see - <http://docs.python.org/library/datetime.html#datetime.date.fromordinal>
      */
     dateutil.fromOrdinal = function (ordinal) {
-        return new Date(dateutil.ORDINAL_BASE.getTime() + (ordinal * dateutil.ONE_DAY));
+        return new Date(dateutil.ORDINAL_BASE.getTime() + ordinal * dateutil.ONE_DAY);
     };
     dateutil.getMonthDays = function (date) {
         const month = date.getUTCMonth();
@@ -85,7 +86,7 @@ var dateutil;
      * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
      */
     dateutil.monthRange = function (year, month) {
-        const date = new Date(year, month, 1);
+        const date = new Date(Date.UTC(year, month, 1));
         return [dateutil.getWeekday(date), dateutil.getMonthDays(date)];
     };
     /**

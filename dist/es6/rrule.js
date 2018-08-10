@@ -81,7 +81,7 @@ class RRule {
         const keys = Object.keys(options);
         const defaultKeys = Object.keys(exports.DEFAULT_OPTIONS);
         for (let i = 0; i < keys.length; i++) {
-            if (!helpers_1.contains(defaultKeys, keys[i]))
+            if (!helpers_1.includes(defaultKeys, keys[i]))
                 continue;
             let key = keys[i].toUpperCase();
             let value = options[keys[i]];
@@ -364,19 +364,17 @@ class RRule {
         }
         else {
             gettimeset = {
-                [RRule.YEARLY]: ii.ydayset,
-                [RRule.MONTHLY]: ii.mdayset,
-                [RRule.WEEKLY]: ii.wdayset,
-                [RRule.DAILY]: ii.ddayset,
                 [RRule.HOURLY]: ii.htimeset,
                 [RRule.MINUTELY]: ii.mtimeset,
                 [RRule.SECONDLY]: ii.stimeset
             }[freq];
-            if ((freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.contains(byhour, hour)) ||
+            if ((freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.includes(byhour, hour)) ||
                 (freq >= RRule.MINUTELY &&
                     helpers_1.notEmpty(byminute) &&
-                    !helpers_1.contains(byminute, minute)) ||
-                (freq >= RRule.SECONDLY && helpers_1.notEmpty(bysecond) && !helpers_1.contains(bysecond, second))) {
+                    !helpers_1.includes(byminute, minute)) ||
+                (freq >= RRule.SECONDLY &&
+                    helpers_1.notEmpty(bysecond) &&
+                    !helpers_1.includes(bysecond, second))) {
                 timeset = [];
             }
             else {
@@ -397,23 +395,7 @@ class RRule {
             let filtered = false;
             for (let dayCounter = start; dayCounter < end; dayCounter++) {
                 currentDay = dayset[dayCounter];
-                filtered =
-                    (helpers_1.notEmpty(bymonth) && !helpers_1.contains(bymonth, ii.mmask[currentDay])) ||
-                        (helpers_1.notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
-                        (helpers_1.notEmpty(byweekday) &&
-                            !helpers_1.contains(byweekday, ii.wdaymask[currentDay])) ||
-                        (helpers_1.notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
-                        (byeaster !== null && !helpers_1.contains(ii.eastermask, currentDay)) ||
-                        ((helpers_1.notEmpty(bymonthday) || helpers_1.notEmpty(bynmonthday)) &&
-                            !helpers_1.contains(bymonthday, ii.mdaymask[currentDay]) &&
-                            !helpers_1.contains(bynmonthday, ii.nmdaymask[currentDay])) ||
-                        (helpers_1.notEmpty(byyearday) &&
-                            ((currentDay < ii.yearlen &&
-                                !helpers_1.contains(byyearday, currentDay + 1) &&
-                                !helpers_1.contains(byyearday, -ii.yearlen + currentDay)) ||
-                                (currentDay >= ii.yearlen &&
-                                    !helpers_1.contains(byyearday, currentDay + 1 - ii.yearlen) &&
-                                    !helpers_1.contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))));
+                filtered = isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday);
                 if (filtered)
                     dayset[currentDay] = null;
             }
@@ -453,7 +435,7 @@ class RRule {
                         const res = dateutil_1.default.combine(date, time);
                         // XXX: can this ever be in the array?
                         // - compare the actual date instead?
-                        if (!helpers_1.contains(poslist, res))
+                        if (!helpers_1.includes(poslist, res))
                             poslist.push(res);
                         // tslint:disable-next-line:no-empty
                     }
@@ -567,7 +549,7 @@ class RRule {
                         day += div;
                         fixday = true;
                     }
-                    if (!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour))
+                    if (!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour))
                         break;
                 }
                 // @ts-ignore
@@ -597,8 +579,8 @@ class RRule {
                             filtered = false;
                         }
                     }
-                    if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute))) {
+                    if ((!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour)) &&
+                        (!helpers_1.notEmpty(byminute) || helpers_1.includes(byminute, minute))) {
                         break;
                     }
                 }
@@ -635,9 +617,9 @@ class RRule {
                             }
                         }
                     }
-                    if ((!helpers_1.notEmpty(byhour) || helpers_1.contains(byhour, hour)) &&
-                        (!helpers_1.notEmpty(byminute) || helpers_1.contains(byminute, minute)) &&
-                        (!helpers_1.notEmpty(bysecond) || helpers_1.contains(bysecond, second))) {
+                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) &&
+                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, minute)) &&
+                        (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, second))) {
                         break;
                     }
                 }
@@ -691,4 +673,21 @@ RRule.FR = types_1.Days.FR;
 RRule.SA = types_1.Days.SA;
 RRule.SU = types_1.Days.SU;
 exports.default = RRule;
+function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
+    return ((helpers_1.notEmpty(bymonth) && !helpers_1.includes(bymonth, ii.mmask[currentDay])) ||
+        (helpers_1.notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
+        (helpers_1.notEmpty(byweekday) && !helpers_1.includes(byweekday, ii.wdaymask[currentDay])) ||
+        (helpers_1.notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+        (byeaster !== null && !helpers_1.includes(ii.eastermask, currentDay)) ||
+        ((helpers_1.notEmpty(bymonthday) || helpers_1.notEmpty(bynmonthday)) &&
+            !helpers_1.includes(bymonthday, ii.mdaymask[currentDay]) &&
+            !helpers_1.includes(bynmonthday, ii.nmdaymask[currentDay])) ||
+        (helpers_1.notEmpty(byyearday) &&
+            ((currentDay < ii.yearlen &&
+                !helpers_1.includes(byyearday, currentDay + 1) &&
+                !helpers_1.includes(byyearday, -ii.yearlen + currentDay)) ||
+                (currentDay >= ii.yearlen &&
+                    !helpers_1.includes(byyearday, currentDay + 1 - ii.yearlen) &&
+                    !helpers_1.includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen)))));
+}
 //# sourceMappingURL=rrule.js.map

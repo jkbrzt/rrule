@@ -3616,12 +3616,9 @@ describe('RRule', function () {
     ])
   })
 
-  it.only('generates events', () => {
+  it('generates events', () => {
     const startEvent = 1533895200000
     const endSearch = 1543618799999
-
-    console.log('start', new Date(startEvent))
-    console.log('end', new Date(endSearch))
 
     const rrule = new RRule({
       freq: RRule.WEEKLY,

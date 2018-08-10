@@ -26,7 +26,7 @@ class RRuleSet extends rrule_1.default {
         if (!(rrule instanceof rrule_1.default)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!helpers_1.contains(this._rrule.map(String), String(rrule))) {
+        if (!helpers_1.includes(this._rrule.map(String), String(rrule))) {
             this._rrule.push(rrule);
         }
     }
@@ -39,7 +39,7 @@ class RRuleSet extends rrule_1.default {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!helpers_1.contains(this._rdate.map(Number), Number(date))) {
+        if (!helpers_1.includes(this._rdate.map(Number), Number(date))) {
             this._rdate.push(date);
             dateutil_1.default.sort(this._rdate);
         }
@@ -53,7 +53,7 @@ class RRuleSet extends rrule_1.default {
         if (!(rrule instanceof rrule_1.default)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!helpers_1.contains(this._exrule.map(String), String(rrule))) {
+        if (!helpers_1.includes(this._exrule.map(String), String(rrule))) {
             this._exrule.push(rrule);
         }
     }
@@ -66,7 +66,7 @@ class RRuleSet extends rrule_1.default {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!helpers_1.contains(this._exdate.map(Number), Number(date))) {
+        if (!helpers_1.includes(this._exdate.map(Number), Number(date))) {
             this._exdate.push(date);
             dateutil_1.default.sort(this._exdate);
         }
@@ -114,7 +114,7 @@ class RRuleSet extends rrule_1.default {
         const _accept = iterResult.accept;
         function evalExdate(after, before) {
             _exrule.forEach(function (rrule) {
-                (rrule.between(after, before, true)).forEach(function (date) {
+                rrule.between(after, before, true).forEach(function (date) {
                     _exdateHash[Number(date)] = true;
                 });
             });

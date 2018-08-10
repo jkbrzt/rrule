@@ -4,14 +4,12 @@
 // =============================================================================
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isPresent = function (value) {
-    return value !== null && typeof value !== 'undefined';
+    return value !== null && value !== undefined;
 };
 exports.isNumber = function (value) {
     return typeof value === 'number';
 };
-exports.isArray = function (value) {
-    return exports.isPresent(value) && value instanceof Array;
-};
+exports.isArray = Array.isArray;
 /**
  * Simplified version of python's range()
  */
@@ -76,6 +74,9 @@ exports.pymod = function (a, b) {
 exports.divmod = function (a, b) {
     return { div: Math.floor(a / b), mod: exports.pymod(a, b) };
 };
+exports.empty = function (obj) {
+    return !exports.isPresent(obj) || obj.length === 0;
+};
 /**
  * Python-like boolean
  * @return {Boolean} value of an object/primitive, taking into account
@@ -83,12 +84,12 @@ exports.divmod = function (a, b) {
  * boolean value is False, whereas in JS it's true
  */
 exports.notEmpty = function (obj) {
-    return exports.isPresent(obj) && obj.length !== 0;
+    return !exports.empty(obj);
 };
 /**
  * Return true if a value is in an array
  */
-exports.contains = function (arr, val) {
-    return arr.indexOf(val) !== -1;
+exports.includes = function (arr, val) {
+    return exports.notEmpty(arr) && arr.indexOf(val) !== -1;
 };
 //# sourceMappingURL=helpers.js.map

@@ -1,6 +1,6 @@
 export declare const isPresent: <T>(value?: T | null | undefined) => value is T;
 export declare const isNumber: (value?: any) => value is number;
-export declare const isArray: <T>(value?: any) => value is T[];
+export declare const isArray: (arg: any) => arg is any[];
 /**
  * Simplified version of python's range()
  */
@@ -34,6 +34,7 @@ export declare const divmod: (a: number, b: number) => {
     div: number;
     mod: number;
 };
+export declare const empty: <T>(obj: T[] | null | undefined) => obj is T[];
 /**
  * Python-like boolean
  * @return {Boolean} value of an object/primitive, taking into account
@@ -44,4 +45,4 @@ export declare const notEmpty: <T>(obj: T[] | null | undefined) => obj is T[];
 /**
  * Return true if a value is in an array
  */
-export declare const contains: <T>(arr: T[], val: T) => boolean;
+export declare const includes: <T>(arr: T[] | null | undefined, val: T) => boolean;

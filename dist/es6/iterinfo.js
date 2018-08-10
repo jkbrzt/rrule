@@ -45,10 +45,10 @@ class Iterinfo {
         if (year !== this.lastyear) {
             this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
             this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
-            const firstyday = new Date(year, 0, 1);
+            const firstyday = new Date(Date.UTC(year, 0, 1));
             this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
             this.yearweekday = dateutil_1.default.getWeekday(firstyday);
-            const wday = dateutil_1.default.getWeekday(new Date(year, 0, 1));
+            const wday = dateutil_1.default.getWeekday(firstyday);
             if (this.yearlen === 365) {
                 this.mmask = helpers_1.clone(masks_1.M365MASK);
                 this.mdaymask = helpers_1.clone(masks_1.MDAY365MASK);
@@ -112,7 +112,7 @@ class Iterinfo {
                             break;
                     }
                 }
-                if (helpers_1.contains(rr.options.byweekno, 1)) {
+                if (helpers_1.includes(rr.options.byweekno, 1)) {
                     // Check week number 1 of next year as well
                     // orig-TODO : Check -numweeks for next year.
                     let i = no1wkst + numweeks * 7;
@@ -137,8 +137,8 @@ class Iterinfo {
                     // days from last year's last week number in
                     // this year.
                     let lnumweeks;
-                    if (!helpers_1.contains(rr.options.byweekno, -1)) {
-                        const lyearweekday = dateutil_1.default.getWeekday(new Date(year - 1, 0, 1));
+                    if (!helpers_1.includes(rr.options.byweekno, -1)) {
+                        const lyearweekday = dateutil_1.default.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
                         let lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
                         const lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
                         if (lno1wkst >= 4) {
@@ -154,7 +154,7 @@ class Iterinfo {
                     else {
                         lnumweeks = -1;
                     }
-                    if (helpers_1.contains(rr.options.byweekno, lnumweeks)) {
+                    if (helpers_1.includes(rr.options.byweekno, lnumweeks)) {
                         for (let i = 0; i < no1wkst; i++)
                             this.wnomask[i] = 1;
                     }
@@ -225,7 +225,8 @@ class Iterinfo {
     wdayset(year, month, day) {
         // We need to handle cross-year weeks here.
         const set = helpers_1.repeat(null, this.yearlen + 7);
-        let i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        let i = dateutil_1.default.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+            this.yearordinal;
         const start = i;
         for (let j = 0; j < 7; j++) {
             set[i] = i;
@@ -237,7 +238,8 @@ class Iterinfo {
     }
     ddayset(year, month, day) {
         const set = helpers_1.repeat(null, this.yearlen);
-        const i = dateutil_1.default.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal;
+        const i = dateutil_1.default.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+            this.yearordinal;
         set[i] = i;
         return [set, i, i + 1];
     }
@@ -245,7 +247,7 @@ class Iterinfo {
         const set = [];
         const rr = this.rrule;
         for (let i = 0; i < rr.options.byminute.length; i++) {
-            minute = (rr.options.byminute)[i];
+            minute = rr.options.byminute[i];
             for (let j = 0; j < rr.options.bysecond.length; j++) {
                 second = rr.options.bysecond[j];
                 set.push(new dateutil_1.default.Time(hour, minute, second, millisecond));

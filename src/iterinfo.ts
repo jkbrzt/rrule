@@ -18,7 +18,8 @@ import {
   includes,
   range,
   clone,
-  isPresent
+  isPresent,
+  empty
 } from './helpers'
 
 export type DaySet = [(number | null)[], number, number]
@@ -105,7 +106,7 @@ export default class Iterinfo {
         this.mrange = clone(M366RANGE)
       }
 
-      if (!notEmpty(rr.options.byweekno)) {
+      if (empty(rr.options.byweekno)) {
         this.wnomask = null
       } else {
         this.wnomask = repeat(0, this.yearlen + 7) as number[]

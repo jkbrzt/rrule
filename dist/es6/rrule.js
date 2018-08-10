@@ -549,7 +549,7 @@ class RRule {
                         day += div;
                         fixday = true;
                     }
-                    if (!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour))
+                    if (helpers_1.empty(byhour) || helpers_1.includes(byhour, hour))
                         break;
                 }
                 // @ts-ignore
@@ -579,8 +579,8 @@ class RRule {
                             filtered = false;
                         }
                     }
-                    if ((!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour)) &&
-                        (!helpers_1.notEmpty(byminute) || helpers_1.includes(byminute, minute))) {
+                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) &&
+                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, minute))) {
                         break;
                     }
                 }

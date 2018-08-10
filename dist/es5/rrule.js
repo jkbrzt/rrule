@@ -952,7 +952,7 @@ var RRule = function () {
                             day += div;
                             fixday = true;
                         }
-                        if (!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour)) break;
+                        if (helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) break;
                     }
                     // @ts-ignore
                     timeset = gettimeset.call(ii, hour, minute, second);
@@ -979,7 +979,7 @@ var RRule = function () {
                                 filtered = false;
                             }
                         }
-                        if ((!helpers_1.notEmpty(byhour) || helpers_1.includes(byhour, hour)) && (!helpers_1.notEmpty(byminute) || helpers_1.includes(byminute, minute))) {
+                        if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) && (helpers_1.empty(byminute) || helpers_1.includes(byminute, minute))) {
                             break;
                         }
                     }
@@ -1718,7 +1718,7 @@ var Iterinfo = function () {
                     this.wdaymask = masks_1.WDAYMASK.slice(wday);
                     this.mrange = helpers_1.clone(masks_1.M366RANGE);
                 }
-                if (!helpers_1.notEmpty(rr.options.byweekno)) {
+                if (helpers_1.empty(rr.options.byweekno)) {
                     this.wnomask = null;
                 } else {
                     this.wnomask = helpers_1.repeat(0, this.yearlen + 7);

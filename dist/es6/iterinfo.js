@@ -63,7 +63,7 @@ class Iterinfo {
                 this.wdaymask = masks_1.WDAYMASK.slice(wday);
                 this.mrange = helpers_1.clone(masks_1.M366RANGE);
             }
-            if (!helpers_1.notEmpty(rr.options.byweekno)) {
+            if (helpers_1.empty(rr.options.byweekno)) {
                 this.wnomask = null;
             }
             else {

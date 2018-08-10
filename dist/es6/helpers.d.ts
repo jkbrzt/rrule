@@ -34,7 +34,7 @@ export declare const divmod: (a: number, b: number) => {
     div: number;
     mod: number;
 };
-export declare const empty: <T>(obj: T[] | null | undefined) => obj is T[];
+export declare const empty: <T>(obj: T[] | null | undefined) => boolean;
 /**
  * Python-like boolean
  * @return {Boolean} value of an object/primitive, taking into account

@@ -690,7 +690,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!notEmpty(byhour) || includes(byhour, hour)) break
+          if (empty(byhour) || includes(byhour, hour)) break
         }
         // @ts-ignore
         timeset = gettimeset.call(ii, hour, minute, second)
@@ -720,8 +720,8 @@ export default class RRule {
             }
           }
           if (
-            (!notEmpty(byhour) || includes(byhour, hour)) &&
-            (!notEmpty(byminute) || includes(byminute, minute))
+            (empty(byhour) || includes(byhour, hour)) &&
+            (empty(byminute) || includes(byminute, minute))
           ) {
             break
           }

@@ -11,7 +11,7 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { notEmpty, repeat, pymod, contains, range, clone, isPresent } from './helpers'
+import { notEmpty, repeat, pymod, includes, range, clone, isPresent } from './helpers'
 
 export type DaySet = [ (number | null)[], number, number ]
 export type GetDayset = () => DaySet
@@ -144,7 +144,7 @@ export default class Iterinfo {
           }
         }
 
-        if (contains(rr.options.byweekno, 1)) {
+        if (includes(rr.options.byweekno, 1)) {
           // Check week number 1 of next year as well
           // orig-TODO : Check -numweeks for next year.
           let i = no1wkst + numweeks * 7
@@ -168,7 +168,7 @@ export default class Iterinfo {
           // days from last year's last week number in
           // this year.
           let lnumweeks: number
-          if (!contains(rr.options.byweekno, -1)) {
+          if (!includes(rr.options.byweekno, -1)) {
             const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
             let lno1wkst = pymod(
               7 - lyearweekday.valueOf() + rr.options.wkst,
@@ -191,7 +191,7 @@ export default class Iterinfo {
           } else {
             lnumweeks = -1
           }
-          if (contains(rr.options.byweekno, lnumweeks)) {
+          if (includes(rr.options.byweekno, lnumweeks)) {
             for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
           }
         }

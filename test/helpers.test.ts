@@ -1,5 +1,50 @@
-import { empty, includes, pymod, divmod, split, clone, range, repeat } from '../src/helpers'
+import { empty, includes, pymod, divmod, split, clone, range, repeat, isPresent, isArray } from '../src/helpers'
 import { expect } from 'chai'
+import { isNumber } from 'util';
+
+describe('isPresent', () => {
+  it('is false if object is null', () => {
+    expect(isPresent(null)).to.be.false
+  })
+
+  it('is false if object is undefined', () => {
+    expect(isPresent(undefined)).to.be.false
+  })
+
+  it('is true if object is non-null and not undefined', () => {
+    expect(isPresent(0)).to.be.true
+    expect(isPresent('')).to.be.true
+    expect(isPresent('foo')).to.be.true
+    expect(isPresent(123)).to.be.true
+    expect(isPresent([])).to.be.true
+  })
+})
+
+describe('isArray', () => {
+  it('is true if it is an array', () => {
+    expect(isArray([])).to.be.true
+    expect(isArray([1])).to.be.true
+    expect(isArray(['foo'])).to.be.true
+  })
+
+  it('is false if it is empty', () => {
+    expect(isArray('foo')).to.be.false
+    expect(isArray(null)).to.be.false
+    expect(isArray(0)).to.be.false
+    expect(isArray(undefined)).to.be.false
+  })
+})
+
+describe('isNumber', () => {
+  it('is true if it is a number', () => {
+    expect(isNumber(0)).to.be.true
+  })
+
+  it('is false if it is not a number', () => {
+    expect(isNumber('1')).to.be.false
+    expect(isNumber(null)).to.be.false
+  })
+})
 
 describe('empty', () => {
   it('is empty if object is null', () => {

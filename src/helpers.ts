@@ -3,16 +3,14 @@
 // =============================================================================
 
 export const isPresent = function<T>(value?: T | null | undefined): value is T {
-  return value !== null && typeof value !== 'undefined'
+  return value !== null && value !== undefined
 }
 
 export const isNumber = function (value?: any): value is number {
   return typeof value === 'number'
 }
 
-export const isArray = function<T>(value?: any): value is Array<T> {
-  return isPresent(value) && value instanceof Array
-}
+export const isArray = Array.isArray
 
 /**
  * Simplified version of python's range()
@@ -35,7 +33,7 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
   const array: (T | T[])[] = []
 
-  if (isArray<T>(value)) {
+  if (isArray(value)) {
     for (; i < times; i++) array[i] = ([] as T[]).concat(value)
   } else {
     for (; i < times; i++) array[i] = value

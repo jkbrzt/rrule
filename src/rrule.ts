@@ -1,14 +1,30 @@
 import Weekday from './weekday'
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
-import { pymod, divmod, notEmpty, contains, isPresent, isNumber, isArray } from './helpers'
+import {
+  pymod,
+  divmod,
+  notEmpty,
+  includes,
+  isPresent,
+  isNumber,
+  isArray,
+  empty
+} from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
-import { Cache, Days, ParsedOptions, Options, Frequency, CacheKeys } from './types'
+import {
+  Cache,
+  Days,
+  ParsedOptions,
+  Options,
+  Frequency,
+  CacheKeys
+} from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 
@@ -135,7 +151,7 @@ export default class RRule {
     const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
     for (let i = 0; i < keys.length; i++) {
-      if (!contains(defaultKeys, keys[i])) continue
+      if (!includes(defaultKeys, keys[i])) continue
 
       let key = keys[i].toUpperCase()
       let value: any = options[keys[i]]
@@ -245,7 +261,9 @@ export default class RRule {
     }
 
     if (iterator) {
-      return this._iter(new CallbackIterResult('between', args, iterator)) as Date[]
+      return this._iter(
+        new CallbackIterResult('between', args, iterator)
+      ) as Date[]
     }
 
     let result = this._cacheGet('between', args)
@@ -358,7 +376,7 @@ export default class RRule {
     if (!this._cache) return false
 
     let cached: Date | Date[] | false | null = false
-    const argsKeys = args ? Object.keys(args) as (keyof IterArgs)[] : []
+    const argsKeys = args ? (Object.keys(args) as (keyof IterArgs)[]) : []
     const findCacheDiff = function (item: IterArgs) {
       for (let i = 0; i < argsKeys.length; i++) {
         const key = argsKeys[i]
@@ -464,21 +482,21 @@ export default class RRule {
       timeset = this.timeset
     } else {
       gettimeset = {
-        [RRule.YEARLY]: ii.ydayset,
-        [RRule.MONTHLY]: ii.mdayset,
-        [RRule.WEEKLY]: ii.wdayset,
-        [RRule.DAILY]: ii.ddayset,
         [RRule.HOURLY]: ii.htimeset,
         [RRule.MINUTELY]: ii.mtimeset,
         [RRule.SECONDLY]: ii.stimeset
-      }[freq] as typeof gettimeset
+      }[
+        freq as Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY
+      ] as typeof gettimeset
 
       if (
-        (freq >= RRule.HOURLY && notEmpty(byhour) && !contains(byhour, hour)) ||
+        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, hour)) ||
         (freq >= RRule.MINUTELY &&
           notEmpty(byminute) &&
-          !contains(byminute, minute)) ||
-        (freq >= RRule.SECONDLY && notEmpty(bysecond) && !contains(bysecond, second))
+          !includes(byminute, minute)) ||
+        (freq >= RRule.SECONDLY &&
+          notEmpty(bysecond) &&
+          !includes(bysecond, second))
       ) {
         timeset = []
       } else {
@@ -495,37 +513,36 @@ export default class RRule {
     let currentDay: number
     let total = 0
     let count = this.options.count
-    let dm: { div: number, mod: number }
+    let dm: { div: number; mod: number }
     let div: number
     let mod: number
     let pos: number
 
     while (true) {
       // Get dayset with the right frequency
-      const [ dayset, start, end ] = getdayset.call(ii, year, month, day) as DaySet
+      const [dayset, start, end] = getdayset.call(
+        ii,
+        year,
+        month,
+        day
+      ) as DaySet
 
       // Do the "hard" work ;-)
       let filtered = false
       for (let dayCounter = start; dayCounter < end; dayCounter++) {
         currentDay = dayset[dayCounter] as number
 
-        filtered =
-          (notEmpty(bymonth) && !contains(bymonth, ii.mmask![currentDay])) ||
-          (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
-          (notEmpty(byweekday) &&
-            !contains(byweekday, ii.wdaymask![currentDay])) ||
-          (notEmpty(ii.nwdaymask!) && !ii.nwdaymask![currentDay]) ||
-          (byeaster !== null && !contains(ii.eastermask!, currentDay)) ||
-          ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
-            !contains(bymonthday, ii.mdaymask![currentDay]) &&
-            !contains(bynmonthday, ii.nmdaymask![currentDay])) ||
-          (notEmpty(byyearday) &&
-            ((currentDay < ii.yearlen &&
-              !contains(byyearday, currentDay + 1) &&
-              !contains(byyearday, -ii.yearlen + currentDay)) ||
-              (currentDay >= ii.yearlen &&
-                !contains(byyearday, currentDay + 1 - ii.yearlen) &&
-                !contains(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
+        filtered = isFiltered(
+          bymonth,
+          ii,
+          currentDay,
+          byweekno,
+          byweekday,
+          byeaster,
+          bymonthday,
+          bynmonthday,
+          byyearday
+        )
 
         if (filtered) dayset[currentDay] = null
       }
@@ -567,8 +584,8 @@ export default class RRule {
             const res = dateutil.combine(date, time)
             // XXX: can this ever be in the array?
             // - compare the actual date instead?
-            if (!contains(poslist, res)) poslist.push(res)
-          // tslint:disable-next-line:no-empty
+            if (!includes(poslist, res)) poslist.push(res)
+            // tslint:disable-next-line:no-empty
           } catch (e) {}
         }
 
@@ -673,7 +690,7 @@ export default class RRule {
             day += div
             fixday = true
           }
-          if (!notEmpty(byhour) || contains(byhour, hour)) break
+          if (empty(byhour) || includes(byhour, hour)) break
         }
         // @ts-ignore
         timeset = gettimeset.call(ii, hour, minute, second)
@@ -703,8 +720,8 @@ export default class RRule {
             }
           }
           if (
-            (!notEmpty(byhour) || contains(byhour, hour)) &&
-            (!notEmpty(byminute) || contains(byminute, minute))
+            (empty(byhour) || includes(byhour, hour)) &&
+            (empty(byminute) || includes(byminute, minute))
           ) {
             break
           }
@@ -744,9 +761,9 @@ export default class RRule {
             }
           }
           if (
-            (!notEmpty(byhour) || contains(byhour, hour)) &&
-            (!notEmpty(byminute) || contains(byminute, minute)) &&
-            (!notEmpty(bysecond) || contains(bysecond, second))
+            (empty(byhour) || includes(byhour, hour)) &&
+            (empty(byminute) || includes(byminute, minute)) &&
+            (empty(bysecond) || includes(bysecond, second))
           ) {
             break
           }
@@ -776,4 +793,34 @@ export default class RRule {
       }
     }
   }
+}
+
+function isFiltered (
+  bymonth: number[],
+  ii: Iterinfo,
+  currentDay: number,
+  byweekno: number[],
+  byweekday: number[],
+  byeaster: number | null,
+  bymonthday: number[],
+  bynmonthday: number[],
+  byyearday: number[]
+): boolean {
+  return (
+    (notEmpty(bymonth) && !includes(bymonth, ii.mmask![currentDay])) ||
+    (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
+    (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask![currentDay])) ||
+    (notEmpty(ii.nwdaymask!) && !ii.nwdaymask![currentDay]) ||
+    (byeaster !== null && !includes(ii.eastermask!, currentDay)) ||
+    ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
+      !includes(bymonthday, ii.mdaymask![currentDay]) &&
+      !includes(bynmonthday, ii.nmdaymask![currentDay])) ||
+    (notEmpty(byyearday) &&
+      ((currentDay < ii.yearlen &&
+        !includes(byyearday, currentDay + 1) &&
+        !includes(byyearday, -ii.yearlen + currentDay)) ||
+        (currentDay >= ii.yearlen &&
+          !includes(byyearday, currentDay + 1 - ii.yearlen) &&
+          !includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
+  )
 }

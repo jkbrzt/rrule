@@ -23,7 +23,7 @@ export namespace dateutil {
    * want to confuse the JS engine with milliseconds > Number.MAX_NUMBER,
    * therefore we use 1-Jan-1970 instead
    */
-  export const ORDINAL_BASE = new Date(1970, 0, 1)
+  export const ORDINAL_BASE = new Date(Date.UTC(1970, 0, 1))
 
   /**
    * Python: MO-SU: 0 - 6
@@ -42,7 +42,8 @@ export namespace dateutil {
     )
     return (
       Math.ceil(
-        (dateNoTime.valueOf() - new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
+        (dateNoTime.valueOf() -
+          new Date(date.getUTCFullYear(), 0, 1).valueOf()) /
           ONE_DAY
       ) + 1
     )
@@ -84,7 +85,7 @@ export namespace dateutil {
    * @see - <http://docs.python.org/library/datetime.html#datetime.date.fromordinal>
    */
   export const fromOrdinal = function (ordinal: number) {
-    return new Date(ORDINAL_BASE.getTime() + (ordinal * ONE_DAY))
+    return new Date(ORDINAL_BASE.getTime() + ordinal * ONE_DAY)
   }
 
   export const getMonthDays = function (date: Date) {
@@ -105,7 +106,7 @@ export namespace dateutil {
    * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
    */
   export const monthRange = function (year: number, month: number) {
-    const date = new Date(year, month, 1)
+    const date = new Date(Date.UTC(year, month, 1))
     return [getWeekday(date), getMonthDays(date)]
   }
 
@@ -114,15 +115,17 @@ export namespace dateutil {
    */
   export const combine = function (date: Date, time: Date | Time) {
     time = time || date
-    return new Date(Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate(),
-      time.getHours(),
-      time.getMinutes(),
-      time.getSeconds(),
-      time.getMilliseconds()
-    ))
+    return new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        time.getHours(),
+        time.getMinutes(),
+        time.getSeconds(),
+        time.getMilliseconds()
+      )
+    )
   }
 
   export const clone = function (date: Date | Time) {

@@ -282,7 +282,7 @@ class RRuleStr {
         const keys = Object.keys(options);
         const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS);
         keys.forEach(function (key) {
-            if (!helpers_1.contains(defaultKeys, key))
+            if (!helpers_1.includes(defaultKeys, key))
                 invalid.push(key);
         }, this);
         if (invalid.length) {
@@ -290,7 +290,7 @@ class RRuleStr {
         }
         // Merge in default options
         defaultKeys.forEach(function (key) {
-            if (!helpers_1.contains(keys, key))
+            if (!helpers_1.includes(keys, key))
                 options[key] = RRuleStr.DEFAULT_OPTIONS[key];
         });
         return this._parseRfc(s, options);

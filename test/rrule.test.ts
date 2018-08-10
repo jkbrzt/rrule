@@ -3615,4 +3615,36 @@ describe('RRule', function () {
       new Date('2018-10-07T00:00:00.000Z')
     ])
   })
+
+  it('generates events', () => {
+    const startEvent = 1533895200000
+    const endSearch = 1543618799999
+
+    const rrule = new RRule({
+      freq: RRule.WEEKLY,
+      interval: 1,
+      dtstart: new Date(startEvent),
+      until: new Date(endSearch)
+    })
+
+    expect(rrule.all()).to.deep.equal([
+      new Date('2018-08-10T10:00:00.000Z'),
+      new Date('2018-08-17T10:00:00.000Z'),
+      new Date('2018-08-24T10:00:00.000Z'),
+      new Date('2018-08-31T10:00:00.000Z'),
+      new Date('2018-09-07T10:00:00.000Z'),
+      new Date('2018-09-14T10:00:00.000Z'),
+      new Date('2018-09-21T10:00:00.000Z'),
+      new Date('2018-09-28T10:00:00.000Z'),
+      new Date('2018-10-05T10:00:00.000Z'),
+      new Date('2018-10-12T10:00:00.000Z'),
+      new Date('2018-10-19T10:00:00.000Z'),
+      new Date('2018-10-26T10:00:00.000Z'),
+      new Date('2018-11-02T10:00:00.000Z'),
+      new Date('2018-11-09T10:00:00.000Z'),
+      new Date('2018-11-16T10:00:00.000Z'),
+      new Date('2018-11-23T10:00:00.000Z'),
+      new Date('2018-11-30T10:00:00.000Z')
+    ])
+  })
 })

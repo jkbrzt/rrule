@@ -11,9 +11,18 @@ import {
 } from './masks'
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { notEmpty, repeat, pymod, contains, range, clone, isPresent } from './helpers'
+import {
+  notEmpty,
+  repeat,
+  pymod,
+  includes,
+  range,
+  clone,
+  isPresent,
+  empty
+} from './helpers'
 
-export type DaySet = [ (number | null)[], number, number ]
+export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
 
 // =============================================================================
@@ -76,12 +85,12 @@ export default class Iterinfo {
     if (year !== this.lastyear) {
       this.yearlen = dateutil.isLeapYear(year) ? 366 : 365
       this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365
-      const firstyday = new Date(year, 0, 1)
+      const firstyday = new Date(Date.UTC(year, 0, 1))
 
       this.yearordinal = dateutil.toOrdinal(firstyday)
       this.yearweekday = dateutil.getWeekday(firstyday)
 
-      const wday = dateutil.getWeekday(new Date(year, 0, 1))
+      const wday = dateutil.getWeekday(firstyday)
 
       if (this.yearlen === 365) {
         this.mmask = clone(M365MASK) as number[]
@@ -97,7 +106,7 @@ export default class Iterinfo {
         this.mrange = clone(M366RANGE)
       }
 
-      if (!notEmpty(rr.options.byweekno)) {
+      if (empty(rr.options.byweekno)) {
         this.wnomask = null
       } else {
         this.wnomask = repeat(0, this.yearlen + 7) as number[]
@@ -144,7 +153,7 @@ export default class Iterinfo {
           }
         }
 
-        if (contains(rr.options.byweekno, 1)) {
+        if (includes(rr.options.byweekno, 1)) {
           // Check week number 1 of next year as well
           // orig-TODO : Check -numweeks for next year.
           let i = no1wkst + numweeks * 7
@@ -168,8 +177,10 @@ export default class Iterinfo {
           // days from last year's last week number in
           // this year.
           let lnumweeks: number
-          if (!contains(rr.options.byweekno, -1)) {
-            const lyearweekday = dateutil.getWeekday(new Date(year - 1, 0, 1))
+          if (!includes(rr.options.byweekno, -1)) {
+            const lyearweekday = dateutil.getWeekday(
+              new Date(Date.UTC(year - 1, 0, 1))
+            )
             let lno1wkst = pymod(
               7 - lyearweekday.valueOf() + rr.options.wkst,
               7
@@ -191,7 +202,7 @@ export default class Iterinfo {
           } else {
             lnumweeks = -1
           }
-          if (contains(rr.options.byweekno, lnumweeks)) {
+          if (includes(rr.options.byweekno, lnumweeks)) {
             for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
           }
         }
@@ -266,7 +277,8 @@ export default class Iterinfo {
     // We need to handle cross-year weeks here.
     const set = repeat(null, this.yearlen + 7) as (number | null)[]
     let i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
+      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+      this.yearordinal
     const start = i
     for (let j = 0; j < 7; j++) {
       set[i] = i
@@ -279,7 +291,8 @@ export default class Iterinfo {
   ddayset (year: number, month: number, day: number) {
     const set = repeat(null, this.yearlen) as (number | null)[]
     const i =
-      dateutil.toOrdinal(new Date(year, month - 1, day)) - this.yearordinal
+      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+      this.yearordinal
     set[i] = i
     return [set, i, i + 1]
   }
@@ -288,7 +301,7 @@ export default class Iterinfo {
     const set = []
     const rr = this.rrule
     for (let i = 0; i < rr.options.byminute.length; i++) {
-      minute = (rr.options.byminute)[i]
+      minute = rr.options.byminute[i]
       for (let j = 0; j < rr.options.bysecond.length; j++) {
         second = rr.options.bysecond[j]
         set.push(new dateutil.Time(hour, minute, second, millisecond))

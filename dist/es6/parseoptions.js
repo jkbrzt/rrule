@@ -11,7 +11,7 @@ function initializeOptions(options) {
     // Shallow copy for options and origOptions and check for invalid
     keys.forEach(key => {
         initializedOptions[key] = options[key];
-        if (!helpers_1.contains(rrule_1.defaultKeys, key))
+        if (!helpers_1.includes(rrule_1.defaultKeys, key))
             invalid.push(key);
     });
     if (invalid.length) {
@@ -25,7 +25,7 @@ function parseOptions(options) {
     const keys = Object.keys(options);
     // Merge in default options
     rrule_1.defaultKeys.forEach(key => {
-        if (!helpers_1.contains(keys, key))
+        if (!helpers_1.includes(keys, key))
             opts[key] = rrule_1.DEFAULT_OPTIONS[key];
     });
     if (helpers_1.isPresent(opts.byeaster))
@@ -81,7 +81,9 @@ function parseOptions(options) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if (helpers_1.isPresent(opts.byyearday) && !helpers_1.isArray(opts.byyearday) && helpers_1.isNumber(opts.byyearday)) {
+    if (helpers_1.isPresent(opts.byyearday) &&
+        !helpers_1.isArray(opts.byyearday) &&
+        helpers_1.isNumber(opts.byyearday)) {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
@@ -156,7 +158,8 @@ function parseOptions(options) {
     }
     // byhour
     if (!helpers_1.isPresent(opts.byhour)) {
-        opts.byhour = opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
+        opts.byhour =
+            opts.freq < rrule_1.default.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
     else if (helpers_1.isNumber(opts.byhour)) {
         opts.byhour = [opts.byhour];

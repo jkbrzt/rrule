@@ -1,6 +1,6 @@
 import RRule from './rrule'
 import dateutil from './dateutil'
-import { contains } from './helpers'
+import { includes } from './helpers'
 import IterResult from './iterresult'
 
 /**
@@ -33,7 +33,7 @@ export default class RRuleSet extends RRule {
     if (!(rrule instanceof RRule)) {
       throw new TypeError(String(rrule) + ' is not RRule instance')
     }
-    if (!contains(this._rrule.map(String), String(rrule))) {
+    if (!includes(this._rrule.map(String), String(rrule))) {
       this._rrule.push(rrule)
     }
   }
@@ -47,7 +47,7 @@ export default class RRuleSet extends RRule {
     if (!(date instanceof Date)) {
       throw new TypeError(String(date) + ' is not Date instance')
     }
-    if (!contains(this._rdate.map(Number), Number(date))) {
+    if (!includes(this._rdate.map(Number), Number(date))) {
       this._rdate.push(date)
       dateutil.sort(this._rdate)
     }
@@ -62,7 +62,7 @@ export default class RRuleSet extends RRule {
     if (!(rrule instanceof RRule)) {
       throw new TypeError(String(rrule) + ' is not RRule instance')
     }
-    if (!contains(this._exrule.map(String), String(rrule))) {
+    if (!includes(this._exrule.map(String), String(rrule))) {
       this._exrule.push(rrule)
     }
   }
@@ -76,7 +76,7 @@ export default class RRuleSet extends RRule {
     if (!(date instanceof Date)) {
       throw new TypeError(String(date) + ' is not Date instance')
     }
-    if (!contains(this._exdate.map(Number), Number(date))) {
+    if (!includes(this._exdate.map(Number), Number(date))) {
       this._exdate.push(date)
       dateutil.sort(this._exdate)
     }
@@ -132,7 +132,7 @@ export default class RRuleSet extends RRule {
 
     function evalExdate (after: Date, before: Date) {
       _exrule.forEach(function (rrule) {
-        (rrule.between(after, before, true)).forEach(function (date) {
+        rrule.between(after, before, true).forEach(function (date) {
           _exdateHash[Number(date)] = true
         })
       })

@@ -1,5 +1,5 @@
 import { Options, ParsedOptions } from './types'
-import { contains, notEmpty, isPresent, isNumber, isArray } from './helpers'
+import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import Weekday from './weekday'
@@ -12,7 +12,7 @@ export function initializeOptions (options: Partial<Options>) {
   // Shallow copy for options and origOptions and check for invalid
   keys.forEach(key => {
     initializedOptions[key] = options[key]
-    if (!contains(defaultKeys, key)) invalid.push(key)
+    if (!includes(defaultKeys, key)) invalid.push(key)
   })
 
   if (invalid.length) {
@@ -28,7 +28,7 @@ export function parseOptions (options: Partial<Options>) {
 
   // Merge in default options
   defaultKeys.forEach(key => {
-    if (!contains(keys, key)) opts[key] = DEFAULT_OPTIONS[key]
+    if (!includes(keys, key)) opts[key] = DEFAULT_OPTIONS[key]
   })
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
@@ -91,7 +91,11 @@ export function parseOptions (options: Partial<Options>) {
     opts.bymonth = [opts.bymonth]
   }
   // byyearday
-  if (isPresent(opts.byyearday) && !isArray(opts.byyearday) && isNumber(opts.byyearday)) {
+  if (
+    isPresent(opts.byyearday) &&
+    !isArray(opts.byyearday) &&
+    isNumber(opts.byyearday)
+  ) {
     opts.byyearday = [opts.byyearday]
   }
 
@@ -165,7 +169,8 @@ export function parseOptions (options: Partial<Options>) {
 
   // byhour
   if (!isPresent(opts.byhour)) {
-    opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
+    opts.byhour =
+      opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
   } else if (isNumber(opts.byhour)) {
     opts.byhour = [opts.byhour]
   }

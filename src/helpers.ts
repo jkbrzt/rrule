@@ -2,17 +2,15 @@
 // Helper functions
 // =============================================================================
 
-export const isPresent = function <T>(value?: T | null | undefined): value is T {
-  return value !== null && typeof value !== 'undefined'
+export const isPresent = function<T>(value?: T | null | undefined): value is T {
+  return value !== null && value !== undefined
 }
 
 export const isNumber = function (value?: any): value is number {
   return typeof value === 'number'
 }
 
-export const isArray = function <T>(value?: any): value is Array<T> {
-  return isPresent(value) && value instanceof Array
-}
+export const isArray = Array.isArray
 
 /**
  * Simplified version of python's range()
@@ -35,7 +33,7 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
   const array: (T | T[])[] = []
 
-  if (isArray<T>(value)) {
+  if (isArray(value)) {
     for (; i < times; i++) array[i] = ([] as T[]).concat(value)
   } else {
     for (; i < times; i++) array[i] = value
@@ -81,19 +79,23 @@ export const divmod = function (a: number, b: number) {
   return { div: Math.floor(a / b), mod: pymod(a, b) }
 }
 
+export const empty = function<T>(obj: T[] | null | undefined) {
+  return !isPresent(obj) || obj.length === 0
+}
+
 /**
  * Python-like boolean
  * @return {Boolean} value of an object/primitive, taking into account
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-export const notEmpty = function <T>(obj: T[] | null | undefined): obj is T[] {
-  return isPresent(obj) && obj.length !== 0
+export const notEmpty = function<T>(obj: T[] | null | undefined): obj is T[] {
+  return !empty(obj)
 }
 
 /**
  * Return true if a value is in an array
  */
-export const contains = function<T>(arr: T[], val: T) {
-  return arr.indexOf(val) !== -1
+export const includes = function<T>(arr: T[] | null | undefined, val: T) {
+  return notEmpty(arr) && arr.indexOf(val) !== -1
 }

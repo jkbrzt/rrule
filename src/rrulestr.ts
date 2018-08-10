@@ -3,7 +3,7 @@ import { Options, Frequency, WeekdayStr } from './types'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import Weekday from './weekday'
-import { contains, split } from './helpers'
+import { includes, split } from './helpers'
 
 export interface RRuleStrOptions {
   dtstart: Date | null
@@ -56,20 +56,12 @@ export default class RRuleStr {
     compatible: false
   }
 
-  private _handle_int (
-    rrkwargs: Options,
-    name: string,
-    value: string
-  ) {
+  private _handle_int (rrkwargs: Options, name: string, value: string) {
     // @ts-ignore
     rrkwargs[name.toLowerCase()] = parseInt(value, 10)
   }
 
-  private _handle_int_list (
-    rrkwargs: Options,
-    name: string,
-    value: string
-  ) {
+  private _handle_int_list (rrkwargs: Options, name: string, value: string) {
     // @ts-ignore
     rrkwargs[name.toLowerCase()] = value.split(',').map(x => parseInt(x, 10))
   }
@@ -90,12 +82,7 @@ export default class RRuleStr {
     rrkwargs['wkst'] = RRuleStr._weekday_map[value]
   }
 
-  private _handle_BYWEEKDAY (
-    rrkwargs: Options,
-    _: any,
-    value: string,
-    __: any
-  ) {
+  private _handle_BYWEEKDAY (rrkwargs: Options, _: any, value: string, __: any) {
     // Two ways to specify this: +1MO or MO(+1)
     let splt: string[]
     let i: number
@@ -130,10 +117,7 @@ export default class RRuleStr {
     rrkwargs['byweekday'] = l
   }
 
-  private _parseRfcRRule (
-    line: string,
-    options: Partial<RRuleStrOptions> = {}
-  ) {
+  private _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
     options.dtstart = options.dtstart || null
     options.cache = options.cache || false
 
@@ -332,10 +316,12 @@ export default class RRuleStr {
   parse (s: string, options: Partial<RRuleStrOptions> = {}): RRule | RRuleSet {
     const invalid: string[] = []
     const keys = Object.keys(options) as (keyof typeof options)[]
-    const defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS) as (keyof typeof RRuleStr.DEFAULT_OPTIONS)[]
+    const defaultKeys = Object.keys(
+      RRuleStr.DEFAULT_OPTIONS
+    ) as (keyof typeof RRuleStr.DEFAULT_OPTIONS)[]
 
     keys.forEach(function (key) {
-      if (!contains(defaultKeys, key)) invalid.push(key)
+      if (!includes(defaultKeys, key)) invalid.push(key)
     }, this)
 
     if (invalid.length) {
@@ -344,7 +330,7 @@ export default class RRuleStr {
 
     // Merge in default options
     defaultKeys.forEach(function (key) {
-      if (!contains(keys, key)) options[key] = RRuleStr.DEFAULT_OPTIONS[key]
+      if (!includes(keys, key)) options[key] = RRuleStr.DEFAULT_OPTIONS[key]
     })
 
     return this._parseRfc(s, options)

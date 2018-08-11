@@ -90,7 +90,9 @@ export declare namespace dateutil {
         getYear(): number;
         addYears(years: number): void;
         addMonths(months: number): void;
-        addInterval(interval: number): DateTime;
+        addWeekly(days: number, wkst: number): void;
+        addDaily(days: number): void;
+        addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
     }
 }
 export default dateutil;

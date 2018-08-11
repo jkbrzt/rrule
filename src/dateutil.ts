@@ -1,4 +1,4 @@
-import { divmod, pymod } from './helpers'
+import { divmod, pymod, empty, includes } from './helpers'
 
 type Datelike = Pick<Date, 'getTime'>
 
@@ -296,41 +296,38 @@ export namespace dateutil {
       }
     }
 
-    public addInterval (interval: number): DateTime {
-      let {
-        second,
-        minute,
-        hour,
-        day
-      } = this
+    public addWeekly (days: number, wkst: number) {
+      if (wkst > this.getWeekday()) {
+        this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7
+      } else {
+        this.day += -(this.getWeekday() - wkst) + days * 7
+      }
+    }
 
-      second = interval
+    public addDaily (days: number) {
+      this.day += days
+    }
 
-      const { div: minuteDiv, mod: secondMod } = divmod(second, 60)
-      if (minuteDiv) {
-        second = secondMod
-        minute += minuteDiv
-        const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
-        if (hourDiv) {
-          minute = minuteMod
-          hour += hourDiv
-          const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
-          if (dayDiv) {
-            hour = hourMod
-            day += dayDiv
-          }
-        }
+    public addHours (hours: number, filtered: boolean, byhour: number[]) {
+      let fixday = false
+      if (filtered) {
+          // Jump to one iteration before next day
+        this.hour += Math.floor((23 - this.hour) / hours) * hours
       }
 
-      return new DateTime(
-        this.year,
-        this.month,
-        day,
-        hour,
-        minute,
-        second,
-        this.millisecond
-      )
+      while (true) {
+        this.hour += hours
+        const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
+        if (dayDiv) {
+          this.hour = hourMod
+          this.day += dayDiv
+          fixday = true
+        }
+
+        if (empty(byhour) || includes(byhour, this.hour)) break
+      }
+
+      return fixday
     }
   }
 }

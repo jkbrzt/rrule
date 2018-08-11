@@ -657,32 +657,13 @@ export default class RRule {
 
         ii.rebuild(date.year, date.month)
       } else if (freq === RRule.WEEKLY) {
-        if (wkst > date.getWeekday()) {
-          date.day += -(date.getWeekday() + 1 + (6 - wkst)) + interval * 7
-        } else {
-          date.day += -(date.getWeekday() - wkst) + interval * 7
-        }
+        date.addWeekly(interval, wkst)
         fixday = true
       } else if (freq === RRule.DAILY) {
-        date.day += interval
+        date.addDaily(interval)
         fixday = true
       } else if (freq === RRule.HOURLY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          date.hour += Math.floor((23 - date.hour) / interval) * interval
-        }
-
-        while (true) {
-          date.hour += interval
-          const { div: dayDiv, mod: hourMod } = divmod(date.hour, 24)
-          if (dayDiv) {
-            date.hour = hourMod
-            date.day += dayDiv
-            fixday = true
-          }
-
-          if (empty(byhour) || includes(byhour, date.hour)) break
-        }
+        if (date.addHours(interval, filtered, byhour)) fixday = true
 
         // @ts-ignore
         timeset = gettimeset.call(ii, date.hour, date.minute, date.second)

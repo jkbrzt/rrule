@@ -207,25 +207,35 @@ var dateutil;
                 }
             }
         }
-        addInterval(interval) {
-            let { second, minute, hour, day } = this;
-            second = interval;
-            const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(second, 60);
-            if (minuteDiv) {
-                second = secondMod;
-                minute += minuteDiv;
-                const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
-                if (hourDiv) {
-                    minute = minuteMod;
-                    hour += hourDiv;
-                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
-                    if (dayDiv) {
-                        hour = hourMod;
-                        day += dayDiv;
-                    }
-                }
+        addWeekly(days, wkst) {
+            if (wkst > this.getWeekday()) {
+                this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7;
             }
-            return new DateTime(this.year, this.month, day, hour, minute, second, this.millisecond);
+            else {
+                this.day += -(this.getWeekday() - wkst) + days * 7;
+            }
+        }
+        addDaily(days) {
+            this.day += days;
+        }
+        addHours(hours, filtered, byhour) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.hour += Math.floor((23 - this.hour) / hours) * hours;
+            }
+            while (true) {
+                this.hour += hours;
+                const { div: dayDiv, mod: hourMod } = helpers_1.divmod(this.hour, 24);
+                if (dayDiv) {
+                    this.hour = hourMod;
+                    this.day += dayDiv;
+                    fixday = true;
+                }
+                if (helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour))
+                    break;
+            }
+            return fixday;
         }
     }
     dateutil.DateTime = DateTime;

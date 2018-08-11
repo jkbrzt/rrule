@@ -1,4 +1,4 @@
-import { divmod } from './helpers'
+import { divmod, pymod } from './helpers'
 
 type Datelike = Pick<Date, 'getTime'>
 
@@ -279,27 +279,21 @@ export namespace dateutil {
     }
 
     public addYears (years: number) {
-      return new DateTime(
-        this.year + years,
-        this.month,
-        this.day,
-        this.hour,
-        this.minute,
-        this.second,
-        this.millisecond
-      )
+      this.year += years
     }
 
     public addMonths (months: number) {
-      return new DateTime(
-        this.year,
-        this.month + months,
-        this.day,
-        this.hour,
-        this.minute,
-        this.second,
-        this.millisecond
-      )
+      this.month += months
+      if (this.month > 12) {
+        const yearDiv = Math.floor(this.month / 12)
+        const monthMod = pymod(this.month, 12)
+        this.month = monthMod
+        this.year += yearDiv
+        if (this.month === 0) {
+          this.month = 12
+          --this.year
+        }
+      }
     }
 
     public addInterval (interval: number): DateTime {

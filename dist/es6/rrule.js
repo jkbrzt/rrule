@@ -483,7 +483,7 @@ class RRule {
             // Handle frequency and interval
             let fixday = false;
             if (freq === RRule.YEARLY) {
-                date = date.addYears(interval);
+                date.addYears(interval);
                 if (date.year > dateutil_1.default.MAXYEAR) {
                     this._len = total;
                     return iterResult.getValue();
@@ -491,20 +491,10 @@ class RRule {
                 ii.rebuild(date.year, date.month);
             }
             else if (freq === RRule.MONTHLY) {
-                date = date.addMonths(interval);
-                if (date.month > 12) {
-                    const yearDiv = Math.floor(date.month / 12);
-                    const monthMod = helpers_1.pymod(date.month, 12);
-                    date.month = monthMod;
-                    date.year += yearDiv;
-                    if (date.month === 0) {
-                        date.month = 12;
-                        --date.year;
-                    }
-                    if (date.year > dateutil_1.default.MAXYEAR) {
-                        this._len = total;
-                        return iterResult.getValue();
-                    }
+                date.addMonths(interval);
+                if (date.year > dateutil_1.default.MAXYEAR) {
+                    this._len = total;
+                    return iterResult.getValue();
                 }
                 ii.rebuild(date.year, date.month);
             }

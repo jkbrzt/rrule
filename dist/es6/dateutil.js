@@ -192,10 +192,20 @@ var dateutil;
             return this.year;
         }
         addYears(years) {
-            return new DateTime(this.year + years, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+            this.year += years;
         }
         addMonths(months) {
-            return new DateTime(this.year, this.month + months, this.day, this.hour, this.minute, this.second, this.millisecond);
+            this.month += months;
+            if (this.month > 12) {
+                const yearDiv = Math.floor(this.month / 12);
+                const monthMod = helpers_1.pymod(this.month, 12);
+                this.month = monthMod;
+                this.year += yearDiv;
+                if (this.month === 0) {
+                    this.month = 12;
+                    --this.year;
+                }
+            }
         }
         addInterval(interval) {
             let { second, minute, hour, day } = this;

@@ -639,28 +639,22 @@ export default class RRule {
       // Handle frequency and interval
       let fixday = false
       if (freq === RRule.YEARLY) {
-        date = date.addYears(interval)
+        date.addYears(interval)
+
         if (date.year > dateutil.MAXYEAR) {
           this._len = total
           return iterResult.getValue() as Date[]
         }
+
         ii.rebuild(date.year, date.month)
       } else if (freq === RRule.MONTHLY) {
-        date = date.addMonths(interval)
-        if (date.month > 12) {
-          const yearDiv = Math.floor(date.month / 12)
-          const monthMod = pymod(date.month, 12)
-          date.month = monthMod
-          date.year += yearDiv
-          if (date.month === 0) {
-            date.month = 12
-            --date.year
-          }
-          if (date.year > dateutil.MAXYEAR) {
-            this._len = total
-            return iterResult.getValue() as Date[]
-          }
+        date.addMonths(interval)
+
+        if (date.year > dateutil.MAXYEAR) {
+          this._len = total
+          return iterResult.getValue() as Date[]
         }
+
         ii.rebuild(date.year, date.month)
       } else if (freq === RRule.WEEKLY) {
         if (wkst > date.getWeekday()) {

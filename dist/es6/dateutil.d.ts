@@ -88,8 +88,8 @@ export declare namespace dateutil {
         getDay(): number;
         getMonth(): number;
         getYear(): number;
-        addYears(years: number): DateTime;
-        addMonths(months: number): DateTime;
+        addYears(years: number): void;
+        addMonths(months: number): void;
         addInterval(interval: number): DateTime;
     }
 }

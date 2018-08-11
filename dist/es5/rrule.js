@@ -491,12 +491,22 @@ var dateutil;
         }, {
             key: "addYears",
             value: function addYears(years) {
-                return new DateTime(this.year + years, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+                this.year += years;
             }
         }, {
             key: "addMonths",
             value: function addMonths(months) {
-                return new DateTime(this.year, this.month + months, this.day, this.hour, this.minute, this.second, this.millisecond);
+                this.month += months;
+                if (this.month > 12) {
+                    var yearDiv = Math.floor(this.month / 12);
+                    var monthMod = helpers_1.pymod(this.month, 12);
+                    this.month = monthMod;
+                    this.year += yearDiv;
+                    if (this.month === 0) {
+                        this.month = 12;
+                        --this.year;
+                    }
+                }
             }
         }, {
             key: "addInterval",
@@ -991,27 +1001,17 @@ var RRule = function () {
                 // Handle frequency and interval
                 var fixday = false;
                 if (freq === RRule.YEARLY) {
-                    date = date.addYears(interval);
+                    date.addYears(interval);
                     if (date.year > dateutil_1.default.MAXYEAR) {
                         this._len = total;
                         return iterResult.getValue();
                     }
                     ii.rebuild(date.year, date.month);
                 } else if (freq === RRule.MONTHLY) {
-                    date = date.addMonths(interval);
-                    if (date.month > 12) {
-                        var yearDiv = Math.floor(date.month / 12);
-                        var monthMod = helpers_1.pymod(date.month, 12);
-                        date.month = monthMod;
-                        date.year += yearDiv;
-                        if (date.month === 0) {
-                            date.month = 12;
-                            --date.year;
-                        }
-                        if (date.year > dateutil_1.default.MAXYEAR) {
-                            this._len = total;
-                            return iterResult.getValue();
-                        }
+                    date.addMonths(interval);
+                    if (date.year > dateutil_1.default.MAXYEAR) {
+                        this._len = total;
+                        return iterResult.getValue();
                     }
                     ii.rebuild(date.year, date.month);
                 } else if (freq === RRule.WEEKLY) {

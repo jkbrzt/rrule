@@ -483,19 +483,9 @@ class RRule {
             // Handle frequency and interval
             if (freq === RRule.YEARLY) {
                 date.addYears(interval);
-                if (date.year > dateutil_1.default.MAXYEAR) {
-                    this._len = total;
-                    return iterResult.getValue();
-                }
-                ii.rebuild(date.year, date.month);
             }
             else if (freq === RRule.MONTHLY) {
                 date.addMonths(interval);
-                if (date.year > dateutil_1.default.MAXYEAR) {
-                    this._len = total;
-                    return iterResult.getValue();
-                }
-                ii.rebuild(date.year, date.month);
             }
             else if (freq === RRule.WEEKLY) {
                 date.addWeekly(interval, wkst);

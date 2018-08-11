@@ -829,28 +829,25 @@ var RRule = function () {
                             daypos = Math.floor((pos - 1) / timeset.length);
                             timepos = helpers_1.pymod(pos - 1, timeset.length);
                         }
-                        try {
-                            var tmp = [];
-                            for (var k = start; k < end; k++) {
-                                var val = dayset[k];
-                                if (!helpers_1.isPresent(val)) continue;
-                                tmp.push(val);
-                            }
-                            var i = void 0;
-                            if (daypos < 0) {
-                                // we're trying to emulate python's aList[-n]
-                                i = tmp.slice(daypos)[0];
-                            } else {
-                                i = tmp[daypos];
-                            }
-                            var time = timeset[timepos];
-                            var date = dateutil_1.default.fromOrdinal(ii.yearordinal + i);
-                            var res = dateutil_1.default.combine(date, time);
-                            // XXX: can this ever be in the array?
-                            // - compare the actual date instead?
-                            if (!helpers_1.includes(poslist, res)) poslist.push(res);
-                            // tslint:disable-next-line:no-empty
-                        } catch (e) {}
+                        var tmp = [];
+                        for (var k = start; k < end; k++) {
+                            var val = dayset[k];
+                            if (!helpers_1.isPresent(val)) continue;
+                            tmp.push(val);
+                        }
+                        var i = void 0;
+                        if (daypos < 0) {
+                            // we're trying to emulate python's aList[-n]
+                            i = tmp.slice(daypos)[0];
+                        } else {
+                            i = tmp[daypos];
+                        }
+                        var time = timeset[timepos];
+                        var date = dateutil_1.default.fromOrdinal(ii.yearordinal + i);
+                        var res = dateutil_1.default.combine(date, time);
+                        // XXX: can this ever be in the array?
+                        // - compare the actual date instead?
+                        if (!helpers_1.includes(poslist, res)) poslist.push(res);
                     }
                     dateutil_1.default.sort(poslist);
                     for (var _j = 0; _j < poslist.length; _j++) {
@@ -875,25 +872,26 @@ var RRule = function () {
                 } else {
                     for (var _j2 = start; _j2 < end; _j2++) {
                         currentDay = dayset[_j2];
-                        if (currentDay !== null) {
-                            var _date = dateutil_1.default.fromOrdinal(ii.yearordinal + currentDay);
-                            for (var _k = 0; _k < timeset.length; _k++) {
-                                var _time = timeset[_k];
-                                var _res2 = dateutil_1.default.combine(_date, _time);
-                                if (until && _res2 > until) {
-                                    this._len = total;
+                        if (!helpers_1.isPresent(currentDay)) {
+                            continue;
+                        }
+                        var _date = dateutil_1.default.fromOrdinal(ii.yearordinal + currentDay);
+                        for (var _k = 0; _k < timeset.length; _k++) {
+                            var _time = timeset[_k];
+                            var _res2 = dateutil_1.default.combine(_date, _time);
+                            if (until && _res2 > until) {
+                                this._len = total;
+                                return iterResult.getValue();
+                            } else if (_res2 >= dtstart) {
+                                ++total;
+                                if (!iterResult.accept(_res2)) {
                                     return iterResult.getValue();
-                                } else if (_res2 >= dtstart) {
-                                    ++total;
-                                    if (!iterResult.accept(_res2)) {
+                                }
+                                if (count) {
+                                    --count;
+                                    if (!count) {
+                                        this._len = total;
                                         return iterResult.getValue();
-                                    }
-                                    if (count) {
-                                        --count;
-                                        if (!count) {
-                                            this._len = total;
-                                            return iterResult.getValue();
-                                        }
                                     }
                                 }
                             }

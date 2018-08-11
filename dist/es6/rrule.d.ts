@@ -4,6 +4,7 @@ import IterResult from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
 import { Cache, ParsedOptions, Options, Frequency } from './types';
+import { optionsToString } from './optionstostring';
 export declare const DEFAULT_OPTIONS: Options;
 export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
@@ -39,7 +40,7 @@ export default class RRule {
     static fromText(text: string, language?: Language): RRule;
     static parseString(rfcString: string): Partial<Options> | null;
     static fromString(str: string): RRule;
-    static optionsToString(options: Partial<Options>): string;
+    static optionsToString: typeof optionsToString;
     /**
      * @param {Function} iterator - optional function that will be called
      *                   on each date that is added. It can return false

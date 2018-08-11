@@ -206,69 +206,6 @@ exports.includes = function (arr, val) {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
-// =============================================================================
-// Weekday
-// =============================================================================
-
-var Weekday = function () {
-    function Weekday(weekday, n) {
-        _classCallCheck(this, Weekday);
-
-        if (n === 0) throw new Error("Can't create weekday with n == 0");
-        this.weekday = weekday;
-        this.n = n;
-    }
-    // __call__ - Cannot call the object directly, do it through
-    // e.g. RRule.TH.nth(-1) instead,
-
-
-    _createClass(Weekday, [{
-        key: "nth",
-        value: function nth(n) {
-            return this.n === n ? this : new Weekday(this.weekday, n);
-        }
-        // __eq__
-
-    }, {
-        key: "equals",
-        value: function equals(other) {
-            return this.weekday === other.weekday && this.n === other.n;
-        }
-        // __repr__
-
-    }, {
-        key: "toString",
-        value: function toString() {
-            var s = WDAYS[this.weekday];
-            if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
-            return s;
-        }
-    }, {
-        key: "getJsWeekday",
-        value: function getJsWeekday() {
-            return this.weekday === 6 ? 0 : this.weekday + 1;
-        }
-    }]);
-
-    return Weekday;
-}();
-
-exports.default = Weekday;
-//# sourceMappingURL=weekday.js.map
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -632,7 +569,7 @@ exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map
 
 /***/ }),
-/* 3 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -647,8 +584,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(1);
-var dateutil_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(1);
 var iterinfo_1 = __webpack_require__(9);
 var helpers_1 = __webpack_require__(0);
 var iterresult_1 = __webpack_require__(7);
@@ -656,10 +592,11 @@ var callbackiterresult_1 = __webpack_require__(11);
 var types_1 = __webpack_require__(5);
 var parseoptions_1 = __webpack_require__(12);
 var parsestring_1 = __webpack_require__(13);
+var optionstostring_1 = __webpack_require__(14);
 var getnlp = function getnlp() {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
-        getnlp._nlp = __webpack_require__(14);
+        getnlp._nlp = __webpack_require__(15);
     }
     return getnlp._nlp;
 };
@@ -829,7 +766,7 @@ var RRule = function () {
     }, {
         key: "toString",
         value: function toString() {
-            return RRule.optionsToString(this.origOptions);
+            return optionstostring_1.optionsToString(this.origOptions);
         }
         /**
          * Will convert all rules described in nlp:ToText
@@ -933,8 +870,7 @@ var RRule = function () {
                 we use the IterResult object that tells us when to stop iterating.
                  */
             var dtstart = this.options.dtstart;
-            var dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000;
-            var date = new dateutil_1.default.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstartMillisecondModulo);
+            var date = new dateutil_1.default.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
             // Some local variables to speed things up a bit
             var _options = this.options,
                 freq = _options.freq,
@@ -967,7 +903,7 @@ var RRule = function () {
                 if (freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.includes(byhour, date.hour) || freq >= RRule.MINUTELY && helpers_1.notEmpty(byminute) && !helpers_1.includes(byminute, date.minute) || freq >= RRule.SECONDLY && helpers_1.notEmpty(bysecond) && !helpers_1.includes(bysecond, date.second)) {
                     timeset = [];
                 } else {
-                    timeset = gettimeset.call(ii, date.hour, date.minute, date.second, dtstartMillisecondModulo);
+                    timeset = gettimeset.call(ii, date.hour, date.minute, date.second, date.millisecond);
                 }
             }
             var currentDay = void 0;
@@ -1126,75 +1062,6 @@ var RRule = function () {
         value: function fromString(str) {
             return new RRule(RRule.parseString(str) || undefined);
         }
-    }, {
-        key: "optionsToString",
-        value: function optionsToString(options) {
-            var pairs = [];
-            var keys = Object.keys(options);
-            var defaultKeys = Object.keys(exports.DEFAULT_OPTIONS);
-            for (var i = 0; i < keys.length; i++) {
-                if (!helpers_1.includes(defaultKeys, keys[i])) continue;
-                var key = keys[i].toUpperCase();
-                var value = options[keys[i]];
-                var strValues = [];
-                if (!helpers_1.isPresent(value) || helpers_1.isArray(value) && !value.length) continue;
-                switch (key) {
-                    case 'FREQ':
-                        value = RRule.FREQUENCIES[options.freq];
-                        break;
-                    case 'WKST':
-                        if (helpers_1.isNumber(value)) {
-                            value = new weekday_1.default(value);
-                        }
-                        break;
-                    case 'BYWEEKDAY':
-                        /*
-                        NOTE: BYWEEKDAY is a special case.
-                        RRule() deconstructs the rule.options.byweekday array
-                        into an array of Weekday arguments.
-                        On the other hand, rule.origOptions is an array of Weekdays.
-                        We need to handle both cases here.
-                        It might be worth change RRule to keep the Weekdays.
-                                   Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
-                                   */
-                        key = 'BYDAY';
-                        if (!helpers_1.isArray(value)) value = [value];
-                        for (var j = 0; j < value.length; j++) {
-                            var wday = value[j];
-                            if (wday instanceof weekday_1.default) {
-                                // good
-                            } else if (helpers_1.isArray(wday)) {
-                                wday = new weekday_1.default(wday[0], wday[1]);
-                            } else {
-                                wday = new weekday_1.default(wday);
-                            }
-                            strValues[j] = wday.toString();
-                        }
-                        value = strValues;
-                        break;
-                    case 'DTSTART':
-                    case 'UNTIL':
-                        value = dateutil_1.default.timeToUntilString(value);
-                        break;
-                    default:
-                        if (helpers_1.isArray(value)) {
-                            for (var _j3 = 0; _j3 < value.length; _j3++) {
-                                strValues[_j3] = String(value[_j3]);
-                            }
-                            value = strValues;
-                        } else {
-                            value = String(value);
-                        }
-                }
-                pairs.push([key, value]);
-            }
-            var strings = [];
-            for (var _i2 = 0; _i2 < pairs.length; _i2++) {
-                var attr = pairs[_i2];
-                strings.push(attr[0] + '=' + attr[1].toString());
-            }
-            return strings.join(';');
-        }
     }]);
 
     return RRule;
@@ -1217,11 +1084,75 @@ RRule.TH = types_1.Days.TH;
 RRule.FR = types_1.Days.FR;
 RRule.SA = types_1.Days.SA;
 RRule.SU = types_1.Days.SU;
+RRule.optionsToString = optionstostring_1.optionsToString;
 exports.default = RRule;
 function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
     return helpers_1.notEmpty(bymonth) && !helpers_1.includes(bymonth, ii.mmask[currentDay]) || helpers_1.notEmpty(byweekno) && !ii.wnomask[currentDay] || helpers_1.notEmpty(byweekday) && !helpers_1.includes(byweekday, ii.wdaymask[currentDay]) || helpers_1.notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay] || byeaster !== null && !helpers_1.includes(ii.eastermask, currentDay) || (helpers_1.notEmpty(bymonthday) || helpers_1.notEmpty(bynmonthday)) && !helpers_1.includes(bymonthday, ii.mdaymask[currentDay]) && !helpers_1.includes(bynmonthday, ii.nmdaymask[currentDay]) || helpers_1.notEmpty(byyearday) && (currentDay < ii.yearlen && !helpers_1.includes(byyearday, currentDay + 1) && !helpers_1.includes(byyearday, -ii.yearlen + currentDay) || currentDay >= ii.yearlen && !helpers_1.includes(byyearday, currentDay + 1 - ii.yearlen) && !helpers_1.includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen));
 }
 //# sourceMappingURL=rrule.js.map
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+// =============================================================================
+// Weekday
+// =============================================================================
+
+var Weekday = function () {
+    function Weekday(weekday, n) {
+        _classCallCheck(this, Weekday);
+
+        if (n === 0) throw new Error("Can't create weekday with n == 0");
+        this.weekday = weekday;
+        this.n = n;
+    }
+    // __call__ - Cannot call the object directly, do it through
+    // e.g. RRule.TH.nth(-1) instead,
+
+
+    _createClass(Weekday, [{
+        key: "nth",
+        value: function nth(n) {
+            return this.n === n ? this : new Weekday(this.weekday, n);
+        }
+        // __eq__
+
+    }, {
+        key: "equals",
+        value: function equals(other) {
+            return this.weekday === other.weekday && this.n === other.n;
+        }
+        // __repr__
+
+    }, {
+        key: "toString",
+        value: function toString() {
+            var s = WDAYS[this.weekday];
+            if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s;
+            return s;
+        }
+    }, {
+        key: "getJsWeekday",
+        value: function getJsWeekday() {
+            return this.weekday === 6 ? 0 : this.weekday + 1;
+        }
+    }]);
+
+    return Weekday;
+}();
+
+exports.default = Weekday;
+//# sourceMappingURL=weekday.js.map
 
 /***/ }),
 /* 4 */
@@ -1246,14 +1177,14 @@ function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymo
  */
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(3);
+var rrule_1 = __webpack_require__(2);
 exports.RRule = rrule_1.default;
 var rruleset_1 = __webpack_require__(8);
 exports.RRuleSet = rruleset_1.default;
-var rrulestr_1 = __webpack_require__(17);
+var rrulestr_1 = __webpack_require__(18);
 var types_1 = __webpack_require__(5);
 exports.Frequency = types_1.Frequency;
-var weekday_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(3);
 exports.Weekday = weekday_1.default;
 // =============================================================================
 // Export
@@ -1275,7 +1206,7 @@ exports.default = rrule_1.default;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(3);
 var Frequency;
 (function (Frequency) {
     Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
@@ -1480,8 +1411,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(1);
 var helpers_1 = __webpack_require__(0);
 /**
  *
@@ -1711,8 +1642,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var masks_1 = __webpack_require__(10);
-var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(2);
+var rrule_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(1);
 var helpers_1 = __webpack_require__(0);
 // =============================================================================
 // Iterinfo
@@ -2112,9 +2043,9 @@ exports.default = CallbackIterResult;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = __webpack_require__(0);
-var rrule_1 = __webpack_require__(3);
-var dateutil_1 = __webpack_require__(2);
-var weekday_1 = __webpack_require__(1);
+var rrule_1 = __webpack_require__(2);
+var dateutil_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(3);
 function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
@@ -2294,8 +2225,8 @@ exports.parseOptions = parseOptions;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var types_1 = __webpack_require__(5);
-var weekday_1 = __webpack_require__(1);
-var dateutil_1 = __webpack_require__(2);
+var weekday_1 = __webpack_require__(3);
+var dateutil_1 = __webpack_require__(1);
 function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length) return null;
@@ -2390,8 +2321,90 @@ exports.parseString = parseString;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var totext_1 = __webpack_require__(15);
-var parsetext_1 = __webpack_require__(16);
+var rrule_1 = __webpack_require__(2);
+var helpers_1 = __webpack_require__(0);
+var weekday_1 = __webpack_require__(3);
+var dateutil_1 = __webpack_require__(1);
+function optionsToString(options) {
+    var pairs = [];
+    var keys = Object.keys(options);
+    var defaultKeys = Object.keys(rrule_1.DEFAULT_OPTIONS);
+    for (var i = 0; i < keys.length; i++) {
+        if (!helpers_1.includes(defaultKeys, keys[i])) continue;
+        var key = keys[i].toUpperCase();
+        var value = options[keys[i]];
+        var strValues = [];
+        if (!helpers_1.isPresent(value) || helpers_1.isArray(value) && !value.length) continue;
+        switch (key) {
+            case 'FREQ':
+                value = rrule_1.default.FREQUENCIES[options.freq];
+                break;
+            case 'WKST':
+                if (helpers_1.isNumber(value)) {
+                    value = new weekday_1.default(value);
+                }
+                break;
+            case 'BYWEEKDAY':
+                /*
+                NOTE: BYWEEKDAY is a special case.
+                RRule() deconstructs the rule.options.byweekday array
+                into an array of Weekday arguments.
+                On the other hand, rule.origOptions is an array of Weekdays.
+                We need to handle both cases here.
+                It might be worth change RRule to keep the Weekdays.
+                       Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
+                       */
+                key = 'BYDAY';
+                if (!helpers_1.isArray(value)) value = [value];
+                for (var j = 0; j < value.length; j++) {
+                    var wday = value[j];
+                    if (wday instanceof weekday_1.default) {
+                        // good
+                    } else if (helpers_1.isArray(wday)) {
+                        wday = new weekday_1.default(wday[0], wday[1]);
+                    } else {
+                        wday = new weekday_1.default(wday);
+                    }
+                    strValues[j] = wday.toString();
+                }
+                value = strValues;
+                break;
+            case 'DTSTART':
+            case 'UNTIL':
+                value = dateutil_1.default.timeToUntilString(value);
+                break;
+            default:
+                if (helpers_1.isArray(value)) {
+                    for (var _j = 0; _j < value.length; _j++) {
+                        strValues[_j] = String(value[_j]);
+                    }
+                    value = strValues;
+                } else {
+                    value = String(value);
+                }
+        }
+        pairs.push([key, value]);
+    }
+    var strings = [];
+    for (var _i = 0; _i < pairs.length; _i++) {
+        var attr = pairs[_i];
+        strings.push(attr[0] + '=' + attr[1].toString());
+    }
+    return strings.join(';');
+}
+exports.optionsToString = optionsToString;
+//# sourceMappingURL=optionstostring.js.map
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var totext_1 = __webpack_require__(16);
+var parsetext_1 = __webpack_require__(17);
 exports.parseText = parsetext_1.default;
 var index_1 = __webpack_require__(4);
 var i18n_1 = __webpack_require__(6);
@@ -2511,7 +2524,7 @@ exports.isFullyConvertible = isFullyConvertible;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2886,7 +2899,7 @@ exports.default = ToText;
 //# sourceMappingURL=totext.js.map
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3288,7 +3301,7 @@ exports.default = parseText;
 //# sourceMappingURL=parsetext.js.map
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3299,10 +3312,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var rrule_1 = __webpack_require__(3);
+var rrule_1 = __webpack_require__(2);
 var rruleset_1 = __webpack_require__(8);
-var dateutil_1 = __webpack_require__(2);
-var weekday_1 = __webpack_require__(1);
+var dateutil_1 = __webpack_require__(1);
+var weekday_1 = __webpack_require__(3);
 var helpers_1 = __webpack_require__(0);
 /**
  * RRuleStr

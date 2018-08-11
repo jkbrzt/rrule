@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const weekday_1 = require("./weekday");
 const dateutil_1 = require("./dateutil");
 const iterinfo_1 = require("./iterinfo");
 const helpers_1 = require("./helpers");
@@ -9,6 +8,7 @@ const callbackiterresult_1 = require("./callbackiterresult");
 const types_1 = require("./types");
 const parseoptions_1 = require("./parseoptions");
 const parsestring_1 = require("./parsestring");
+const optionstostring_1 = require("./optionstostring");
 const getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -75,81 +75,6 @@ class RRule {
     }
     static fromString(str) {
         return new RRule(RRule.parseString(str) || undefined);
-    }
-    static optionsToString(options) {
-        const pairs = [];
-        const keys = Object.keys(options);
-        const defaultKeys = Object.keys(exports.DEFAULT_OPTIONS);
-        for (let i = 0; i < keys.length; i++) {
-            if (!helpers_1.includes(defaultKeys, keys[i]))
-                continue;
-            let key = keys[i].toUpperCase();
-            let value = options[keys[i]];
-            let strValues = [];
-            if (!helpers_1.isPresent(value) || (helpers_1.isArray(value) && !value.length))
-                continue;
-            switch (key) {
-                case 'FREQ':
-                    value = RRule.FREQUENCIES[options.freq];
-                    break;
-                case 'WKST':
-                    if (helpers_1.isNumber(value)) {
-                        value = new weekday_1.default(value);
-                    }
-                    break;
-                case 'BYWEEKDAY':
-                    /*
-                    NOTE: BYWEEKDAY is a special case.
-                    RRule() deconstructs the rule.options.byweekday array
-                    into an array of Weekday arguments.
-                    On the other hand, rule.origOptions is an array of Weekdays.
-                    We need to handle both cases here.
-                    It might be worth change RRule to keep the Weekdays.
-          
-                    Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
-          
-                    */
-                    key = 'BYDAY';
-                    if (!helpers_1.isArray(value))
-                        value = [value];
-                    for (let j = 0; j < value.length; j++) {
-                        let wday = value[j];
-                        if (wday instanceof weekday_1.default) {
-                            // good
-                        }
-                        else if (helpers_1.isArray(wday)) {
-                            wday = new weekday_1.default(wday[0], wday[1]);
-                        }
-                        else {
-                            wday = new weekday_1.default(wday);
-                        }
-                        strValues[j] = wday.toString();
-                    }
-                    value = strValues;
-                    break;
-                case 'DTSTART':
-                case 'UNTIL':
-                    value = dateutil_1.default.timeToUntilString(value);
-                    break;
-                default:
-                    if (helpers_1.isArray(value)) {
-                        for (let j = 0; j < value.length; j++) {
-                            strValues[j] = String(value[j]);
-                        }
-                        value = strValues;
-                    }
-                    else {
-                        value = String(value);
-                    }
-            }
-            pairs.push([key, value]);
-        }
-        const strings = [];
-        for (let i = 0; i < pairs.length; i++) {
-            const attr = pairs[i];
-            strings.push(attr[0] + '=' + attr[1].toString());
-        }
-        return strings.join(';');
     }
     /**
      * @param {Function} iterator - optional function that will be called
@@ -236,7 +161,7 @@ class RRule {
      * @return String
      */
     toString() {
-        return RRule.optionsToString(this.origOptions);
+        return optionstostring_1.optionsToString(this.origOptions);
     }
     /**
      * Will convert all rules described in nlp:ToText
@@ -336,8 +261,7 @@ class RRule {
     
         */
         const dtstart = this.options.dtstart;
-        const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000;
-        let date = new dateutil_1.default.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstartMillisecondModulo);
+        let date = new dateutil_1.default.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
         // Some local variables to speed things up a bit
         const { freq, interval, wkst, until, bymonth, byweekno, byyearday, byweekday, byeaster, bymonthday, bynmonthday, bysetpos, byhour, byminute, bysecond } = this.options;
         const ii = new iterinfo_1.default(this);
@@ -372,7 +296,7 @@ class RRule {
                 timeset = [];
             }
             else {
-                timeset = gettimeset.call(ii, date.hour, date.minute, date.second, dtstartMillisecondModulo);
+                timeset = gettimeset.call(ii, date.hour, date.minute, date.second, date.millisecond);
             }
         }
         let currentDay;
@@ -544,6 +468,7 @@ RRule.TH = types_1.Days.TH;
 RRule.FR = types_1.Days.FR;
 RRule.SA = types_1.Days.SA;
 RRule.SU = types_1.Days.SU;
+RRule.optionsToString = optionstostring_1.optionsToString;
 exports.default = RRule;
 function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
     return ((helpers_1.notEmpty(bymonth) && !helpers_1.includes(bymonth, ii.mmask[currentDay])) ||

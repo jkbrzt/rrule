@@ -3,13 +3,11 @@ import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
 import {
   pymod,
-  divmod,
   notEmpty,
   includes,
   isPresent,
   isNumber,
-  isArray,
-  empty
+  isArray
 } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
@@ -27,6 +25,7 @@ import {
 } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
+import { optionsToString } from './optionstostring'
 
 interface GetNlp {
   _nlp: Nlp
@@ -145,82 +144,7 @@ export default class RRule {
     return new RRule(RRule.parseString(str) || undefined)
   }
 
-  static optionsToString (options: Partial<Options>) {
-    const pairs = []
-    const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
-    const defaultKeys = Object.keys(DEFAULT_OPTIONS)
-
-    for (let i = 0; i < keys.length; i++) {
-      if (!includes(defaultKeys, keys[i])) continue
-
-      let key = keys[i].toUpperCase()
-      let value: any = options[keys[i]]
-      let strValues = []
-
-      if (!isPresent(value) || (isArray(value) && !value.length)) continue
-
-      switch (key) {
-        case 'FREQ':
-          value = RRule.FREQUENCIES[options.freq!]
-          break
-        case 'WKST':
-          if (isNumber(value)) {
-            value = new Weekday(value)
-          }
-          break
-        case 'BYWEEKDAY':
-          /*
-          NOTE: BYWEEKDAY is a special case.
-          RRule() deconstructs the rule.options.byweekday array
-          into an array of Weekday arguments.
-          On the other hand, rule.origOptions is an array of Weekdays.
-          We need to handle both cases here.
-          It might be worth change RRule to keep the Weekdays.
-
-          Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
-
-          */
-          key = 'BYDAY'
-          if (!isArray(value)) value = [value]
-
-          for (let j = 0; j < value.length; j++) {
-            let wday: Weekday | number[] | number = value[j]
-            if (wday instanceof Weekday) {
-              // good
-            } else if (isArray(wday)) {
-              wday = new Weekday(wday[0], wday[1])
-            } else {
-              wday = new Weekday(wday)
-            }
-            strValues[j] = wday.toString()
-          }
-          value = strValues
-          break
-        case 'DTSTART':
-        case 'UNTIL':
-          value = dateutil.timeToUntilString(value)
-          break
-        default:
-          if (isArray(value)) {
-            for (let j = 0; j < value.length; j++) {
-              strValues[j] = String(value[j])
-            }
-            value = strValues
-          } else {
-            value = String(value)
-          }
-      }
-
-      pairs.push([key, value])
-    }
-
-    const strings = []
-    for (let i = 0; i < pairs.length; i++) {
-      const attr = pairs[i]
-      strings.push(attr[0] + '=' + attr[1].toString())
-    }
-    return strings.join(';')
-  }
+  static optionsToString = optionsToString
 
   /**
    * @param {Function} iterator - optional function that will be called
@@ -320,7 +244,7 @@ export default class RRule {
    * @return String
    */
   toString () {
-    return RRule.optionsToString(this.origOptions)
+    return optionsToString(this.origOptions)
   }
 
   /**
@@ -434,7 +358,6 @@ export default class RRule {
     */
 
     const dtstart = this.options.dtstart
-    const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000
 
     let date = new dateutil.DateTime(
       dtstart.getUTCFullYear(),
@@ -443,7 +366,7 @@ export default class RRule {
       dtstart.getUTCHours(),
       dtstart.getUTCMinutes(),
       dtstart.getUTCSeconds(),
-      dtstartMillisecondModulo
+      dtstart.valueOf() % 1000
     )
 
     // Some local variables to speed things up a bit
@@ -468,7 +391,7 @@ export default class RRule {
     const ii = new Iterinfo(this)
     ii.rebuild(date.year, date.month)
 
-    const getdayset: GetDayset = {
+    const getdayset = {
       [RRule.YEARLY]: ii.ydayset,
       [RRule.MONTHLY]: ii.mdayset,
       [RRule.WEEKLY]: ii.wdayset,
@@ -507,7 +430,7 @@ export default class RRule {
           date.hour,
           date.minute,
           date.second,
-          dtstartMillisecondModulo
+          date.millisecond
         )
       }
     }

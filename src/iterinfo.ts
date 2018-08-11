@@ -17,7 +17,6 @@ import {
   pymod,
   includes,
   range,
-  clone,
   isPresent,
   empty
 } from './helpers'

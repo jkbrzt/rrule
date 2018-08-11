@@ -847,7 +847,6 @@ var RRule = function () {
                 }
             }
             var currentDay = void 0;
-            var total = 0;
             var count = this.options.count;
             var pos = void 0;
             while (true) {
@@ -904,17 +903,16 @@ var RRule = function () {
                     for (var _j = 0; _j < poslist.length; _j++) {
                         var _res = poslist[_j];
                         if (until && _res > until) {
-                            this._len = total;
+                            this._len = iterResult.total;
                             return iterResult.getValue();
                         } else if (_res >= dtstart) {
-                            ++total;
                             if (!iterResult.accept(_res)) {
                                 return iterResult.getValue();
                             }
                             if (count) {
                                 --count;
                                 if (!count) {
-                                    this._len = total;
+                                    this._len = iterResult.total;
                                     return iterResult.getValue();
                                 }
                             }
@@ -931,17 +929,16 @@ var RRule = function () {
                             var _time = timeset[_k];
                             var _res2 = dateutil_1.default.combine(_date2, _time);
                             if (until && _res2 > until) {
-                                this._len = total;
+                                this._len = iterResult.total;
                                 return iterResult.getValue();
                             } else if (_res2 >= dtstart) {
-                                ++total;
                                 if (!iterResult.accept(_res2)) {
                                     return iterResult.getValue();
                                 }
                                 if (count) {
                                     --count;
                                     if (!count) {
-                                        this._len = total;
+                                        this._len = iterResult.total;
                                         return iterResult.getValue();
                                     }
                                 }
@@ -976,7 +973,7 @@ var RRule = function () {
                     timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
                 }
                 if (date.year > dateutil_1.default.MAXYEAR) {
-                    this._len = total;
+                    this._len = iterResult.total;
                     return iterResult.getValue();
                 }
                 ii.rebuild(date.year, date.month);
@@ -1154,11 +1151,12 @@ var IterResult = function () {
     function IterResult(method, args) {
         _classCallCheck(this, IterResult);
 
-        this.method = method;
-        this.args = args;
         this.minDate = null;
         this.maxDate = null;
         this._result = [];
+        this.total = 0;
+        this.method = method;
+        this.args = args;
         if (method === 'between') {
             this.maxDate = args.inc ? args.before : new Date(args.before.getTime() - 1);
             this.minDate = args.inc ? args.after : new Date(args.after.getTime() + 1);
@@ -1181,6 +1179,7 @@ var IterResult = function () {
     _createClass(IterResult, [{
         key: "accept",
         value: function accept(date) {
+            ++this.total;
             var tooEarly = this.minDate && date < this.minDate;
             var tooLate = this.maxDate && date > this.maxDate;
             if (this.method === 'between') {

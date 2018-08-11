@@ -356,7 +356,6 @@ export default class RRule implements QueryMethods {
     }
 
     let currentDay: number
-    let total = 0
     let count = this.options.count
     let pos: number
 
@@ -432,17 +431,16 @@ export default class RRule implements QueryMethods {
         for (let j = 0; j < poslist.length; j++) {
           const res = poslist[j]
           if (until && res > until) {
-            this._len = total
+            this._len = iterResult.total
             return iterResult.getValue() as Date[]
           } else if (res >= dtstart) {
-            ++total
             if (!iterResult.accept(res)) {
               return iterResult.getValue() as Date[]
             }
             if (count) {
               --count
               if (!count) {
-                this._len = total
+                this._len = iterResult.total
                 return iterResult.getValue() as Date[]
               }
             }
@@ -460,17 +458,16 @@ export default class RRule implements QueryMethods {
             const time = timeset![k]
             const res = dateutil.combine(date, time)
             if (until && res > until) {
-              this._len = total
+              this._len = iterResult.total
               return iterResult.getValue() as Date[]
             } else if (res >= dtstart) {
-              ++total
               if (!iterResult.accept(res)) {
                 return iterResult.getValue() as Date[]
               }
               if (count) {
                 --count
                 if (!count) {
-                  this._len = total
+                  this._len = iterResult.total
                   return iterResult.getValue() as Date[]
                 }
               }
@@ -510,7 +507,7 @@ export default class RRule implements QueryMethods {
       }
 
       if (date.year > dateutil.MAXYEAR) {
-        this._len = total
+        this._len = iterResult.total
         return iterResult.getValue() as Date[]
       }
 

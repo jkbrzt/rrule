@@ -18,16 +18,14 @@ export interface IterArgs {
 export default class IterResult {
   public readonly method: keyof QueryMethods
   public readonly args: Partial<IterArgs>
-  public readonly minDate: Date | null
-  public readonly maxDate: Date | null
-  public _result: Date[]
+  public readonly minDate: Date | null = null
+  public readonly maxDate: Date | null = null
+  public _result: Date[] = []
+  public total = 0
 
   constructor (method: keyof QueryMethods, args: Partial<IterArgs>) {
     this.method = method
     this.args = args
-    this.minDate = null
-    this.maxDate = null
-    this._result = []
 
     if (method === 'between') {
       this.maxDate = args.inc
@@ -50,6 +48,7 @@ export default class IterResult {
    *                   false if we're done.
    */
   accept (date: Date) {
+    ++this.total
     const tooEarly = this.minDate && date < this.minDate
     const tooLate = this.maxDate && date > this.maxDate
 

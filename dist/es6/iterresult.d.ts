@@ -15,6 +15,7 @@ export default class IterResult {
     readonly minDate: Date | null;
     readonly maxDate: Date | null;
     _result: Date[];
+    total: number;
     constructor(method: keyof QueryMethods, args: Partial<IterArgs>);
     /**
      * Possibly adds a date into the result.

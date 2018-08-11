@@ -564,29 +564,26 @@ export default class RRule {
             timepos = pymod(pos - 1, timeset.length)
           }
 
-          try {
-            const tmp = []
-            for (let k = start; k < end; k++) {
-              const val = dayset[k]
-              if (!isPresent(val)) continue
-              tmp.push(val)
-            }
-            let i: number
-            if (daypos < 0) {
-              // we're trying to emulate python's aList[-n]
-              i = tmp.slice(daypos)[0]
-            } else {
-              i = tmp[daypos]
-            }
+          const tmp = []
+          for (let k = start; k < end; k++) {
+            const val = dayset[k]
+            if (!isPresent(val)) continue
+            tmp.push(val)
+          }
+          let i: number
+          if (daypos < 0) {
+            // we're trying to emulate python's aList[-n]
+            i = tmp.slice(daypos)[0]
+          } else {
+            i = tmp[daypos]
+          }
 
-            const time = timeset[timepos]
-            const date = dateutil.fromOrdinal(ii.yearordinal + i)
-            const res = dateutil.combine(date, time)
-            // XXX: can this ever be in the array?
-            // - compare the actual date instead?
-            if (!includes(poslist, res)) poslist.push(res)
-            // tslint:disable-next-line:no-empty
-          } catch (e) {}
+          const time = timeset[timepos]
+          const date = dateutil.fromOrdinal(ii.yearordinal + i)
+          const res = dateutil.combine(date, time)
+          // XXX: can this ever be in the array?
+          // - compare the actual date instead?
+          if (!includes(poslist, res)) poslist.push(res)
         }
 
         dateutil.sort(poslist)
@@ -612,25 +609,27 @@ export default class RRule {
       } else {
         for (let j = start; j < end; j++) {
           currentDay = dayset[j] as number
-          if (currentDay !== null) {
-            const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
-            for (let k = 0; k < timeset!.length; k++) {
-              const time = timeset![k]
-              const res = dateutil.combine(date, time)
-              if (until && res > until) {
-                this._len = total
+          if (!isPresent(currentDay)) {
+            continue
+          }
+
+          const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
+          for (let k = 0; k < timeset!.length; k++) {
+            const time = timeset![k]
+            const res = dateutil.combine(date, time)
+            if (until && res > until) {
+              this._len = total
+              return iterResult.getValue() as Date[]
+            } else if (res >= dtstart) {
+              ++total
+              if (!iterResult.accept(res)) {
                 return iterResult.getValue() as Date[]
-              } else if (res >= dtstart) {
-                ++total
-                if (!iterResult.accept(res)) {
+              }
+              if (count) {
+                --count
+                if (!count) {
+                  this._len = total
                   return iterResult.getValue() as Date[]
-                }
-                if (count) {
-                  --count
-                  if (!count) {
-                    this._len = total
-                    return iterResult.getValue() as Date[]
-                  }
                 }
               }
             }

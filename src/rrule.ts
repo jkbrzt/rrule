@@ -637,7 +637,6 @@ export default class RRule {
       }
 
       // Handle frequency and interval
-      let fixday = false
       if (freq === RRule.YEARLY) {
         date.addYears(interval)
 
@@ -658,18 +657,15 @@ export default class RRule {
         ii.rebuild(date.year, date.month)
       } else if (freq === RRule.WEEKLY) {
         date.addWeekly(interval, wkst)
-        fixday = true
       } else if (freq === RRule.DAILY) {
         date.addDaily(interval)
-        fixday = true
       } else if (freq === RRule.HOURLY) {
-        if (date.addHours(interval, filtered, byhour)) fixday = true
+        date.addHours(interval, filtered, byhour)
 
         // @ts-ignore
         timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.MINUTELY) {
         if (date.addMinutes(interval, filtered, byhour, byminute)) {
-          fixday = true
           filtered = false
         }
 
@@ -677,7 +673,6 @@ export default class RRule {
         timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.SECONDLY) {
         if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
-          fixday = true
           filtered = false
         }
 
@@ -685,16 +680,12 @@ export default class RRule {
         timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       }
 
-      if (fixday && date.day > 28) {
-        date.fixDay()
-
-        if (date.year > dateutil.MAXYEAR) {
-          this._len = total
-          return iterResult.getValue() as Date[]
-        }
-
-        ii.rebuild(date.year, date.month)
+      if (date.year > dateutil.MAXYEAR) {
+        this._len = total
+        return iterResult.getValue() as Date[]
       }
+
+      ii.rebuild(date.year, date.month)
     }
   }
 }

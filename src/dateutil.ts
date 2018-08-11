@@ -302,10 +302,13 @@ export namespace dateutil {
       } else {
         this.day += -(this.getWeekday() - wkst) + days * 7
       }
+
+      this.fixDay()
     }
 
     public addDaily (days: number) {
       this.day += days
+      this.fixDay()
     }
 
     public addHours (hours: number, filtered: boolean, byhour: number[]) {

@@ -214,9 +214,11 @@ var dateutil;
             else {
                 this.day += -(this.getWeekday() - wkst) + days * 7;
             }
+            this.fixDay();
         }
         addDaily(days) {
             this.day += days;
+            this.fixDay();
         }
         addHours(hours, filtered, byhour) {
             let fixday = false;

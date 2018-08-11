@@ -320,7 +320,7 @@ export namespace dateutil {
         const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
         if (dayDiv) {
           this.hour = hourMod
-          this.day += dayDiv
+          this.addDaily(dayDiv)
           fixday = true
         }
 
@@ -343,13 +343,7 @@ export namespace dateutil {
         const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
         if (hourDiv) {
           this.minute = minuteMod
-          this.hour += hourDiv
-          const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
-          if (dayDiv) {
-            this.hour = hourMod
-            this.day += dayDiv
-            fixday = true
-          }
+          fixday = this.addHours(hourDiv, false, byhour)
         }
 
         if (
@@ -378,18 +372,7 @@ export namespace dateutil {
         const { div: minuteDiv, mod: secondMod } = divmod(this.second, 60)
         if (minuteDiv) {
           this.second = secondMod
-          this.minute += minuteDiv
-          const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
-          if (hourDiv) {
-            this.minute = minuteMod
-            this.hour += hourDiv
-            const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
-            if (dayDiv) {
-              this.hour = hourMod
-              this.day += dayDiv
-              fixday = true
-            }
-          }
+          fixday = this.addMinutes(minuteDiv, false, byhour, byminute)
         }
 
         if (
@@ -402,6 +385,31 @@ export namespace dateutil {
       }
 
       return fixday
+    }
+
+    public fixDay () {
+      if (this.day <= 28) {
+        return
+      }
+
+      let daysinmonth = monthRange(this.year, this.month - 1)[1]
+      if (this.day <= daysinmonth) {
+        return
+      }
+
+      while (this.day > daysinmonth) {
+        this.day -= daysinmonth
+        ++this.month
+        if (this.month === 13) {
+          this.month = 1
+          ++this.year
+          if (this.year > MAXYEAR) {
+            return
+          }
+        }
+
+        daysinmonth = monthRange(this.year, this.month - 1)[1]
+      }
     }
   }
 }

@@ -539,7 +539,7 @@ var dateutil;
 
                     if (dayDiv) {
                         this.hour = hourMod;
-                        this.day += dayDiv;
+                        this.addDaily(dayDiv);
                         fixday = true;
                     }
                     if (helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) break;
@@ -563,17 +563,7 @@ var dateutil;
 
                     if (hourDiv) {
                         this.minute = minuteMod;
-                        this.hour += hourDiv;
-
-                        var _helpers_1$divmod3 = helpers_1.divmod(this.hour, 24),
-                            dayDiv = _helpers_1$divmod3.div,
-                            hourMod = _helpers_1$divmod3.mod;
-
-                        if (dayDiv) {
-                            this.hour = hourMod;
-                            this.day += dayDiv;
-                            fixday = true;
-                        }
+                        fixday = this.addHours(hourDiv, false, byhour);
                     }
                     if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) && (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute))) {
                         break;
@@ -592,38 +582,42 @@ var dateutil;
                 while (true) {
                     this.second += seconds;
 
-                    var _helpers_1$divmod4 = helpers_1.divmod(this.second, 60),
-                        minuteDiv = _helpers_1$divmod4.div,
-                        secondMod = _helpers_1$divmod4.mod;
+                    var _helpers_1$divmod3 = helpers_1.divmod(this.second, 60),
+                        minuteDiv = _helpers_1$divmod3.div,
+                        secondMod = _helpers_1$divmod3.mod;
 
                     if (minuteDiv) {
                         this.second = secondMod;
-                        this.minute += minuteDiv;
-
-                        var _helpers_1$divmod5 = helpers_1.divmod(this.minute, 60),
-                            hourDiv = _helpers_1$divmod5.div,
-                            minuteMod = _helpers_1$divmod5.mod;
-
-                        if (hourDiv) {
-                            this.minute = minuteMod;
-                            this.hour += hourDiv;
-
-                            var _helpers_1$divmod6 = helpers_1.divmod(this.hour, 24),
-                                dayDiv = _helpers_1$divmod6.div,
-                                hourMod = _helpers_1$divmod6.mod;
-
-                            if (dayDiv) {
-                                this.hour = hourMod;
-                                this.day += dayDiv;
-                                fixday = true;
-                            }
-                        }
+                        fixday = this.addMinutes(minuteDiv, false, byhour, byminute);
                     }
                     if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) && (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute)) && (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, this.second))) {
                         break;
                     }
                 }
                 return fixday;
+            }
+        }, {
+            key: "fixDay",
+            value: function fixDay() {
+                if (this.day <= 28) {
+                    return;
+                }
+                var daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
+                if (this.day <= daysinmonth) {
+                    return;
+                }
+                while (this.day > daysinmonth) {
+                    this.day -= daysinmonth;
+                    ++this.month;
+                    if (this.month === 13) {
+                        this.month = 1;
+                        ++this.year;
+                        if (this.year > dateutil.MAXYEAR) {
+                            return;
+                        }
+                    }
+                    daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
+                }
             }
         }]);
 
@@ -1119,23 +1113,12 @@ var RRule = function () {
                     timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
                 }
                 if (fixday && date.day > 28) {
-                    var daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
-                    if (date.day > daysinmonth) {
-                        while (date.day > daysinmonth) {
-                            date.day -= daysinmonth;
-                            ++date.month;
-                            if (date.month === 13) {
-                                date.month = 1;
-                                ++date.year;
-                                if (date.year > dateutil_1.default.MAXYEAR) {
-                                    this._len = total;
-                                    return iterResult.getValue();
-                                }
-                            }
-                            daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
-                        }
-                        ii.rebuild(date.year, date.month);
+                    date.fixDay();
+                    if (date.year > dateutil_1.default.MAXYEAR) {
+                        this._len = total;
+                        return iterResult.getValue();
                     }
+                    ii.rebuild(date.year, date.month);
                 }
             }
         }

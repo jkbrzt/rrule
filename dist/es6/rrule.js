@@ -529,23 +529,12 @@ class RRule {
                 timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             if (fixday && date.day > 28) {
-                let daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
-                if (date.day > daysinmonth) {
-                    while (date.day > daysinmonth) {
-                        date.day -= daysinmonth;
-                        ++date.month;
-                        if (date.month === 13) {
-                            date.month = 1;
-                            ++date.year;
-                            if (date.year > dateutil_1.default.MAXYEAR) {
-                                this._len = total;
-                                return iterResult.getValue();
-                            }
-                        }
-                        daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
-                    }
-                    ii.rebuild(date.year, date.month);
+                date.fixDay();
+                if (date.year > dateutil_1.default.MAXYEAR) {
+                    this._len = total;
+                    return iterResult.getValue();
                 }
+                ii.rebuild(date.year, date.month);
             }
         }
     }

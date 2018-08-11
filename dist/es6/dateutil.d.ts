@@ -95,6 +95,7 @@ export declare namespace dateutil {
         addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
         addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): boolean;
         addSeconds(seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]): boolean;
+        fixDay(): void;
     }
 }
 export default dateutil;

@@ -329,6 +329,39 @@ export namespace dateutil {
 
       return fixday
     }
+
+    public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
+      let fixday = false
+      if (filtered) {
+            // Jump to one iteration before next day
+        this.minute +=
+              Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
+      }
+
+      while (true) {
+        this.minute += minutes
+        const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
+        if (hourDiv) {
+          this.minute = minuteMod
+          this.hour += hourDiv
+          const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
+          if (dayDiv) {
+            this.hour = hourMod
+            this.day += dayDiv
+            fixday = true
+          }
+        }
+
+        if (
+              (empty(byhour) || includes(byhour, this.hour)) &&
+              (empty(byminute) || includes(byminute, this.minute))
+            ) {
+          break
+        }
+      }
+
+      return fixday
+    }
   }
 }
 

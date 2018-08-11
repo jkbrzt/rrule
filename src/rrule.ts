@@ -668,33 +668,9 @@ export default class RRule {
         // @ts-ignore
         timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.MINUTELY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          date.minute +=
-            Math.floor((1439 - (date.hour * 60 + date.minute)) / interval) * interval
-        }
-
-        while (true) {
-          date.minute += interval
-          const { div: hourDiv, mod: minuteMod } = divmod(date.minute, 60)
-          if (hourDiv) {
-            date.minute = minuteMod
-            date.hour += hourDiv
-            const { div: dayDiv, mod: hourMod } = divmod(date.hour, 24)
-            if (dayDiv) {
-              date.hour = hourMod
-              date.day += dayDiv
-              fixday = true
-              filtered = false
-            }
-          }
-
-          if (
-            (empty(byhour) || includes(byhour, date.hour)) &&
-            (empty(byminute) || includes(byminute, date.minute))
-          ) {
-            break
-          }
+        if (date.addMinutes(interval, filtered, byhour, byminute)) {
+          fixday = true
+          filtered = false
         }
 
         // @ts-ignore

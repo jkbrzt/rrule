@@ -237,6 +237,33 @@ var dateutil;
             }
             return fixday;
         }
+        addMinutes(minutes, filtered, byhour, byminute) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.minute +=
+                    Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes;
+            }
+            while (true) {
+                this.minute += minutes;
+                const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(this.minute, 60);
+                if (hourDiv) {
+                    this.minute = minuteMod;
+                    this.hour += hourDiv;
+                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(this.hour, 24);
+                    if (dayDiv) {
+                        this.hour = hourMod;
+                        this.day += dayDiv;
+                        fixday = true;
+                    }
+                }
+                if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) &&
+                    (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute))) {
+                    break;
+                }
+            }
+            return fixday;
+        }
     }
     dateutil.DateTime = DateTime;
 })(dateutil = exports.dateutil || (exports.dateutil = {}));

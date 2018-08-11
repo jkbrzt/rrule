@@ -93,6 +93,7 @@ export declare namespace dateutil {
         addWeekly(days: number, wkst: number): void;
         addDaily(days: number): void;
         addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
+        addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): boolean;
     }
 }
 export default dateutil;

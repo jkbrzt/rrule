@@ -521,35 +521,9 @@ class RRule {
                 timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             else if (freq === RRule.SECONDLY) {
-                if (filtered) {
-                    // Jump to one iteration before next day
-                    date.second +=
-                        Math.floor((86399 - (date.hour * 3600 + date.minute * 60 + date.second)) / interval) * interval;
-                }
-                while (true) {
-                    date.second += interval;
-                    const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(date.second, 60);
-                    if (minuteDiv) {
-                        date.second = secondMod;
-                        date.minute += minuteDiv;
-                        const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(date.minute, 60);
-                        if (hourDiv) {
-                            date.minute = minuteMod;
-                            date.hour += hourDiv;
-                            const { div: dayDiv, mod: hourMod } = helpers_1.divmod(date.hour, 24);
-                            if (dayDiv) {
-                                date.hour = hourMod;
-                                date.day += dayDiv;
-                                fixday = true;
-                                filtered = false;
-                            }
-                        }
-                    }
-                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, date.hour)) &&
-                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, date.minute)) &&
-                        (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, date.second))) {
-                        break;
-                    }
+                if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
+                    fixday = true;
+                    filtered = false;
                 }
                 // @ts-ignore
                 timeset = gettimeset.call(ii, date.hour, date.minute, date.second);

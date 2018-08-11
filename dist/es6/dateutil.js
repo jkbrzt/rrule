@@ -264,6 +264,39 @@ var dateutil;
             }
             return fixday;
         }
+        addSeconds(seconds, filtered, byhour, byminute, bysecond) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.second +=
+                    Math.floor((86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds) * seconds;
+            }
+            while (true) {
+                this.second += seconds;
+                const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(this.second, 60);
+                if (minuteDiv) {
+                    this.second = secondMod;
+                    this.minute += minuteDiv;
+                    const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(this.minute, 60);
+                    if (hourDiv) {
+                        this.minute = minuteMod;
+                        this.hour += hourDiv;
+                        const { div: dayDiv, mod: hourMod } = helpers_1.divmod(this.hour, 24);
+                        if (dayDiv) {
+                            this.hour = hourMod;
+                            this.day += dayDiv;
+                            fixday = true;
+                        }
+                    }
+                }
+                if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) &&
+                    (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute)) &&
+                    (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, this.second))) {
+                    break;
+                }
+            }
+            return fixday;
+        }
     }
     dateutil.DateTime = DateTime;
 })(dateutil = exports.dateutil || (exports.dateutil = {}));

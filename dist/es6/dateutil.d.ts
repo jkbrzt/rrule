@@ -94,6 +94,7 @@ export declare namespace dateutil {
         addDaily(days: number): void;
         addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
         addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): boolean;
+        addSeconds(seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]): boolean;
     }
 }
 export default dateutil;

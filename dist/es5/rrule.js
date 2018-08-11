@@ -581,6 +581,50 @@ var dateutil;
                 }
                 return fixday;
             }
+        }, {
+            key: "addSeconds",
+            value: function addSeconds(seconds, filtered, byhour, byminute, bysecond) {
+                var fixday = false;
+                if (filtered) {
+                    // Jump to one iteration before next day
+                    this.second += Math.floor((86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds) * seconds;
+                }
+                while (true) {
+                    this.second += seconds;
+
+                    var _helpers_1$divmod4 = helpers_1.divmod(this.second, 60),
+                        minuteDiv = _helpers_1$divmod4.div,
+                        secondMod = _helpers_1$divmod4.mod;
+
+                    if (minuteDiv) {
+                        this.second = secondMod;
+                        this.minute += minuteDiv;
+
+                        var _helpers_1$divmod5 = helpers_1.divmod(this.minute, 60),
+                            hourDiv = _helpers_1$divmod5.div,
+                            minuteMod = _helpers_1$divmod5.mod;
+
+                        if (hourDiv) {
+                            this.minute = minuteMod;
+                            this.hour += hourDiv;
+
+                            var _helpers_1$divmod6 = helpers_1.divmod(this.hour, 24),
+                                dayDiv = _helpers_1$divmod6.div,
+                                hourMod = _helpers_1$divmod6.mod;
+
+                            if (dayDiv) {
+                                this.hour = hourMod;
+                                this.day += dayDiv;
+                                fixday = true;
+                            }
+                        }
+                    }
+                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) && (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute)) && (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, this.second))) {
+                        break;
+                    }
+                }
+                return fixday;
+            }
         }]);
 
         return DateTime;
@@ -1067,44 +1111,9 @@ var RRule = function () {
                     // @ts-ignore
                     timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
                 } else if (freq === RRule.SECONDLY) {
-                    if (filtered) {
-                        // Jump to one iteration before next day
-                        date.second += Math.floor((86399 - (date.hour * 3600 + date.minute * 60 + date.second)) / interval) * interval;
-                    }
-                    while (true) {
-                        date.second += interval;
-
-                        var _helpers_1$divmod = helpers_1.divmod(date.second, 60),
-                            minuteDiv = _helpers_1$divmod.div,
-                            secondMod = _helpers_1$divmod.mod;
-
-                        if (minuteDiv) {
-                            date.second = secondMod;
-                            date.minute += minuteDiv;
-
-                            var _helpers_1$divmod2 = helpers_1.divmod(date.minute, 60),
-                                hourDiv = _helpers_1$divmod2.div,
-                                minuteMod = _helpers_1$divmod2.mod;
-
-                            if (hourDiv) {
-                                date.minute = minuteMod;
-                                date.hour += hourDiv;
-
-                                var _helpers_1$divmod3 = helpers_1.divmod(date.hour, 24),
-                                    dayDiv = _helpers_1$divmod3.div,
-                                    hourMod = _helpers_1$divmod3.mod;
-
-                                if (dayDiv) {
-                                    date.hour = hourMod;
-                                    date.day += dayDiv;
-                                    fixday = true;
-                                    filtered = false;
-                                }
-                            }
-                        }
-                        if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, date.hour)) && (helpers_1.empty(byminute) || helpers_1.includes(byminute, date.minute)) && (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, date.second))) {
-                            break;
-                        }
+                    if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
+                        fixday = true;
+                        filtered = false;
                     }
                     // @ts-ignore
                     timeset = gettimeset.call(ii, date.hour, date.minute, date.second);

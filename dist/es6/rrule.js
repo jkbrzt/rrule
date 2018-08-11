@@ -337,17 +337,11 @@ class RRule {
         */
         const dtstart = this.options.dtstart;
         const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000;
-        let year = dtstart.getUTCFullYear();
-        let month = dtstart.getUTCMonth() + 1;
-        let day = dtstart.getUTCDate();
-        let hour = dtstart.getUTCHours();
-        let minute = dtstart.getUTCMinutes();
-        let second = dtstart.getUTCSeconds();
-        let weekday = dateutil_1.default.getWeekday(dtstart);
+        let date = new dateutil_1.default.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstartMillisecondModulo);
         // Some local variables to speed things up a bit
         const { freq, interval, wkst, until, bymonth, byweekno, byyearday, byweekday, byeaster, bymonthday, bynmonthday, bysetpos, byhour, byminute, bysecond } = this.options;
         const ii = new iterinfo_1.default(this);
-        ii.rebuild(year, month);
+        ii.rebuild(date.year, date.month);
         const getdayset = {
             [RRule.YEARLY]: ii.ydayset,
             [RRule.MONTHLY]: ii.mdayset,
@@ -368,17 +362,17 @@ class RRule {
                 [RRule.MINUTELY]: ii.mtimeset,
                 [RRule.SECONDLY]: ii.stimeset
             }[freq];
-            if ((freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.includes(byhour, hour)) ||
+            if ((freq >= RRule.HOURLY && helpers_1.notEmpty(byhour) && !helpers_1.includes(byhour, date.hour)) ||
                 (freq >= RRule.MINUTELY &&
                     helpers_1.notEmpty(byminute) &&
-                    !helpers_1.includes(byminute, minute)) ||
+                    !helpers_1.includes(byminute, date.minute)) ||
                 (freq >= RRule.SECONDLY &&
                     helpers_1.notEmpty(bysecond) &&
-                    !helpers_1.includes(bysecond, second))) {
+                    !helpers_1.includes(bysecond, date.second))) {
                 timeset = [];
             }
             else {
-                timeset = gettimeset.call(ii, hour, minute, second, dtstartMillisecondModulo);
+                timeset = gettimeset.call(ii, date.hour, date.minute, date.second, dtstartMillisecondModulo);
             }
         }
         let currentDay;
@@ -387,7 +381,7 @@ class RRule {
         let pos;
         while (true) {
             // Get dayset with the right frequency
-            const [dayset, start, end] = getdayset.call(ii, year, month, day);
+            const [dayset, start, end] = getdayset.call(ii, date.year, date.month, date.day);
             // Do the "hard" work ;-)
             let filtered = false;
             for (let dayCounter = start; dayCounter < end; dayCounter++) {
@@ -489,143 +483,142 @@ class RRule {
             // Handle frequency and interval
             let fixday = false;
             if (freq === RRule.YEARLY) {
-                year += interval;
-                if (year > dateutil_1.default.MAXYEAR) {
+                date = date.addYears(interval);
+                if (date.year > dateutil_1.default.MAXYEAR) {
                     this._len = total;
                     return iterResult.getValue();
                 }
-                ii.rebuild(year, month);
+                ii.rebuild(date.year, date.month);
             }
             else if (freq === RRule.MONTHLY) {
-                month += interval;
-                if (month > 12) {
-                    const yearDiv = Math.floor(month / 12);
-                    const monthMod = helpers_1.pymod(month, 12);
-                    month = monthMod;
-                    year += yearDiv;
-                    if (month === 0) {
-                        month = 12;
-                        --year;
+                date = date.addMonths(interval);
+                if (date.month > 12) {
+                    const yearDiv = Math.floor(date.month / 12);
+                    const monthMod = helpers_1.pymod(date.month, 12);
+                    date.month = monthMod;
+                    date.year += yearDiv;
+                    if (date.month === 0) {
+                        date.month = 12;
+                        --date.year;
                     }
-                    if (year > dateutil_1.default.MAXYEAR) {
+                    if (date.year > dateutil_1.default.MAXYEAR) {
                         this._len = total;
                         return iterResult.getValue();
                     }
                 }
-                ii.rebuild(year, month);
+                ii.rebuild(date.year, date.month);
             }
             else if (freq === RRule.WEEKLY) {
-                if (wkst > weekday) {
-                    day += -(weekday + 1 + (6 - wkst)) + interval * 7;
+                if (wkst > date.getWeekday()) {
+                    date.day += -(date.getWeekday() + 1 + (6 - wkst)) + interval * 7;
                 }
                 else {
-                    day += -(weekday - wkst) + interval * 7;
+                    date.day += -(date.getWeekday() - wkst) + interval * 7;
                 }
-                weekday = wkst;
                 fixday = true;
             }
             else if (freq === RRule.DAILY) {
-                day += interval;
+                date.day += interval;
                 fixday = true;
             }
             else if (freq === RRule.HOURLY) {
                 if (filtered) {
                     // Jump to one iteration before next day
-                    hour += Math.floor((23 - hour) / interval) * interval;
+                    date.hour += Math.floor((23 - date.hour) / interval) * interval;
                 }
                 while (true) {
-                    hour += interval;
-                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                    date.hour += interval;
+                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(date.hour, 24);
                     if (dayDiv) {
-                        hour = hourMod;
-                        day += dayDiv;
+                        date.hour = hourMod;
+                        date.day += dayDiv;
                         fixday = true;
                     }
-                    if (helpers_1.empty(byhour) || helpers_1.includes(byhour, hour))
+                    if (helpers_1.empty(byhour) || helpers_1.includes(byhour, date.hour))
                         break;
                 }
                 // @ts-ignore
-                timeset = gettimeset.call(ii, hour, minute, second);
+                timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             else if (freq === RRule.MINUTELY) {
                 if (filtered) {
                     // Jump to one iteration before next day
-                    minute +=
-                        Math.floor((1439 - (hour * 60 + minute)) / interval) * interval;
+                    date.minute +=
+                        Math.floor((1439 - (date.hour * 60 + date.minute)) / interval) * interval;
                 }
                 while (true) {
-                    minute += interval;
-                    const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
+                    date.minute += interval;
+                    const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(date.minute, 60);
                     if (hourDiv) {
-                        minute = minuteMod;
-                        hour += hourDiv;
-                        const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                        date.minute = minuteMod;
+                        date.hour += hourDiv;
+                        const { div: dayDiv, mod: hourMod } = helpers_1.divmod(date.hour, 24);
                         if (dayDiv) {
-                            hour = hourMod;
-                            day += dayDiv;
+                            date.hour = hourMod;
+                            date.day += dayDiv;
                             fixday = true;
                             filtered = false;
                         }
                     }
-                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) &&
-                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, minute))) {
+                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, date.hour)) &&
+                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, date.minute))) {
                         break;
                     }
                 }
                 // @ts-ignore
-                timeset = gettimeset.call(ii, hour, minute, second);
+                timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             else if (freq === RRule.SECONDLY) {
                 if (filtered) {
                     // Jump to one iteration before next day
-                    second +=
-                        Math.floor((86399 - (hour * 3600 + minute * 60 + second)) / interval) * interval;
+                    date.second +=
+                        Math.floor((86399 - (date.hour * 3600 + date.minute * 60 + date.second)) / interval) * interval;
                 }
                 while (true) {
-                    second += interval;
-                    const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(second, 60);
+                    date.second += interval;
+                    const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(date.second, 60);
                     if (minuteDiv) {
-                        second = secondMod;
-                        minute += minuteDiv;
-                        const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
+                        date.second = secondMod;
+                        date.minute += minuteDiv;
+                        const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(date.minute, 60);
                         if (hourDiv) {
-                            minute = minuteMod;
-                            hour += hourDiv;
-                            const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                            date.minute = minuteMod;
+                            date.hour += hourDiv;
+                            const { div: dayDiv, mod: hourMod } = helpers_1.divmod(date.hour, 24);
                             if (dayDiv) {
-                                hour = hourMod;
-                                day += dayDiv;
+                                date.hour = hourMod;
+                                date.day += dayDiv;
                                 fixday = true;
                                 filtered = false;
                             }
                         }
                     }
-                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) &&
-                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, minute)) &&
-                        (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, second))) {
+                    if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, date.hour)) &&
+                        (helpers_1.empty(byminute) || helpers_1.includes(byminute, date.minute)) &&
+                        (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, date.second))) {
                         break;
                     }
                 }
                 // @ts-ignore
-                timeset = gettimeset.call(ii, hour, minute, second);
+                timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
-            if (fixday && day > 28) {
-                let daysinmonth = dateutil_1.default.monthRange(year, month - 1)[1];
-                if (day > daysinmonth) {
-                    while (day > daysinmonth) {
-                        day -= daysinmonth;
-                        ++month;
-                        if (month === 13) {
-                            month = 1;
-                            ++year;
-                            if (year > dateutil_1.default.MAXYEAR) {
+            if (fixday && date.day > 28) {
+                let daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
+                if (date.day > daysinmonth) {
+                    while (date.day > daysinmonth) {
+                        date.day -= daysinmonth;
+                        ++date.month;
+                        if (date.month === 13) {
+                            date.month = 1;
+                            ++date.year;
+                            if (date.year > dateutil_1.default.MAXYEAR) {
                                 this._len = total;
                                 return iterResult.getValue();
                             }
                         }
-                        daysinmonth = dateutil_1.default.monthRange(year, month - 1)[1];
+                        daysinmonth = dateutil_1.default.monthRange(date.year, date.month - 1)[1];
                     }
-                    ii.rebuild(year, month);
+                    ii.rebuild(date.year, date.month);
                 }
             }
         }

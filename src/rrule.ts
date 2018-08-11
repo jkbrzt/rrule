@@ -436,13 +436,15 @@ export default class RRule {
     const dtstart = this.options.dtstart
     const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000
 
-    let year = dtstart.getUTCFullYear()
-    let month = dtstart.getUTCMonth() + 1
-    let day = dtstart.getUTCDate()
-    let hour = dtstart.getUTCHours()
-    let minute = dtstart.getUTCMinutes()
-    let second = dtstart.getUTCSeconds()
-    let weekday = dateutil.getWeekday(dtstart)
+    let date = new dateutil.DateTime(
+      dtstart.getUTCFullYear(),
+      dtstart.getUTCMonth() + 1,
+      dtstart.getUTCDate(),
+      dtstart.getUTCHours(),
+      dtstart.getUTCMinutes(),
+      dtstart.getUTCSeconds(),
+      dtstartMillisecondModulo
+    )
 
     // Some local variables to speed things up a bit
     const {
@@ -464,7 +466,7 @@ export default class RRule {
     } = this.options
 
     const ii = new Iterinfo(this)
-    ii.rebuild(year, month)
+    ii.rebuild(date.year, date.month)
 
     const getdayset: GetDayset = {
       [RRule.YEARLY]: ii.ydayset,
@@ -490,21 +492,21 @@ export default class RRule {
       ] as typeof gettimeset
 
       if (
-        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, hour)) ||
+        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, date.hour)) ||
         (freq >= RRule.MINUTELY &&
           notEmpty(byminute) &&
-          !includes(byminute, minute)) ||
+          !includes(byminute, date.minute)) ||
         (freq >= RRule.SECONDLY &&
           notEmpty(bysecond) &&
-          !includes(bysecond, second))
+          !includes(bysecond, date.second))
       ) {
         timeset = []
       } else {
         timeset = gettimeset.call(
           ii,
-          hour,
-          minute,
-          second,
+          date.hour,
+          date.minute,
+          date.second,
           dtstartMillisecondModulo
         )
       }
@@ -519,9 +521,9 @@ export default class RRule {
       // Get dayset with the right frequency
       const [dayset, start, end] = getdayset.call(
         ii,
-        year,
-        month,
-        day
+        date.year,
+        date.month,
+        date.day
       ) as DaySet
 
       // Do the "hard" work ;-)
@@ -637,143 +639,149 @@ export default class RRule {
       // Handle frequency and interval
       let fixday = false
       if (freq === RRule.YEARLY) {
-        year += interval
-        if (year > dateutil.MAXYEAR) {
+        date = date.addYears(interval)
+        if (date.year > dateutil.MAXYEAR) {
           this._len = total
           return iterResult.getValue() as Date[]
         }
-        ii.rebuild(year, month)
+        ii.rebuild(date.year, date.month)
       } else if (freq === RRule.MONTHLY) {
-        month += interval
-        if (month > 12) {
-          const yearDiv = Math.floor(month / 12)
-          const monthMod = pymod(month, 12)
-          month = monthMod
-          year += yearDiv
-          if (month === 0) {
-            month = 12
-            --year
+        date = date.addMonths(interval)
+        if (date.month > 12) {
+          const yearDiv = Math.floor(date.month / 12)
+          const monthMod = pymod(date.month, 12)
+          date.month = monthMod
+          date.year += yearDiv
+          if (date.month === 0) {
+            date.month = 12
+            --date.year
           }
-          if (year > dateutil.MAXYEAR) {
+          if (date.year > dateutil.MAXYEAR) {
             this._len = total
             return iterResult.getValue() as Date[]
           }
         }
-        ii.rebuild(year, month)
+        ii.rebuild(date.year, date.month)
       } else if (freq === RRule.WEEKLY) {
-        if (wkst > weekday) {
-          day += -(weekday + 1 + (6 - wkst)) + interval * 7
+        if (wkst > date.getWeekday()) {
+          date.day += -(date.getWeekday() + 1 + (6 - wkst)) + interval * 7
         } else {
-          day += -(weekday - wkst) + interval * 7
+          date.day += -(date.getWeekday() - wkst) + interval * 7
         }
-        weekday = wkst
         fixday = true
       } else if (freq === RRule.DAILY) {
-        day += interval
+        date.day += interval
         fixday = true
       } else if (freq === RRule.HOURLY) {
         if (filtered) {
           // Jump to one iteration before next day
-          hour += Math.floor((23 - hour) / interval) * interval
-        }
-        while (true) {
-          hour += interval
-          const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
-          if (dayDiv) {
-            hour = hourMod
-            day += dayDiv
-            fixday = true
-          }
-          if (empty(byhour) || includes(byhour, hour)) break
-        }
-        // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
-      } else if (freq === RRule.MINUTELY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          minute +=
-            Math.floor((1439 - (hour * 60 + minute)) / interval) * interval
+          date.hour += Math.floor((23 - date.hour) / interval) * interval
         }
 
         while (true) {
-          minute += interval
-          const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
+          date.hour += interval
+          const { div: dayDiv, mod: hourMod } = divmod(date.hour, 24)
+          if (dayDiv) {
+            date.hour = hourMod
+            date.day += dayDiv
+            fixday = true
+          }
+
+          if (empty(byhour) || includes(byhour, date.hour)) break
+        }
+
+        // @ts-ignore
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
+      } else if (freq === RRule.MINUTELY) {
+        if (filtered) {
+          // Jump to one iteration before next day
+          date.minute +=
+            Math.floor((1439 - (date.hour * 60 + date.minute)) / interval) * interval
+        }
+
+        while (true) {
+          date.minute += interval
+          const { div: hourDiv, mod: minuteMod } = divmod(date.minute, 60)
           if (hourDiv) {
-            minute = minuteMod
-            hour += hourDiv
-            const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+            date.minute = minuteMod
+            date.hour += hourDiv
+            const { div: dayDiv, mod: hourMod } = divmod(date.hour, 24)
             if (dayDiv) {
-              hour = hourMod
-              day += dayDiv
+              date.hour = hourMod
+              date.day += dayDiv
               fixday = true
               filtered = false
             }
           }
+
           if (
-            (empty(byhour) || includes(byhour, hour)) &&
-            (empty(byminute) || includes(byminute, minute))
+            (empty(byhour) || includes(byhour, date.hour)) &&
+            (empty(byminute) || includes(byminute, date.minute))
           ) {
             break
           }
         }
+
         // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.SECONDLY) {
         if (filtered) {
           // Jump to one iteration before next day
-          second +=
+          date.second +=
             Math.floor(
-              (86399 - (hour * 3600 + minute * 60 + second)) / interval
+              (86399 - (date.hour * 3600 + date.minute * 60 + date.second)) / interval
             ) * interval
         }
+
         while (true) {
-          second += interval
-          const { div: minuteDiv, mod: secondMod } = divmod(second, 60)
+          date.second += interval
+          const { div: minuteDiv, mod: secondMod } = divmod(date.second, 60)
           if (minuteDiv) {
-            second = secondMod
-            minute += minuteDiv
-            const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
+            date.second = secondMod
+            date.minute += minuteDiv
+            const { div: hourDiv, mod: minuteMod } = divmod(date.minute, 60)
             if (hourDiv) {
-              minute = minuteMod
-              hour += hourDiv
-              const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+              date.minute = minuteMod
+              date.hour += hourDiv
+              const { div: dayDiv, mod: hourMod } = divmod(date.hour, 24)
               if (dayDiv) {
-                hour = hourMod
-                day += dayDiv
+                date.hour = hourMod
+                date.day += dayDiv
                 fixday = true
                 filtered = false
               }
             }
           }
+
           if (
-            (empty(byhour) || includes(byhour, hour)) &&
-            (empty(byminute) || includes(byminute, minute)) &&
-            (empty(bysecond) || includes(bysecond, second))
+            (empty(byhour) || includes(byhour, date.hour)) &&
+            (empty(byminute) || includes(byminute, date.minute)) &&
+            (empty(bysecond) || includes(bysecond, date.second))
           ) {
             break
           }
         }
         // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       }
 
-      if (fixday && day > 28) {
-        let daysinmonth = dateutil.monthRange(year, month - 1)[1]
-        if (day > daysinmonth) {
-          while (day > daysinmonth) {
-            day -= daysinmonth
-            ++month
-            if (month === 13) {
-              month = 1
-              ++year
-              if (year > dateutil.MAXYEAR) {
+      if (fixday && date.day > 28) {
+        let daysinmonth = dateutil.monthRange(date.year, date.month - 1)[1]
+        if (date.day > daysinmonth) {
+          while (date.day > daysinmonth) {
+            date.day -= daysinmonth
+            ++date.month
+            if (date.month === 13) {
+              date.month = 1
+              ++date.year
+              if (date.year > dateutil.MAXYEAR) {
                 this._len = total
                 return iterResult.getValue() as Date[]
               }
             }
-            daysinmonth = dateutil.monthRange(year, month - 1)[1]
+            daysinmonth = dateutil.monthRange(date.year, date.month - 1)[1]
           }
-          ii.rebuild(year, month)
+          ii.rebuild(date.year, date.month)
         }
       }
     }

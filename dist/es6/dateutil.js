@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const helpers_1 = require("./helpers");
 /**
  * General date-related utilities.
  * Also handles several incompatibilities between JavaScript and Python
@@ -168,6 +169,56 @@ var dateutil;
         }
     }
     dateutil.Time = Time;
+    class DateTime extends Time {
+        constructor(year, month, day, hour, minute, second, millisecond) {
+            super(hour, minute, second, millisecond);
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
+        getWeekday() {
+            return dateutil.getWeekday(new Date(this.getTime()));
+        }
+        getTime() {
+            return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond)).getTime();
+        }
+        getDay() {
+            return this.day;
+        }
+        getMonth() {
+            return this.month;
+        }
+        getYear() {
+            return this.year;
+        }
+        addYears(years) {
+            return new DateTime(this.year + years, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+        }
+        addMonths(months) {
+            return new DateTime(this.year, this.month + months, this.day, this.hour, this.minute, this.second, this.millisecond);
+        }
+        addInterval(interval) {
+            let { second, minute, hour, day } = this;
+            second = interval;
+            const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(second, 60);
+            if (minuteDiv) {
+                second = secondMod;
+                minute += minuteDiv;
+                const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
+                if (hourDiv) {
+                    minute = minuteMod;
+                    hour += hourDiv;
+                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                    if (dayDiv) {
+                        hour = hourMod;
+                        day += dayDiv;
+                    }
+                }
+            }
+            return new DateTime(this.year, this.month, day, hour, minute, second, this.millisecond);
+        }
+    }
+    dateutil.DateTime = DateTime;
 })(dateutil = exports.dateutil || (exports.dateutil = {}));
 exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map

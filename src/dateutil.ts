@@ -1,3 +1,5 @@
+import { divmod } from './helpers'
+
 type Datelike = Pick<Date, 'getTime'>
 
 /**
@@ -190,10 +192,10 @@ export namespace dateutil {
   }
 
   export class Time {
-    private hour: number
-    private minute: number
-    private second: number
-    private millisecond: number
+    public hour: number
+    public minute: number
+    public second: number
+    public millisecond: number
 
     constructor (
       hour: number,
@@ -226,6 +228,113 @@ export namespace dateutil {
     getTime () {
       return (
         (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
+        this.millisecond
+      )
+    }
+
+  }
+
+  export class DateTime extends Time {
+    public day: number
+    public month: number
+    public year: number
+
+    constructor (
+      year: number,
+      month: number,
+      day: number,
+      hour: number,
+      minute: number,
+      second: number,
+      millisecond: number
+    ) {
+      super(hour, minute, second, millisecond)
+      this.year = year
+      this.month = month
+      this.day = day
+    }
+
+    getWeekday () {
+      return getWeekday(new Date(this.getTime()))
+    }
+
+    getTime () {
+      return new Date(
+        Date.UTC(
+          this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond
+        )
+      ).getTime()
+    }
+
+    getDay () {
+      return this.day
+    }
+
+    getMonth () {
+      return this.month
+    }
+
+    getYear () {
+      return this.year
+    }
+
+    public addYears (years: number) {
+      return new DateTime(
+        this.year + years,
+        this.month,
+        this.day,
+        this.hour,
+        this.minute,
+        this.second,
+        this.millisecond
+      )
+    }
+
+    public addMonths (months: number) {
+      return new DateTime(
+        this.year,
+        this.month + months,
+        this.day,
+        this.hour,
+        this.minute,
+        this.second,
+        this.millisecond
+      )
+    }
+
+    public addInterval (interval: number): DateTime {
+      let {
+        second,
+        minute,
+        hour,
+        day
+      } = this
+
+      second = interval
+
+      const { div: minuteDiv, mod: secondMod } = divmod(second, 60)
+      if (minuteDiv) {
+        second = secondMod
+        minute += minuteDiv
+        const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
+        if (hourDiv) {
+          minute = minuteMod
+          hour += hourDiv
+          const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+          if (dayDiv) {
+            hour = hourMod
+            day += dayDiv
+          }
+        }
+      }
+
+      return new DateTime(
+        this.year,
+        this.month,
+        day,
+        hour,
+        minute,
+        second,
         this.millisecond
       )
     }

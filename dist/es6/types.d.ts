@@ -1,5 +1,10 @@
 import Weekday from './weekday';
-import { IterArgs } from './iterresult';
+export interface QueryMethods {
+    all(): Date[];
+    between(after: Date, before: Date, inc: boolean): Date[];
+    before(date: Date, inc: boolean): Date;
+    after(date: Date, inc: boolean): Date;
+}
 export declare enum Frequency {
     YEARLY = 0,
     MONTHLY = 1,
@@ -43,13 +48,6 @@ export interface ParsedOptions extends Options {
     byminute: number[];
     bysecond: number[];
 }
-export declare type CacheKeys = 'before' | 'after' | 'between';
-declare type CacheBase = {
-    [K in CacheKeys]: IterArgs[];
-};
-export declare type Cache = CacheBase & {
-    all: Date[] | Partial<IterArgs>[] | false;
-};
 export declare const Days: {
     MO: Weekday;
     TU: Weekday;
@@ -61,4 +59,3 @@ export declare const Days: {
 };
 export declare type WeekdayStr = keyof typeof Days;
 export declare type ByWeekday = WeekdayStr | number | Weekday;
-export {};

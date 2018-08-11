@@ -1,13 +1,10 @@
-import Weekday from './weekday'
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
 import {
   pymod,
   notEmpty,
   includes,
-  isPresent,
-  isNumber,
-  isArray
+  isPresent
 } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
@@ -16,16 +13,16 @@ import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
 import {
-  Cache,
   Days,
   ParsedOptions,
   Options,
   Frequency,
-  CacheKeys
+  QueryMethods
 } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
+import { Cache, CacheKeys } from './cache'
 
 interface GetNlp {
   _nlp: Nlp
@@ -73,7 +70,7 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule {
+export default class RRule implements QueryMethods {
   public _string: any
   public _cache: Cache | null
   public origOptions: Partial<Options>
@@ -114,12 +111,7 @@ export default class RRule {
     this._string = null
     this._cache = noCache
       ? null
-      : {
-        all: false,
-        before: [],
-        after: [],
-        between: []
-      }
+      : new Cache()
 
     // used by toString()
     this.origOptions = initializeOptions(options)
@@ -136,15 +128,27 @@ export default class RRule {
     return getnlp().fromText(text, language)
   }
 
-  static parseString (rfcString: string) {
-    return parseString(rfcString)
-  }
+  static parseString = parseString
 
   static fromString (str: string) {
     return new RRule(RRule.parseString(str) || undefined)
   }
 
   static optionsToString = optionsToString
+
+  private _cacheGet (what: CacheKeys | 'all', args?: Partial<IterArgs>) {
+    if (!this._cache) return false
+    return this._cache._cacheGet(what, args)
+  }
+
+  public _cacheAdd (
+    what: CacheKeys | 'all',
+    value: Date[] | Date | null,
+    args?: Partial<IterArgs>
+  ) {
+    if (!this._cache) return
+    return this._cache._cacheAdd(what, value, args)
+  }
 
   /**
    * @param {Function} iterator - optional function that will be called
@@ -257,90 +261,6 @@ export default class RRule {
 
   isFullyConvertibleToText () {
     return getnlp().isFullyConvertible(this)
-  }
-
-  /**
-   * @param {String} what - all/before/after/between
-   * @param {Array,Date} value - an array of dates, one date, or null
-   * @param {Object?} args - _iter arguments
-   */
-  private _cacheAdd (
-    what: CacheKeys | 'all',
-    value: Date[] | Date | null,
-    args?: Partial<IterArgs>
-  ) {
-    if (!this._cache) return
-
-    if (value) {
-      value =
-        value instanceof Date
-          ? dateutil.clone(value)
-          : dateutil.cloneDates(value)
-    }
-
-    if (what === 'all') {
-      this._cache.all = value as Date[]
-    } else {
-      args!._value = value
-      this._cache[what].push(args as IterArgs)
-    }
-  }
-
-  /**
-   * @return false - not in the cache
-   *         null  - cached, but zero occurrences (before/after)
-   *         Date  - cached (before/after)
-   *         []    - cached, but zero occurrences (all/between)
-   *         [Date1, DateN] - cached (all/between)
-   */
-  private _cacheGet (
-    what: CacheKeys | 'all',
-    args?: Partial<IterArgs>
-  ): Date | Date[] | false | null {
-    if (!this._cache) return false
-
-    let cached: Date | Date[] | false | null = false
-    const argsKeys = args ? (Object.keys(args) as (keyof IterArgs)[]) : []
-    const findCacheDiff = function (item: IterArgs) {
-      for (let i = 0; i < argsKeys.length; i++) {
-        const key = argsKeys[i]
-        if (String(args![key]) !== String(item[key])) {
-          return true
-        }
-      }
-      return false
-    }
-
-    const cachedObject = this._cache[what]
-    if (what === 'all') {
-      cached = this._cache.all as Date[]
-    } else if (isArray(cachedObject)) {
-      // Let's see whether we've already called the
-      // 'what' method with the same 'args'
-      for (let i = 0; i < cachedObject.length; i++) {
-        const item = cachedObject[i] as IterArgs
-        if (argsKeys.length && findCacheDiff(item)) continue
-        cached = item._value
-        break
-      }
-    }
-
-    if (!cached && this._cache.all) {
-      // Not in the cache, but we already know all the occurrences,
-      // so we can find the correct dates from the cached ones.
-      const iterResult = new IterResult(what, args!)
-      for (let i = 0; i < this._cache.all.length; i++) {
-        if (!iterResult.accept(this._cache.all[i])) break
-      }
-      cached = iterResult.getValue() as Date
-      this._cacheAdd(what, cached, args)
-    }
-
-    return isArray(cached)
-      ? dateutil.cloneDates(cached)
-      : cached instanceof Date
-        ? dateutil.clone(cached)
-        : cached
   }
 
   /**

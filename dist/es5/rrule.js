@@ -587,16 +587,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dateutil_1 = __webpack_require__(1);
 var iterinfo_1 = __webpack_require__(9);
 var helpers_1 = __webpack_require__(0);
-var iterresult_1 = __webpack_require__(7);
+var iterresult_1 = __webpack_require__(5);
 var callbackiterresult_1 = __webpack_require__(11);
-var types_1 = __webpack_require__(5);
+var types_1 = __webpack_require__(6);
 var parseoptions_1 = __webpack_require__(12);
 var parsestring_1 = __webpack_require__(13);
 var optionstostring_1 = __webpack_require__(14);
+var cache_1 = __webpack_require__(15);
 var getnlp = function getnlp() {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
-        getnlp._nlp = __webpack_require__(15);
+        getnlp._nlp = __webpack_require__(16);
     }
     return getnlp._nlp;
 };
@@ -640,12 +641,7 @@ var RRule = function () {
 
         // RFC string
         this._string = null;
-        this._cache = noCache ? null : {
-            all: false,
-            before: [],
-            after: [],
-            between: []
-        };
+        this._cache = noCache ? null : new cache_1.Cache();
         // used by toString()
         this.origOptions = parseoptions_1.initializeOptions(options);
 
@@ -658,14 +654,26 @@ var RRule = function () {
     }
 
     _createClass(RRule, [{
-        key: "all",
-
+        key: "_cacheGet",
+        value: function _cacheGet(what, args) {
+            if (!this._cache) return false;
+            return this._cache._cacheGet(what, args);
+        }
+    }, {
+        key: "_cacheAdd",
+        value: function _cacheAdd(what, value, args) {
+            if (!this._cache) return;
+            return this._cache._cacheAdd(what, value, args);
+        }
         /**
          * @param {Function} iterator - optional function that will be called
          *                   on each date that is added. It can return false
          *                   to stop the iteration.
          * @return Array containing all recurrences.
          */
+
+    }, {
+        key: "all",
         value: function all(iterator) {
             if (iterator) {
                 return this._iter(new callbackiterresult_1.default('all', {}, iterator));
@@ -782,74 +790,6 @@ var RRule = function () {
         key: "isFullyConvertibleToText",
         value: function isFullyConvertibleToText() {
             return getnlp().isFullyConvertible(this);
-        }
-        /**
-         * @param {String} what - all/before/after/between
-         * @param {Array,Date} value - an array of dates, one date, or null
-         * @param {Object?} args - _iter arguments
-         */
-
-    }, {
-        key: "_cacheAdd",
-        value: function _cacheAdd(what, value, args) {
-            if (!this._cache) return;
-            if (value) {
-                value = value instanceof Date ? dateutil_1.default.clone(value) : dateutil_1.default.cloneDates(value);
-            }
-            if (what === 'all') {
-                this._cache.all = value;
-            } else {
-                args._value = value;
-                this._cache[what].push(args);
-            }
-        }
-        /**
-         * @return false - not in the cache
-         *         null  - cached, but zero occurrences (before/after)
-         *         Date  - cached (before/after)
-         *         []    - cached, but zero occurrences (all/between)
-         *         [Date1, DateN] - cached (all/between)
-         */
-
-    }, {
-        key: "_cacheGet",
-        value: function _cacheGet(what, args) {
-            if (!this._cache) return false;
-            var cached = false;
-            var argsKeys = args ? Object.keys(args) : [];
-            var findCacheDiff = function findCacheDiff(item) {
-                for (var i = 0; i < argsKeys.length; i++) {
-                    var key = argsKeys[i];
-                    if (String(args[key]) !== String(item[key])) {
-                        return true;
-                    }
-                }
-                return false;
-            };
-            var cachedObject = this._cache[what];
-            if (what === 'all') {
-                cached = this._cache.all;
-            } else if (helpers_1.isArray(cachedObject)) {
-                // Let's see whether we've already called the
-                // 'what' method with the same 'args'
-                for (var i = 0; i < cachedObject.length; i++) {
-                    var item = cachedObject[i];
-                    if (argsKeys.length && findCacheDiff(item)) continue;
-                    cached = item._value;
-                    break;
-                }
-            }
-            if (!cached && this._cache.all) {
-                // Not in the cache, but we already know all the occurrences,
-                // so we can find the correct dates from the cached ones.
-                var iterResult = new iterresult_1.default(what, args);
-                for (var _i = 0; _i < this._cache.all.length; _i++) {
-                    if (!iterResult.accept(this._cache.all[_i])) break;
-                }
-                cached = iterResult.getValue();
-                this._cacheAdd(what, cached, args);
-            }
-            return helpers_1.isArray(cached) ? dateutil_1.default.cloneDates(cached) : cached instanceof Date ? dateutil_1.default.clone(cached) : cached;
         }
         /**
          * @return a RRule instance with the same freq and options
@@ -1053,11 +993,6 @@ var RRule = function () {
             return getnlp().fromText(text, language);
         }
     }, {
-        key: "parseString",
-        value: function parseString(rfcString) {
-            return parsestring_1.parseString(rfcString);
-        }
-    }, {
         key: "fromString",
         value: function fromString(str) {
             return new RRule(RRule.parseString(str) || undefined);
@@ -1084,6 +1019,7 @@ RRule.TH = types_1.Days.TH;
 RRule.FR = types_1.Days.FR;
 RRule.SA = types_1.Days.SA;
 RRule.SU = types_1.Days.SU;
+RRule.parseString = parsestring_1.parseString;
 RRule.optionsToString = optionstostring_1.optionsToString;
 exports.default = RRule;
 function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
@@ -1181,8 +1117,8 @@ var rrule_1 = __webpack_require__(2);
 exports.RRule = rrule_1.default;
 var rruleset_1 = __webpack_require__(8);
 exports.RRuleSet = rruleset_1.default;
-var rrulestr_1 = __webpack_require__(18);
-var types_1 = __webpack_require__(5);
+var rrulestr_1 = __webpack_require__(19);
+var types_1 = __webpack_require__(6);
 exports.Frequency = types_1.Frequency;
 var weekday_1 = __webpack_require__(3);
 exports.Weekday = weekday_1.default;
@@ -1200,98 +1136,6 @@ exports.default = rrule_1.default;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var weekday_1 = __webpack_require__(3);
-var Frequency;
-(function (Frequency) {
-    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
-    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
-    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
-    Frequency[Frequency["DAILY"] = 3] = "DAILY";
-    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
-    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
-    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
-})(Frequency = exports.Frequency || (exports.Frequency = {}));
-exports.Days = {
-    MO: new weekday_1.default(0),
-    TU: new weekday_1.default(1),
-    WE: new weekday_1.default(2),
-    TH: new weekday_1.default(3),
-    FR: new weekday_1.default(4),
-    SA: new weekday_1.default(5),
-    SU: new weekday_1.default(6)
-};
-//# sourceMappingURL=types.js.map
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-// =============================================================================
-// i18n
-// =============================================================================
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ENGLISH = {
-    dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-    tokens: {
-        'SKIP': /^[ \r\n\t]+|^\.$/,
-        'number': /^[1-9][0-9]*/,
-        'numberAsText': /^(one|two|three)/i,
-        'every': /^every/i,
-        'day(s)': /^days?/i,
-        'weekday(s)': /^weekdays?/i,
-        'week(s)': /^weeks?/i,
-        'hour(s)': /^hours?/i,
-        'minute(s)': /^minutes?/i,
-        'month(s)': /^months?/i,
-        'year(s)': /^years?/i,
-        'on': /^(on|in)/i,
-        'at': /^(at)/i,
-        'the': /^the/i,
-        'first': /^first/i,
-        'second': /^second/i,
-        'third': /^third/i,
-        'nth': /^([1-9][0-9]*)(\.|th|nd|rd|st)/i,
-        'last': /^last/i,
-        'for': /^for/i,
-        'time(s)': /^times?/i,
-        'until': /^(un)?til/i,
-        'monday': /^mo(n(day)?)?/i,
-        'tuesday': /^tu(e(s(day)?)?)?/i,
-        'wednesday': /^we(d(n(esday)?)?)?/i,
-        'thursday': /^th(u(r(sday)?)?)?/i,
-        'friday': /^fr(i(day)?)?/i,
-        'saturday': /^sa(t(urday)?)?/i,
-        'sunday': /^su(n(day)?)?/i,
-        'january': /^jan(uary)?/i,
-        'february': /^feb(ruary)?/i,
-        'march': /^mar(ch)?/i,
-        'april': /^apr(il)?/i,
-        'may': /^may/i,
-        'june': /^june?/i,
-        'july': /^july?/i,
-        'august': /^aug(ust)?/i,
-        'september': /^sep(t(ember)?)?/i,
-        'october': /^oct(ober)?/i,
-        'november': /^nov(ember)?/i,
-        'december': /^dec(ember)?/i,
-        'comma': /^(,\s*|(and|or)\s*)+/i
-    }
-};
-exports.default = ENGLISH;
-//# sourceMappingURL=i18n.js.map
-
-/***/ }),
-/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1394,6 +1238,98 @@ var IterResult = function () {
 
 exports.default = IterResult;
 //# sourceMappingURL=iterresult.js.map
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var weekday_1 = __webpack_require__(3);
+var Frequency;
+(function (Frequency) {
+    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
+    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
+    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
+    Frequency[Frequency["DAILY"] = 3] = "DAILY";
+    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
+    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
+    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
+})(Frequency = exports.Frequency || (exports.Frequency = {}));
+exports.Days = {
+    MO: new weekday_1.default(0),
+    TU: new weekday_1.default(1),
+    WE: new weekday_1.default(2),
+    TH: new weekday_1.default(3),
+    FR: new weekday_1.default(4),
+    SA: new weekday_1.default(5),
+    SU: new weekday_1.default(6)
+};
+//# sourceMappingURL=types.js.map
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// =============================================================================
+// i18n
+// =============================================================================
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var ENGLISH = {
+    dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    tokens: {
+        'SKIP': /^[ \r\n\t]+|^\.$/,
+        'number': /^[1-9][0-9]*/,
+        'numberAsText': /^(one|two|three)/i,
+        'every': /^every/i,
+        'day(s)': /^days?/i,
+        'weekday(s)': /^weekdays?/i,
+        'week(s)': /^weeks?/i,
+        'hour(s)': /^hours?/i,
+        'minute(s)': /^minutes?/i,
+        'month(s)': /^months?/i,
+        'year(s)': /^years?/i,
+        'on': /^(on|in)/i,
+        'at': /^(at)/i,
+        'the': /^the/i,
+        'first': /^first/i,
+        'second': /^second/i,
+        'third': /^third/i,
+        'nth': /^([1-9][0-9]*)(\.|th|nd|rd|st)/i,
+        'last': /^last/i,
+        'for': /^for/i,
+        'time(s)': /^times?/i,
+        'until': /^(un)?til/i,
+        'monday': /^mo(n(day)?)?/i,
+        'tuesday': /^tu(e(s(day)?)?)?/i,
+        'wednesday': /^we(d(n(esday)?)?)?/i,
+        'thursday': /^th(u(r(sday)?)?)?/i,
+        'friday': /^fr(i(day)?)?/i,
+        'saturday': /^sa(t(urday)?)?/i,
+        'sunday': /^su(n(day)?)?/i,
+        'january': /^jan(uary)?/i,
+        'february': /^feb(ruary)?/i,
+        'march': /^mar(ch)?/i,
+        'april': /^apr(il)?/i,
+        'may': /^may/i,
+        'june': /^june?/i,
+        'july': /^july?/i,
+        'august': /^aug(ust)?/i,
+        'september': /^sep(t(ember)?)?/i,
+        'october': /^oct(ober)?/i,
+        'november': /^nov(ember)?/i,
+        'december': /^dec(ember)?/i,
+        'comma': /^(,\s*|(and|or)\s*)+/i
+    }
+};
+exports.default = ENGLISH;
+//# sourceMappingURL=i18n.js.map
 
 /***/ }),
 /* 8 */
@@ -1999,7 +1935,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var iterresult_1 = __webpack_require__(7);
+var iterresult_1 = __webpack_require__(5);
 /**
  * IterResult subclass that calls a callback function on each add,
  * and stops iterating when the callback returns false.
@@ -2224,7 +2160,7 @@ exports.parseOptions = parseOptions;
 
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var types_1 = __webpack_require__(5);
+var types_1 = __webpack_require__(6);
 var weekday_1 = __webpack_require__(3);
 var dateutil_1 = __webpack_require__(1);
 function parseString(rfcString) {
@@ -2402,12 +2338,112 @@ exports.optionsToString = optionsToString;
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", { value: true });
-var totext_1 = __webpack_require__(16);
-var parsetext_1 = __webpack_require__(17);
+var iterresult_1 = __webpack_require__(5);
+var dateutil_1 = __webpack_require__(1);
+var helpers_1 = __webpack_require__(0);
+
+var Cache = function () {
+    function Cache() {
+        _classCallCheck(this, Cache);
+
+        this.all = false;
+        this.before = [];
+        this.after = [];
+        this.between = [];
+    }
+    /**
+     * @param {String} what - all/before/after/between
+     * @param {Array,Date} value - an array of dates, one date, or null
+     * @param {Object?} args - _iter arguments
+     */
+
+
+    _createClass(Cache, [{
+        key: "_cacheAdd",
+        value: function _cacheAdd(what, value, args) {
+            if (value) {
+                value = value instanceof Date ? dateutil_1.default.clone(value) : dateutil_1.default.cloneDates(value);
+            }
+            if (what === 'all') {
+                this.all = value;
+            } else {
+                args._value = value;
+                this[what].push(args);
+            }
+        }
+        /**
+         * @return false - not in the cache
+         *         null  - cached, but zero occurrences (before/after)
+         *         Date  - cached (before/after)
+         *         []    - cached, but zero occurrences (all/between)
+         *         [Date1, DateN] - cached (all/between)
+         */
+
+    }, {
+        key: "_cacheGet",
+        value: function _cacheGet(what, args) {
+            var cached = false;
+            var argsKeys = args ? Object.keys(args) : [];
+            var findCacheDiff = function findCacheDiff(item) {
+                for (var i = 0; i < argsKeys.length; i++) {
+                    var key = argsKeys[i];
+                    if (String(args[key]) !== String(item[key])) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+            var cachedObject = this[what];
+            if (what === 'all') {
+                cached = this.all;
+            } else if (helpers_1.isArray(cachedObject)) {
+                // Let's see whether we've already called the
+                // 'what' method with the same 'args'
+                for (var i = 0; i < cachedObject.length; i++) {
+                    var item = cachedObject[i];
+                    if (argsKeys.length && findCacheDiff(item)) continue;
+                    cached = item._value;
+                    break;
+                }
+            }
+            if (!cached && this.all) {
+                // Not in the cache, but we already know all the occurrences,
+                // so we can find the correct dates from the cached ones.
+                var iterResult = new iterresult_1.default(what, args);
+                for (var _i = 0; _i < this.all.length; _i++) {
+                    if (!iterResult.accept(this.all[_i])) break;
+                }
+                cached = iterResult.getValue();
+                this._cacheAdd(what, cached, args);
+            }
+            return helpers_1.isArray(cached) ? dateutil_1.default.cloneDates(cached) : cached instanceof Date ? dateutil_1.default.clone(cached) : cached;
+        }
+    }]);
+
+    return Cache;
+}();
+
+exports.Cache = Cache;
+//# sourceMappingURL=cache.js.map
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var totext_1 = __webpack_require__(17);
+var parsetext_1 = __webpack_require__(18);
 exports.parseText = parsetext_1.default;
 var index_1 = __webpack_require__(4);
-var i18n_1 = __webpack_require__(6);
+var i18n_1 = __webpack_require__(7);
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.
 * https://github.com/jakubroztocil/rrule
@@ -2524,7 +2560,7 @@ exports.isFullyConvertible = isFullyConvertible;
 //# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2535,7 +2571,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var i18n_1 = __webpack_require__(6);
+var i18n_1 = __webpack_require__(7);
 var index_1 = __webpack_require__(4);
 var helpers_1 = __webpack_require__(0);
 // =============================================================================
@@ -2899,7 +2935,7 @@ exports.default = ToText;
 //# sourceMappingURL=totext.js.map
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2910,7 +2946,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var i18n_1 = __webpack_require__(6);
+var i18n_1 = __webpack_require__(7);
 var index_1 = __webpack_require__(4);
 // =============================================================================
 // Parser
@@ -3301,7 +3337,7 @@ exports.default = parseText;
 //# sourceMappingURL=parsetext.js.map
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

@@ -174,7 +174,7 @@ export default class RRuleSet extends RRule {
       rrule._iter(iterResult)
     })
 
-    const res = iterResult._result as Date[]
+    const res = iterResult._result
     dateutil.sort(res)
     switch (iterResult.method) {
       case 'all':

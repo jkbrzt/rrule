@@ -1,10 +1,11 @@
-import Weekday from './weekday';
 import dateutil from './dateutil';
-import IterResult from './iterresult';
+import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
-import { Cache, ParsedOptions, Options, Frequency } from './types';
+import { ParsedOptions, Options, Frequency, QueryMethods } from './types';
+import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
+import { Cache, CacheKeys } from './cache';
 export declare const DEFAULT_OPTIONS: Options;
 export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
@@ -13,7 +14,7 @@ export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule {
+export default class RRule implements QueryMethods {
     _string: any;
     _cache: Cache | null;
     origOptions: Partial<Options>;
@@ -28,19 +29,21 @@ export default class RRule {
     static readonly HOURLY: Frequency;
     static readonly MINUTELY: Frequency;
     static readonly SECONDLY: Frequency;
-    static readonly MO: Weekday;
-    static readonly TU: Weekday;
-    static readonly WE: Weekday;
-    static readonly TH: Weekday;
-    static readonly FR: Weekday;
-    static readonly SA: Weekday;
-    static readonly SU: Weekday;
+    static readonly MO: import("src/weekday").default;
+    static readonly TU: import("src/weekday").default;
+    static readonly WE: import("src/weekday").default;
+    static readonly TH: import("src/weekday").default;
+    static readonly FR: import("src/weekday").default;
+    static readonly SA: import("src/weekday").default;
+    static readonly SU: import("src/weekday").default;
     constructor(options?: Partial<Options>, noCache?: boolean);
     static parseText(text: string, language: Language): Partial<Options> | null;
     static fromText(text: string, language?: Language): RRule;
-    static parseString(rfcString: string): Partial<Options> | null;
+    static parseString: typeof parseString;
     static fromString(str: string): RRule;
     static optionsToString: typeof optionsToString;
+    private _cacheGet;
+    _cacheAdd(what: CacheKeys | 'all', value: Date[] | Date | null, args?: Partial<IterArgs>): void;
     /**
      * @param {Function} iterator - optional function that will be called
      *                   on each date that is added. It can return false
@@ -87,20 +90,6 @@ export default class RRule {
      */
     toText(gettext?: GetText, language?: Language): string;
     isFullyConvertibleToText(): boolean;
-    /**
-     * @param {String} what - all/before/after/between
-     * @param {Array,Date} value - an array of dates, one date, or null
-     * @param {Object?} args - _iter arguments
-     */
-    private _cacheAdd;
-    /**
-     * @return false - not in the cache
-     *         null  - cached, but zero occurrences (before/after)
-     *         Date  - cached (before/after)
-     *         []    - cached, but zero occurrences (all/between)
-     *         [Date1, DateN] - cached (all/between)
-     */
-    private _cacheGet;
     /**
      * @return a RRule instance with the same freq and options
      *          as this one (cache is not cloned)

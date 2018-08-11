@@ -9,6 +9,7 @@ const types_1 = require("./types");
 const parseoptions_1 = require("./parseoptions");
 const parsestring_1 = require("./parsestring");
 const optionstostring_1 = require("./optionstostring");
+const cache_1 = require("./cache");
 const getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -52,12 +53,7 @@ class RRule {
         this._string = null;
         this._cache = noCache
             ? null
-            : {
-                all: false,
-                before: [],
-                after: [],
-                between: []
-            };
+            : new cache_1.Cache();
         // used by toString()
         this.origOptions = parseoptions_1.initializeOptions(options);
         const { parsedOptions, timeset } = parseoptions_1.parseOptions(options);
@@ -70,11 +66,18 @@ class RRule {
     static fromText(text, language) {
         return getnlp().fromText(text, language);
     }
-    static parseString(rfcString) {
-        return parsestring_1.parseString(rfcString);
-    }
     static fromString(str) {
         return new RRule(RRule.parseString(str) || undefined);
+    }
+    _cacheGet(what, args) {
+        if (!this._cache)
+            return false;
+        return this._cache._cacheGet(what, args);
+    }
+    _cacheAdd(what, value, args) {
+        if (!this._cache)
+            return;
+        return this._cache._cacheAdd(what, value, args);
     }
     /**
      * @param {Function} iterator - optional function that will be called
@@ -172,81 +175,6 @@ class RRule {
     }
     isFullyConvertibleToText() {
         return getnlp().isFullyConvertible(this);
-    }
-    /**
-     * @param {String} what - all/before/after/between
-     * @param {Array,Date} value - an array of dates, one date, or null
-     * @param {Object?} args - _iter arguments
-     */
-    _cacheAdd(what, value, args) {
-        if (!this._cache)
-            return;
-        if (value) {
-            value =
-                value instanceof Date
-                    ? dateutil_1.default.clone(value)
-                    : dateutil_1.default.cloneDates(value);
-        }
-        if (what === 'all') {
-            this._cache.all = value;
-        }
-        else {
-            args._value = value;
-            this._cache[what].push(args);
-        }
-    }
-    /**
-     * @return false - not in the cache
-     *         null  - cached, but zero occurrences (before/after)
-     *         Date  - cached (before/after)
-     *         []    - cached, but zero occurrences (all/between)
-     *         [Date1, DateN] - cached (all/between)
-     */
-    _cacheGet(what, args) {
-        if (!this._cache)
-            return false;
-        let cached = false;
-        const argsKeys = args ? Object.keys(args) : [];
-        const findCacheDiff = function (item) {
-            for (let i = 0; i < argsKeys.length; i++) {
-                const key = argsKeys[i];
-                if (String(args[key]) !== String(item[key])) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        const cachedObject = this._cache[what];
-        if (what === 'all') {
-            cached = this._cache.all;
-        }
-        else if (helpers_1.isArray(cachedObject)) {
-            // Let's see whether we've already called the
-            // 'what' method with the same 'args'
-            for (let i = 0; i < cachedObject.length; i++) {
-                const item = cachedObject[i];
-                if (argsKeys.length && findCacheDiff(item))
-                    continue;
-                cached = item._value;
-                break;
-            }
-        }
-        if (!cached && this._cache.all) {
-            // Not in the cache, but we already know all the occurrences,
-            // so we can find the correct dates from the cached ones.
-            const iterResult = new iterresult_1.default(what, args);
-            for (let i = 0; i < this._cache.all.length; i++) {
-                if (!iterResult.accept(this._cache.all[i]))
-                    break;
-            }
-            cached = iterResult.getValue();
-            this._cacheAdd(what, cached, args);
-        }
-        return helpers_1.isArray(cached)
-            ? dateutil_1.default.cloneDates(cached)
-            : cached instanceof Date
-                ? dateutil_1.default.clone(cached)
-                : cached;
     }
     /**
      * @return a RRule instance with the same freq and options
@@ -468,6 +396,7 @@ RRule.TH = types_1.Days.TH;
 RRule.FR = types_1.Days.FR;
 RRule.SA = types_1.Days.SA;
 RRule.SU = types_1.Days.SU;
+RRule.parseString = parsestring_1.parseString;
 RRule.optionsToString = optionstostring_1.optionsToString;
 exports.default = RRule;
 function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {

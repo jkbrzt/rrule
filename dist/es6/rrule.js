@@ -283,18 +283,16 @@ class RRule {
                 for (let j = 0; j < poslist.length; j++) {
                     const res = poslist[j];
                     if (until && res > until) {
-                        this._len = iterResult.total;
-                        return iterResult.getValue();
+                        return this.emitResult(iterResult);
                     }
-                    else if (res >= dtstart) {
+                    if (res >= dtstart) {
                         if (!iterResult.accept(res)) {
-                            return iterResult.getValue();
+                            return this.emitResult(iterResult);
                         }
                         if (count) {
                             --count;
                             if (!count) {
-                                this._len = iterResult.total;
-                                return iterResult.getValue();
+                                return this.emitResult(iterResult);
                             }
                         }
                     }
@@ -311,18 +309,16 @@ class RRule {
                         const time = timeset[k];
                         const res = dateutil_1.default.combine(date, time);
                         if (until && res > until) {
-                            this._len = iterResult.total;
-                            return iterResult.getValue();
+                            return this.emitResult(iterResult);
                         }
-                        else if (res >= dtstart) {
+                        if (res >= dtstart) {
                             if (!iterResult.accept(res)) {
-                                return iterResult.getValue();
+                                return this.emitResult(iterResult);
                             }
                             if (count) {
                                 --count;
                                 if (!count) {
-                                    this._len = iterResult.total;
-                                    return iterResult.getValue();
+                                    return this.emitResult(iterResult);
                                 }
                             }
                         }
@@ -362,11 +358,14 @@ class RRule {
                 timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             if (date.year > dateutil_1.default.MAXYEAR) {
-                this._len = iterResult.total;
-                return iterResult.getValue();
+                return this.emitResult(iterResult);
             }
             ii.rebuild(date.year, date.month);
         }
+    }
+    emitResult(iterResult) {
+        this._len = iterResult.total;
+        return iterResult.getValue();
     }
 }
 // RRule class 'constants'

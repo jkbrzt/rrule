@@ -903,17 +903,16 @@ var RRule = function () {
                     for (var _j = 0; _j < poslist.length; _j++) {
                         var _res = poslist[_j];
                         if (until && _res > until) {
-                            this._len = iterResult.total;
-                            return iterResult.getValue();
-                        } else if (_res >= dtstart) {
+                            return this.emitResult(iterResult);
+                        }
+                        if (_res >= dtstart) {
                             if (!iterResult.accept(_res)) {
-                                return iterResult.getValue();
+                                return this.emitResult(iterResult);
                             }
                             if (count) {
                                 --count;
                                 if (!count) {
-                                    this._len = iterResult.total;
-                                    return iterResult.getValue();
+                                    return this.emitResult(iterResult);
                                 }
                             }
                         }
@@ -929,17 +928,16 @@ var RRule = function () {
                             var _time = timeset[_k];
                             var _res2 = dateutil_1.default.combine(_date2, _time);
                             if (until && _res2 > until) {
-                                this._len = iterResult.total;
-                                return iterResult.getValue();
-                            } else if (_res2 >= dtstart) {
+                                return this.emitResult(iterResult);
+                            }
+                            if (_res2 >= dtstart) {
                                 if (!iterResult.accept(_res2)) {
-                                    return iterResult.getValue();
+                                    return this.emitResult(iterResult);
                                 }
                                 if (count) {
                                     --count;
                                     if (!count) {
-                                        this._len = iterResult.total;
-                                        return iterResult.getValue();
+                                        return this.emitResult(iterResult);
                                     }
                                 }
                             }
@@ -973,11 +971,16 @@ var RRule = function () {
                     timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
                 }
                 if (date.year > dateutil_1.default.MAXYEAR) {
-                    this._len = iterResult.total;
-                    return iterResult.getValue();
+                    return this.emitResult(iterResult);
                 }
                 ii.rebuild(date.year, date.month);
             }
+        }
+    }, {
+        key: "emitResult",
+        value: function emitResult(iterResult) {
+            this._len = iterResult.total;
+            return iterResult.getValue();
         }
     }], [{
         key: "parseText",

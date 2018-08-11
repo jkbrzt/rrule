@@ -96,4 +96,5 @@ export default class RRule implements QueryMethods {
      */
     clone(): RRule;
     _iter(iterResult: IterResult): Date | Date[] | null;
+    private emitResult;
 }

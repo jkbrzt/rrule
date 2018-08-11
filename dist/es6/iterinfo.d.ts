@@ -21,6 +21,8 @@ export default class Iterinfo {
     constructor(rrule: RRule);
     easter(y: number, offset?: number): number[];
     rebuild(year: number, month: number): void;
+    private rebuildYear;
+    private rebuildMonth;
     ydayset(): (number | number[])[];
     mdayset(_: any, month: number, __: any): (number | (number | null)[])[];
     wdayset(year: number, month: number, day: number): (number | (number | null)[])[];

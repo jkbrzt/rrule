@@ -43,173 +43,181 @@ class Iterinfo {
     rebuild(year, month) {
         const rr = this.rrule;
         if (year !== this.lastyear) {
-            this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
-            this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
-            const firstyday = new Date(Date.UTC(year, 0, 1));
-            this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
-            this.yearweekday = dateutil_1.default.getWeekday(firstyday);
-            const wday = dateutil_1.default.getWeekday(firstyday);
-            if (this.yearlen === 365) {
-                this.mmask = helpers_1.clone(masks_1.M365MASK);
-                this.mdaymask = helpers_1.clone(masks_1.MDAY365MASK);
-                this.nmdaymask = helpers_1.clone(masks_1.NMDAY365MASK);
-                this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                this.mrange = helpers_1.clone(masks_1.M365RANGE);
-            }
-            else {
-                this.mmask = helpers_1.clone(masks_1.M366MASK);
-                this.mdaymask = helpers_1.clone(masks_1.MDAY366MASK);
-                this.nmdaymask = helpers_1.clone(masks_1.NMDAY366MASK);
-                this.wdaymask = masks_1.WDAYMASK.slice(wday);
-                this.mrange = helpers_1.clone(masks_1.M366RANGE);
-            }
-            if (helpers_1.empty(rr.options.byweekno)) {
-                this.wnomask = null;
-            }
-            else {
-                this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
-                let no1wkst;
-                let firstwkst;
-                let wyearlen;
-                no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
-                if (no1wkst >= 4) {
-                    no1wkst = 0;
-                    // Number of days in the year, plus the days we got
-                    // from last year.
-                    wyearlen =
-                        this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
-                }
-                else {
-                    // Number of days in the year, minus the days we
-                    // left in last year.
-                    wyearlen = this.yearlen - no1wkst;
-                }
-                const div = Math.floor(wyearlen / 7);
-                const mod = helpers_1.pymod(wyearlen, 7);
-                const numweeks = Math.floor(div + mod / 4);
-                for (let j = 0; j < rr.options.byweekno.length; j++) {
-                    let i;
-                    let n = rr.options.byweekno[j];
-                    if (n < 0) {
-                        n += numweeks + 1;
-                    }
-                    if (!(n > 0 && n <= numweeks)) {
-                        continue;
-                    }
-                    if (n > 1) {
-                        i = no1wkst + (n - 1) * 7;
-                        if (no1wkst !== firstwkst) {
-                            i -= 7 - firstwkst;
-                        }
-                    }
-                    else {
-                        i = no1wkst;
-                    }
-                    for (let k = 0; k < 7; k++) {
-                        this.wnomask[i] = 1;
-                        i++;
-                        if (this.wdaymask[i] === rr.options.wkst)
-                            break;
-                    }
-                }
-                if (helpers_1.includes(rr.options.byweekno, 1)) {
-                    // Check week number 1 of next year as well
-                    // orig-TODO : Check -numweeks for next year.
-                    let i = no1wkst + numweeks * 7;
-                    if (no1wkst !== firstwkst)
-                        i -= 7 - firstwkst;
-                    if (i < this.yearlen) {
-                        // If week starts in next year, we
-                        // don't care about it.
-                        for (let j = 0; j < 7; j++) {
-                            this.wnomask[i] = 1;
-                            i += 1;
-                            if (this.wdaymask[i] === rr.options.wkst)
-                                break;
-                        }
-                    }
-                }
-                if (no1wkst) {
-                    // Check last week number of last year as
-                    // well. If no1wkst is 0, either the year
-                    // started on week start, or week number 1
-                    // got days from last year, so there are no
-                    // days from last year's last week number in
-                    // this year.
-                    let lnumweeks;
-                    if (!helpers_1.includes(rr.options.byweekno, -1)) {
-                        const lyearweekday = dateutil_1.default.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
-                        let lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
-                        const lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
-                        if (lno1wkst >= 4) {
-                            lno1wkst = 0;
-                            lnumweeks = Math.floor(52 +
-                                helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) /
-                                    4);
-                        }
-                        else {
-                            lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
-                        }
-                    }
-                    else {
-                        lnumweeks = -1;
-                    }
-                    if (helpers_1.includes(rr.options.byweekno, lnumweeks)) {
-                        for (let i = 0; i < no1wkst; i++)
-                            this.wnomask[i] = 1;
-                    }
-                }
-            }
+            this.rebuildYear(year);
         }
         if (helpers_1.notEmpty(rr.options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
-            let ranges = [];
-            if (rr.options.freq === rrule_1.default.YEARLY) {
-                if (helpers_1.notEmpty(rr.options.bymonth)) {
-                    for (let j = 0; j < rr.options.bymonth.length; j++) {
-                        month = rr.options.bymonth[j];
-                        ranges.push(this.mrange.slice(month - 1, month + 1));
-                    }
-                }
-                else {
-                    ranges = [[0, this.yearlen]];
-                }
-            }
-            else if (rr.options.freq === rrule_1.default.MONTHLY) {
-                ranges = [this.mrange.slice(month - 1, month + 1)];
-            }
-            if (helpers_1.notEmpty(ranges)) {
-                // Weekly frequency won't get here, so we may not
-                // care about cross-year weekly periods.
-                this.nwdaymask = helpers_1.repeat(0, this.yearlen);
-                for (let j = 0; j < ranges.length; j++) {
-                    const rang = ranges[j];
-                    const first = rang[0];
-                    let last = rang[1];
-                    last -= 1;
-                    for (let k = 0; k < rr.options.bynweekday.length; k++) {
-                        let i;
-                        const wday = rr.options.bynweekday[k][0];
-                        const n = rr.options.bynweekday[k][1];
-                        if (n < 0) {
-                            i = last + (n + 1) * 7;
-                            i -= helpers_1.pymod(this.wdaymask[i] - wday, 7);
-                        }
-                        else {
-                            i = first + (n - 1) * 7;
-                            i += helpers_1.pymod(7 - this.wdaymask[i] + wday, 7);
-                        }
-                        if (first <= i && i <= last)
-                            this.nwdaymask[i] = 1;
-                    }
-                }
-            }
-            this.lastyear = year;
-            this.lastmonth = month;
+            this.rebuildMonth(year, month);
         }
         if (helpers_1.isPresent(rr.options.byeaster)) {
             this.eastermask = this.easter(year, rr.options.byeaster);
         }
+    }
+    rebuildYear(year) {
+        const rr = this.rrule;
+        this.yearlen = dateutil_1.default.isLeapYear(year) ? 366 : 365;
+        this.nextyearlen = dateutil_1.default.isLeapYear(year + 1) ? 366 : 365;
+        const firstyday = new Date(Date.UTC(year, 0, 1));
+        this.yearordinal = dateutil_1.default.toOrdinal(firstyday);
+        this.yearweekday = dateutil_1.default.getWeekday(firstyday);
+        const wday = dateutil_1.default.getWeekday(firstyday);
+        if (this.yearlen === 365) {
+            this.mmask = masks_1.M365MASK;
+            this.mdaymask = masks_1.MDAY365MASK;
+            this.nmdaymask = masks_1.NMDAY365MASK;
+            this.wdaymask = masks_1.WDAYMASK.slice(wday);
+            this.mrange = masks_1.M365RANGE;
+        }
+        else {
+            this.mmask = masks_1.M366MASK;
+            this.mdaymask = masks_1.MDAY366MASK;
+            this.nmdaymask = masks_1.NMDAY366MASK;
+            this.wdaymask = masks_1.WDAYMASK.slice(wday);
+            this.mrange = masks_1.M366RANGE;
+        }
+        if (helpers_1.empty(rr.options.byweekno)) {
+            this.wnomask = null;
+        }
+        else {
+            this.wnomask = helpers_1.repeat(0, this.yearlen + 7);
+            let no1wkst;
+            let firstwkst;
+            let wyearlen;
+            no1wkst = firstwkst = helpers_1.pymod(7 - this.yearweekday + rr.options.wkst, 7);
+            if (no1wkst >= 4) {
+                no1wkst = 0;
+                // Number of days in the year, plus the days we got
+                // from last year.
+                wyearlen =
+                    this.yearlen + helpers_1.pymod(this.yearweekday - rr.options.wkst, 7);
+            }
+            else {
+                // Number of days in the year, minus the days we
+                // left in last year.
+                wyearlen = this.yearlen - no1wkst;
+            }
+            const div = Math.floor(wyearlen / 7);
+            const mod = helpers_1.pymod(wyearlen, 7);
+            const numweeks = Math.floor(div + mod / 4);
+            for (let j = 0; j < rr.options.byweekno.length; j++) {
+                let i;
+                let n = rr.options.byweekno[j];
+                if (n < 0) {
+                    n += numweeks + 1;
+                }
+                if (!(n > 0 && n <= numweeks)) {
+                    continue;
+                }
+                if (n > 1) {
+                    i = no1wkst + (n - 1) * 7;
+                    if (no1wkst !== firstwkst) {
+                        i -= 7 - firstwkst;
+                    }
+                }
+                else {
+                    i = no1wkst;
+                }
+                for (let k = 0; k < 7; k++) {
+                    this.wnomask[i] = 1;
+                    i++;
+                    if (this.wdaymask[i] === rr.options.wkst)
+                        break;
+                }
+            }
+            if (helpers_1.includes(rr.options.byweekno, 1)) {
+                // Check week number 1 of next year as well
+                // orig-TODO : Check -numweeks for next year.
+                let i = no1wkst + numweeks * 7;
+                if (no1wkst !== firstwkst)
+                    i -= 7 - firstwkst;
+                if (i < this.yearlen) {
+                    // If week starts in next year, we
+                    // don't care about it.
+                    for (let j = 0; j < 7; j++) {
+                        this.wnomask[i] = 1;
+                        i += 1;
+                        if (this.wdaymask[i] === rr.options.wkst)
+                            break;
+                    }
+                }
+            }
+            if (no1wkst) {
+                // Check last week number of last year as
+                // well. If no1wkst is 0, either the year
+                // started on week start, or week number 1
+                // got days from last year, so there are no
+                // days from last year's last week number in
+                // this year.
+                let lnumweeks;
+                if (!helpers_1.includes(rr.options.byweekno, -1)) {
+                    const lyearweekday = dateutil_1.default.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
+                    let lno1wkst = helpers_1.pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                    const lyearlen = dateutil_1.default.isLeapYear(year - 1) ? 366 : 365;
+                    if (lno1wkst >= 4) {
+                        lno1wkst = 0;
+                        lnumweeks = Math.floor(52 +
+                            helpers_1.pymod(lyearlen + helpers_1.pymod(lyearweekday - rr.options.wkst, 7), 7) /
+                                4);
+                    }
+                    else {
+                        lnumweeks = Math.floor(52 + helpers_1.pymod(this.yearlen - no1wkst, 7) / 4);
+                    }
+                }
+                else {
+                    lnumweeks = -1;
+                }
+                if (helpers_1.includes(rr.options.byweekno, lnumweeks)) {
+                    for (let i = 0; i < no1wkst; i++)
+                        this.wnomask[i] = 1;
+                }
+            }
+        }
+    }
+    rebuildMonth(year, month) {
+        const rr = this.rrule;
+        let ranges = [];
+        if (rr.options.freq === rrule_1.default.YEARLY) {
+            if (helpers_1.notEmpty(rr.options.bymonth)) {
+                for (let j = 0; j < rr.options.bymonth.length; j++) {
+                    month = rr.options.bymonth[j];
+                    ranges.push(this.mrange.slice(month - 1, month + 1));
+                }
+            }
+            else {
+                ranges = [[0, this.yearlen]];
+            }
+        }
+        else if (rr.options.freq === rrule_1.default.MONTHLY) {
+            ranges = [this.mrange.slice(month - 1, month + 1)];
+        }
+        if (helpers_1.notEmpty(ranges)) {
+            // Weekly frequency won't get here, so we may not
+            // care about cross-year weekly periods.
+            this.nwdaymask = helpers_1.repeat(0, this.yearlen);
+            for (let j = 0; j < ranges.length; j++) {
+                const rang = ranges[j];
+                const first = rang[0];
+                let last = rang[1];
+                last -= 1;
+                for (let k = 0; k < rr.options.bynweekday.length; k++) {
+                    let i;
+                    const wday = rr.options.bynweekday[k][0];
+                    const n = rr.options.bynweekday[k][1];
+                    if (n < 0) {
+                        i = last + (n + 1) * 7;
+                        i -= helpers_1.pymod(this.wdaymask[i] - wday, 7);
+                    }
+                    else {
+                        i = first + (n - 1) * 7;
+                        i += helpers_1.pymod(7 - this.wdaymask[i] + wday, 7);
+                    }
+                    if (first <= i && i <= last)
+                        this.nwdaymask[i] = 1;
+                }
+            }
+        }
+        this.lastyear = year;
+        this.lastmonth = month;
     }
     ydayset() {
         return [helpers_1.range(this.yearlen), 0, this.yearlen];

@@ -795,9 +795,6 @@ var RRule = function () {
             var currentDay = void 0;
             var total = 0;
             var count = this.options.count;
-            var dm = void 0;
-            var div = void 0;
-            var mod = void 0;
             var pos = void 0;
             while (true) {
                 // Get dayset with the right frequency
@@ -910,10 +907,10 @@ var RRule = function () {
                 } else if (freq === RRule.MONTHLY) {
                     month += interval;
                     if (month > 12) {
-                        div = Math.floor(month / 12);
-                        mod = helpers_1.pymod(month, 12);
-                        month = mod;
-                        year += div;
+                        var yearDiv = Math.floor(month / 12);
+                        var monthMod = helpers_1.pymod(month, 12);
+                        month = monthMod;
+                        year += yearDiv;
                         if (month === 0) {
                             month = 12;
                             --year;
@@ -942,12 +939,14 @@ var RRule = function () {
                     }
                     while (true) {
                         hour += interval;
-                        dm = helpers_1.divmod(hour, 24);
-                        div = dm.div;
-                        mod = dm.mod;
-                        if (div) {
-                            hour = mod;
-                            day += div;
+
+                        var _helpers_1$divmod = helpers_1.divmod(hour, 24),
+                            dayDiv = _helpers_1$divmod.div,
+                            hourMod = _helpers_1$divmod.mod;
+
+                        if (dayDiv) {
+                            hour = hourMod;
+                            day += dayDiv;
                             fixday = true;
                         }
                         if (helpers_1.empty(byhour) || helpers_1.includes(byhour, hour)) break;
@@ -961,18 +960,22 @@ var RRule = function () {
                     }
                     while (true) {
                         minute += interval;
-                        dm = helpers_1.divmod(minute, 60);
-                        div = dm.div;
-                        mod = dm.mod;
-                        if (div) {
-                            minute = mod;
-                            hour += div;
-                            dm = helpers_1.divmod(hour, 24);
-                            div = dm.div;
-                            mod = dm.mod;
-                            if (div) {
-                                hour = mod;
-                                day += div;
+
+                        var _helpers_1$divmod2 = helpers_1.divmod(minute, 60),
+                            hourDiv = _helpers_1$divmod2.div,
+                            minuteMod = _helpers_1$divmod2.mod;
+
+                        if (hourDiv) {
+                            minute = minuteMod;
+                            hour += hourDiv;
+
+                            var _helpers_1$divmod3 = helpers_1.divmod(hour, 24),
+                                _dayDiv = _helpers_1$divmod3.div,
+                                _hourMod = _helpers_1$divmod3.mod;
+
+                            if (_dayDiv) {
+                                hour = _hourMod;
+                                day += _dayDiv;
                                 fixday = true;
                                 filtered = false;
                             }
@@ -990,25 +993,32 @@ var RRule = function () {
                     }
                     while (true) {
                         second += interval;
-                        dm = helpers_1.divmod(second, 60);
-                        div = dm.div;
-                        mod = dm.mod;
-                        if (div) {
-                            second = mod;
-                            minute += div;
-                            dm = helpers_1.divmod(minute, 60);
-                            div = dm.div;
-                            mod = dm.mod;
-                            if (div) {
-                                minute = mod;
-                                hour += div;
-                                dm = helpers_1.divmod(hour, 24);
-                                div = dm.div;
-                                mod = dm.mod;
-                                if (div) {
-                                    hour = mod;
-                                    day += div;
+
+                        var _helpers_1$divmod4 = helpers_1.divmod(second, 60),
+                            minuteDiv = _helpers_1$divmod4.div,
+                            secondMod = _helpers_1$divmod4.mod;
+
+                        if (minuteDiv) {
+                            second = secondMod;
+                            minute += minuteDiv;
+
+                            var _helpers_1$divmod5 = helpers_1.divmod(minute, 60),
+                                _hourDiv = _helpers_1$divmod5.div,
+                                _minuteMod = _helpers_1$divmod5.mod;
+
+                            if (_hourDiv) {
+                                minute = _minuteMod;
+                                hour += _hourDiv;
+
+                                var _helpers_1$divmod6 = helpers_1.divmod(hour, 24),
+                                    _dayDiv2 = _helpers_1$divmod6.div,
+                                    _hourMod2 = _helpers_1$divmod6.mod;
+
+                                if (_dayDiv2) {
+                                    hour = _hourMod2;
+                                    day += _dayDiv2;
                                     fixday = true;
+                                    filtered = false;
                                 }
                             }
                         }

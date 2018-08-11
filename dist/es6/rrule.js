@@ -384,9 +384,6 @@ class RRule {
         let currentDay;
         let total = 0;
         let count = this.options.count;
-        let dm;
-        let div;
-        let mod;
         let pos;
         while (true) {
             // Get dayset with the right frequency
@@ -502,10 +499,10 @@ class RRule {
             else if (freq === RRule.MONTHLY) {
                 month += interval;
                 if (month > 12) {
-                    div = Math.floor(month / 12);
-                    mod = helpers_1.pymod(month, 12);
-                    month = mod;
-                    year += div;
+                    const yearDiv = Math.floor(month / 12);
+                    const monthMod = helpers_1.pymod(month, 12);
+                    month = monthMod;
+                    year += yearDiv;
                     if (month === 0) {
                         month = 12;
                         --year;
@@ -538,12 +535,10 @@ class RRule {
                 }
                 while (true) {
                     hour += interval;
-                    dm = helpers_1.divmod(hour, 24);
-                    div = dm.div;
-                    mod = dm.mod;
-                    if (div) {
-                        hour = mod;
-                        day += div;
+                    const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                    if (dayDiv) {
+                        hour = hourMod;
+                        day += dayDiv;
                         fixday = true;
                     }
                     if (helpers_1.empty(byhour) || helpers_1.includes(byhour, hour))
@@ -560,18 +555,14 @@ class RRule {
                 }
                 while (true) {
                     minute += interval;
-                    dm = helpers_1.divmod(minute, 60);
-                    div = dm.div;
-                    mod = dm.mod;
-                    if (div) {
-                        minute = mod;
-                        hour += div;
-                        dm = helpers_1.divmod(hour, 24);
-                        div = dm.div;
-                        mod = dm.mod;
-                        if (div) {
-                            hour = mod;
-                            day += div;
+                    const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
+                    if (hourDiv) {
+                        minute = minuteMod;
+                        hour += hourDiv;
+                        const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                        if (dayDiv) {
+                            hour = hourMod;
+                            day += dayDiv;
                             fixday = true;
                             filtered = false;
                         }
@@ -592,25 +583,20 @@ class RRule {
                 }
                 while (true) {
                     second += interval;
-                    dm = helpers_1.divmod(second, 60);
-                    div = dm.div;
-                    mod = dm.mod;
-                    if (div) {
-                        second = mod;
-                        minute += div;
-                        dm = helpers_1.divmod(minute, 60);
-                        div = dm.div;
-                        mod = dm.mod;
-                        if (div) {
-                            minute = mod;
-                            hour += div;
-                            dm = helpers_1.divmod(hour, 24);
-                            div = dm.div;
-                            mod = dm.mod;
-                            if (div) {
-                                hour = mod;
-                                day += div;
+                    const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(second, 60);
+                    if (minuteDiv) {
+                        second = secondMod;
+                        minute += minuteDiv;
+                        const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(minute, 60);
+                        if (hourDiv) {
+                            minute = minuteMod;
+                            hour += hourDiv;
+                            const { div: dayDiv, mod: hourMod } = helpers_1.divmod(hour, 24);
+                            if (dayDiv) {
+                                hour = hourMod;
+                                day += dayDiv;
                                 fixday = true;
+                                filtered = false;
                             }
                         }
                     }

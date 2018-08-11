@@ -513,9 +513,6 @@ export default class RRule {
     let currentDay: number
     let total = 0
     let count = this.options.count
-    let dm: { div: number; mod: number }
-    let div: number
-    let mod: number
     let pos: number
 
     while (true) {
@@ -649,10 +646,10 @@ export default class RRule {
       } else if (freq === RRule.MONTHLY) {
         month += interval
         if (month > 12) {
-          div = Math.floor(month / 12)
-          mod = pymod(month, 12)
-          month = mod
-          year += div
+          const yearDiv = Math.floor(month / 12)
+          const monthMod = pymod(month, 12)
+          month = monthMod
+          year += yearDiv
           if (month === 0) {
             month = 12
             --year
@@ -681,12 +678,10 @@ export default class RRule {
         }
         while (true) {
           hour += interval
-          dm = divmod(hour, 24)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            hour = mod
-            day += div
+          const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+          if (dayDiv) {
+            hour = hourMod
+            day += dayDiv
             fixday = true
           }
           if (empty(byhour) || includes(byhour, hour)) break
@@ -702,18 +697,14 @@ export default class RRule {
 
         while (true) {
           minute += interval
-          dm = divmod(minute, 60)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            minute = mod
-            hour += div
-            dm = divmod(hour, 24)
-            div = dm.div
-            mod = dm.mod
-            if (div) {
-              hour = mod
-              day += div
+          const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
+          if (hourDiv) {
+            minute = minuteMod
+            hour += hourDiv
+            const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+            if (dayDiv) {
+              hour = hourMod
+              day += dayDiv
               fixday = true
               filtered = false
             }
@@ -737,25 +728,20 @@ export default class RRule {
         }
         while (true) {
           second += interval
-          dm = divmod(second, 60)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            second = mod
-            minute += div
-            dm = divmod(minute, 60)
-            div = dm.div
-            mod = dm.mod
-            if (div) {
-              minute = mod
-              hour += div
-              dm = divmod(hour, 24)
-              div = dm.div
-              mod = dm.mod
-              if (div) {
-                hour = mod
-                day += div
+          const { div: minuteDiv, mod: secondMod } = divmod(second, 60)
+          if (minuteDiv) {
+            second = secondMod
+            minute += minuteDiv
+            const { div: hourDiv, mod: minuteMod } = divmod(minute, 60)
+            if (hourDiv) {
+              minute = minuteMod
+              hour += hourDiv
+              const { div: dayDiv, mod: hourMod } = divmod(hour, 24)
+              if (dayDiv) {
+                hour = hourMod
+                day += dayDiv
                 fixday = true
+                filtered = false
               }
             }
           }

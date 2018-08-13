@@ -231,7 +231,7 @@ iCalendar RFC. Only `freq` is required.
     </tr>
     <tr>
         <td><code>bysetpos</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, positive or negative. Each given integer will specify
             an occurrence number, corresponding to the nth occurrence of
             the rule inside the frequency period. For example, a
@@ -244,25 +244,25 @@ iCalendar RFC. Only `freq` is required.
     </tr>
     <tr>
         <td><code>bymonth</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the months to apply the recurrence to.
         </td>
     </tr>
     <tr>
         <td><code>bymonthday</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the month days to apply the recurrence to.
         </td>
     </tr>
     <tr>
         <td><code>byyearday</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the year days to apply the recurrence to.
         </td>
     </tr>
     <tr>
         <td><code>byweekno</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the week numbers to apply the recurrence to.
             Week numbers have the meaning described in ISO8601, that is,
             the first week of the year is that containing at least four
@@ -271,10 +271,10 @@ iCalendar RFC. Only `freq` is required.
     </tr>
     <tr>
         <td><code>byweekday</code></td>
-        <td>If given, it must be either an integer (<code>0 == RRule.MO</code>), a
-            sequence of integers, one of the weekday constants
+        <td>If given, it must be either an integer (<code>0 == RRule.MO</code>), an
+            array of integers, one of the weekday constants
             (<code>RRule.MO</code>,
-            <code>RRule.TU</code>, etc), or a sequence of these constants. When
+            <code>RRule.TU</code>, etc), or an array of these constants. When
             given,
             these variables will define the weekdays where the recurrence
             will be applied. It's also possible to use an argument n for
@@ -292,19 +292,19 @@ iCalendar RFC. Only `freq` is required.
     </tr>
     <tr>
         <td><code>byhour</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the hours to apply the recurrence to.
         </td>
     </tr>
     <tr>
         <td><code>byminute</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the minutes to apply the recurrence to.
         </td>
     </tr>
     <tr>
         <td><code>bysecond</code></td>
-        <td>If given, it must be either an integer, or a sequence of
+        <td>If given, it must be either an integer, or an array of
             integers, meaning the seconds to apply the recurrence to.
         </td>
     </tr>

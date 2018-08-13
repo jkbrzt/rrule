@@ -41,6 +41,20 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   return array
 }
 
+export function padStart (str: string, targetLength: number, padString: string = ' ') {
+  targetLength = targetLength >> 0
+  if (str.length > targetLength) {
+    return String(str)
+  }
+
+  targetLength = targetLength - str.length
+  if (targetLength > padString.length) {
+    padString += repeat(padString, targetLength / padString.length)
+  }
+
+  return padString.slice(0,targetLength) + String(str)
+}
+
 /**
  * Python like split
  */

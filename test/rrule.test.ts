@@ -3677,4 +3677,19 @@ describe('RRule', function () {
       new Date('2018-11-09T12:00:00.000Z')
     ])
   })
+
+  it('handles 3-digit years properly (#202)', () => {
+    const rrule = new RRule({
+      count: 1,
+      dtstart: new Date(Date.UTC(990, 0, 1, 0, 0, 0))
+    })
+    const ruleString = rrule.toString()
+    const rrule2 = RRule.fromString(ruleString)
+
+    expect(ruleString).to.equal('COUNT=1;DTSTART=09900101T000000Z')
+    expect(rrule2.count()).to.equal(1)
+    expect(rrule2.all()).to.deep.equal([
+      new Date(Date.UTC(990, 0, 1, 0, 0, 0))
+    ])
+  })
 })

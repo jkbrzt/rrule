@@ -112,20 +112,6 @@ exports.isNumber = function (value) {
     return typeof value === 'number';
 };
 exports.isArray = Array.isArray;
-function padStart(str, targetLength) {
-    var padString = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
-
-    targetLength = targetLength >> 0;
-    if (str.length > targetLength) {
-        return String(str);
-    }
-    targetLength = targetLength - str.length;
-    if (targetLength > padString.length) {
-        padString += padString.repeat(targetLength / padString.length);
-    }
-    return padString.slice(0, targetLength) + String(str);
-}
-exports.padStart = padStart;
 /**
  * Simplified version of python's range()
  */
@@ -158,6 +144,20 @@ exports.repeat = function (value, times) {
     }
     return array;
 };
+function padStart(str, targetLength) {
+    var padString = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
+
+    targetLength = targetLength >> 0;
+    if (str.length > targetLength) {
+        return String(str);
+    }
+    targetLength = targetLength - str.length;
+    if (targetLength > padString.length) {
+        padString += exports.repeat(padString, targetLength / padString.length);
+    }
+    return padString.slice(0, targetLength) + String(str);
+}
+exports.padStart = padStart;
 /**
  * Python like split
  */

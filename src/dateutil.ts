@@ -165,15 +165,15 @@ export namespace dateutil {
       date.getUTCSeconds(),
       'Z'
     ].map(value => value.toString())
-      .map((value, i) => {
-        return /[TZ]/.test(value) ?
+      .map(value =>
+        /[TZ]/.test(value) ?
           value :
           padStart(value, 2, '0')
-      }).join('')
+      ).join('')
   }
 
   export const untilStringToDate = function (until: string) {
-    const re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
+    const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
     const bits = re.exec(until)
     if (!bits) throw new Error(`Invalid UNTIL value: ${until}`)
     return new Date(

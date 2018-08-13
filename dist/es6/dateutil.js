@@ -129,14 +129,12 @@ var dateutil;
             date.getUTCSeconds(),
             'Z'
         ].map(value => value.toString())
-            .map((value, i) => {
-            return /[TZ]/.test(value) ?
-                value :
-                helpers_1.padStart(value, 2, '0');
-        }).join('');
+            .map(value => /[TZ]/.test(value) ?
+            value :
+            helpers_1.padStart(value, 2, '0')).join('');
     };
     dateutil.untilStringToDate = function (until) {
-        const re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
+        const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         const bits = re.exec(until);
         if (!bits)
             throw new Error(`Invalid UNTIL value: ${until}`);

@@ -344,13 +344,13 @@ var dateutil;
         var date = new Date(time);
         return [helpers_1.padStart(date.getUTCFullYear().toString(), 4, '0'), date.getUTCMonth() + 1, date.getUTCDate(), 'T', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), 'Z'].map(function (value) {
             return value.toString();
-        }).map(function (value, i) {
+        }).map(function (value) {
             return (/[TZ]/.test(value) ? value : helpers_1.padStart(value, 2, '0')
             );
         }).join('');
     };
     dateutil.untilStringToDate = function (until) {
-        var re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
+        var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         var bits = re.exec(until);
         if (!bits) throw new Error("Invalid UNTIL value: " + until);
         return new Date(Date.UTC(parseInt(bits[1], 10), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10), parseInt(bits[5], 10) || 0, parseInt(bits[6], 10) || 0, parseInt(bits[7], 10) || 0));

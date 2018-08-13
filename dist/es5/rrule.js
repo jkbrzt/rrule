@@ -340,7 +340,6 @@ var dateutil;
         });
     };
     dateutil.timeToUntilString = function (time) {
-        var comp = void 0;
         var date = new Date(time);
         return [helpers_1.padStart(date.getUTCFullYear().toString(), 4, '0'), date.getUTCMonth() + 1, date.getUTCDate(), 'T', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), 'Z'].map(function (value) {
             return value.toString();

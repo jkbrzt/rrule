@@ -117,7 +117,6 @@ var dateutil;
         });
     };
     dateutil.timeToUntilString = function (time) {
-        let comp;
         const date = new Date(time);
         return [
             helpers_1.padStart(date.getUTCFullYear().toString(), 4, '0'),

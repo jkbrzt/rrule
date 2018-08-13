@@ -3681,7 +3681,7 @@ describe('RRule', function () {
   it('handles 3-digit years properly (#202)', () => {
     const new_rule = new RRule({ 
       count: 1,
-      dtstart: new Date(990, 0, 1)
+      dtstart: new Date(Date.UTC(990, 0, 1, 0, 0, 0))
     })
     const ruleString = new_rule.toString()
     const rrule = RRule.fromString(ruleString)

@@ -153,7 +153,6 @@ export namespace dateutil {
   }
 
   export const timeToUntilString = function (time: number) {
-    let comp
     const date = new Date(time)
     return [
       padStart(date.getUTCFullYear().toString(), 4, '0'),

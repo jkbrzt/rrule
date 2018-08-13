@@ -119,8 +119,8 @@ var dateutil;
     dateutil.timeToUntilString = function (time) {
         let comp;
         const date = new Date(time);
-        const comps = [
-            date.getUTCFullYear(),
+        return [
+            helpers_1.padStart(date.getUTCFullYear().toString(), 4, '0'),
             date.getUTCMonth() + 1,
             date.getUTCDate(),
             'T',
@@ -128,17 +128,15 @@ var dateutil;
             date.getUTCMinutes(),
             date.getUTCSeconds(),
             'Z'
-        ];
-        for (let i = 0; i < comps.length; i++) {
-            comp = comps[i];
-            if (!/[TZ]/.test(comp.toString()) && comp < 10) {
-                comps[i] = '0' + String(comp);
-            }
-        }
-        return comps.join('');
+        ].map(value => value.toString())
+            .map((value, i) => {
+            return /[TZ]/.test(value) ?
+                value :
+                helpers_1.padStart(value, 2, '0');
+        }).join('');
     };
     dateutil.untilStringToDate = function (until) {
-        const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
+        const re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         const bits = re.exec(until);
         if (!bits)
             throw new Error(`Invalid UNTIL value: ${until}`);

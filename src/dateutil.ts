@@ -1,4 +1,4 @@
-import { divmod, pymod, empty, includes } from './helpers'
+import { divmod, pymod, empty, includes, padStart } from './helpers'
 
 type Datelike = Pick<Date, 'getTime'>
 
@@ -155,8 +155,8 @@ export namespace dateutil {
   export const timeToUntilString = function (time: number) {
     let comp
     const date = new Date(time)
-    const comps = [
-      date.getUTCFullYear(),
+    return [
+      padStart(date.getUTCFullYear().toString(), 4, '0'),
       date.getUTCMonth() + 1,
       date.getUTCDate(),
       'T',
@@ -164,19 +164,16 @@ export namespace dateutil {
       date.getUTCMinutes(),
       date.getUTCSeconds(),
       'Z'
-    ]
-
-    for (let i = 0; i < comps.length; i++) {
-      comp = comps[i]
-      if (!/[TZ]/.test(comp.toString()) && comp < 10) {
-        comps[i] = '0' + String(comp)
-      }
-    }
-    return comps.join('')
+    ].map(value => value.toString())
+      .map((value, i) => {
+        return /[TZ]/.test(value) ?
+          value :
+          padStart(value, 2, '0')
+      }).join('')
   }
 
   export const untilStringToDate = function (until: string) {
-    const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
+    const re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
     const bits = re.exec(until)
     if (!bits) throw new Error(`Invalid UNTIL value: ${until}`)
     return new Date(

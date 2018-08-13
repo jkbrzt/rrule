@@ -12,6 +12,20 @@ export const isNumber = function (value?: any): value is number {
 
 export const isArray = Array.isArray
 
+export function padStart (str: string, targetLength: number, padString: string = ' ') {
+  targetLength = targetLength >> 0
+  if (str.length > targetLength) {
+    return String(str)
+  }
+
+  targetLength = targetLength - str.length
+  if (targetLength > padString.length) {
+    padString += padString.repeat(targetLength / padString.length)
+  }
+
+  return padString.slice(0,targetLength) + String(str)
+}
+
 /**
  * Simplified version of python's range()
  */

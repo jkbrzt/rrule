@@ -112,6 +112,20 @@ exports.isNumber = function (value) {
     return typeof value === 'number';
 };
 exports.isArray = Array.isArray;
+function padStart(str, targetLength) {
+    var padString = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ' ';
+
+    targetLength = targetLength >> 0;
+    if (str.length > targetLength) {
+        return String(str);
+    }
+    targetLength = targetLength - str.length;
+    if (targetLength > padString.length) {
+        padString += padString.repeat(targetLength / padString.length);
+    }
+    return padString.slice(0, targetLength) + String(str);
+}
+exports.padStart = padStart;
 /**
  * Simplified version of python's range()
  */
@@ -328,17 +342,15 @@ var dateutil;
     dateutil.timeToUntilString = function (time) {
         var comp = void 0;
         var date = new Date(time);
-        var comps = [date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 'T', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), 'Z'];
-        for (var i = 0; i < comps.length; i++) {
-            comp = comps[i];
-            if (!/[TZ]/.test(comp.toString()) && comp < 10) {
-                comps[i] = '0' + String(comp);
-            }
-        }
-        return comps.join('');
+        return [helpers_1.padStart(date.getUTCFullYear().toString(), 4, '0'), date.getUTCMonth() + 1, date.getUTCDate(), 'T', date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), 'Z'].map(function (value) {
+            return value.toString();
+        }).map(function (value, i) {
+            return (/[TZ]/.test(value) ? value : helpers_1.padStart(value, 2, '0')
+            );
+        }).join('');
     };
     dateutil.untilStringToDate = function (until) {
-        var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
+        var re = /^(\d{3,4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
         var bits = re.exec(until);
         if (!bits) throw new Error("Invalid UNTIL value: " + until);
         return new Date(Date.UTC(parseInt(bits[1], 10), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10), parseInt(bits[5], 10) || 0, parseInt(bits[6], 10) || 0, parseInt(bits[7], 10) || 0));

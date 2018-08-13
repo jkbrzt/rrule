@@ -67,16 +67,35 @@ export declare namespace dateutil {
     const timeToUntilString: (time: number) => string;
     const untilStringToDate: (until: string) => Date;
     class Time {
-        private hour;
-        private minute;
-        private second;
-        private millisecond;
+        hour: number;
+        minute: number;
+        second: number;
+        millisecond: number;
         constructor(hour: number, minute: number, second: number, millisecond: number);
         getHours(): number;
         getMinutes(): number;
         getSeconds(): number;
         getMilliseconds(): number;
         getTime(): number;
+    }
+    class DateTime extends Time {
+        day: number;
+        month: number;
+        year: number;
+        constructor(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number);
+        getWeekday(): number;
+        getTime(): number;
+        getDay(): number;
+        getMonth(): number;
+        getYear(): number;
+        addYears(years: number): void;
+        addMonths(months: number): void;
+        addWeekly(days: number, wkst: number): void;
+        addDaily(days: number): void;
+        addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
+        addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): boolean;
+        addSeconds(seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]): boolean;
+        fixDay(): void;
     }
 }
 export default dateutil;

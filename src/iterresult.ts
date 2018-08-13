@@ -1,4 +1,4 @@
-import { Cache } from './types'
+import { QueryMethods } from './types'
 
 // =============================================================================
 // Results
@@ -16,18 +16,16 @@ export interface IterArgs {
  * This class helps us to emulate python's generators, sorta.
  */
 export default class IterResult {
-  public readonly method: keyof Cache
+  public readonly method: keyof QueryMethods
   public readonly args: Partial<IterArgs>
-  public readonly minDate: Date | null
-  public readonly maxDate: Date | null
-  public _result: (Date | Partial<IterArgs>)[]
+  public readonly minDate: Date | null = null
+  public readonly maxDate: Date | null = null
+  public _result: Date[] = []
+  public total = 0
 
-  constructor (method: keyof Cache, args: Partial<IterArgs>) {
+  constructor (method: keyof QueryMethods, args: Partial<IterArgs>) {
     this.method = method
     this.args = args
-    this.minDate = null
-    this.maxDate = null
-    this._result = []
 
     if (method === 'between') {
       this.maxDate = args.inc
@@ -49,7 +47,8 @@ export default class IterResult {
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept (date: Date | Partial<IterArgs>) {
+  accept (date: Date) {
+    ++this.total
     const tooEarly = this.minDate && date < this.minDate
     const tooLate = this.maxDate && date > this.maxDate
 
@@ -72,7 +71,7 @@ export default class IterResult {
    * @param {Date} date that is part of the result.
    * @return {Boolean} whether we are interested in more values.
    */
-  add (date: Date | Partial<IterArgs>) {
+  add (date: Date) {
     this._result.push(date)
     return true
   }
@@ -87,10 +86,10 @@ export default class IterResult {
     switch (this.method) {
       case 'all':
       case 'between':
-        return res as Date[]
+        return res
       case 'before':
       case 'after':
-        return res.length ? res[res.length - 1] as Date : null
+        return res.length ? res[res.length - 1] : null
     }
   }
 

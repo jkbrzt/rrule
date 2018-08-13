@@ -5,11 +5,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 class IterResult {
     constructor(method, args) {
-        this.method = method;
-        this.args = args;
         this.minDate = null;
         this.maxDate = null;
         this._result = [];
+        this.total = 0;
+        this.method = method;
+        this.args = args;
         if (method === 'between') {
             this.maxDate = args.inc
                 ? args.before
@@ -32,6 +33,7 @@ class IterResult {
      *                   false if we're done.
      */
     accept(date) {
+        ++this.total;
         const tooEarly = this.minDate && date < this.minDate;
         const tooLate = this.maxDate && date > this.maxDate;
         if (this.method === 'between') {

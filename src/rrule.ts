@@ -1,15 +1,10 @@
-import Weekday from './weekday'
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
 import {
   pymod,
-  divmod,
   notEmpty,
   includes,
-  isPresent,
-  isNumber,
-  isArray,
-  empty
+  isPresent
 } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
@@ -18,15 +13,16 @@ import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
 import {
-  Cache,
   Days,
   ParsedOptions,
   Options,
   Frequency,
-  CacheKeys
+  QueryMethods
 } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
+import { optionsToString } from './optionstostring'
+import { Cache, CacheKeys } from './cache'
 
 interface GetNlp {
   _nlp: Nlp
@@ -74,7 +70,7 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule {
+export default class RRule implements QueryMethods {
   public _string: any
   public _cache: Cache | null
   public origOptions: Partial<Options>
@@ -115,12 +111,7 @@ export default class RRule {
     this._string = null
     this._cache = noCache
       ? null
-      : {
-        all: false,
-        before: [],
-        after: [],
-        between: []
-      }
+      : new Cache()
 
     // used by toString()
     this.origOptions = initializeOptions(options)
@@ -137,89 +128,26 @@ export default class RRule {
     return getnlp().fromText(text, language)
   }
 
-  static parseString (rfcString: string) {
-    return parseString(rfcString)
-  }
+  static parseString = parseString
 
   static fromString (str: string) {
     return new RRule(RRule.parseString(str) || undefined)
   }
 
-  static optionsToString (options: Partial<Options>) {
-    const pairs = []
-    const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
-    const defaultKeys = Object.keys(DEFAULT_OPTIONS)
+  static optionsToString = optionsToString
 
-    for (let i = 0; i < keys.length; i++) {
-      if (!includes(defaultKeys, keys[i])) continue
+  private _cacheGet (what: CacheKeys | 'all', args?: Partial<IterArgs>) {
+    if (!this._cache) return false
+    return this._cache._cacheGet(what, args)
+  }
 
-      let key = keys[i].toUpperCase()
-      let value: any = options[keys[i]]
-      let strValues = []
-
-      if (!isPresent(value) || (isArray(value) && !value.length)) continue
-
-      switch (key) {
-        case 'FREQ':
-          value = RRule.FREQUENCIES[options.freq!]
-          break
-        case 'WKST':
-          if (isNumber(value)) {
-            value = new Weekday(value)
-          }
-          break
-        case 'BYWEEKDAY':
-          /*
-          NOTE: BYWEEKDAY is a special case.
-          RRule() deconstructs the rule.options.byweekday array
-          into an array of Weekday arguments.
-          On the other hand, rule.origOptions is an array of Weekdays.
-          We need to handle both cases here.
-          It might be worth change RRule to keep the Weekdays.
-
-          Also, BYWEEKDAY (used by RRule) vs. BYDAY (RFC)
-
-          */
-          key = 'BYDAY'
-          if (!isArray(value)) value = [value]
-
-          for (let j = 0; j < value.length; j++) {
-            let wday: Weekday | number[] | number = value[j]
-            if (wday instanceof Weekday) {
-              // good
-            } else if (isArray(wday)) {
-              wday = new Weekday(wday[0], wday[1])
-            } else {
-              wday = new Weekday(wday)
-            }
-            strValues[j] = wday.toString()
-          }
-          value = strValues
-          break
-        case 'DTSTART':
-        case 'UNTIL':
-          value = dateutil.timeToUntilString(value)
-          break
-        default:
-          if (isArray(value)) {
-            for (let j = 0; j < value.length; j++) {
-              strValues[j] = String(value[j])
-            }
-            value = strValues
-          } else {
-            value = String(value)
-          }
-      }
-
-      pairs.push([key, value])
-    }
-
-    const strings = []
-    for (let i = 0; i < pairs.length; i++) {
-      const attr = pairs[i]
-      strings.push(attr[0] + '=' + attr[1].toString())
-    }
-    return strings.join(';')
+  public _cacheAdd (
+    what: CacheKeys | 'all',
+    value: Date[] | Date | null,
+    args?: Partial<IterArgs>
+  ) {
+    if (!this._cache) return
+    return this._cache._cacheAdd(what, value, args)
   }
 
   /**
@@ -320,7 +248,7 @@ export default class RRule {
    * @return String
    */
   toString () {
-    return RRule.optionsToString(this.origOptions)
+    return optionsToString(this.origOptions)
   }
 
   /**
@@ -333,90 +261,6 @@ export default class RRule {
 
   isFullyConvertibleToText () {
     return getnlp().isFullyConvertible(this)
-  }
-
-  /**
-   * @param {String} what - all/before/after/between
-   * @param {Array,Date} value - an array of dates, one date, or null
-   * @param {Object?} args - _iter arguments
-   */
-  private _cacheAdd (
-    what: CacheKeys | 'all',
-    value: Date[] | Date | null,
-    args?: Partial<IterArgs>
-  ) {
-    if (!this._cache) return
-
-    if (value) {
-      value =
-        value instanceof Date
-          ? dateutil.clone(value)
-          : dateutil.cloneDates(value)
-    }
-
-    if (what === 'all') {
-      this._cache.all = value as Date[]
-    } else {
-      args!._value = value
-      this._cache[what].push(args as IterArgs)
-    }
-  }
-
-  /**
-   * @return false - not in the cache
-   *         null  - cached, but zero occurrences (before/after)
-   *         Date  - cached (before/after)
-   *         []    - cached, but zero occurrences (all/between)
-   *         [Date1, DateN] - cached (all/between)
-   */
-  private _cacheGet (
-    what: CacheKeys | 'all',
-    args?: Partial<IterArgs>
-  ): Date | Date[] | false | null {
-    if (!this._cache) return false
-
-    let cached: Date | Date[] | false | null = false
-    const argsKeys = args ? (Object.keys(args) as (keyof IterArgs)[]) : []
-    const findCacheDiff = function (item: IterArgs) {
-      for (let i = 0; i < argsKeys.length; i++) {
-        const key = argsKeys[i]
-        if (String(args![key]) !== String(item[key])) {
-          return true
-        }
-      }
-      return false
-    }
-
-    const cachedObject = this._cache[what]
-    if (what === 'all') {
-      cached = this._cache.all as Date[]
-    } else if (isArray(cachedObject)) {
-      // Let's see whether we've already called the
-      // 'what' method with the same 'args'
-      for (let i = 0; i < cachedObject.length; i++) {
-        const item = cachedObject[i] as IterArgs
-        if (argsKeys.length && findCacheDiff(item)) continue
-        cached = item._value
-        break
-      }
-    }
-
-    if (!cached && this._cache.all) {
-      // Not in the cache, but we already know all the occurrences,
-      // so we can find the correct dates from the cached ones.
-      const iterResult = new IterResult(what, args!)
-      for (let i = 0; i < this._cache.all.length; i++) {
-        if (!iterResult.accept(this._cache.all[i])) break
-      }
-      cached = iterResult.getValue() as Date
-      this._cacheAdd(what, cached, args)
-    }
-
-    return isArray(cached)
-      ? dateutil.cloneDates(cached)
-      : cached instanceof Date
-        ? dateutil.clone(cached)
-        : cached
   }
 
   /**
@@ -434,15 +278,16 @@ export default class RRule {
     */
 
     const dtstart = this.options.dtstart
-    const dtstartMillisecondModulo = this.options.dtstart.valueOf() % 1000
 
-    let year = dtstart.getUTCFullYear()
-    let month = dtstart.getUTCMonth() + 1
-    let day = dtstart.getUTCDate()
-    let hour = dtstart.getUTCHours()
-    let minute = dtstart.getUTCMinutes()
-    let second = dtstart.getUTCSeconds()
-    let weekday = dateutil.getWeekday(dtstart)
+    let date = new dateutil.DateTime(
+      dtstart.getUTCFullYear(),
+      dtstart.getUTCMonth() + 1,
+      dtstart.getUTCDate(),
+      dtstart.getUTCHours(),
+      dtstart.getUTCMinutes(),
+      dtstart.getUTCSeconds(),
+      dtstart.valueOf() % 1000
+    )
 
     // Some local variables to speed things up a bit
     const {
@@ -464,9 +309,9 @@ export default class RRule {
     } = this.options
 
     const ii = new Iterinfo(this)
-    ii.rebuild(year, month)
+    ii.rebuild(date.year, date.month)
 
-    const getdayset: GetDayset = {
+    const getdayset = {
       [RRule.YEARLY]: ii.ydayset,
       [RRule.MONTHLY]: ii.mdayset,
       [RRule.WEEKLY]: ii.wdayset,
@@ -490,41 +335,37 @@ export default class RRule {
       ] as typeof gettimeset
 
       if (
-        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, hour)) ||
+        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, date.hour)) ||
         (freq >= RRule.MINUTELY &&
           notEmpty(byminute) &&
-          !includes(byminute, minute)) ||
+          !includes(byminute, date.minute)) ||
         (freq >= RRule.SECONDLY &&
           notEmpty(bysecond) &&
-          !includes(bysecond, second))
+          !includes(bysecond, date.second))
       ) {
         timeset = []
       } else {
         timeset = gettimeset.call(
           ii,
-          hour,
-          minute,
-          second,
-          dtstartMillisecondModulo
+          date.hour,
+          date.minute,
+          date.second,
+          date.millisecond
         )
       }
     }
 
     let currentDay: number
-    let total = 0
     let count = this.options.count
-    let dm: { div: number; mod: number }
-    let div: number
-    let mod: number
     let pos: number
 
     while (true) {
       // Get dayset with the right frequency
       const [dayset, start, end] = getdayset.call(
         ii,
-        year,
-        month,
-        day
+        date.year,
+        date.month,
+        date.day
       ) as DaySet
 
       // Do the "hard" work ;-)
@@ -564,47 +405,44 @@ export default class RRule {
             timepos = pymod(pos - 1, timeset.length)
           }
 
-          try {
-            const tmp = []
-            for (let k = start; k < end; k++) {
-              const val = dayset[k]
-              if (!isPresent(val)) continue
-              tmp.push(val)
-            }
-            let i: number
-            if (daypos < 0) {
-              // we're trying to emulate python's aList[-n]
-              i = tmp.slice(daypos)[0]
-            } else {
-              i = tmp[daypos]
-            }
+          const tmp = []
+          for (let k = start; k < end; k++) {
+            const val = dayset[k]
+            if (!isPresent(val)) continue
+            tmp.push(val)
+          }
+          let i: number
+          if (daypos < 0) {
+            // we're trying to emulate python's aList[-n]
+            i = tmp.slice(daypos)[0]
+          } else {
+            i = tmp[daypos]
+          }
 
-            const time = timeset[timepos]
-            const date = dateutil.fromOrdinal(ii.yearordinal + i)
-            const res = dateutil.combine(date, time)
-            // XXX: can this ever be in the array?
-            // - compare the actual date instead?
-            if (!includes(poslist, res)) poslist.push(res)
-            // tslint:disable-next-line:no-empty
-          } catch (e) {}
+          const time = timeset[timepos]
+          const date = dateutil.fromOrdinal(ii.yearordinal + i)
+          const res = dateutil.combine(date, time)
+          // XXX: can this ever be in the array?
+          // - compare the actual date instead?
+          if (!includes(poslist, res)) poslist.push(res)
         }
 
         dateutil.sort(poslist)
         for (let j = 0; j < poslist.length; j++) {
           const res = poslist[j]
           if (until && res > until) {
-            this._len = total
-            return iterResult.getValue() as Date[]
-          } else if (res >= dtstart) {
-            ++total
+            return this.emitResult(iterResult)
+          }
+
+          if (res >= dtstart) {
             if (!iterResult.accept(res)) {
-              return iterResult.getValue() as Date[]
+              return this.emitResult(iterResult)
             }
+
             if (count) {
               --count
               if (!count) {
-                this._len = total
-                return iterResult.getValue() as Date[]
+                return this.emitResult(iterResult)
               }
             }
           }
@@ -612,25 +450,27 @@ export default class RRule {
       } else {
         for (let j = start; j < end; j++) {
           currentDay = dayset[j] as number
-          if (currentDay !== null) {
-            const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
-            for (let k = 0; k < timeset!.length; k++) {
-              const time = timeset![k]
-              const res = dateutil.combine(date, time)
-              if (until && res > until) {
-                this._len = total
-                return iterResult.getValue() as Date[]
-              } else if (res >= dtstart) {
-                ++total
-                if (!iterResult.accept(res)) {
-                  return iterResult.getValue() as Date[]
-                }
-                if (count) {
-                  --count
-                  if (!count) {
-                    this._len = total
-                    return iterResult.getValue() as Date[]
-                  }
+          if (!isPresent(currentDay)) {
+            continue
+          }
+
+          const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
+          for (let k = 0; k < timeset!.length; k++) {
+            const time = timeset![k]
+            const res = dateutil.combine(date, time)
+            if (until && res > until) {
+              return this.emitResult(iterResult)
+            }
+
+            if (res >= dtstart) {
+              if (!iterResult.accept(res)) {
+                return this.emitResult(iterResult)
+              }
+
+              if (count) {
+                --count
+                if (!count) {
+                  return this.emitResult(iterResult)
                 }
               }
             }
@@ -639,159 +479,46 @@ export default class RRule {
       }
 
       // Handle frequency and interval
-      let fixday = false
       if (freq === RRule.YEARLY) {
-        year += interval
-        if (year > dateutil.MAXYEAR) {
-          this._len = total
-          return iterResult.getValue() as Date[]
-        }
-        ii.rebuild(year, month)
+        date.addYears(interval)
       } else if (freq === RRule.MONTHLY) {
-        month += interval
-        if (month > 12) {
-          div = Math.floor(month / 12)
-          mod = pymod(month, 12)
-          month = mod
-          year += div
-          if (month === 0) {
-            month = 12
-            --year
-          }
-          if (year > dateutil.MAXYEAR) {
-            this._len = total
-            return iterResult.getValue() as Date[]
-          }
-        }
-        ii.rebuild(year, month)
+        date.addMonths(interval)
       } else if (freq === RRule.WEEKLY) {
-        if (wkst > weekday) {
-          day += -(weekday + 1 + (6 - wkst)) + interval * 7
-        } else {
-          day += -(weekday - wkst) + interval * 7
-        }
-        weekday = wkst
-        fixday = true
+        date.addWeekly(interval, wkst)
       } else if (freq === RRule.DAILY) {
-        day += interval
-        fixday = true
+        date.addDaily(interval)
       } else if (freq === RRule.HOURLY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          hour += Math.floor((23 - hour) / interval) * interval
-        }
-        while (true) {
-          hour += interval
-          dm = divmod(hour, 24)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            hour = mod
-            day += div
-            fixday = true
-          }
-          if (empty(byhour) || includes(byhour, hour)) break
-        }
+        date.addHours(interval, filtered, byhour)
+
         // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.MINUTELY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          minute +=
-            Math.floor((1439 - (hour * 60 + minute)) / interval) * interval
+        if (date.addMinutes(interval, filtered, byhour, byminute)) {
+          filtered = false
         }
 
-        while (true) {
-          minute += interval
-          dm = divmod(minute, 60)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            minute = mod
-            hour += div
-            dm = divmod(hour, 24)
-            div = dm.div
-            mod = dm.mod
-            if (div) {
-              hour = mod
-              day += div
-              fixday = true
-              filtered = false
-            }
-          }
-          if (
-            (empty(byhour) || includes(byhour, hour)) &&
-            (empty(byminute) || includes(byminute, minute))
-          ) {
-            break
-          }
-        }
         // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       } else if (freq === RRule.SECONDLY) {
-        if (filtered) {
-          // Jump to one iteration before next day
-          second +=
-            Math.floor(
-              (86399 - (hour * 3600 + minute * 60 + second)) / interval
-            ) * interval
+        if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
+          filtered = false
         }
-        while (true) {
-          second += interval
-          dm = divmod(second, 60)
-          div = dm.div
-          mod = dm.mod
-          if (div) {
-            second = mod
-            minute += div
-            dm = divmod(minute, 60)
-            div = dm.div
-            mod = dm.mod
-            if (div) {
-              minute = mod
-              hour += div
-              dm = divmod(hour, 24)
-              div = dm.div
-              mod = dm.mod
-              if (div) {
-                hour = mod
-                day += div
-                fixday = true
-              }
-            }
-          }
-          if (
-            (empty(byhour) || includes(byhour, hour)) &&
-            (empty(byminute) || includes(byminute, minute)) &&
-            (empty(bysecond) || includes(bysecond, second))
-          ) {
-            break
-          }
-        }
+
         // @ts-ignore
-        timeset = gettimeset.call(ii, hour, minute, second)
+        timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
       }
 
-      if (fixday && day > 28) {
-        let daysinmonth = dateutil.monthRange(year, month - 1)[1]
-        if (day > daysinmonth) {
-          while (day > daysinmonth) {
-            day -= daysinmonth
-            ++month
-            if (month === 13) {
-              month = 1
-              ++year
-              if (year > dateutil.MAXYEAR) {
-                this._len = total
-                return iterResult.getValue() as Date[]
-              }
-            }
-            daysinmonth = dateutil.monthRange(year, month - 1)[1]
-          }
-          ii.rebuild(year, month)
-        }
+      if (date.year > dateutil.MAXYEAR) {
+        return this.emitResult(iterResult)
       }
+
+      ii.rebuild(date.year, date.month)
     }
+  }
+
+  private emitResult (iterResult: IterResult) {
+    this._len = iterResult.total
+    return iterResult.getValue() as Date[]
   }
 }
 

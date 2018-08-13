@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const helpers_1 = require("./helpers");
 /**
  * General date-related utilities.
  * Also handles several incompatibilities between JavaScript and Python
@@ -168,6 +169,142 @@ var dateutil;
         }
     }
     dateutil.Time = Time;
+    class DateTime extends Time {
+        constructor(year, month, day, hour, minute, second, millisecond) {
+            super(hour, minute, second, millisecond);
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
+        getWeekday() {
+            return dateutil.getWeekday(new Date(this.getTime()));
+        }
+        getTime() {
+            return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond)).getTime();
+        }
+        getDay() {
+            return this.day;
+        }
+        getMonth() {
+            return this.month;
+        }
+        getYear() {
+            return this.year;
+        }
+        addYears(years) {
+            this.year += years;
+        }
+        addMonths(months) {
+            this.month += months;
+            if (this.month > 12) {
+                const yearDiv = Math.floor(this.month / 12);
+                const monthMod = helpers_1.pymod(this.month, 12);
+                this.month = monthMod;
+                this.year += yearDiv;
+                if (this.month === 0) {
+                    this.month = 12;
+                    --this.year;
+                }
+            }
+        }
+        addWeekly(days, wkst) {
+            if (wkst > this.getWeekday()) {
+                this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7;
+            }
+            else {
+                this.day += -(this.getWeekday() - wkst) + days * 7;
+            }
+            this.fixDay();
+        }
+        addDaily(days) {
+            this.day += days;
+            this.fixDay();
+        }
+        addHours(hours, filtered, byhour) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.hour += Math.floor((23 - this.hour) / hours) * hours;
+            }
+            while (true) {
+                this.hour += hours;
+                const { div: dayDiv, mod: hourMod } = helpers_1.divmod(this.hour, 24);
+                if (dayDiv) {
+                    this.hour = hourMod;
+                    this.addDaily(dayDiv);
+                    fixday = true;
+                }
+                if (helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour))
+                    break;
+            }
+            return fixday;
+        }
+        addMinutes(minutes, filtered, byhour, byminute) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.minute +=
+                    Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes;
+            }
+            while (true) {
+                this.minute += minutes;
+                const { div: hourDiv, mod: minuteMod } = helpers_1.divmod(this.minute, 60);
+                if (hourDiv) {
+                    this.minute = minuteMod;
+                    fixday = this.addHours(hourDiv, false, byhour);
+                }
+                if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) &&
+                    (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute))) {
+                    break;
+                }
+            }
+            return fixday;
+        }
+        addSeconds(seconds, filtered, byhour, byminute, bysecond) {
+            let fixday = false;
+            if (filtered) {
+                // Jump to one iteration before next day
+                this.second +=
+                    Math.floor((86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds) * seconds;
+            }
+            while (true) {
+                this.second += seconds;
+                const { div: minuteDiv, mod: secondMod } = helpers_1.divmod(this.second, 60);
+                if (minuteDiv) {
+                    this.second = secondMod;
+                    fixday = this.addMinutes(minuteDiv, false, byhour, byminute);
+                }
+                if ((helpers_1.empty(byhour) || helpers_1.includes(byhour, this.hour)) &&
+                    (helpers_1.empty(byminute) || helpers_1.includes(byminute, this.minute)) &&
+                    (helpers_1.empty(bysecond) || helpers_1.includes(bysecond, this.second))) {
+                    break;
+                }
+            }
+            return fixday;
+        }
+        fixDay() {
+            if (this.day <= 28) {
+                return;
+            }
+            let daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
+            if (this.day <= daysinmonth) {
+                return;
+            }
+            while (this.day > daysinmonth) {
+                this.day -= daysinmonth;
+                ++this.month;
+                if (this.month === 13) {
+                    this.month = 1;
+                    ++this.year;
+                    if (this.year > dateutil.MAXYEAR) {
+                        return;
+                    }
+                }
+                daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
+            }
+        }
+    }
+    dateutil.DateTime = DateTime;
 })(dateutil = exports.dateutil || (exports.dateutil = {}));
 exports.default = dateutil;
 //# sourceMappingURL=dateutil.js.map

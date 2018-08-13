@@ -1,3 +1,5 @@
+import { divmod, pymod, empty, includes } from './helpers'
+
 type Datelike = Pick<Date, 'getTime'>
 
 /**
@@ -190,10 +192,10 @@ export namespace dateutil {
   }
 
   export class Time {
-    private hour: number
-    private minute: number
-    private second: number
-    private millisecond: number
+    public hour: number
+    public minute: number
+    public second: number
+    public millisecond: number
 
     constructor (
       hour: number,
@@ -228,6 +230,189 @@ export namespace dateutil {
         (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
         this.millisecond
       )
+    }
+
+  }
+
+  export class DateTime extends Time {
+    public day: number
+    public month: number
+    public year: number
+
+    constructor (
+      year: number,
+      month: number,
+      day: number,
+      hour: number,
+      minute: number,
+      second: number,
+      millisecond: number
+    ) {
+      super(hour, minute, second, millisecond)
+      this.year = year
+      this.month = month
+      this.day = day
+    }
+
+    getWeekday () {
+      return getWeekday(new Date(this.getTime()))
+    }
+
+    getTime () {
+      return new Date(
+        Date.UTC(
+          this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond
+        )
+      ).getTime()
+    }
+
+    getDay () {
+      return this.day
+    }
+
+    getMonth () {
+      return this.month
+    }
+
+    getYear () {
+      return this.year
+    }
+
+    public addYears (years: number) {
+      this.year += years
+    }
+
+    public addMonths (months: number) {
+      this.month += months
+      if (this.month > 12) {
+        const yearDiv = Math.floor(this.month / 12)
+        const monthMod = pymod(this.month, 12)
+        this.month = monthMod
+        this.year += yearDiv
+        if (this.month === 0) {
+          this.month = 12
+          --this.year
+        }
+      }
+    }
+
+    public addWeekly (days: number, wkst: number) {
+      if (wkst > this.getWeekday()) {
+        this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7
+      } else {
+        this.day += -(this.getWeekday() - wkst) + days * 7
+      }
+
+      this.fixDay()
+    }
+
+    public addDaily (days: number) {
+      this.day += days
+      this.fixDay()
+    }
+
+    public addHours (hours: number, filtered: boolean, byhour: number[]) {
+      let fixday = false
+      if (filtered) {
+          // Jump to one iteration before next day
+        this.hour += Math.floor((23 - this.hour) / hours) * hours
+      }
+
+      while (true) {
+        this.hour += hours
+        const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
+        if (dayDiv) {
+          this.hour = hourMod
+          this.addDaily(dayDiv)
+          fixday = true
+        }
+
+        if (empty(byhour) || includes(byhour, this.hour)) break
+      }
+
+      return fixday
+    }
+
+    public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
+      let fixday = false
+      if (filtered) {
+            // Jump to one iteration before next day
+        this.minute +=
+              Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
+      }
+
+      while (true) {
+        this.minute += minutes
+        const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
+        if (hourDiv) {
+          this.minute = minuteMod
+          fixday = this.addHours(hourDiv, false, byhour)
+        }
+
+        if (
+              (empty(byhour) || includes(byhour, this.hour)) &&
+              (empty(byminute) || includes(byminute, this.minute))
+            ) {
+          break
+        }
+      }
+
+      return fixday
+    }
+
+    public addSeconds (seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]) {
+      let fixday = false
+      if (filtered) {
+        // Jump to one iteration before next day
+        this.second +=
+          Math.floor(
+            (86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds
+          ) * seconds
+      }
+
+      while (true) {
+        this.second += seconds
+        const { div: minuteDiv, mod: secondMod } = divmod(this.second, 60)
+        if (minuteDiv) {
+          this.second = secondMod
+          fixday = this.addMinutes(minuteDiv, false, byhour, byminute)
+        }
+
+        if (
+          (empty(byhour) || includes(byhour, this.hour)) &&
+          (empty(byminute) || includes(byminute, this.minute)) &&
+          (empty(bysecond) || includes(bysecond, this.second))
+        ) {
+          break
+        }
+      }
+
+      return fixday
+    }
+
+    public fixDay () {
+      if (this.day <= 28) {
+        return
+      }
+
+      let daysinmonth = monthRange(this.year, this.month - 1)[1]
+      if (this.day <= daysinmonth) {
+        return
+      }
+
+      while (this.day > daysinmonth) {
+        this.day -= daysinmonth
+        ++this.month
+        if (this.month === 13) {
+          this.month = 1
+          ++this.year
+          if (this.year > MAXYEAR) {
+            return
+          }
+        }
+
+        daysinmonth = monthRange(this.year, this.month - 1)[1]
+      }
     }
   }
 }

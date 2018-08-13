@@ -3616,7 +3616,7 @@ describe('RRule', function () {
     ])
   })
 
-  it('generates events', () => {
+  it('generates weekly events (#247)', () => {
     const startEvent = 1533895200000
     const endSearch = 1543618799999
 
@@ -3645,6 +3645,36 @@ describe('RRule', function () {
       new Date('2018-11-16T10:00:00.000Z'),
       new Date('2018-11-23T10:00:00.000Z'),
       new Date('2018-11-30T10:00:00.000Z')
+    ])
+  })
+
+  it('generates monthly (#233)', () => {
+    const start = new Date(Date.parse('Mon Aug 06 2018 10:30:00 GMT+0530'))
+    const end = new Date(Date.parse('Mon Oct 08 2018 11:00:00 GMT+0530'))
+
+    const rrule = new RRule({
+      freq: RRule.MONTHLY,
+      interval: 1,
+      dtstart: start,
+      until: end
+    })
+
+    expect(rrule.all()).to.deep.equal([
+      new Date('2018-08-06T05:00:00.000Z'),
+      new Date('2018-09-06T05:00:00.000Z'),
+      new Date('2018-10-06T05:00:00.000Z')
+    ])
+  })
+
+  it('generates around dst (#249)', () => {
+    const ruleString = 'DTSTART=20181101T120000Z;FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=4;WKST=SU';
+    const rrule = RRule.fromString(ruleString);
+
+    expect(rrule.all()).to.deep.equal([
+      new Date('2018-11-02T12:00:00.000Z'),
+      new Date('2018-11-05T12:00:00.000Z'),
+      new Date('2018-11-07T12:00:00.000Z'),
+      new Date('2018-11-09T12:00:00.000Z')
     ])
   })
 })

@@ -11,13 +11,13 @@ const paths = {
   },
   demoDist: path.resolve(__dirname, "dist"),
   es5: path.resolve(__dirname, "dist", "es5"),
-  es6: path.resolve(__dirname, "dist", "es6")
+  esm: path.resolve(__dirname, "dist", "esm")
 };
 
 const rruleConfig = {
   entry: {
-    rrule: path.join(paths.es6, "index.js"),
-    'rrule.min': path.join(paths.es6, "index.js")
+    rrule: path.join(paths.esm, "index.js"),
+    'rrule.min': path.join(paths.esm, "index.js")
   },
   output: {
     filename: "[name].js",
@@ -28,15 +28,6 @@ const rruleConfig = {
   },
   devtool: "source-map",
   mode: "production",
-  module: {
-    rules: [
-      {
-        test: /\.js?$/,
-        use: "babel-loader",
-        exclude: /node_modules/
-      }
-    ]
-  },
   resolve: {
     extensions: [".js"]
   },

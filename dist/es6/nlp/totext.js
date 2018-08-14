@@ -32,9 +32,8 @@ class ToText {
         if (this.origOptions.bymonthday) {
             const bymonthday = [].concat(this.options.bymonthday);
             const bynmonthday = [].concat(this.options.bynmonthday);
-            bymonthday.sort();
-            bynmonthday.sort();
-            bynmonthday.reverse();
+            bymonthday.sort((a, b) => a - b);
+            bynmonthday.sort((a, b) => b - a);
             // 1, 2, 3, .., -5, -4, -3, ..
             this.bymonthday = bymonthday.concat(bynmonthday);
             if (!this.bymonthday.length)

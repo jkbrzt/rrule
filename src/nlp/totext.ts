@@ -44,6 +44,7 @@ export default class ToText {
     allWeeks: ByWeekday[] | null
     someWeeks: ByWeekday[] | null
     isWeekdays: boolean
+    isEveryDay: boolean
   } | null
 
   constructor (rrule: RRule, gettext: GetText = defaultGetText, language: Language = ENGLISH) {
@@ -86,7 +87,15 @@ export default class ToText {
           days.indexOf('TH') !== -1 &&
           days.indexOf('FR') !== -1 &&
           days.indexOf('SA') === -1 &&
-          days.indexOf('SU') === -1
+          days.indexOf('SU') === -1,
+        isEveryDay:
+          days.indexOf('MO') !== -1 &&
+          days.indexOf('TU') !== -1 &&
+          days.indexOf('WE') !== -1 &&
+          days.indexOf('TH') !== -1 &&
+          days.indexOf('FR') !== -1 &&
+          days.indexOf('SA') !== -1 &&
+          days.indexOf('SU') !== -1
       }
 
       const sortWeekDays = function (a: Weekday, b: Weekday) {
@@ -199,6 +208,7 @@ export default class ToText {
       this.add(
         this.plural(this.options.interval!) ? gettext('days') : gettext('day')
       )
+
     }
 
     if (this.origOptions.bymonth) {
@@ -234,6 +244,10 @@ export default class ToText {
       } else {
         this.add(gettext('on')).add(gettext('weekdays'))
       }
+    } else if (this.byweekday && this.byweekday.isEveryDay) {
+      this.add(
+        this.plural(this.options.interval!) ? gettext('days') : gettext('day')
+      )
     } else {
       if (this.options.interval === 1) this.add(gettext('week'))
 

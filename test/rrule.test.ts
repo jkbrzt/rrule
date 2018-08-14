@@ -3708,4 +3708,12 @@ describe('RRule', function () {
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every week on the 3rd, 10th, 17th and 24th')
   })
+
+  it('shows correct text for every day', () => {
+    const options = { "freq": RRule.WEEKLY, byweekday: [
+      RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU
+    ]}
+    const rule = new RRule(options)
+    expect(rule.toText()).to.equal('every day')
+  })
 })

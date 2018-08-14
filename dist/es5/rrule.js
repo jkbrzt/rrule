@@ -2624,9 +2624,12 @@ var ToText = function () {
         if (this.origOptions.bymonthday) {
             var bymonthday = [].concat(this.options.bymonthday);
             var bynmonthday = [].concat(this.options.bynmonthday);
-            bymonthday.sort();
-            bynmonthday.sort();
-            bynmonthday.reverse();
+            bymonthday.sort(function (a, b) {
+                return a - b;
+            });
+            bynmonthday.sort(function (a, b) {
+                return b - a;
+            });
             // 1, 2, 3, .., -5, -4, -3, ..
             this.bymonthday = bymonthday.concat(bynmonthday);
             if (!this.bymonthday.length) this.bymonthday = null;

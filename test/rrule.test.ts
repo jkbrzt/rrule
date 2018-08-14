@@ -3702,4 +3702,10 @@ describe('RRule', function () {
     expect(rrule.toText()).to.equal('every week on Monday')
     expect(rrule.toString()).to.equal('FREQ=WEEKLY;BYDAY=MO')
   })
+
+  it('sorts monthdays correctly (#101)', () => {
+    const options = { "freq": 2, "bymonthday": [3, 10, 17, 24] }
+    const rule = new RRule(options)
+    expect(rule.toText()).to.equal('every week on the 3rd, 10th, 17th and 24th')
+  })
 })

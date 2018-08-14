@@ -2,7 +2,7 @@ import ENGLISH, { Language } from './i18n'
 import RRule from '../index'
 import { Options, ByWeekday } from '../types'
 import Weekday from '../weekday'
-import { isArray, isNumber, isPresent } from '../helpers'
+import { isArray, isNumber, isPresent, padStart } from '../helpers'
 
 // =============================================================================
 // Helper functions
@@ -59,9 +59,8 @@ export default class ToText {
       const bymonthday = ([] as number[]).concat(this.options.bymonthday!)
       const bynmonthday = ([] as number[]).concat(this.options.bynmonthday!)
 
-      bymonthday.sort()
-      bynmonthday.sort()
-      bynmonthday.reverse()
+      bymonthday.sort((a, b) => a - b)
+      bynmonthday.sort((a, b) => b - a)
       // 1, 2, 3, .., -5, -4, -3, ..
       this.bymonthday = bymonthday.concat(bynmonthday)
       if (!this.bymonthday.length) this.bymonthday = null

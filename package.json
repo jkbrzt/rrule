@@ -17,8 +17,7 @@
     "rfc"
   ],
   "author": "Jakub Roztocil and Lars Schöning",
-  "main": "dist/es6",
-  "module": "dist/es6",
+  "main": "dist/es5",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"

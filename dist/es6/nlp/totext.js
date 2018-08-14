@@ -40,7 +40,7 @@ class ToText {
             if (!this.bymonthday.length)
                 this.bymonthday = null;
         }
-        if (this.origOptions.byweekday) {
+        if (helpers_1.isPresent(this.origOptions.byweekday)) {
             const byweekday = !helpers_1.isArray(this.origOptions.byweekday)
                 ? [this.origOptions.byweekday]
                 : this.origOptions.byweekday;

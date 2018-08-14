@@ -2039,7 +2039,7 @@ function parseOptions(options) {
             }
         }
     }
-    if (!(Boolean(opts.byweekno) || helpers_1.notEmpty(opts.byweekno) || helpers_1.notEmpty(opts.byyearday) || Boolean(opts.bymonthday) || helpers_1.notEmpty(opts.bymonthday) || opts.byweekday !== null || opts.byeaster !== null)) {
+    if (!(Boolean(opts.byweekno) || helpers_1.notEmpty(opts.byweekno) || helpers_1.notEmpty(opts.byyearday) || Boolean(opts.bymonthday) || helpers_1.notEmpty(opts.bymonthday) || helpers_1.isPresent(opts.byweekday) || helpers_1.isPresent(opts.byeaster))) {
         switch (opts.freq) {
             case rrule_1.default.YEARLY:
                 if (!opts.bymonth) opts.bymonth = opts.dtstart.getUTCMonth() + 1;
@@ -2631,7 +2631,7 @@ var ToText = function () {
             this.bymonthday = bymonthday.concat(bynmonthday);
             if (!this.bymonthday.length) this.bymonthday = null;
         }
-        if (this.origOptions.byweekday) {
+        if (helpers_1.isPresent(this.origOptions.byweekday)) {
             var byweekday = !helpers_1.isArray(this.origOptions.byweekday) ? [this.origOptions.byweekday] : this.origOptions.byweekday;
             var days = String(byweekday);
             this.byweekday = {

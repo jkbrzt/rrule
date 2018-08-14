@@ -60,8 +60,8 @@ function parseOptions(options) {
         helpers_1.notEmpty(opts.byyearday) ||
         Boolean(opts.bymonthday) ||
         helpers_1.notEmpty(opts.bymonthday) ||
-        opts.byweekday !== null ||
-        opts.byeaster !== null)) {
+        helpers_1.isPresent(opts.byweekday) ||
+        helpers_1.isPresent(opts.byeaster))) {
         switch (opts.freq) {
             case rrule_1.default.YEARLY:
                 if (!opts.bymonth)

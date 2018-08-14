@@ -3692,4 +3692,14 @@ describe('RRule', function () {
       new Date(Date.UTC(990, 0, 1, 0, 0, 0))
     ])
   })
+
+  it('permits integers in byweekday (#153)', () => {
+    const rrule = new RRule({
+      freq: RRule.WEEKLY,
+      byweekday: 0
+    })
+
+    expect(rrule.toText()).to.equal('every week on Monday')
+    expect(rrule.toString()).to.equal('FREQ=WEEKLY;BYDAY=MO')
+  })
 })

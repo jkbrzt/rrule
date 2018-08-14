@@ -68,8 +68,8 @@ export function parseOptions (options: Partial<Options>) {
       notEmpty(opts.byyearday as number[]) ||
       Boolean(opts.bymonthday) ||
       notEmpty(opts.bymonthday as number[]) ||
-      opts.byweekday !== null ||
-      opts.byeaster !== null
+      isPresent(opts.byweekday) ||
+      isPresent(opts.byeaster)
     )
   ) {
     switch (opts.freq) {
@@ -90,6 +90,7 @@ export function parseOptions (options: Partial<Options>) {
   if (isPresent(opts.bymonth) && !isArray(opts.bymonth)) {
     opts.bymonth = [opts.bymonth]
   }
+
   // byyearday
   if (
     isPresent(opts.byyearday) &&

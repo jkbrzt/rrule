@@ -1,8 +1,8 @@
 import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
-import { DateTime } from 'luxon';
-import { pymod } from '../src/helpers';
+import { DateTime } from 'luxon'
+import mockDate from 'mockdate'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -3749,7 +3749,10 @@ describe('RRule', function () {
         )
     })
 
-    it.skip('generates correct recurrences when the dst offset is different', () => {
+    it('generates correct recurrences when the dst offset is different', () => {
+      const localDate = DateTime.local(2013, 2, 6, 11, 0, 0)
+      mockDate.set(localDate.toJSDate())
+
       const targetZone = 'America/Los_Angeles'
       const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
       const targetOffset = startDate.setZone(targetZone).offset
@@ -3776,6 +3779,8 @@ describe('RRule', function () {
         .to.deep.equal(
           expected 
         )
+
+      mockDate.reset()
     })
   })
 })

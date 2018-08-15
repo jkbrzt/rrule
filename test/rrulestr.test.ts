@@ -255,7 +255,7 @@ describe('rrulestr', function () {
     ]
   )
 
-  it.only('parses TZID', () => {
+  it('parses TZID', () => {
     const rrule = rrulestr(
       'DTSTART;TZID=America/New_York:19970902T090000\n' +
       'RRULE:FREQ=DAILY'

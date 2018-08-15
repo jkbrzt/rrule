@@ -11,6 +11,7 @@ export interface RRuleStrOptions {
   unfold: boolean
   forceset: boolean
   compatible: boolean
+  tzid: string | null
 }
 
 type FreqKey = keyof typeof Frequency
@@ -23,9 +24,8 @@ type FreqKey = keyof typeof Frequency
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
   private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
-    console.log('dtstart', value)
+    console.log('HANDLE DTSTART')
     const parms = /^(;[^:]+):?(.*)/.exec(value)!
-    console.log(parms)
     rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
     if (parms.length > 0) {
       const [ key, timezone ] = parms[0].split('=')
@@ -62,7 +62,8 @@ export default class RRuleStr {
     cache: false,
     unfold: false,
     forceset: false,
-    compatible: false
+    compatible: false,
+    tzid: null
   }
 
   private _handle_int (rrkwargs: Options, name: string, value: string) {
@@ -154,12 +155,12 @@ export default class RRuleStr {
       try {
         // @ts-ignore
         this[`_handle_${name}`](rrkwargs, name, value)
-        console.log('handling',name, value)
       } catch (error) {
         throw new Error("unknown parameter '" + name + "':" + value)
       }
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
+    rrkwargs.tzid = rrkwargs.tzid || options.tzid
     return new RRule(rrkwargs, !options.cache)
   }
 
@@ -267,6 +268,12 @@ export default class RRuleStr {
           exdatevals.push(value)
         } else if (name === 'DTSTART') {
           dtstart = dateutil.untilStringToDate(value)
+          if (parms.length) {
+            const [ key, value ] = parms[0].split('=')
+            if (key === 'TZID') {
+              tzid = value
+            }
+          }
         } else {
           throw new Error('unsupported property: ' + name)
         }
@@ -318,7 +325,9 @@ export default class RRuleStr {
         return this._parseRfcRRule(rrulevals[0], {
           // @ts-ignore
           dtstart: options.dtstart || dtstart,
-          cache: options.cache
+          cache: options.cache,
+          // @ts-ignore
+          tzid: options.tzid || tzid
         })
       }
     }

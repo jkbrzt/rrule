@@ -1,7 +1,7 @@
 import { parseOptions } from '../src/parseoptions'
 import { expect } from 'chai'
 
-describe.only('TZID', () => {
+describe('TZID', () => {
   it('leaves null when null', () => {
     const options = parseOptions({ tzid: null })
     // tslint:disable-next-line:no-unused-expression

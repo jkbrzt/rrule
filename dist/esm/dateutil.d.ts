@@ -64,7 +64,7 @@ export declare namespace dateutil {
      * Sorts an array of Date or dateutil.Time objects
      */
     const sort: <T extends Pick<Date, "getTime">>(dates: T[]) => void;
-    const timeToUntilString: (time: number) => string;
+    const timeToUntilString: (time: number, utc?: boolean) => string;
     const untilStringToDate: (until: string) => Date;
     class Time {
         hour: number;

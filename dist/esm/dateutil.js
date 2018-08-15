@@ -127,23 +127,19 @@ export var dateutil;
             return a.getTime() - b.getTime();
         });
     };
-    dateutil.timeToUntilString = function (time) {
+    dateutil.timeToUntilString = function (time, utc) {
+        if (utc === void 0) { utc = true; }
         var date = new Date(time);
         return [
             padStart(date.getUTCFullYear().toString(), 4, '0'),
-            date.getUTCMonth() + 1,
-            date.getUTCDate(),
+            padStart(date.getUTCMonth() + 1, 2, '0'),
+            padStart(date.getUTCDate(), 2, '0'),
             'T',
-            date.getUTCHours(),
-            date.getUTCMinutes(),
-            date.getUTCSeconds(),
-            'Z'
-        ].map(function (value) { return value.toString(); })
-            .map(function (value) {
-            return /[TZ]/.test(value) ?
-                value :
-                padStart(value, 2, '0');
-        }).join('');
+            padStart(date.getUTCHours(), 2, '0'),
+            padStart(date.getUTCMinutes(), 2, '0'),
+            padStart(date.getUTCSeconds(), 2, '0'),
+            utc ? 'Z' : ''
+        ].join('');
     };
     dateutil.untilStringToDate = function (until) {
         var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;

@@ -4,7 +4,7 @@ import { parseString } from '../src/parsestring'
 import { Options } from '../src/types';
 
 describe('parseString', () => {
-  it('fromString()', function () {
+  it('parses valid single lines of rrules', function () {
     const expectations: ([ string, Partial<Options>][]) = [
       ['FREQ=WEEKLY;UNTIL=20100101T000000Z', { freq: RRule.WEEKLY, until: new Date(Date.UTC(2010, 0, 1, 0, 0, 0)) }],
 

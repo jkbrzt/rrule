@@ -7,7 +7,8 @@ export declare const isArray: (arg: any) => arg is any[];
 export declare const range: (start: number, end?: number) => number[];
 export declare const clone: <T>(array: T[]) => T[];
 export declare const repeat: <T>(value: T | T[], times: number) => (T | T[])[];
-export declare function padStart(str: string, targetLength: number, padString?: string): string;
+export declare const toArray: <T>(item: T | T[]) => T[];
+export declare function padStart(item: string | number, targetLength: number, padString?: string): string;
 /**
  * Python like split
  */

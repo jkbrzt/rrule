@@ -38,8 +38,15 @@ export var repeat = function (value, times) {
     }
     return array;
 };
-export function padStart(str, targetLength, padString) {
+export var toArray = function (item) {
+    if (isArray(item)) {
+        return item;
+    }
+    return [item];
+};
+export function padStart(item, targetLength, padString) {
     if (padString === void 0) { padString = ' '; }
+    var str = String(item);
     targetLength = targetLength >> 0;
     if (str.length > targetLength) {
         return String(str);

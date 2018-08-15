@@ -3719,24 +3719,63 @@ describe('RRule', function () {
     expect(rule.toText()).to.equal('every day')
   })
 
-  it.only('generates recurrences in the timezone if specified with TZID', () => {
-    const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
-    const targetOffset = startDate.setZone('America/New_York').offset
-    const systemOffset = DateTime.local(2013, 8, 6, 11, 0, 0).offset
+  describe.only('time zones', () => {
+    it('generates recurrences in the timezone if specified with TZID', () => {
+      const targetZone = 'America/Los_Angeles'
+      const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
+      const targetOffset = startDate.setZone(targetZone).offset
+      const {
+        offset: systemOffset,
+        zoneName: systemZone
+      } = DateTime.local(2013, 8, 6, 11, 0, 0)
 
-    const dtstart = startDate.toJSDate()
-    const rule = new RRule({
-      dtstart,
-      count: 1,
-      // tzid: 'America/New_York'
+      const dtstart = startDate.toJSDate()
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const netOffset = targetOffset - systemOffset
+      const hours = -((netOffset / 60) % 24)
+      const minutes = -(netOffset % 60)
+      const expected = DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
+      console.log('time in target zone', dtstart, targetZone)
+      console.log('actual', recurrence, systemZone)
+      console.log('expected', expected, systemZone)
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
     })
-    const recurrence = rule.all()[0]
-    const netOffset = targetOffset - systemOffset
-    const hours = (netOffset / 60) % 24
-    const minutes = netOffset % 60
-    expect(recurrence)
-      .to.deep.equal(
-        DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
-      )
+
+    it.skip('generates correct recurrences when the dst offset is different', () => {
+      const targetZone = 'America/Los_Angeles'
+      const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
+      const targetOffset = startDate.setZone(targetZone).offset
+      const {
+        offset: systemOffset,
+        zoneName: systemZone
+      } = DateTime.local(2013, 2, 6, 11, 0, 0)
+
+      const dtstart = startDate.toJSDate()
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const netOffset = targetOffset - systemOffset
+      const hours = -((netOffset / 60) % 24)
+      const minutes = -(netOffset % 60)
+      const expected = DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
+      console.log('time in target zone', dtstart, targetZone)
+      console.log('actual', recurrence, systemZone)
+      console.log('expected', expected, systemZone)
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+    })
   })
 })

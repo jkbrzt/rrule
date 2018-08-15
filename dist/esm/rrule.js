@@ -8,6 +8,7 @@ import { parseOptions, initializeOptions } from './parseoptions';
 import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache } from './cache';
+import { DateTime } from 'luxon';
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -291,7 +292,8 @@ var RRule = /** @class */ (function () {
                         return this.emitResult(iterResult);
                     }
                     if (res >= dtstart) {
-                        if (!iterResult.accept(res)) {
+                        var rezonedDate = this.rezoneIfNeeded(res);
+                        if (!iterResult.accept(rezonedDate)) {
                             return this.emitResult(iterResult);
                         }
                         if (count) {
@@ -317,7 +319,8 @@ var RRule = /** @class */ (function () {
                             return this.emitResult(iterResult);
                         }
                         if (res >= dtstart) {
-                            if (!iterResult.accept(res)) {
+                            var rezonedDate = this.rezoneIfNeeded(res);
+                            if (!iterResult.accept(rezonedDate)) {
                                 return this.emitResult(iterResult);
                             }
                             if (count) {
@@ -371,6 +374,17 @@ var RRule = /** @class */ (function () {
     RRule.prototype.emitResult = function (iterResult) {
         this._len = iterResult.total;
         return iterResult.getValue();
+    };
+    RRule.prototype.rezoneIfNeeded = function (date) {
+        var tzid = this.options.tzid;
+        console.log('tzid', tzid);
+        if (!tzid) {
+            return date;
+        }
+        return DateTime
+            .fromJSDate(date)
+            .setZone(tzid, { keepLocalTime: true })
+            .toJSDate();
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [

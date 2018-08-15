@@ -23,6 +23,7 @@ import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
+import { DateTime } from 'luxon'
 
 interface GetNlp {
   _nlp: Nlp
@@ -436,7 +437,8 @@ export default class RRule implements QueryMethods {
           }
 
           if (res >= dtstart) {
-            if (!iterResult.accept(res)) {
+            const rezonedDate = this.rezoneIfNeeded(res)
+            if (!iterResult.accept(rezonedDate)) {
               return this.emitResult(iterResult)
             }
 
@@ -464,7 +466,8 @@ export default class RRule implements QueryMethods {
             }
 
             if (res >= dtstart) {
-              if (!iterResult.accept(res)) {
+              const rezonedDate = this.rezoneIfNeeded(res)
+              if (!iterResult.accept(rezonedDate)) {
                 return this.emitResult(iterResult)
               }
 
@@ -520,6 +523,19 @@ export default class RRule implements QueryMethods {
   private emitResult (iterResult: IterResult) {
     this._len = iterResult.total
     return iterResult.getValue() as Date[]
+  }
+
+  private rezoneIfNeeded (date: Date) {
+    const { tzid } = this.options
+    console.log('tzid', tzid)
+    if (!tzid) {
+      return date
+    }
+
+    return DateTime
+      .fromJSDate(date)
+      .setZone(tzid, { keepLocalTime: true })
+      .toJSDate()
   }
 }
 

@@ -70,20 +70,6 @@ describe('RRule', function () {
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
 
-  it('fromString()', function () {
-    const strings = [
-      ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],
-
-      // Parse also `date` but return `date-time`
-      ['FREQ=WEEKLY;UNTIL=20100101', 'FREQ=WEEKLY;UNTIL=20100101T000000Z']
-    ]
-    strings.forEach(function (item) {
-      const s = item[0]
-      const s2 = item[1]
-      expect(RRule.fromString(s).toString()).equals(s2, s + ' => ' + s2)
-    })
-  })
-
   it('does not mutate the passed-in options object', function () {
     const options = {
       freq: RRule.MONTHLY,
@@ -3719,7 +3705,7 @@ describe('RRule', function () {
     expect(rule.toText()).to.equal('every day')
   })
 
-  describe.only('time zones', () => {
+  describe('time zones', () => {
     it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
       const local = DateTime.local(2013, 2, 6, 11, 0, 0)
       console.log("local", local.toJSDate(), { dst: local.isInDST, fixed: local.isOffsetFixed })
@@ -3745,9 +3731,7 @@ describe('RRule', function () {
       const hours = -((netOffset / 60) % 24)
       const minutes = -(netOffset % 60)
       const expected = startDate.plus({ hours, minutes }).toJSDate()
-      console.log('time in target zone', dtstart, targetZone)
-      console.log('actual', recurrence, systemZone)
-      console.log('expected', expected, systemZone)
+
       expect(recurrence)
         .to.deep.equal(
           expected 
@@ -3780,9 +3764,7 @@ describe('RRule', function () {
       const hours = -((netOffset / 60) % 24)
       const minutes = -(netOffset % 60)
       const expected = DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
-      console.log('time in target zone', dtstart, targetZone)
-      console.log('actual', recurrence, systemZone)
-      console.log('expected', expected, systemZone)
+
       expect(recurrence)
         .to.deep.equal(
           expected 

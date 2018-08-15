@@ -1258,8 +1258,15 @@ function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
-    var attrs = rfcString.split(';');
     var options = {};
+    var dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString);
+    if (dtstartWithZone) {
+        var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
+        options.tzid = tzid;
+        options.dtstart = esm_dateutil.untilStringToDate(dtstart);
+        return options;
+    }
+    var attrs = rfcString.split(';');
     for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i].split('=');
         var key = attr[0];

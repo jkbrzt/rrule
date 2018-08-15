@@ -21,6 +21,7 @@ export interface Options {
     wkst: Weekday | number | null;
     count: number | null;
     until: Date | null;
+    tzid: string | null;
     bysetpos: number | number[] | null;
     bymonth: number | number[] | null;
     bymonthday: number | number[] | null;

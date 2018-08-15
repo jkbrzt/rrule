@@ -1537,6 +1537,7 @@ var DEFAULT_OPTIONS = {
     wkst: Days.MO,
     count: null,
     until: null,
+    tzid: null,
     bysetpos: null,
     bymonth: null,
     bymonthday: null,
@@ -2165,7 +2166,15 @@ var rrulestr_RRuleStr = /** @class */ (function () {
     }
     // tslint:disable-next-line:variable-name
     RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
+        console.log('HANDLE DTSTART');
+        var parms = /^(;[^:]+):?(.*)/.exec(value);
         rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(value);
+        if (parms.length > 0) {
+            var _a = parms[0].split('='), key = _a[0], timezone = _a[1];
+            if (key.toUpperCase() === 'TZID') {
+                rrkwargs['tzid'] = timezone;
+            }
+        }
     };
     RRuleStr.prototype._handle_int = function (rrkwargs, name, value) {
         // @ts-ignore
@@ -2255,6 +2264,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
             }
         }
         rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
+        rrkwargs.tzid = rrkwargs.tzid || options.tzid;
         return new esm_rrule(rrkwargs, !options.cache);
     };
     RRuleStr.prototype._parseRfc = function (s, options) {
@@ -2262,7 +2272,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
             options.forceset = true;
             options.unfold = true;
         }
-        s = s && s.toUpperCase().trim();
+        s = s && s.trim();
         if (!s)
             throw new Error('Invalid empty string');
         var i = 0;
@@ -2298,6 +2308,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
         var value;
         var parts;
         var dtstart;
+        var tzid;
         var rset;
         var j;
         var k;
@@ -2328,7 +2339,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 var parms = name.split(';');
                 if (!parms)
                     throw new Error('empty property name');
-                name = parms[0];
+                name = parms[0].toUpperCase();
                 parms = parms.slice(1);
                 if (name === 'RRULE') {
                     for (j = 0; j < parms.length; j++) {
@@ -2364,6 +2375,12 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 }
                 else if (name === 'DTSTART') {
                     dtstart = esm_dateutil.untilStringToDate(value);
+                    if (parms.length) {
+                        var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
+                        if (key === 'TZID') {
+                            tzid = value_1;
+                        }
+                    }
                 }
                 else {
                     throw new Error('unsupported property: ' + name);
@@ -2410,7 +2427,9 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 return this._parseRfcRRule(rrulevals[0], {
                     // @ts-ignore
                     dtstart: options.dtstart || dtstart,
-                    cache: options.cache
+                    cache: options.cache,
+                    // @ts-ignore
+                    tzid: options.tzid || tzid
                 });
             }
         }
@@ -2459,7 +2478,8 @@ var rrulestr_RRuleStr = /** @class */ (function () {
         cache: false,
         unfold: false,
         forceset: false,
-        compatible: false
+        compatible: false,
+        tzid: null
     };
     return RRuleStr;
 }());

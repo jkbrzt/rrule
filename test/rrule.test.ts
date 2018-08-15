@@ -1,6 +1,8 @@
 import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
+import { DateTime } from 'luxon';
+import { pymod } from '../src/helpers';
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -3715,5 +3717,26 @@ describe('RRule', function () {
     ]}
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every day')
+  })
+
+  it.only('generates recurrences in the timezone if specified with TZID', () => {
+    const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
+    const targetOffset = startDate.setZone('America/New_York').offset
+    const systemOffset = DateTime.local(2013, 8, 6, 11, 0, 0).offset
+
+    const dtstart = startDate.toJSDate()
+    const rule = new RRule({
+      dtstart,
+      count: 1,
+      // tzid: 'America/New_York'
+    })
+    const recurrence = rule.all()[0]
+    const netOffset = targetOffset - systemOffset
+    const hours = (netOffset / 60) % 24
+    const minutes = netOffset % 60
+    expect(recurrence)
+      .to.deep.equal(
+        DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
+      )
   })
 })

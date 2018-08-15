@@ -380,10 +380,18 @@ var RRule = /** @class */ (function () {
         if (!tzid) {
             return date;
         }
-        var datetime = DateTime
-            .fromJSDate(date);
-        var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
-        return rezoned.toJSDate();
+        try {
+            var datetime = DateTime
+                .fromJSDate(date);
+            var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
+            return rezoned.toJSDate();
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
+            }
+            return date;
+        }
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [

@@ -532,12 +532,19 @@ export default class RRule implements QueryMethods {
       return date
     }
 
-    const datetime = DateTime
-      .fromJSDate(date)
+    try {
+      const datetime = DateTime
+        .fromJSDate(date)
 
-    const rezoned = datetime.setZone(tzid, { keepLocalTime: true })
+      const rezoned = datetime.setZone(tzid, { keepLocalTime: true })
 
-    return rezoned.toJSDate()
+      return rezoned.toJSDate()
+    } catch (e) {
+      if (e instanceof TypeError) {
+        console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone')
+      }
+      return date
+    }
   }
 }
 

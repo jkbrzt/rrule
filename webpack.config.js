@@ -28,6 +28,9 @@ const rruleConfig = {
   },
   devtool: "source-map",
   mode: "production",
+  externals: {
+    luxon: 'luxon'
+  },
   resolve: {
     extensions: [".js"]
   },

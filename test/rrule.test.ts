@@ -2,7 +2,7 @@ import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
-import mockDate from 'mockdate'
+import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -3720,7 +3720,47 @@ describe('RRule', function () {
   })
 
   describe.only('time zones', () => {
-    it('generates recurrences in the timezone if specified with TZID', () => {
+    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+      const local = DateTime.local(2013, 2, 6, 11, 0, 0)
+      console.log("local", local.toJSDate(), { dst: local.isInDST, fixed: local.isOffsetFixed })
+      setMockDate(local.toJSDate())
+
+      const targetZone = 'America/Los_Angeles'
+      const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
+
+      const { zoneName: systemZone } = local
+      const targetOffset = startDate.setZone(targetZone).offset
+      const {
+        offset: systemOffset,
+      } = startDate.setZone(systemZone)
+
+      const dtstart = startDate.toJSDate()
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const netOffset = targetOffset - systemOffset
+      const hours = -((netOffset / 60) % 24)
+      const minutes = -(netOffset % 60)
+      const expected = startDate.plus({ hours, minutes }).toJSDate()
+      console.log('time in target zone', dtstart, targetZone)
+      console.log('actual', recurrence, systemZone)
+      console.log('expected', expected, systemZone)
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+
+      resetMockDate()
+    })
+
+  it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
+      const localDate = DateTime.local(2013, 8, 6, 11, 0, 0)
+      console.log("local", localDate.toJSDate(), { dst: localDate.isInDST, fixed: localDate.isOffsetFixed })
+      setMockDate(localDate.toJSDate())
+
       const targetZone = 'America/Los_Angeles'
       const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
       const targetOffset = startDate.setZone(targetZone).offset
@@ -3747,40 +3787,8 @@ describe('RRule', function () {
         .to.deep.equal(
           expected 
         )
-    })
 
-    it('generates correct recurrences when the dst offset is different', () => {
-      const localDate = DateTime.local(2013, 2, 6, 11, 0, 0)
-      mockDate.set(localDate.toJSDate())
-
-      const targetZone = 'America/Los_Angeles'
-      const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
-      const targetOffset = startDate.setZone(targetZone).offset
-      const {
-        offset: systemOffset,
-        zoneName: systemZone
-      } = DateTime.local(2013, 2, 6, 11, 0, 0)
-
-      const dtstart = startDate.toJSDate()
-      const rule = new RRule({
-        dtstart,
-        count: 1,
-        tzid: targetZone
-      })
-      const recurrence = rule.all()[0]
-      const netOffset = targetOffset - systemOffset
-      const hours = -((netOffset / 60) % 24)
-      const minutes = -(netOffset % 60)
-      const expected = DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
-      console.log('time in target zone', dtstart, targetZone)
-      console.log('actual', recurrence, systemZone)
-      console.log('expected', expected, systemZone)
-      expect(recurrence)
-        .to.deep.equal(
-          expected 
-        )
-
-      mockDate.reset()
+      resetMockDate()
     })
   })
 })

@@ -1892,14 +1892,13 @@ var rrule_RRule = /** @class */ (function () {
     };
     RRule.prototype.rezoneIfNeeded = function (date) {
         var tzid = this.options.tzid;
-        console.log('tzid', tzid);
         if (!tzid) {
             return date;
         }
-        return luxon["DateTime"]
-            .fromJSDate(date)
-            .setZone(tzid, { keepLocalTime: true })
-            .toJSDate();
+        var datetime = luxon["DateTime"]
+            .fromJSDate(date);
+        var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
+        return rezoned.toJSDate();
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [

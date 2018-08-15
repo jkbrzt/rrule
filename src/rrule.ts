@@ -527,15 +527,17 @@ export default class RRule implements QueryMethods {
 
   private rezoneIfNeeded (date: Date) {
     const { tzid } = this.options
-    console.log('tzid', tzid)
+
     if (!tzid) {
       return date
     }
 
-    return DateTime
+    const datetime = DateTime
       .fromJSDate(date)
-      .setZone(tzid, { keepLocalTime: true })
-      .toJSDate()
+
+    const rezoned = datetime.setZone(tzid, { keepLocalTime: true })
+
+    return rezoned.toJSDate()
   }
 }
 

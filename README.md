@@ -59,22 +59,26 @@ const rule = new RRule({
   freq: RRule.WEEKLY,
   interval: 5,
   byweekday: [RRule.MO, RRule.FR],
-  dtstart: new Date(2012, 1, 1, 10, 30),
-  until: new Date(2012, 12, 31)
+  dtstart: new Date(Date.UTC(2012, 1, 1, 10, 30)),
+  until: new Date(Date.UTC(2012, 12, 31))
 })
 
 // Get all occurrence dates (Date instances):
 rule.all()
-['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
- 'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',
- 'Fri Mar 09 2012 10:30:00 GMT+0100 (CET)',
- 'Mon Apr 09 2012 10:30:00 GMT+0200 (CEST)',
+[ '2012-02-03T10:30:00.000Z',
+  '2012-03-05T10:30:00.000Z',
+  '2012-03-09T10:30:00.000Z',
+  '2012-04-09T10:30:00.000Z',
+  '2012-04-13T10:30:00.000Z',
+  '2012-05-14T10:30:00.000Z',
+  '2012-05-18T10:30:00.000Z',
+
  /* … */]
 
 // Get a slice:
-rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
-['Mon Aug 27 2012 10:30:00 GMT+0200 (CEST)',
- 'Fri Aug 31 2012 10:30:00 GMT+0200 (CEST)']
+rule.between(new Date(Date.UTC(2012, 7, 1)), new Date(Date.UTC(2012, 8, 1)))
+['2012-08-27T10:30:00.000Z',
+ '2012-08-31T10:30:00.000Z']
 
 // Get an iCalendar RRULE string representation:
 // The output can be used with RRule.fromString().
@@ -95,36 +99,36 @@ const rruleSet = new RRuleSet()
 rruleSet.rrule(new RRule({
   freq: RRule.MONTHLY,
   count: 5,
-  dtstart: new Date(2012, 1, 1, 10, 30)
+  dtstart: new Date(Date.UTC(2012, 1, 1, 10, 30))
 }))
 
 // Add a date to rruleSet
-rruleSet.rdate(new Date(2012, 6, 1, 10, 30))
+rruleSet.rdate(new Date(Date.UTC(2012, 6, 1, 10, 30)))
 
 // Add another date to rruleSet
-rruleSet.rdate(new Date(2012, 6, 2, 10, 30))
+rruleSet.rdate(new Date(Date.UTC(2012, 6, 2, 10, 30)))
 
 // Add a exclusion rrule to rruleSet
 rruleSet.exrule(new r.RRule({
   freq: RRule.MONTHLY,
   count: 2,
-  dtstart: new Date(2012, 2, 1, 10, 30)
+  dtstart: new Date(Date.UTC(2012, 2, 1, 10, 30))
 }))
 
 // Add a exclusion date to rruleSet
-rruleSet.exdate(new Date(2012, 5, 1, 10, 30))
+rruleSet.exdate(new Date(Date.UTC(2012, 5, 1, 10, 30)))
 
 // Get all occurrence dates (Date instances):
 rruleSet.all()
-['Wed Feb 01 2012 10:30:00 GMT+0800 (CST)',
- 'Tue May 01 2012 10:30:00 GMT+0800 (CST)',
- 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)',
- 'Mon Jul 02 2012 10:30:00 GMT+0800 (CST)']
+[ '2012-02-01T10:30:00.000Z',
+  '2012-05-01T10:30:00.000Z',
+  '2012-07-01T10:30:00.000Z',
+  '2012-07-02T10:30:00.000Z' ]
 
 // Get a slice:
-rruleSet.between(new Date(2012, 2, 1), new Date(2012, 6, 2))
-['Tue May 01 2012 10:30:00 GMT+0800 (CST)',
- 'Sun Jul 01 2012 10:30:00 GMT+0800 (CST)']
+rruleSet.between(new Date(Date.UTC(2012, 2, 1)), new Date(Date.UTC(2012, 6, 2)))
+[ '2012-05-01T10:30:00.000Z', '2012-07-01T10:30:00.000Z' ]
+
 
  // To string
 rruleSet.valueOf()
@@ -153,6 +157,55 @@ rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T02
 
 For more examples see
 [python-dateutil](http://labix.org/python-dateutil/) documentation.
+
+* * * * *
+
+### Timezone Support
+
+By default, `RRule` only correctly supports
+["floating" times or UTC timezones](https://tools.ietf.org/html/rfc2445#section-4.2.19).
+Optionally, it also supports use of the `TZID` parameter in the
+[RFC](https://tools.ietf.org/html/rfc2445#section-4.2.19)
+when the [Luxon](https://github.com/moment/luxon) library is provided. The 
+[specification](https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone)
+and [support matrix](https://moment.github.io/luxon/docs/manual/matrix.html) for Luxon apply.
+
+Example with `TZID`:
+
+```js
+new RRule({
+  dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
+  count: 1,
+  tzid: 'Asia/Tokyo'
+}).all()
+
+// assuming the system timezone is set to America/Los_Angeles, you get:
+[ '2018-01-31T17:30:00.000Z' ]
+// which is the time in Los Angeles when it's 2018-02-01T10:30:00 in Tokyo.
+```
+
+Whether or not you use the `TZID` param, make sure to only use JS `Date` objects that are
+represented in UTC to avoid unexpected timezone offsets being applied, for example:
+
+```js
+// WRONG: Will produce dates with TZ offsets added
+new RRule({
+  freq: RRule.MONTHLY,
+  dtstart: new Date(2018, 1, 1, 10, 30),
+  until: new Date(2018, 2, 31)
+}).all()
+
+[ '2018-02-01T18:30:00.000Z' ]
+
+// RIGHT: Will produce dates with recurrences at the correct time
+new RRule({
+  freq: RRule.MONTHLY,
+  dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
+  until: new Date(Date.UTC(2018, 2, 31))
+}).all()
+
+[ '2018-02-01T10:30:00.000Z' ]
+```
 
 ### API
 
@@ -228,6 +281,13 @@ iCalendar RFC. Only `freq` is required.
             <code>until</code>
             argument, this will be the last occurrence.
         </td>
+    </tr>
+    <tr>
+      <td><code>tzid</code></td>
+      <td>If given, this must be a string <a href="https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone">supported</a>
+      by Luxon, and the <a href="https://moment.github.io/luxon/">Luxon</a> library must be provided. See
+      discussion under <a href="#timezone-support">Timezone support</a>.
+      </td>
     </tr>
     <tr>
         <td><code>bysetpos</code></td>
@@ -365,15 +425,14 @@ the result and the iteration is interrupted (possibly prematurely).
 
 ```javascript
 rule.all()
-['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
- 'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',
- 'Fri Mar 09 2012 10:30:00 GMT+0100 (CET)',
- 'Mon Apr 09 2012 10:30:00 GMT+0200 (CEST)',
- /* … */]
+[ '2012-02-01T10:30:00.000Z',
+  '2012-05-01T10:30:00.000Z',
+  '2012-07-01T10:30:00.000Z',
+  '2012-07-02T10:30:00.000Z' ]
 
 rule.all(function (date, i){return i < 2})
-['Fri Feb 03 2012 10:30:00 GMT+0100 (CET)',
- 'Mon Mar 05 2012 10:30:00 GMT+0100 (CET)',]
+[ '2012-02-01T10:30:00.000Z',
+  '2012-05-01T10:30:00.000Z' ]
 ```
 
 ##### `RRule.prototype.between(after, before, inc=false [, iterator])`
@@ -387,9 +446,9 @@ Optional `iterator` has the same function as it has with
 `RRule.prototype.all()`.
 
 ```javascript
-rule.between(new Date(2012, 7, 1), new Date(2012, 8, 1))
-['Mon Aug 27 2012 10:30:00 GMT+0200 (CEST)',
- 'Fri Aug 31 2012 10:30:00 GMT+0200 (CEST)']
+rule.between(new Date(Date.UTC(2012, 7, 1)), new Date(Date.UTC(2012, 8, 1)))
+['2012-08-27T10:30:00.000Z',
+ '2012-08-31T10:30:00.000Z']
 ```
 
 ##### `RRule.prototype.before(dt, inc=false)`
@@ -463,7 +522,7 @@ Only parse RFC string and return `options`.
 
 ```javascript
 var options = RRule.parseString('FREQ=DAILY;INTERVAL=6')
-options.dtstart = new Date(2000, 1, 1)
+options.dtstart = new Date(Date.UTC(2000, 1, 1))
 var rule = new RRule(options)
 ```
 
@@ -599,15 +658,15 @@ If set to True, the parser will operate in RFC-compatible mode. Right now it
 means that unfold will be turned on, and if a DTSTART is found, it will be
 considered the first recurrence instance, as documented in the RFC.
 
+`tzid`
+If given, it must be a string that will be used when no `TZID` property is found
+in the parsed string. If it is not given, and the property is not found, `'UTC'`
+will be used by default.
+
+
 * * * * *
 
 ### Differences From iCalendar RFC
-
-* *Timezones:* `RRule` does not implement the `TZID` keyword in the RFC. It
-only correctly supports "floating" times or UTC timezones. While it will work
-the same regardless of the host system's timezone, for best results, only pass
-in JS `Date` objects that are represented in UTC to avoid unexpected timezone
-offsets being applied.
 
 * `RRule` has no `byday` keyword. The equivalent keyword has been replaced by
 the `byweekday` keyword, to remove the ambiguity present in the original
@@ -621,7 +680,7 @@ original behavior by using a `RRuleSet` and adding the `dtstart` as an `rdate`.
 
 ```javascript
 var rruleSet = new RRuleSet()
-var start = new Date(2012, 1, 1, 10, 30)
+var start = new Date(Date.UTC(2012, 1, 1, 10, 30))
 
 // Add a rrule to rruleSet
 rruleSet.rrule(new RRule({

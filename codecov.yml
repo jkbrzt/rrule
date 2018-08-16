@@ -1,0 +1,6 @@
+ignore:
+  - "dist/"
+  - "test/"
+  - "demo/"
+  - "node_modules/"
+  - ".github/"

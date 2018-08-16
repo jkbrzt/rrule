@@ -26,13 +26,11 @@ var RRuleStr = /** @class */ (function () {
     }
     // tslint:disable-next-line:variable-name
     RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
-        var parms = /^(;[^:]+):?(.*)/.exec(value);
-        rrkwargs['dtstart'] = dateutil.untilStringToDate(value);
-        if (parms.length > 0) {
-            var _a = parms[0].split('='), key = _a[0], timezone = _a[1];
-            if (key.toUpperCase() === 'TZID') {
-                rrkwargs['tzid'] = timezone;
-            }
+        var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+        var ___ = parms[0], tzid = parms[1], dtstart = parms[2];
+        rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart);
+        if (tzid) {
+            rrkwargs['tzid'] = tzid;
         }
     };
     RRuleStr.prototype._handle_int = function (rrkwargs, name, value) {
@@ -98,29 +96,37 @@ var RRuleStr = /** @class */ (function () {
         var name;
         var value;
         var parts;
-        if (line.indexOf(':') !== -1) {
-            parts = line.split(':');
-            name = parts[0];
-            value = parts[1];
+        var nameRegex = /^([A-Z]+):(.*)$/;
+        var nameParts = nameRegex.exec(line);
+        if (nameParts && nameParts.length >= 3) {
+            name = nameParts[1];
+            value = nameParts[2];
             if (name !== 'RRULE')
-                throw new Error('unknown parameter name');
+                throw new Error("unknown parameter name " + name);
         }
         else {
             value = line;
         }
         var rrkwargs = {};
+        var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
+        if (dtstart && dtstart.length > 0) {
+            var dtstartClause = dtstart[0];
+            this._handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
+        }
         var pairs = value.split(';');
         for (var i = 0; i < pairs.length; i++) {
             parts = pairs[i].split('=');
             name = parts[0].toUpperCase();
-            value = parts[1].toUpperCase();
-            try {
-                // @ts-ignore
-                this["_handle_" + name](rrkwargs, name, value);
+            if (/DTSTART|TZID/.test(name)) {
+                continue;
             }
-            catch (error) {
+            value = parts[1].toUpperCase();
+            // @ts-ignore
+            var paramHandler = this["_handle_" + name];
+            if (typeof paramHandler !== 'function') {
                 throw new Error("unknown parameter '" + name + "':" + value);
             }
+            paramHandler(rrkwargs, name, value);
         }
         rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
         rrkwargs.tzid = rrkwargs.tzid || options.tzid;

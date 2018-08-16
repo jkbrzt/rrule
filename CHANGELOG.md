@@ -1,5 +1,10 @@
 ### Changelog
 
+- 2.4.1 (2018-08-16)
+  - Features:
+    - Added codecov (#265)
+  - Bugfixes:
+    - Fixed RRULE parsing issue (#266)
 - 2.4.0 (2018-08-16)
   - Features:
     - Implement `TZID` support (#38, #261)

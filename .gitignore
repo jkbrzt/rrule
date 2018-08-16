@@ -3,3 +3,5 @@ bower_components/
 .idea
 .vscode
 *.log
+coverage
+.nyc_output

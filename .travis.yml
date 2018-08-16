@@ -12,5 +12,4 @@ script:
   - TZ=Asia/Tokyo nyc yarn test
 after_success:
   - nyc report --reporter=json && codecov -f coverage/*.json
-  - codecov
 sudo: false

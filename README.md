@@ -34,7 +34,9 @@ Alternatively, download manually:
 
  * [rrule.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.min.js) (bundled, minified)
  * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) (bundled, not minified)
- * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es6/rrule.js) (es6 source with optional TypeScript types)
+ * [rrule-tz.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule-tz.min.js) (with timezone support, bundled, minified)
+ * [rrule-tz.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule-tz.js) (with timezone support, bundled, not minified)
+ * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/esm/rrule.js) (ES module source with optional TypeScript types)
 
 ```html
 <script src="rrule/dist/es5/rrule.min.js"></script>

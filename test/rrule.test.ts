@@ -3706,44 +3706,61 @@ describe('RRule', function () {
   })
 
   describe('time zones', () => {
-    let local: DateTime
     const targetZone = 'America/Los_Angeles'
     const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
     const targetOffset = startDate.setZone(targetZone).offset
     const dtstart = startDate.toJSDate()
-    let systemZone: string
-    let systemOffset: number
 
-    beforeEach(() => {
-      local = DateTime.local(2013, 2, 6, 11, 0, 0)
+    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+      const local = DateTime.local(2013, 2, 6, 11, 0, 0)
       setMockDate(local.toJSDate())
-      systemZone = local.zoneName
 
-      const {
-        offset: systemOffset,
-      } = startDate.setZone(systemZone)
-    })
-
-    afterEach(() => {
-      resetMockDate()
-    })
-
-    it('generates correct recurrences', () => {
       const rule = new RRule({
         dtstart,
         count: 1,
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const netOffset = targetOffset - systemOffset
-      const hours = -((netOffset / 60) % 24)
-      const minutes = -(netOffset % 60)
-      const expected = startDate.plus({ hours, minutes }).toJSDate()
+      const expected = expectedDate(startDate, local)
 
       expect(recurrence)
         .to.deep.equal(
           expected 
         )
+
+      resetMockDate()
     })
+
+  it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
+      const local = DateTime.local(2013, 8, 6, 11, 0, 0)
+      setMockDate(local.toJSDate())
+
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const expected = expectedDate(startDate, local)
+
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+
+      resetMockDate()
+    })
+
+    function expectedDate(startDate: DateTime, local: DateTime): Date {
+      const { zoneName: systemZone } = local
+      const {
+        offset: systemOffset,
+      } = startDate.setZone(systemZone)
+
+      const netOffset = targetOffset - systemOffset
+      const hours = -((netOffset / 60) % 24)
+      const minutes = -(netOffset % 60)
+      return DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
+    }
   })
 })

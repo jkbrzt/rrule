@@ -139,7 +139,6 @@ $ ->
                     if not value
                         continue
                     else if key in ['dtstart', 'until']
-                        console.log value, Date.parse(value + 'Z')
                         date = new Date(Date.parse(value + 'Z'))
                         value = date
                     else if key is 'byweekday'

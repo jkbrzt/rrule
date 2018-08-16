@@ -29,14 +29,14 @@ getOptionsCode = (options) ->
         else if k is 'freq'
             v = 'RRule.' + RRule.FREQUENCIES[v]
         else if k in ["dtstart", "until"]
-            v = "new Date(" + [
-                v.getFullYear()
-                v.getMonth()
-                v.getDate()
-                v.getHours()
-                v.getMinutes()
-                v.getSeconds()
-            ].join(', ') + ")"
+            v = "new Date(Date.UTC(" + [
+                v.getUTCFullYear()
+                v.getUTCMonth()
+                v.getUTCDate()
+                v.getUTCHours()
+                v.getUTCMinutes()
+                v.getUTCSeconds()
+            ].join(', ') + "))"
         else if k is "byweekday"
             if v instanceof Array
                 v = v.map (wday)->
@@ -68,7 +68,7 @@ makeRows = (dates)->
     rows = for date in dates
 
         states = []
-        parts = date.toString().split(' ')
+        parts = date.toUTCString().split(' ')
 
         cells = for part, i in parts
             if part != prevParts[i]
@@ -139,8 +139,8 @@ $ ->
                     if not value
                         continue
                     else if key in ['dtstart', 'until']
-                        date = new Date(Date.parse(value))
-                        value = new Date(date.getTime() + (date.getTimezoneOffset() * 60 * 1000))
+                        date = new Date(Date.parse(value + 'Z'))
+                        value = date
                     else if key is 'byweekday'
                         if value instanceof Array
                             value = value.map(getDay)

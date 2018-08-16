@@ -1,10 +1,11 @@
-const WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
-
 // =============================================================================
 // Weekday
 // =============================================================================
 
-export default class Weekday {
+export type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
+const WDAYS: WeekdayStr[] = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
+
+export class Weekday {
   public readonly weekday: number
   public readonly n?: number
 
@@ -27,7 +28,7 @@ export default class Weekday {
 
   // __repr__
   toString () {
-    let s = WDAYS[this.weekday]
+    let s: string = WDAYS[this.weekday]
     if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s
     return s
   }

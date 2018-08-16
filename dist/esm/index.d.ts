@@ -16,8 +16,8 @@
 import RRule from './rrule';
 import RRuleSet from './rruleset';
 import RRuleStr from './rrulestr';
-export { Frequency, ByWeekday, WeekdayStr, Options } from './types';
-export { default as Weekday } from './weekday';
+export { Frequency, ByWeekday, Options } from './types';
+export { Weekday, WeekdayStr } from './weekday';
 export { RRuleStrOptions } from './rrulestr';
 declare const rruleStr: RRuleStr;
 declare const rrulestr: typeof rruleStr.parse;

@@ -6,6 +6,16 @@ import { ParsedOptions, Options, Frequency, QueryMethods } from './types';
 import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache, CacheKeys } from './cache';
+import { Weekday } from './weekday';
+export declare const Days: {
+    MO: Weekday;
+    TU: Weekday;
+    WE: Weekday;
+    TH: Weekday;
+    FR: Weekday;
+    SA: Weekday;
+    SU: Weekday;
+};
 export declare const DEFAULT_OPTIONS: Options;
 export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
@@ -29,13 +39,13 @@ export default class RRule implements QueryMethods {
     static readonly HOURLY: Frequency;
     static readonly MINUTELY: Frequency;
     static readonly SECONDLY: Frequency;
-    static readonly MO: import("src/weekday").default;
-    static readonly TU: import("src/weekday").default;
-    static readonly WE: import("src/weekday").default;
-    static readonly TH: import("src/weekday").default;
-    static readonly FR: import("src/weekday").default;
-    static readonly SA: import("src/weekday").default;
-    static readonly SU: import("src/weekday").default;
+    static readonly MO: Weekday;
+    static readonly TU: Weekday;
+    static readonly WE: Weekday;
+    static readonly TH: Weekday;
+    static readonly FR: Weekday;
+    static readonly SA: Weekday;
+    static readonly SU: Weekday;
     constructor(options?: Partial<Options>, noCache?: boolean);
     static parseText(text: string, language: Language): Partial<Options> | null;
     static fromText(text: string, language?: Language): RRule;

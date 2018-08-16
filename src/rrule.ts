@@ -1,28 +1,18 @@
 import dateutil from './dateutil'
 import Iterinfo, { GetDayset, DaySet } from './iterinfo'
-import {
-  pymod,
-  notEmpty,
-  includes,
-  isPresent
-} from './helpers'
+import { pymod, notEmpty, includes, isPresent } from './helpers'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
-import {
-  Days,
-  ParsedOptions,
-  Options,
-  Frequency,
-  QueryMethods
-} from './types'
+import { ParsedOptions, Options, Frequency, QueryMethods } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
+import { Weekday } from './weekday'
 
 interface GetNlp {
   _nlp: Nlp
@@ -40,6 +30,16 @@ const getnlp: GetNlp = function () {
 // =============================================================================
 // RRule
 // =============================================================================
+
+export const Days = {
+  MO: new Weekday(0),
+  TU: new Weekday(1),
+  WE: new Weekday(2),
+  TH: new Weekday(3),
+  FR: new Weekday(4),
+  SA: new Weekday(5),
+  SU: new Weekday(6)
+}
 
 export const DEFAULT_OPTIONS: Options = {
   freq: Frequency.YEARLY,
@@ -109,9 +109,7 @@ export default class RRule implements QueryMethods {
   constructor (options: Partial<Options> = {}, noCache: boolean = false) {
     // RFC string
     this._string = null
-    this._cache = noCache
-      ? null
-      : new Cache()
+    this._cache = noCache ? null : new Cache()
 
     // used by toString()
     this.origOptions = initializeOptions(options)
@@ -335,7 +333,9 @@ export default class RRule implements QueryMethods {
       ] as typeof gettimeset
 
       if (
-        (freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, date.hour)) ||
+        (freq >= RRule.HOURLY &&
+          notEmpty(byhour) &&
+          !includes(byhour, date.hour)) ||
         (freq >= RRule.MINUTELY &&
           notEmpty(byminute) &&
           !includes(byminute, date.minute)) ||

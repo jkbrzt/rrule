@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "build": "yarn lint && tsc && webpack",
+    "build": "yarn lint && tsc && webpack && tsc dist/esm/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
     "test": "yarn lint && TS_NODE_PROJECT=tsconfig.test.json mocha --require ts-node/register **/*.test.ts"
   },
@@ -46,7 +46,7 @@
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
-    "tslint-eslint-rules": "^5.3.1",
+    "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.0.1",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.1.0"

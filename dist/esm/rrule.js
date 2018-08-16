@@ -3,11 +3,12 @@ import Iterinfo from './iterinfo';
 import { pymod, notEmpty, includes, isPresent } from './helpers';
 import IterResult from './iterresult';
 import CallbackIterResult from './callbackiterresult';
-import { Days, Frequency } from './types';
+import { Frequency } from './types';
 import { parseOptions, initializeOptions } from './parseoptions';
 import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache } from './cache';
+import { Weekday } from './weekday';
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -18,6 +19,15 @@ var getnlp = function () {
 // =============================================================================
 // RRule
 // =============================================================================
+export var Days = {
+    MO: new Weekday(0),
+    TU: new Weekday(1),
+    WE: new Weekday(2),
+    TH: new Weekday(3),
+    FR: new Weekday(4),
+    SA: new Weekday(5),
+    SU: new Weekday(6)
+};
 export var DEFAULT_OPTIONS = {
     freq: Frequency.YEARLY,
     dtstart: null,
@@ -51,9 +61,7 @@ var RRule = /** @class */ (function () {
         if (noCache === void 0) { noCache = false; }
         // RFC string
         this._string = null;
-        this._cache = noCache
-            ? null
-            : new Cache();
+        this._cache = noCache ? null : new Cache();
         // used by toString()
         this.origOptions = initializeOptions(options);
         var _a = parseOptions(options), parsedOptions = _a.parsedOptions, timeset = _a.timeset;
@@ -218,7 +226,9 @@ var RRule = /** @class */ (function () {
                 _b[RRule.MINUTELY] = ii.mtimeset,
                 _b[RRule.SECONDLY] = ii.stimeset,
                 _b)[freq];
-            if ((freq >= RRule.HOURLY && notEmpty(byhour) && !includes(byhour, date.hour)) ||
+            if ((freq >= RRule.HOURLY &&
+                notEmpty(byhour) &&
+                !includes(byhour, date.hour)) ||
                 (freq >= RRule.MINUTELY &&
                     notEmpty(byminute) &&
                     !includes(byminute, date.minute)) ||

@@ -17,7 +17,7 @@ import RRule from './rrule';
 import RRuleSet from './rruleset';
 import RRuleStr from './rrulestr';
 export { Frequency } from './types';
-export { default as Weekday } from './weekday';
+export { Weekday } from './weekday';
 // =============================================================================
 // Export
 // =============================================================================

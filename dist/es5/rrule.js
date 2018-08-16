@@ -2211,7 +2211,6 @@ var rrulestr_RRuleStr = /** @class */ (function () {
     }
     // tslint:disable-next-line:variable-name
     RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
-        console.log('HANDLE DTSTART');
         var parms = /^(;[^:]+):?(.*)/.exec(value);
         rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(value);
         if (parms.length > 0) {

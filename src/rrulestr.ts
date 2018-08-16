@@ -24,7 +24,6 @@ type FreqKey = keyof typeof Frequency
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
   private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
-    console.log('HANDLE DTSTART')
     const parms = /^(;[^:]+):?(.*)/.exec(value)!
     rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
     if (parms.length > 0) {

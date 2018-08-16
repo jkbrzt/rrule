@@ -3712,8 +3712,8 @@ describe('RRule', function () {
     const dtstart = startDate.toJSDate()
 
     it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
-      const local = DateTime.local(2013, 2, 6, 11, 0, 0)
-      setMockDate(local.toJSDate())
+      const currentLocalDate = DateTime.local(2013, 2, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
 
       const rule = new RRule({
         dtstart,
@@ -3721,7 +3721,7 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, local)
+      const expected = expectedDate(startDate, currentLocalDate)
 
       expect(recurrence)
         .to.deep.equal(
@@ -3732,8 +3732,8 @@ describe('RRule', function () {
     })
 
   it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
-      const local = DateTime.local(2013, 8, 6, 11, 0, 0)
-      setMockDate(local.toJSDate())
+      const currentLocalDate = DateTime.local(2013, 8, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
 
       const rule = new RRule({
         dtstart,
@@ -3741,7 +3741,7 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, local)
+      const expected = expectedDate(startDate, currentLocalDate)
 
       expect(recurrence)
         .to.deep.equal(
@@ -3751,8 +3751,8 @@ describe('RRule', function () {
       resetMockDate()
     })
 
-    function expectedDate(startDate: DateTime, local: DateTime): Date {
-      const { zoneName: systemZone } = local
+    function expectedDate(startDate: DateTime, currentLocalDate: DateTime): Date {
+      const { zoneName: systemZone } = currentLocalDate
       const {
         offset: systemOffset,
       } = startDate.setZone(systemZone)
@@ -3760,7 +3760,7 @@ describe('RRule', function () {
       const netOffset = targetOffset - systemOffset
       const hours = -((netOffset / 60) % 24)
       const minutes = -(netOffset % 60)
-      return DateTime.fromJSDate(dtstart).plus({ hours, minutes }).toJSDate()
+      return startDate.plus({ hours, minutes }).toJSDate()
     }
   })
 })

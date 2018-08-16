@@ -23,14 +23,17 @@ type FreqKey = keyof typeof Frequency
 
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
-  private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
-    const parms = /^(;[^:]+):?(.*)/.exec(value)!
-    rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
-    if (parms.length > 0) {
-      const [ key, timezone ] = parms[0].split('=')
-      if (key.toUpperCase() === 'TZID') {
-        rrkwargs['tzid'] = timezone
-      }
+  private _handle_DTSTART (
+    rrkwargs: Partial<Options>,
+    _: any,
+    value: string,
+    __?: any
+  ) {
+    const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
+    const [ ___, tzid, dtstart ] = parms
+    rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart)
+    if (tzid) {
+      rrkwargs['tzid'] = tzid
     }
   }
 
@@ -133,30 +136,42 @@ export default class RRuleStr {
     let name: string
     let value: string
     let parts: string[]
-    if (line.indexOf(':') !== -1) {
-      parts = line.split(':')
-      name = parts[0]
-      value = parts[1]
+    const nameRegex = /^([A-Z]+):(.*)$/
+    const nameParts = nameRegex.exec(line)
+    if (nameParts && nameParts.length >= 3) {
+      name = nameParts[1]
+      value = nameParts[2]
 
-      if (name !== 'RRULE') throw new Error('unknown parameter name')
+      if (name !== 'RRULE') throw new Error(`unknown parameter name ${name}`)
     } else {
       value = line
     }
 
     const rrkwargs: Partial<RRuleStrOptions> = {}
+    const dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line)
+    if (dtstart && dtstart.length > 0) {
+      const dtstartClause = dtstart[0]
+      this._handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause)
+    }
+
     const pairs = value.split(';')
 
     for (let i = 0; i < pairs.length; i++) {
       parts = pairs[i].split('=')
       name = parts[0].toUpperCase()
+      if (/DTSTART|TZID/.test(name)) {
+        continue
+      }
+
       value = parts[1].toUpperCase()
 
-      try {
-        // @ts-ignore
-        this[`_handle_${name}`](rrkwargs, name, value)
-      } catch (error) {
+      // @ts-ignore
+      const paramHandler = this[`_handle_${name}`]
+      if (typeof paramHandler !== 'function') {
         throw new Error("unknown parameter '" + name + "':" + value)
       }
+
+      paramHandler(rrkwargs, name, value)
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
     rrkwargs.tzid = rrkwargs.tzid || options.tzid
@@ -268,7 +283,7 @@ export default class RRuleStr {
         } else if (name === 'DTSTART') {
           dtstart = dateutil.untilStringToDate(value)
           if (parms.length) {
-            const [ key, value ] = parms[0].split('=')
+            const [key, value] = parms[0].split('=')
             if (key === 'TZID') {
               tzid = value
             }

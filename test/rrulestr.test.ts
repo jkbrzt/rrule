@@ -1,6 +1,7 @@
 import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
-import { RRule, RRuleSet, rrulestr } from '../src'
+import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { expect } from 'chai'
+import { Days } from '../src/rrule';
 
 describe('rrulestr', function () {
   // Enable additional toString() / fromString() tests
@@ -262,5 +263,32 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options.tzid).to.equal('America/New_York')
+  })
+
+  it('parses a DTSTART inside an RRULE', () => {
+    const rrule = rrulestr(
+      'RRULE:UNTIL=19990404T110000Z;DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'
+    )
+
+    expect(rrule.options).to.deep.include({
+      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
+      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      freq: Frequency.WEEKLY,
+      byweekday: [Days.TU.weekday, Days.WE.weekday]
+    })
+  })
+
+  it('parses a DTSTART with a TZID inside an RRULE', () => {
+    const rrule = rrulestr(
+      'RRULE:UNTIL=19990404T110000Z;DTSTART;TZID=America/New_York:19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'
+    )
+
+    expect(rrule.options).to.deep.include({
+      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
+      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      freq: Frequency.WEEKLY,
+      tzid: 'America/New_York',
+      byweekday: [Days.TU.weekday, Days.WE.weekday]
+    })
   })
 })

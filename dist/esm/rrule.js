@@ -9,6 +9,7 @@ import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache } from './cache';
 import { Weekday } from './weekday';
+import { DateTime } from 'luxon';
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -35,6 +36,7 @@ export var DEFAULT_OPTIONS = {
     wkst: Days.MO,
     count: null,
     until: null,
+    tzid: null,
     bysetpos: null,
     bymonth: null,
     bymonthday: null,
@@ -300,7 +302,8 @@ var RRule = /** @class */ (function () {
                         return this.emitResult(iterResult);
                     }
                     if (res >= dtstart) {
-                        if (!iterResult.accept(res)) {
+                        var rezonedDate = this.rezoneIfNeeded(res);
+                        if (!iterResult.accept(rezonedDate)) {
                             return this.emitResult(iterResult);
                         }
                         if (count) {
@@ -326,7 +329,8 @@ var RRule = /** @class */ (function () {
                             return this.emitResult(iterResult);
                         }
                         if (res >= dtstart) {
-                            if (!iterResult.accept(res)) {
+                            var rezonedDate = this.rezoneIfNeeded(res);
+                            if (!iterResult.accept(rezonedDate)) {
                                 return this.emitResult(iterResult);
                             }
                             if (count) {
@@ -380,6 +384,24 @@ var RRule = /** @class */ (function () {
     RRule.prototype.emitResult = function (iterResult) {
         this._len = iterResult.total;
         return iterResult.getValue();
+    };
+    RRule.prototype.rezoneIfNeeded = function (date) {
+        var tzid = this.options.tzid;
+        if (!tzid) {
+            return date;
+        }
+        try {
+            var datetime = DateTime
+                .fromJSDate(date);
+            var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
+            return rezoned.toJSDate();
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
+            }
+            return date;
+        }
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [

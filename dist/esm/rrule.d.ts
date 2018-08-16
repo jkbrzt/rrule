@@ -17,7 +17,7 @@ export declare const Days: {
     SU: Weekday;
 };
 export declare const DEFAULT_OPTIONS: Options;
-export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
+export declare const defaultKeys: ("bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "tzid" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -107,4 +107,5 @@ export default class RRule implements QueryMethods {
     clone(): RRule;
     _iter(iterResult: IterResult): Date | Date[] | null;
     private emitResult;
+    private rezoneIfNeeded;
 }

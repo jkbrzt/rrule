@@ -7,8 +7,17 @@ export function parseString (rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
-  const attrs = rfcString.split(';')
   const options: Partial<Options> = {}
+
+  const dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString)
+  if (dtstartWithZone) {
+    const [ _, tzid, dtstart ] = dtstartWithZone
+    options.tzid = tzid
+    options.dtstart = dateutil.untilStringToDate(dtstart)
+    return options
+  }
+
+  const attrs = rfcString.split(';')
 
   for (let i = 0; i < attrs.length; i++) {
     const attr = attrs[i].split('=')

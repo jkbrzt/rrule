@@ -1,30 +1,33 @@
 import { Options } from './types'
 import RRule, { DEFAULT_OPTIONS } from './rrule'
-import { includes, isPresent, isArray, isNumber } from './helpers'
+import { includes, isPresent, isArray, isNumber, toArray } from './helpers'
 import { Weekday } from './weekday'
 import dateutil from './dateutil'
 
 export function optionsToString (options: Partial<Options>) {
-  const pairs = []
+  const pairs: string[][] = []
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
   const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
   for (let i = 0; i < keys.length; i++) {
+    if (keys[i] === 'tzid') continue
     if (!includes(defaultKeys, keys[i])) continue
 
     let key = keys[i].toUpperCase()
-    let value: any = options[keys[i]]
-    let strValues = []
+    const value: any = options[keys[i]]
+    let outValue: string = ''
 
     if (!isPresent(value) || (isArray(value) && !value.length)) continue
 
     switch (key) {
       case 'FREQ':
-        value = RRule.FREQUENCIES[options.freq!]
+        outValue = RRule.FREQUENCIES[options.freq!]
         break
       case 'WKST':
         if (isNumber(value)) {
-          value = new Weekday(value)
+          outValue = new Weekday(value).toString()
+        } else {
+          outValue = value.toString()
         }
         break
       case 'BYWEEKDAY':
@@ -40,43 +43,48 @@ export function optionsToString (options: Partial<Options>) {
 
           */
         key = 'BYDAY'
-        if (!isArray(value)) value = [value]
-
-        for (let j = 0; j < value.length; j++) {
-          let wday: Weekday | number[] | number = value[j]
+        const arrayValue = toArray(value) as (Weekday | number[] | number)[]
+        outValue = toArray<Weekday | number[] | number>(value).map(wday => {
           if (wday instanceof Weekday) {
-              // good
+            return wday
           } else if (isArray(wday)) {
-            wday = new Weekday(wday[0], wday[1])
+            return new Weekday(wday[0], wday[1])
           } else {
-            wday = new Weekday(wday)
+            return new Weekday(wday)
           }
-          strValues[j] = wday.toString()
-        }
-        value = strValues
+        }).toString()
+
         break
       case 'DTSTART':
       case 'UNTIL':
-        value = dateutil.timeToUntilString(value)
+        outValue = dateutil.timeToUntilString(value, !options.tzid)
+        if (options.tzid) {
+          outValue = `;TZID=${options.tzid}:${outValue}`
+        }
         break
       default:
         if (isArray(value)) {
+          const strValues: string[] = []
           for (let j = 0; j < value.length; j++) {
             strValues[j] = String(value[j])
           }
-          value = strValues
+          outValue = strValues.toString()
         } else {
-          value = String(value)
+          outValue = String(value)
         }
     }
 
-    pairs.push([key, value])
+    pairs.push([key, outValue])
   }
 
   const strings = []
   for (let i = 0; i < pairs.length; i++) {
-    const attr = pairs[i]
-    strings.push(attr[0] + '=' + attr[1].toString())
+    const [key, value] = pairs[i]
+    if (value.indexOf(';') === 0) {
+      strings.push(`${key}${value}`)
+    } else {
+      strings.push(`${key}=${value.toString()}`)
+    }
   }
   return strings.join(';')
 }

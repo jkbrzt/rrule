@@ -1,5 +1,5 @@
 import RRule, { DEFAULT_OPTIONS } from './rrule';
-import { includes, isPresent, isArray, isNumber } from './helpers';
+import { includes, isPresent, isArray, isNumber, toArray } from './helpers';
 import { Weekday } from './weekday';
 import dateutil from './dateutil';
 export function optionsToString(options) {
@@ -7,20 +7,25 @@ export function optionsToString(options) {
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(DEFAULT_OPTIONS);
     for (var i = 0; i < keys.length; i++) {
+        if (keys[i] === 'tzid')
+            continue;
         if (!includes(defaultKeys, keys[i]))
             continue;
         var key = keys[i].toUpperCase();
         var value = options[keys[i]];
-        var strValues = [];
+        var outValue = '';
         if (!isPresent(value) || (isArray(value) && !value.length))
             continue;
         switch (key) {
             case 'FREQ':
-                value = RRule.FREQUENCIES[options.freq];
+                outValue = RRule.FREQUENCIES[options.freq];
                 break;
             case 'WKST':
                 if (isNumber(value)) {
-                    value = new Weekday(value);
+                    outValue = new Weekday(value).toString();
+                }
+                else {
+                    outValue = value.toString();
                 }
                 break;
             case 'BYWEEKDAY':
@@ -36,44 +41,49 @@ export function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                if (!isArray(value))
-                    value = [value];
-                for (var j = 0; j < value.length; j++) {
-                    var wday = value[j];
+                var arrayValue = toArray(value);
+                outValue = toArray(value).map(function (wday) {
                     if (wday instanceof Weekday) {
-                        // good
+                        return wday;
                     }
                     else if (isArray(wday)) {
-                        wday = new Weekday(wday[0], wday[1]);
+                        return new Weekday(wday[0], wday[1]);
                     }
                     else {
-                        wday = new Weekday(wday);
+                        return new Weekday(wday);
                     }
-                    strValues[j] = wday.toString();
-                }
-                value = strValues;
+                }).toString();
                 break;
             case 'DTSTART':
             case 'UNTIL':
-                value = dateutil.timeToUntilString(value);
+                outValue = dateutil.timeToUntilString(value, !options.tzid);
+                if (options.tzid) {
+                    outValue = ";TZID=" + options.tzid + ":" + outValue;
+                }
                 break;
             default:
                 if (isArray(value)) {
+                    var strValues = [];
                     for (var j = 0; j < value.length; j++) {
                         strValues[j] = String(value[j]);
                     }
-                    value = strValues;
+                    outValue = strValues.toString();
                 }
                 else {
-                    value = String(value);
+                    outValue = String(value);
                 }
         }
-        pairs.push([key, value]);
+        pairs.push([key, outValue]);
     }
     var strings = [];
     for (var i = 0; i < pairs.length; i++) {
-        var attr = pairs[i];
-        strings.push(attr[0] + '=' + attr[1].toString());
+        var _a = pairs[i], key = _a[0], value = _a[1];
+        if (value.indexOf(';') === 0) {
+            strings.push("" + key + value);
+        }
+        else {
+            strings.push(key + "=" + value.toString());
+        }
     }
     return strings.join(';');
 }

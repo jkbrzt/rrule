@@ -41,7 +41,16 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   return array
 }
 
-export function padStart (str: string, targetLength: number, padString: string = ' ') {
+export const toArray = function<T>(item: T | T[]): T[] {
+  if (isArray(item)) {
+    return item
+  }
+
+  return [ item ]
+}
+
+export function padStart (item: string | number, targetLength: number, padString: string = ' ') {
+  const str = String(item)
   targetLength = targetLength >> 0
   if (str.length > targetLength) {
     return String(str)

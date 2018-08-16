@@ -11,6 +11,7 @@ export interface RRuleStrOptions {
   unfold: boolean
   forceset: boolean
   compatible: boolean
+  tzid: string | null
 }
 
 type FreqKey = keyof typeof Frequency
@@ -23,7 +24,14 @@ type FreqKey = keyof typeof Frequency
 export default class RRuleStr {
   // tslint:disable-next-line:variable-name
   private _handle_DTSTART (rrkwargs: Options, _: any, value: string, __: any) {
+    const parms = /^(;[^:]+):?(.*)/.exec(value)!
     rrkwargs['dtstart'] = dateutil.untilStringToDate(value)
+    if (parms.length > 0) {
+      const [ key, timezone ] = parms[0].split('=')
+      if (key.toUpperCase() === 'TZID') {
+        rrkwargs['tzid'] = timezone
+      }
+    }
   }
 
   // tslint:disable-next-line:variable-name
@@ -53,7 +61,8 @@ export default class RRuleStr {
     cache: false,
     unfold: false,
     forceset: false,
-    compatible: false
+    compatible: false,
+    tzid: null
   }
 
   private _handle_int (rrkwargs: Options, name: string, value: string) {
@@ -150,6 +159,7 @@ export default class RRuleStr {
       }
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
+    rrkwargs.tzid = rrkwargs.tzid || options.tzid
     return new RRule(rrkwargs, !options.cache)
   }
 
@@ -159,7 +169,7 @@ export default class RRuleStr {
       options.unfold = true
     }
 
-    s = s && s.toUpperCase().trim()
+    s = s && s.trim()
     if (!s) throw new Error('Invalid empty string')
 
     let i = 0
@@ -194,6 +204,7 @@ export default class RRuleStr {
     let value: string
     let parts: string[]
     let dtstart: Date
+    let tzid: string
     let rset: RRuleSet
     let j: number
     let k: number
@@ -223,7 +234,7 @@ export default class RRuleStr {
         }
         let parms = name.split(';')
         if (!parms) throw new Error('empty property name')
-        name = parms[0]
+        name = parms[0].toUpperCase()
         parms = parms.slice(1)
 
         if (name === 'RRULE') {
@@ -256,6 +267,12 @@ export default class RRuleStr {
           exdatevals.push(value)
         } else if (name === 'DTSTART') {
           dtstart = dateutil.untilStringToDate(value)
+          if (parms.length) {
+            const [ key, value ] = parms[0].split('=')
+            if (key === 'TZID') {
+              tzid = value
+            }
+          }
         } else {
           throw new Error('unsupported property: ' + name)
         }
@@ -307,7 +324,9 @@ export default class RRuleStr {
         return this._parseRfcRRule(rrulevals[0], {
           // @ts-ignore
           dtstart: options.dtstart || dtstart,
-          cache: options.cache
+          cache: options.cache,
+          // @ts-ignore
+          tzid: options.tzid || tzid
         })
       }
     }

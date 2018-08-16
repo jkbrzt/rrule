@@ -146,6 +146,8 @@ $ ->
                             value = value.map(getDay)
                         else
                             value = getDay(value)
+                    else if key is 'tzid'
+                        value = value
                     else if /^by/.test(key)
                         if not (value instanceof Array)
                             value = value.split(/[,\s]+/)

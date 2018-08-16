@@ -6,6 +6,7 @@ export interface RRuleStrOptions {
     unfold: boolean;
     forceset: boolean;
     compatible: boolean;
+    tzid: string | null;
 }
 /**
  * RRuleStr

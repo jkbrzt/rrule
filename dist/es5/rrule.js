@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
+		module.exports = factory(require("luxon"));
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define(["luxon"], factory);
 	else if(typeof exports === 'object')
-		exports["rrule"] = factory();
+		exports["rrule"] = factory(require("luxon"));
 	else
-		root["rrule"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+		root["rrule"] = factory(root["luxon"]);
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE__2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -105,6 +105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return range; });
 /* unused harmony export clone */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return repeat; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return toArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return padStart; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return split; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return pymod; });
@@ -152,8 +153,15 @@ var repeat = function (value, times) {
     }
     return array;
 };
-function padStart(str, targetLength, padString) {
+var toArray = function (item) {
+    if (isArray(item)) {
+        return item;
+    }
+    return [item];
+};
+function padStart(item, targetLength, padString) {
     if (padString === void 0) { padString = ' '; }
+    var str = String(item);
     targetLength = targetLength >> 0;
     if (str.length > targetLength) {
         return String(str);
@@ -359,23 +367,19 @@ var dateutil_dateutil;
             return a.getTime() - b.getTime();
         });
     };
-    dateutil.timeToUntilString = function (time) {
+    dateutil.timeToUntilString = function (time, utc) {
+        if (utc === void 0) { utc = true; }
         var date = new Date(time);
         return [
             Object(helpers["h" /* padStart */])(date.getUTCFullYear().toString(), 4, '0'),
-            date.getUTCMonth() + 1,
-            date.getUTCDate(),
+            Object(helpers["h" /* padStart */])(date.getUTCMonth() + 1, 2, '0'),
+            Object(helpers["h" /* padStart */])(date.getUTCDate(), 2, '0'),
             'T',
-            date.getUTCHours(),
-            date.getUTCMinutes(),
-            date.getUTCSeconds(),
-            'Z'
-        ].map(function (value) { return value.toString(); })
-            .map(function (value) {
-            return /[TZ]/.test(value) ?
-                value :
-                Object(helpers["h" /* padStart */])(value, 2, '0');
-        }).join('');
+            Object(helpers["h" /* padStart */])(date.getUTCHours(), 2, '0'),
+            Object(helpers["h" /* padStart */])(date.getUTCMinutes(), 2, '0'),
+            Object(helpers["h" /* padStart */])(date.getUTCSeconds(), 2, '0'),
+            utc ? 'Z' : ''
+        ].join('');
     };
     dateutil.untilStringToDate = function (until) {
         var re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/;
@@ -1249,8 +1253,15 @@ function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
-    var attrs = rfcString.split(';');
     var options = {};
+    var dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString);
+    if (dtstartWithZone) {
+        var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
+        options.tzid = tzid;
+        options.dtstart = esm_dateutil.untilStringToDate(dtstart);
+        return options;
+    }
+    var attrs = rfcString.split(';');
     for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i].split('=');
         var key = attr[0];
@@ -1343,20 +1354,25 @@ function optionsToString(options) {
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(DEFAULT_OPTIONS);
     for (var i = 0; i < keys.length; i++) {
+        if (keys[i] === 'tzid')
+            continue;
         if (!Object(helpers["c" /* includes */])(defaultKeys, keys[i]))
             continue;
         var key = keys[i].toUpperCase();
         var value = options[keys[i]];
-        var strValues = [];
+        var outValue = '';
         if (!Object(helpers["f" /* isPresent */])(value) || (Object(helpers["d" /* isArray */])(value) && !value.length))
             continue;
         switch (key) {
             case 'FREQ':
-                value = esm_rrule.FREQUENCIES[options.freq];
+                outValue = esm_rrule.FREQUENCIES[options.freq];
                 break;
             case 'WKST':
                 if (Object(helpers["e" /* isNumber */])(value)) {
-                    value = new Weekday(value);
+                    outValue = new Weekday(value).toString();
+                }
+                else {
+                    outValue = value.toString();
                 }
                 break;
             case 'BYWEEKDAY':
@@ -1372,44 +1388,49 @@ function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                if (!Object(helpers["d" /* isArray */])(value))
-                    value = [value];
-                for (var j = 0; j < value.length; j++) {
-                    var wday = value[j];
+                var arrayValue = Object(helpers["m" /* toArray */])(value);
+                outValue = Object(helpers["m" /* toArray */])(value).map(function (wday) {
                     if (wday instanceof Weekday) {
-                        // good
+                        return wday;
                     }
                     else if (Object(helpers["d" /* isArray */])(wday)) {
-                        wday = new Weekday(wday[0], wday[1]);
+                        return new Weekday(wday[0], wday[1]);
                     }
                     else {
-                        wday = new Weekday(wday);
+                        return new Weekday(wday);
                     }
-                    strValues[j] = wday.toString();
-                }
-                value = strValues;
+                }).toString();
                 break;
             case 'DTSTART':
             case 'UNTIL':
-                value = esm_dateutil.timeToUntilString(value);
+                outValue = esm_dateutil.timeToUntilString(value, !options.tzid);
+                if (options.tzid) {
+                    outValue = ";TZID=" + options.tzid + ":" + outValue;
+                }
                 break;
             default:
                 if (Object(helpers["d" /* isArray */])(value)) {
+                    var strValues = [];
                     for (var j = 0; j < value.length; j++) {
                         strValues[j] = String(value[j]);
                     }
-                    value = strValues;
+                    outValue = strValues.toString();
                 }
                 else {
-                    value = String(value);
+                    outValue = String(value);
                 }
         }
-        pairs.push([key, value]);
+        pairs.push([key, outValue]);
     }
     var strings = [];
     for (var i = 0; i < pairs.length; i++) {
-        var attr = pairs[i];
-        strings.push(attr[0] + '=' + attr[1].toString());
+        var _a = pairs[i], key = _a[0], value = _a[1];
+        if (value.indexOf(';') === 0) {
+            strings.push("" + key + value);
+        }
+        else {
+            strings.push(key + "=" + value.toString());
+        }
     }
     return strings.join(';');
 }
@@ -1500,7 +1521,11 @@ var cache_Cache = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=cache.js.map
+// EXTERNAL MODULE: external "luxon"
+var external_luxon_ = __webpack_require__(2);
+
 // CONCATENATED MODULE: ./dist/esm/rrule.js
+
 
 
 
@@ -1515,7 +1540,7 @@ var cache_Cache = /** @class */ (function () {
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
-        getnlp._nlp = __webpack_require__(2);
+        getnlp._nlp = __webpack_require__(3);
     }
     return getnlp._nlp;
 };
@@ -1538,6 +1563,7 @@ var DEFAULT_OPTIONS = {
     wkst: Days.MO,
     count: null,
     until: null,
+    tzid: null,
     bysetpos: null,
     bymonth: null,
     bymonthday: null,
@@ -1803,7 +1829,8 @@ var rrule_RRule = /** @class */ (function () {
                         return this.emitResult(iterResult);
                     }
                     if (res >= dtstart) {
-                        if (!iterResult.accept(res)) {
+                        var rezonedDate = this.rezoneIfNeeded(res);
+                        if (!iterResult.accept(rezonedDate)) {
                             return this.emitResult(iterResult);
                         }
                         if (count) {
@@ -1829,7 +1856,8 @@ var rrule_RRule = /** @class */ (function () {
                             return this.emitResult(iterResult);
                         }
                         if (res >= dtstart) {
-                            if (!iterResult.accept(res)) {
+                            var rezonedDate = this.rezoneIfNeeded(res);
+                            if (!iterResult.accept(rezonedDate)) {
                                 return this.emitResult(iterResult);
                             }
                             if (count) {
@@ -1883,6 +1911,24 @@ var rrule_RRule = /** @class */ (function () {
     RRule.prototype.emitResult = function (iterResult) {
         this._len = iterResult.total;
         return iterResult.getValue();
+    };
+    RRule.prototype.rezoneIfNeeded = function (date) {
+        var tzid = this.options.tzid;
+        if (!tzid) {
+            return date;
+        }
+        try {
+            var datetime = external_luxon_["DateTime"]
+                .fromJSDate(date);
+            var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
+            return rezoned.toJSDate();
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
+            }
+            return date;
+        }
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [
@@ -2166,7 +2212,14 @@ var rrulestr_RRuleStr = /** @class */ (function () {
     }
     // tslint:disable-next-line:variable-name
     RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
+        var parms = /^(;[^:]+):?(.*)/.exec(value);
         rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(value);
+        if (parms.length > 0) {
+            var _a = parms[0].split('='), key = _a[0], timezone = _a[1];
+            if (key.toUpperCase() === 'TZID') {
+                rrkwargs['tzid'] = timezone;
+            }
+        }
     };
     RRuleStr.prototype._handle_int = function (rrkwargs, name, value) {
         // @ts-ignore
@@ -2256,6 +2309,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
             }
         }
         rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
+        rrkwargs.tzid = rrkwargs.tzid || options.tzid;
         return new esm_rrule(rrkwargs, !options.cache);
     };
     RRuleStr.prototype._parseRfc = function (s, options) {
@@ -2263,7 +2317,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
             options.forceset = true;
             options.unfold = true;
         }
-        s = s && s.toUpperCase().trim();
+        s = s && s.trim();
         if (!s)
             throw new Error('Invalid empty string');
         var i = 0;
@@ -2299,6 +2353,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
         var value;
         var parts;
         var dtstart;
+        var tzid;
         var rset;
         var j;
         var k;
@@ -2329,7 +2384,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 var parms = name.split(';');
                 if (!parms)
                     throw new Error('empty property name');
-                name = parms[0];
+                name = parms[0].toUpperCase();
                 parms = parms.slice(1);
                 if (name === 'RRULE') {
                     for (j = 0; j < parms.length; j++) {
@@ -2365,6 +2420,12 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 }
                 else if (name === 'DTSTART') {
                     dtstart = esm_dateutil.untilStringToDate(value);
+                    if (parms.length) {
+                        var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
+                        if (key === 'TZID') {
+                            tzid = value_1;
+                        }
+                    }
                 }
                 else {
                     throw new Error('unsupported property: ' + name);
@@ -2411,7 +2472,9 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 return this._parseRfcRRule(rrulevals[0], {
                     // @ts-ignore
                     dtstart: options.dtstart || dtstart,
-                    cache: options.cache
+                    cache: options.cache,
+                    // @ts-ignore
+                    tzid: options.tzid || tzid
                 });
             }
         }
@@ -2460,7 +2523,8 @@ var rrulestr_RRuleStr = /** @class */ (function () {
         cache: false,
         unfold: false,
         forceset: false,
-        compatible: false
+        compatible: false,
+        tzid: null
     };
     return RRuleStr;
 }());
@@ -2506,6 +2570,12 @@ var esm_rrulestr = function () {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

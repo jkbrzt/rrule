@@ -14,11 +14,7 @@ const paths = {
   esm: path.resolve(__dirname, "dist", "esm")
 };
 
-const rruleConfig = {
-  entry: {
-    rrule: path.join(paths.esm, "index.js"),
-    'rrule.min': path.join(paths.esm, "index.js")
-  },
+const commonConfig = {
   output: {
     filename: "[name].js",
     path: paths.es5,
@@ -40,6 +36,23 @@ const rruleConfig = {
     ]
   }
 };
+
+const rruleConfig = Object.assign({
+  entry: {
+    rrule: path.join(paths.esm, "index.js"),
+    'rrule.min': path.join(paths.esm, "index.js")
+  },
+  externals: {
+    luxon: 'luxon'
+  },
+}, commonConfig);
+
+const rruleWithLuxonConfig = Object.assign({
+  entry: {
+    'rrule-tz': path.join(paths.esm, "index.js"),
+    'rrule-tz.min': path.join(paths.esm, "index.js")
+  },
+}, commonConfig);
 
 const demoConfig = {
   entry: {
@@ -77,4 +90,4 @@ const demoConfig = {
   mode: "production"
 };
 
-module.exports = [rruleConfig, demoConfig];
+module.exports = [rruleConfig, rruleWithLuxonConfig, demoConfig];

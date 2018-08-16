@@ -1,6 +1,8 @@
 import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
+import { DateTime } from 'luxon'
+import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -66,20 +68,6 @@ describe('RRule', function () {
     const s1 = 'FREQ=WEEKLY;WKST=WE'
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
-  })
-
-  it('fromString()', function () {
-    const strings = [
-      ['FREQ=WEEKLY;UNTIL=20100101T000000Z', 'FREQ=WEEKLY;UNTIL=20100101T000000Z'],
-
-      // Parse also `date` but return `date-time`
-      ['FREQ=WEEKLY;UNTIL=20100101', 'FREQ=WEEKLY;UNTIL=20100101T000000Z']
-    ]
-    strings.forEach(function (item) {
-      const s = item[0]
-      const s2 = item[1]
-      expect(RRule.fromString(s).toString()).equals(s2, s + ' => ' + s2)
-    })
   })
 
   it('does not mutate the passed-in options object', function () {
@@ -3715,5 +3703,64 @@ describe('RRule', function () {
     ]}
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every day')
+  })
+
+  describe('time zones', () => {
+    const targetZone = 'America/Los_Angeles'
+    const startDate = DateTime.utc(2013, 8, 6, 11, 0, 0)
+    const targetOffset = startDate.setZone(targetZone).offset
+    const dtstart = startDate.toJSDate()
+
+    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+      const currentLocalDate = DateTime.local(2013, 2, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
+
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const expected = expectedDate(startDate, currentLocalDate)
+
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+
+      resetMockDate()
+    })
+
+  it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
+      const currentLocalDate = DateTime.local(2013, 8, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
+
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.all()[0]
+      const expected = expectedDate(startDate, currentLocalDate)
+
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+
+      resetMockDate()
+    })
+
+    function expectedDate(startDate: DateTime, currentLocalDate: DateTime): Date {
+      const { zoneName: systemZone } = currentLocalDate
+      const {
+        offset: systemOffset,
+      } = startDate.setZone(systemZone)
+
+      const netOffset = targetOffset - systemOffset
+      const hours = -((netOffset / 60) % 24)
+      const minutes = -(netOffset % 60)
+      return startDate.plus({ hours, minutes }).toJSDate()
+    }
   })
 })

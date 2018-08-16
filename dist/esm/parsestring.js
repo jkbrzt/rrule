@@ -1,6 +1,7 @@
-import { Frequency, Days } from './types';
-import Weekday from './weekday';
+import { Frequency } from './types';
+import { Weekday } from './weekday';
 import dateutil from './dateutil';
+import { Days } from './rrule';
 export function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)

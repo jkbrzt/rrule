@@ -1,7 +1,7 @@
 import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers';
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule';
 import dateutil from './dateutil';
-import Weekday from './weekday';
+import { Weekday } from './weekday';
 export function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);

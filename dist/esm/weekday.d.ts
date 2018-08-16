@@ -1,4 +1,5 @@
-export default class Weekday {
+export declare type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
+export declare class Weekday {
     readonly weekday: number;
     readonly n?: number;
     constructor(weekday: number, n?: number);

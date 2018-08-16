@@ -1,7 +1,7 @@
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 // =============================================================================
 // Weekday
 // =============================================================================
+var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 var Weekday = /** @class */ (function () {
     function Weekday(weekday, n) {
         if (n === 0)
@@ -30,5 +30,5 @@ var Weekday = /** @class */ (function () {
     };
     return Weekday;
 }());
-export default Weekday;
+export { Weekday };
 //# sourceMappingURL=weekday.js.map

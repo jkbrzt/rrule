@@ -1,5 +1,20 @@
 ### Changelog
 
+- 2.4.0 (2018-08-16)
+  - Features:
+    - Implement `TZID` support (#38, #261)
+  - Bugfixes:
+    - Fixed an error in Typescript output (#264)
+- 2.3.6 (2018-08-14)
+  - Bugfixes:
+    - Point package.json to es5-compiled bundle (#260)
+- 2.3.5 (2018-08-14)
+  - Features:
+    - Return text "every day" when all days are selected
+  - Bugfixes:
+    - Sort monthdays correctly from toText() (#101)
+    - Accept 0 as a valid monthday/weekday value (#153)
+    - Support 3-digit years (#202)
 - 2.3.4 (2018-08-10)
   - Fixed support for eastern hemisphere timezones (#247)
 - 2.3.3 (2018-08-08)

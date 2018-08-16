@@ -89,8 +89,9 @@ export const testRecurring = function (msg: string, testObj: any, expectedDates:
     let actualDates = rule[method].apply(rule, args)
     time = Date.now() - time
 
-    expect(time).to.be.lessThan(100,
-      rule + '\' method "' + method + '" should finish in 100 ms, but ' + time + ' ms')
+    const maxTestDuration = 200
+    expect(time).to.be.lessThan(maxTestDuration,
+      `${rule}\' method "${method}" should finish in ${maxTestDuration} ms, but took ${time} ms`)
 
     if (!(actualDates instanceof Array)) actualDates = [actualDates]
     if (!(expectedDates instanceof Array)) expectedDates = [expectedDates]

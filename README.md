@@ -8,6 +8,7 @@ rrule.js
 [![js-standard-style][js-standard-image]][js-standard-url]
 [![Downloads][downloads-image]][downloads-url]
 [![Gitter][gitter-image]][gitter-url]
+[![codecov.io](http://codecov.io/github/jakubroztocil/rrule/coverage.svg?branch=master)](http://codecov.io/github/jakubroztocil/rrule?branch=master)
 
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important

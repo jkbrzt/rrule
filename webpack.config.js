@@ -37,7 +37,7 @@ const commonConfig = {
   }
 };
 
-const rruleConfig = {
+const rruleConfig = Object.assign({
   entry: {
     rrule: path.join(paths.esm, "index.js"),
     'rrule.min': path.join(paths.esm, "index.js")
@@ -45,16 +45,14 @@ const rruleConfig = {
   externals: {
     luxon: 'luxon'
   },
-  ...commonConfig
-};
+}, commonConfig);
 
-const rruleWithLuxonConfig = {
+const rruleWithLuxonConfig = Object.assign({
   entry: {
     'rrule-tz': path.join(paths.esm, "index.js"),
     'rrule-tz.min': path.join(paths.esm, "index.js")
   },
-  ...commonConfig
-}
+}, commonConfig);
 
 const demoConfig = {
   entry: {

@@ -1,4 +1,4 @@
-import Weekday from './weekday'
+import { Weekday, WeekdayStr } from './weekday'
 
 export interface QueryMethods {
   all (): Date[]
@@ -54,15 +54,4 @@ export interface ParsedOptions extends Options {
   bysecond: number[]
 }
 
-export const Days = {
-  MO: new Weekday(0),
-  TU: new Weekday(1),
-  WE: new Weekday(2),
-  TH: new Weekday(3),
-  FR: new Weekday(4),
-  SA: new Weekday(5),
-  SU: new Weekday(6)
-}
-
-export type WeekdayStr = keyof typeof Days
 export type ByWeekday = WeekdayStr | number | Weekday

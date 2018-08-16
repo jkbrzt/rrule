@@ -993,11 +993,23 @@ var CallbackIterResult = /** @class */ (function (_super) {
 }(iterresult));
 /* harmony default export */ var callbackiterresult = (CallbackIterResult);
 //# sourceMappingURL=callbackiterresult.js.map
+// CONCATENATED MODULE: ./dist/esm/types.js
+var Frequency;
+(function (Frequency) {
+    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
+    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
+    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
+    Frequency[Frequency["DAILY"] = 3] = "DAILY";
+    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
+    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
+    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
+})(Frequency || (Frequency = {}));
+//# sourceMappingURL=types.js.map
 // CONCATENATED MODULE: ./dist/esm/weekday.js
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 // =============================================================================
 // Weekday
 // =============================================================================
+var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 var Weekday = /** @class */ (function () {
     function Weekday(weekday, n) {
         if (n === 0)
@@ -1026,30 +1038,8 @@ var Weekday = /** @class */ (function () {
     };
     return Weekday;
 }());
-/* harmony default export */ var esm_weekday = (Weekday);
-//# sourceMappingURL=weekday.js.map
-// CONCATENATED MODULE: ./dist/esm/types.js
 
-var Frequency;
-(function (Frequency) {
-    Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
-    Frequency[Frequency["MONTHLY"] = 1] = "MONTHLY";
-    Frequency[Frequency["WEEKLY"] = 2] = "WEEKLY";
-    Frequency[Frequency["DAILY"] = 3] = "DAILY";
-    Frequency[Frequency["HOURLY"] = 4] = "HOURLY";
-    Frequency[Frequency["MINUTELY"] = 5] = "MINUTELY";
-    Frequency[Frequency["SECONDLY"] = 6] = "SECONDLY";
-})(Frequency || (Frequency = {}));
-var Days = {
-    MO: new esm_weekday(0),
-    TU: new esm_weekday(1),
-    WE: new esm_weekday(2),
-    TH: new esm_weekday(3),
-    FR: new esm_weekday(4),
-    SA: new esm_weekday(5),
-    SU: new esm_weekday(6)
-};
-//# sourceMappingURL=types.js.map
+//# sourceMappingURL=weekday.js.map
 // CONCATENATED MODULE: ./dist/esm/parseoptions.js
 
 
@@ -1176,7 +1166,7 @@ function parseOptions(options) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
-    else if (opts.byweekday instanceof esm_weekday) {
+    else if (opts.byweekday instanceof Weekday) {
         if (!opts.byweekday.n || opts.freq > esm_rrule.MONTHLY) {
             opts.byweekday = [opts.byweekday.weekday];
             opts.bynweekday = null;
@@ -1258,6 +1248,7 @@ function parseOptions(options) {
 
 
 
+
 function parseString(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
@@ -1333,7 +1324,7 @@ function parseString(rfcString) {
                         n = Number(parts[1]);
                         var wdaypart = parts[2];
                         wday = Days[wdaypart].weekday;
-                        options.byweekday.push(new esm_weekday(wday, n));
+                        options.byweekday.push(new Weekday(wday, n));
                     }
                 }
                 break;
@@ -1378,7 +1369,7 @@ function optionsToString(options) {
                 break;
             case 'WKST':
                 if (Object(helpers["e" /* isNumber */])(value)) {
-                    outValue = new esm_weekday(value).toString();
+                    outValue = new Weekday(value).toString();
                 }
                 else {
                     outValue = value.toString();
@@ -1399,14 +1390,14 @@ function optionsToString(options) {
                 key = 'BYDAY';
                 var arrayValue = Object(helpers["m" /* toArray */])(value);
                 outValue = Object(helpers["m" /* toArray */])(value).map(function (wday) {
-                    if (wday instanceof esm_weekday) {
+                    if (wday instanceof Weekday) {
                         return wday;
                     }
                     else if (Object(helpers["d" /* isArray */])(wday)) {
-                        return new esm_weekday(wday[0], wday[1]);
+                        return new Weekday(wday[0], wday[1]);
                     }
                     else {
-                        return new esm_weekday(wday);
+                        return new Weekday(wday);
                     }
                 }).toString();
                 break;
@@ -1545,6 +1536,7 @@ var luxon = __webpack_require__(2);
 
 
 
+
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -1555,6 +1547,15 @@ var getnlp = function () {
 // =============================================================================
 // RRule
 // =============================================================================
+var Days = {
+    MO: new Weekday(0),
+    TU: new Weekday(1),
+    WE: new Weekday(2),
+    TH: new Weekday(3),
+    FR: new Weekday(4),
+    SA: new Weekday(5),
+    SU: new Weekday(6)
+};
 var DEFAULT_OPTIONS = {
     freq: Frequency.YEARLY,
     dtstart: null,
@@ -1589,9 +1590,7 @@ var rrule_RRule = /** @class */ (function () {
         if (noCache === void 0) { noCache = false; }
         // RFC string
         this._string = null;
-        this._cache = noCache
-            ? null
-            : new cache_Cache();
+        this._cache = noCache ? null : new cache_Cache();
         // used by toString()
         this.origOptions = initializeOptions(options);
         var _a = parseOptions(options), parsedOptions = _a.parsedOptions, timeset = _a.timeset;
@@ -1756,7 +1755,9 @@ var rrule_RRule = /** @class */ (function () {
                 _b[RRule.MINUTELY] = ii.mtimeset,
                 _b[RRule.SECONDLY] = ii.stimeset,
                 _b)[freq];
-            if ((freq >= RRule.HOURLY && Object(helpers["g" /* notEmpty */])(byhour) && !Object(helpers["c" /* includes */])(byhour, date.hour)) ||
+            if ((freq >= RRule.HOURLY &&
+                Object(helpers["g" /* notEmpty */])(byhour) &&
+                !Object(helpers["c" /* includes */])(byhour, date.hour)) ||
                 (freq >= RRule.MINUTELY &&
                     Object(helpers["g" /* notEmpty */])(byminute) &&
                     !Object(helpers["c" /* includes */])(byminute, date.minute)) ||
@@ -2271,7 +2272,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
                 if (n)
                     n = parseInt(n, 10);
             }
-            var weekday = new esm_weekday(RRuleStr._weekday_map[w], n);
+            var weekday = new Weekday(RRuleStr._weekday_map[w], n);
             l.push(weekday);
         }
         rrkwargs['byweekday'] = l;
@@ -2532,7 +2533,7 @@ var rrulestr_RRuleStr = /** @class */ (function () {
 // CONCATENATED MODULE: ./dist/esm/index.js
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rrulestr", function() { return esm_rrulestr; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return esm_weekday; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return esm_rrule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
 /*!

@@ -1,8 +1,8 @@
 import RRule from './rrule'
-import { Options, Frequency, WeekdayStr } from './types'
+import { Options, Frequency } from './types'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
-import Weekday from './weekday'
+import { Weekday, WeekdayStr } from './weekday'
 import { includes, split } from './helpers'
 
 export interface RRuleStrOptions {

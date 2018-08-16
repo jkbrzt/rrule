@@ -2,7 +2,7 @@ import { Options, ParsedOptions } from './types'
 import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
-import Weekday from './weekday'
+import { Weekday } from './weekday'
 
 export function initializeOptions (options: Partial<Options>) {
   const invalid: string[] = []

@@ -1,7 +1,7 @@
 import RRule from './rrule';
 import RRuleSet from './rruleset';
 import dateutil from './dateutil';
-import Weekday from './weekday';
+import { Weekday } from './weekday';
 import { includes, split } from './helpers';
 /**
  * RRuleStr

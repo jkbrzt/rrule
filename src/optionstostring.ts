@@ -15,7 +15,6 @@ export function optionsToString (options: Partial<Options>) {
 
     let key = keys[i].toUpperCase()
     const value: any = options[keys[i]]
-    console.log('value', key, value)
     let outValue: string = ''
 
     if (!isPresent(value) || (isArray(value) && !value.length)) continue

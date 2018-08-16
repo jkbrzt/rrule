@@ -1369,7 +1369,6 @@ function optionsToString(options) {
             continue;
         var key = keys[i].toUpperCase();
         var value = options[keys[i]];
-        console.log('value', key, value);
         var outValue = '';
         if (!Object(helpers["f" /* isPresent */])(value) || (Object(helpers["d" /* isArray */])(value) && !value.length))
             continue;

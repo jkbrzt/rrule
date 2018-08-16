@@ -13,7 +13,6 @@ export function optionsToString(options) {
             continue;
         var key = keys[i].toUpperCase();
         var value = options[keys[i]];
-        console.log('value', key, value);
         var outValue = '';
         if (!isPresent(value) || (isArray(value) && !value.length))
             continue;

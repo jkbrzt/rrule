@@ -2219,7 +2219,7 @@ function handle_int(value) {
     return parseInt(value, 10);
 }
 function handle_int_list(value) {
-    return value.split(',').map(function (x) { return parseInt(x, 10); });
+    return value.split(',').map(handle_int);
 }
 function handle_FREQ(value) {
     return Frequency[value];
@@ -2459,32 +2459,26 @@ function _parseRfc(s, options) {
         exrulevals.length ||
         exdatevals.length) {
         rset = new rruleset(!options.cache);
-        for (j = 0; j < rrulevals.length; j++) {
-            rset.rrule(_parseRfcRRule(rrulevals[j], {
-                // @ts-ignore
+        rrulevals.forEach(function (val) {
+            rset.rrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
-        }
-        for (j = 0; j < rdatevals.length; j++) {
-            datestrs = rdatevals[j].split(',');
-            for (k = 0; k < datestrs.length; k++) {
-                datestr = datestrs[k];
+        });
+        rdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
                 rset.rdate(esm_dateutil.untilStringToDate(datestr));
-            }
-        }
-        for (j = 0; j < exrulevals.length; j++) {
-            rset.exrule(_parseRfcRRule(exrulevals[j], {
-                // @ts-ignore
+            });
+        });
+        exrulevals.forEach(function (val) {
+            rset.exrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
-        }
-        for (j = 0; j < exdatevals.length; j++) {
-            datestrs = exdatevals[j].split(',');
-            for (k = 0; k < datestrs.length; k++) {
-                datestr = datestrs[k];
+        });
+        exdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
                 rset.exdate(esm_dateutil.untilStringToDate(datestr));
-            }
-        }
+            });
+        });
         // @ts-ignore
         if (options.compatible && options.dtstart)
             rset.rdate(dtstart);

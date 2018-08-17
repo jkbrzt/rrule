@@ -33,7 +33,7 @@ export function handle_int(value) {
     return parseInt(value, 10);
 }
 export function handle_int_list(value) {
-    return value.split(',').map(function (x) { return parseInt(x, 10); });
+    return value.split(',').map(handle_int);
 }
 export function handle_FREQ(value) {
     return Frequency[value];

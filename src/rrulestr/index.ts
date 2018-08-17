@@ -200,38 +200,31 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
       exdatevals.length
     ) {
     rset = new RRuleSet(!options.cache)
-    for (j = 0; j < rrulevals.length; j++) {
-      rset.rrule(
-          _parseRfcRRule(rrulevals[j], {
-            // @ts-ignore
-            dtstart: options.dtstart || dtstart
-          })
-        )
-    }
-    for (j = 0; j < rdatevals.length; j++) {
-      datestrs = rdatevals[j].split(',')
-      for (k = 0; k < datestrs.length; k++) {
-        datestr = datestrs[k]
-        rset.rdate(dateutil.untilStringToDate(datestr))
-      }
-    }
-    for (j = 0; j < exrulevals.length; j++) {
-      rset.exrule(
-          _parseRfcRRule(exrulevals[j], {
-            // @ts-ignore
-            dtstart: options.dtstart || dtstart
-          })
-        )
-    }
-    for (j = 0; j < exdatevals.length; j++) {
-      datestrs = exdatevals[j].split(',')
-      for (k = 0; k < datestrs.length; k++) {
-        datestr = datestrs[k]
-        rset.exdate(dateutil.untilStringToDate(datestr))
-      }
-    }
+    rrulevals.forEach(val => {
+      rset.rrule(_parseRfcRRule(val, {
+        dtstart: options.dtstart || dtstart
+      }))
+    })
 
-      // @ts-ignore
+    rdatevals.forEach(dates => {
+      dates.split(',').forEach(datestr => {
+        rset.rdate(dateutil.untilStringToDate(datestr))
+      })
+    })
+
+    exrulevals.forEach(val => {
+      rset.exrule(_parseRfcRRule(val, {
+        dtstart: options.dtstart || dtstart
+      }))
+    })
+
+    exdatevals.forEach(dates => {
+      dates.split(',').forEach(datestr => {
+        rset.exdate(dateutil.untilStringToDate(datestr))
+      })
+    })
+
+    // @ts-ignore
     if (options.compatible && options.dtstart) rset.rdate(dtstart)
     return rset
   }

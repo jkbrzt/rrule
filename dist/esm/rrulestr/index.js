@@ -181,32 +181,26 @@ function _parseRfc(s, options) {
         exrulevals.length ||
         exdatevals.length) {
         rset = new RRuleSet(!options.cache);
-        for (j = 0; j < rrulevals.length; j++) {
-            rset.rrule(_parseRfcRRule(rrulevals[j], {
-                // @ts-ignore
+        rrulevals.forEach(function (val) {
+            rset.rrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
-        }
-        for (j = 0; j < rdatevals.length; j++) {
-            datestrs = rdatevals[j].split(',');
-            for (k = 0; k < datestrs.length; k++) {
-                datestr = datestrs[k];
+        });
+        rdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
                 rset.rdate(dateutil.untilStringToDate(datestr));
-            }
-        }
-        for (j = 0; j < exrulevals.length; j++) {
-            rset.exrule(_parseRfcRRule(exrulevals[j], {
-                // @ts-ignore
+            });
+        });
+        exrulevals.forEach(function (val) {
+            rset.exrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
-        }
-        for (j = 0; j < exdatevals.length; j++) {
-            datestrs = exdatevals[j].split(',');
-            for (k = 0; k < datestrs.length; k++) {
-                datestr = datestrs[k];
+        });
+        exdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
                 rset.exdate(dateutil.untilStringToDate(datestr));
-            }
-        }
+            });
+        });
         // @ts-ignore
         if (options.compatible && options.dtstart)
             rset.rdate(dtstart);

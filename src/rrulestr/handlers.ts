@@ -47,7 +47,7 @@ export function handle_int (value: string) {
 }
 
 export function handle_int_list (value: string) {
-  return value.split(',').map(x => parseInt(x, 10))
+  return value.split(',').map(handle_int)
 }
 
 export function handle_FREQ (value: FreqKey) {

@@ -16,10 +16,10 @@
 
 import RRule from './rrule'
 import RRuleSet from './rruleset'
-import RRuleStr from './rrulestr'
+import RRuleStr from './rrulestr/index'
 export { Frequency, ByWeekday, Options } from './types'
 export { Weekday, WeekdayStr } from './weekday'
-export { RRuleStrOptions } from './rrulestr'
+export { RRuleStrOptions } from './rrulestr/index'
 
 // =============================================================================
 // Export

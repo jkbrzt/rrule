@@ -13,8 +13,12 @@ var weekday_map = {
 };
 export function handle_DTSTART(rrkwargs, _, value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
-    var ___ = parms[0], tzid = parms[1], dtstart = parms[2];
+    var __ = parms[0], ___ = parms[1], dtstart = parms[2];
     rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart);
+}
+export function handle_TZID(rrkwargs, _, value) {
+    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var __ = parms[0], tzid = parms[1];
     if (tzid) {
         rrkwargs['tzid'] = tzid;
     }

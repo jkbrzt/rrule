@@ -2199,8 +2199,12 @@ var weekday_map = {
 };
 function handle_DTSTART(rrkwargs, _, value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
-    var ___ = parms[0], tzid = parms[1], dtstart = parms[2];
+    var __ = parms[0], ___ = parms[1], dtstart = parms[2];
     rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(dtstart);
+}
+function handle_TZID(rrkwargs, _, value) {
+    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var __ = parms[0], tzid = parms[1];
     if (tzid) {
         rrkwargs['tzid'] = tzid;
     }
@@ -2321,6 +2325,7 @@ function _parseRfcRRule(line, options) {
     if (dtstart && dtstart.length > 0) {
         var dtstartClause = dtstart[0];
         handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
+        handle_TZID(rrkwargs, 'TZID', dtstartClause);
     }
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {

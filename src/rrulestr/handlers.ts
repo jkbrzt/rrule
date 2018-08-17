@@ -23,8 +23,17 @@ export function handle_DTSTART (
   value: string
 ) {
   const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
-  const [ ___, tzid, dtstart ] = parms
+  const [ __, ___, dtstart ] = parms
   rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart)
+}
+
+export function handle_TZID (
+  rrkwargs: Partial<Options>,
+  _: string,
+  value: string
+) {
+  const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
+  const [ __, tzid ] = parms
   if (tzid) {
     rrkwargs['tzid'] = tzid
   }

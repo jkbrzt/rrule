@@ -2,7 +2,7 @@ import RRule from '../rrule';
 import RRuleSet from '../rruleset';
 import dateutil from '../dateutil';
 import { includes, split } from '../helpers';
-import { handlers, handle_DTSTART } from './handlers';
+import { handlers, handle_DTSTART, handle_TZID } from './handlers';
 /**
  * RRuleStr
  *  To parse a set of rrule strings
@@ -38,6 +38,7 @@ function _parseRfcRRule(line, options) {
     if (dtstart && dtstart.length > 0) {
         var dtstartClause = dtstart[0];
         handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
+        handle_TZID(rrkwargs, 'TZID', dtstartClause);
     }
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {

@@ -2,7 +2,7 @@ import RRule from '../rrule'
 import RRuleSet from '../rruleset'
 import dateutil from '../dateutil'
 import { includes, split } from '../helpers'
-import { handlers, handle_DTSTART } from './handlers'
+import { handlers, handle_DTSTART, handle_TZID } from './handlers'
 import { Options } from '../types'
 
 export interface RRuleStrOptions {
@@ -50,6 +50,7 @@ function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
   if (dtstart && dtstart.length > 0) {
     const dtstartClause = dtstart[0]
     handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause)
+    handle_TZID(rrkwargs, 'TZID', dtstartClause)
   }
 
   const pairs = value.split(';')

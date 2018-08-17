@@ -12,13 +12,18 @@ var weekdays = {
     SA: 5,
     SU: 6
 };
+var DTSTART_CLAUSE = /DTSTART(?:;TZID=([^:=]+))?(?::|=)([^;]+)/;
 export function handle_DTSTART(value) {
-    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var parms = DTSTART_CLAUSE.exec(value);
+    if (!parms)
+        return;
     var __ = parms[0], ___ = parms[1], dtstart = parms[2];
     return dateutil.untilStringToDate(dtstart);
 }
 export function handle_TZID(value) {
-    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var parms = DTSTART_CLAUSE.exec(value);
+    if (!parms)
+        return;
     var __ = parms[0], tzid = parms[1];
     if (tzid) {
         return tzid;

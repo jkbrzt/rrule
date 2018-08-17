@@ -33,13 +33,10 @@ function _parseRfcRRule(line, options) {
     else {
         value = line;
     }
-    var rrkwargs = {};
-    var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
-    if (dtstart && dtstart.length > 0) {
-        var dtstartClause = dtstart[0];
-        rrkwargs.dtstart = handle_DTSTART(dtstartClause);
-        rrkwargs.tzid = handle_TZID(dtstartClause);
-    }
+    var rrkwargs = {
+        dtstart: handle_DTSTART(line),
+        tzid: handle_TZID(line)
+    };
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {
         parts = pairs[i].split('=');

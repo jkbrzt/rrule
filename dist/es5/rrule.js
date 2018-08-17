@@ -2198,13 +2198,18 @@ var weekdays = {
     SA: 5,
     SU: 6
 };
+var DTSTART_CLAUSE = /DTSTART(?:;TZID=([^:=]+))?(?::|=)([^;]+)/;
 function handle_DTSTART(value) {
-    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var parms = DTSTART_CLAUSE.exec(value);
+    if (!parms)
+        return;
     var __ = parms[0], ___ = parms[1], dtstart = parms[2];
     return esm_dateutil.untilStringToDate(dtstart);
 }
 function handle_TZID(value) {
-    var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
+    var parms = DTSTART_CLAUSE.exec(value);
+    if (!parms)
+        return;
     var __ = parms[0], tzid = parms[1];
     if (tzid) {
         return tzid;
@@ -2306,13 +2311,10 @@ function _parseRfcRRule(line, options) {
     else {
         value = line;
     }
-    var rrkwargs = {};
-    var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
-    if (dtstart && dtstart.length > 0) {
-        var dtstartClause = dtstart[0];
-        rrkwargs.dtstart = handle_DTSTART(dtstartClause);
-        rrkwargs.tzid = handle_TZID(dtstartClause);
-    }
+    var rrkwargs = {
+        dtstart: handle_DTSTART(line),
+        tzid: handle_TZID(line)
+    };
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {
         parts = pairs[i].split('=');

@@ -45,12 +45,9 @@ function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
     value = line
   }
 
-  const rrkwargs: Partial<Options> = {}
-  const dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line)
-  if (dtstart && dtstart.length > 0) {
-    const dtstartClause = dtstart[0]
-    rrkwargs.dtstart = handle_DTSTART(dtstartClause)
-    rrkwargs.tzid = handle_TZID(dtstartClause)
+  const rrkwargs: Partial<Options> = {
+    dtstart: handle_DTSTART(line),
+    tzid: handle_TZID(line)
   }
 
   const pairs = value.split(';')

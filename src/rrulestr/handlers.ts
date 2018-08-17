@@ -16,12 +16,16 @@ const weekdays = {
   SU: 6
 }
 
-type Handler = (value: string | FreqKey | WeekdayStr) => string | Date | number | number[] | undefined | ByWeekday | ByWeekday[]
+type Handler = (value: string | FreqKey | WeekdayStr) => string | Date | undefined | ByWeekday | ByWeekday[]
+
+const DTSTART_CLAUSE = /DTSTART(?:;TZID=([^:=]+))?(?::|=)([^;]+)/
 
 export function handle_DTSTART (
   value: string
 ) {
-  const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
+  const parms = DTSTART_CLAUSE.exec(value)
+  if (!parms) return
+
   const [ __, ___, dtstart ] = parms
   return dateutil.untilStringToDate(dtstart)
 }
@@ -29,7 +33,9 @@ export function handle_DTSTART (
 export function handle_TZID (
   value: string
 ) {
-  const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
+  const parms = DTSTART_CLAUSE.exec(value)
+  if (!parms) return
+
   const [ __, tzid ] = parms
   if (tzid) {
     return tzid

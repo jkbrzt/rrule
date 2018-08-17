@@ -1,8 +1,8 @@
 import { Frequency, ByWeekday } from '../types';
 import { WeekdayStr, Weekday } from '../weekday';
 declare type FreqKey = keyof typeof Frequency;
-declare type Handler = (value: string | FreqKey | WeekdayStr) => string | Date | number | number[] | undefined | ByWeekday | ByWeekday[];
-export declare function handle_DTSTART(value: string): Date;
+declare type Handler = (value: string | FreqKey | WeekdayStr) => string | Date | undefined | ByWeekday | ByWeekday[];
+export declare function handle_DTSTART(value: string): Date | undefined;
 export declare function handle_TZID(value: string): string | undefined;
 export declare function handle_int(value: string): number;
 export declare function handle_int_list(value: string): number[];

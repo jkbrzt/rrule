@@ -2197,41 +2197,34 @@ var weekday_map = {
     SA: 5,
     SU: 6
 };
-function handle_DTSTART(rrkwargs, _, value) {
+function handle_DTSTART(value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
     var __ = parms[0], ___ = parms[1], dtstart = parms[2];
-    rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(dtstart);
+    return esm_dateutil.untilStringToDate(dtstart);
 }
-function handle_TZID(rrkwargs, _, value) {
+function handle_TZID(value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
     var __ = parms[0], tzid = parms[1];
     if (tzid) {
-        rrkwargs['tzid'] = tzid;
+        return tzid;
     }
 }
-function handle_int(rrkwargs, name, value) {
-    // @ts-ignore
-    rrkwargs[name.toLowerCase()] = parseInt(value, 10);
+function handle_int(value) {
+    return parseInt(value, 10);
 }
-function handle_int_list(rrkwargs, name, value) {
-    // @ts-ignore
-    rrkwargs[name.toLowerCase()] = value.split(',').map(function (x) { return parseInt(x, 10); });
+function handle_int_list(value) {
+    return value.split(',').map(function (x) { return parseInt(x, 10); });
 }
-function handle_FREQ(rrkwargs, _, value) {
-    rrkwargs['freq'] = Frequency[value];
+function handle_FREQ(value) {
+    return Frequency[value];
 }
-function handle_UNTIL(rrkwargs, _, value) {
-    try {
-        rrkwargs['until'] = esm_dateutil.untilStringToDate(value);
-    }
-    catch (error) {
-        throw new Error('invalid until date');
-    }
+function handle_UNTIL(value) {
+    return esm_dateutil.untilStringToDate(value);
 }
-function handle_WKST(rrkwargs, _, value) {
-    rrkwargs['wkst'] = weekday_map[value];
+function handle_WKST(value) {
+    return weekday_map[value];
 }
-function handle_BYWEEKDAY(rrkwargs, _, value) {
+function handle_BYWEEKDAY(value) {
     // Two ways to specify this: +1MO or MO(+1)
     var splt;
     var i;
@@ -2263,7 +2256,7 @@ function handle_BYWEEKDAY(rrkwargs, _, value) {
         var weekday = new Weekday(weekday_map[w], n);
         l.push(weekday);
     }
-    rrkwargs['byweekday'] = l;
+    return l;
 }
 var handlers = {
     BYDAY: handle_BYWEEKDAY,
@@ -2324,8 +2317,8 @@ function _parseRfcRRule(line, options) {
     var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
     if (dtstart && dtstart.length > 0) {
         var dtstartClause = dtstart[0];
-        handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
-        handle_TZID(rrkwargs, 'TZID', dtstartClause);
+        rrkwargs.dtstart = handle_DTSTART(dtstartClause);
+        rrkwargs.tzid = handle_TZID(dtstartClause);
     }
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {
@@ -2339,7 +2332,9 @@ function _parseRfcRRule(line, options) {
         if (typeof paramHandler !== 'function') {
             throw new Error("unknown parameter '" + name + "':" + value);
         }
-        paramHandler(rrkwargs, name, value);
+        if (name === 'BYDAY')
+            name = 'BYWEEKDAY';
+        rrkwargs[name.toLowerCase()] = paramHandler(value);
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
     rrkwargs.tzid = rrkwargs.tzid || options.tzid;

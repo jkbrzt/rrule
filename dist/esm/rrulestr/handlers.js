@@ -11,41 +11,34 @@ var weekday_map = {
     SA: 5,
     SU: 6
 };
-export function handle_DTSTART(rrkwargs, _, value) {
+export function handle_DTSTART(value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
     var __ = parms[0], ___ = parms[1], dtstart = parms[2];
-    rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart);
+    return dateutil.untilStringToDate(dtstart);
 }
-export function handle_TZID(rrkwargs, _, value) {
+export function handle_TZID(value) {
     var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
     var __ = parms[0], tzid = parms[1];
     if (tzid) {
-        rrkwargs['tzid'] = tzid;
+        return tzid;
     }
 }
-export function handle_int(rrkwargs, name, value) {
-    // @ts-ignore
-    rrkwargs[name.toLowerCase()] = parseInt(value, 10);
+export function handle_int(value) {
+    return parseInt(value, 10);
 }
-export function handle_int_list(rrkwargs, name, value) {
-    // @ts-ignore
-    rrkwargs[name.toLowerCase()] = value.split(',').map(function (x) { return parseInt(x, 10); });
+export function handle_int_list(value) {
+    return value.split(',').map(function (x) { return parseInt(x, 10); });
 }
-export function handle_FREQ(rrkwargs, _, value) {
-    rrkwargs['freq'] = Frequency[value];
+export function handle_FREQ(value) {
+    return Frequency[value];
 }
-export function handle_UNTIL(rrkwargs, _, value) {
-    try {
-        rrkwargs['until'] = dateutil.untilStringToDate(value);
-    }
-    catch (error) {
-        throw new Error('invalid until date');
-    }
+export function handle_UNTIL(value) {
+    return dateutil.untilStringToDate(value);
 }
-export function handle_WKST(rrkwargs, _, value) {
-    rrkwargs['wkst'] = weekday_map[value];
+export function handle_WKST(value) {
+    return weekday_map[value];
 }
-export function handle_BYWEEKDAY(rrkwargs, _, value) {
+export function handle_BYWEEKDAY(value) {
     // Two ways to specify this: +1MO or MO(+1)
     var splt;
     var i;
@@ -77,7 +70,7 @@ export function handle_BYWEEKDAY(rrkwargs, _, value) {
         var weekday = new Weekday(weekday_map[w], n);
         l.push(weekday);
     }
-    rrkwargs['byweekday'] = l;
+    return l;
 }
 export var handlers = {
     BYDAY: handle_BYWEEKDAY,

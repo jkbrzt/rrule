@@ -291,4 +291,17 @@ describe('rrulestr', function () {
       byweekday: [Days.TU.weekday, Days.WE.weekday]
     })
   })
+
+  it('parses a DTSTART if it is the first param', () => {
+    const rrule = rrulestr(
+      "RRULE:DTSTART;TZID=America/Los_Angeles:20180819T111500;FREQ=DAILY;INTERVAL=1"
+    )
+
+    expect(rrule.options).to.deep.include({
+      dtstart: new Date(Date.UTC(2018, 7, 19, 11, 15, 0)),
+      freq: Frequency.DAILY,
+      interval: 1,
+      tzid: 'America/Los_Angeles'
+    })
+  })
 })

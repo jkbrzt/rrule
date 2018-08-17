@@ -1,4 +1,4 @@
-import { Options, Frequency, ByWeekday } from '../types'
+import { Frequency, ByWeekday } from '../types'
 import dateutil from '../dateutil'
 import { WeekdayStr, Weekday } from '../weekday'
 
@@ -15,57 +15,47 @@ const weekday_map = {
   SU: 6
 }
 
-type Handler = (rrkwargs: Partial<Options>, name: string, value: string | FreqKey | WeekdayStr) => void
+type Handler = (value: string | FreqKey | WeekdayStr) => string | Date | number | number[] | undefined | ByWeekday | ByWeekday[]
 
 export function handle_DTSTART (
-  rrkwargs: Partial<Options>,
-  _: string,
   value: string
 ) {
   const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
   const [ __, ___, dtstart ] = parms
-  rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart)
+  return dateutil.untilStringToDate(dtstart)
 }
 
 export function handle_TZID (
-  rrkwargs: Partial<Options>,
-  _: string,
   value: string
 ) {
   const parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value)!
   const [ __, tzid ] = parms
   if (tzid) {
-    rrkwargs['tzid'] = tzid
+    return tzid
   }
 }
 
-export function handle_int (rrkwargs: Partial<Options>, name: string, value: string) {
-  // @ts-ignore
-  rrkwargs[name.toLowerCase()] = parseInt(value, 10)
+export function handle_int (value: string) {
+  return parseInt(value, 10)
 }
 
-export function handle_int_list (rrkwargs: Partial<Options>, name: string, value: string) {
-  // @ts-ignore
-  rrkwargs[name.toLowerCase()] = value.split(',').map(x => parseInt(x, 10))
+export function handle_int_list (value: string) {
+  return value.split(',').map(x => parseInt(x, 10))
 }
 
-export function handle_FREQ (rrkwargs: Partial<Options>, _: string, value: FreqKey) {
-  rrkwargs['freq'] = Frequency[value]
+export function handle_FREQ (value: FreqKey) {
+  return Frequency[value]
 }
 
-export function handle_UNTIL (rrkwargs: Partial<Options>, _: string, value: string) {
-  try {
-    rrkwargs['until'] = dateutil.untilStringToDate(value)
-  } catch (error) {
-    throw new Error('invalid until date')
-  }
+export function handle_UNTIL (value: string) {
+  return dateutil.untilStringToDate(value)
 }
 
-export function handle_WKST (rrkwargs: Partial<Options>, _: string, value: WeekdayStr) {
-  rrkwargs['wkst'] = weekday_map[value]
+export function handle_WKST (value: WeekdayStr) {
+  return weekday_map[value]
 }
 
-export function handle_BYWEEKDAY (rrkwargs: Partial<Options>, _: string, value: string) {
+export function handle_BYWEEKDAY (value: string) {
   // Two ways to specify this: +1MO or MO(+1)
   let splt: string[]
   let i: number
@@ -97,7 +87,7 @@ export function handle_BYWEEKDAY (rrkwargs: Partial<Options>, _: string, value: 
     const weekday = new Weekday(weekday_map[w], n as number)
     l.push(weekday)
   }
-  rrkwargs['byweekday'] = l
+  return l
 }
 
 export const handlers = {

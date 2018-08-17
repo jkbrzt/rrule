@@ -37,8 +37,8 @@ function _parseRfcRRule(line, options) {
     var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
     if (dtstart && dtstart.length > 0) {
         var dtstartClause = dtstart[0];
-        handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
-        handle_TZID(rrkwargs, 'TZID', dtstartClause);
+        rrkwargs.dtstart = handle_DTSTART(dtstartClause);
+        rrkwargs.tzid = handle_TZID(dtstartClause);
     }
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {
@@ -52,7 +52,9 @@ function _parseRfcRRule(line, options) {
         if (typeof paramHandler !== 'function') {
             throw new Error("unknown parameter '" + name + "':" + value);
         }
-        paramHandler(rrkwargs, name, value);
+        if (name === 'BYDAY')
+            name = 'BYWEEKDAY';
+        rrkwargs[name.toLowerCase()] = paramHandler(value);
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
     rrkwargs.tzid = rrkwargs.tzid || options.tzid;

@@ -49,8 +49,8 @@ function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
   const dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line)
   if (dtstart && dtstart.length > 0) {
     const dtstartClause = dtstart[0]
-    handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause)
-    handle_TZID(rrkwargs, 'TZID', dtstartClause)
+    rrkwargs.dtstart = handle_DTSTART(dtstartClause)
+    rrkwargs.tzid = handle_TZID(dtstartClause)
   }
 
   const pairs = value.split(';')
@@ -69,8 +69,10 @@ function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
       throw new Error(`unknown parameter '${name}':${value}`)
     }
 
-    paramHandler(rrkwargs, name, value)
+    if (name === 'BYDAY') name = 'BYWEEKDAY'
+    rrkwargs[name.toLowerCase() as keyof typeof rrkwargs] = paramHandler(value)
   }
+
   rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
   rrkwargs.tzid = rrkwargs.tzid || options.tzid
 

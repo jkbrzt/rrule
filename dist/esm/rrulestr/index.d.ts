@@ -8,8 +8,4 @@ export interface RRuleStrOptions {
     compatible: boolean;
     tzid: string | null;
 }
-export default class RRuleStr {
-    private _parseRfcRRule;
-    private _parseRfc;
-    parse(s: string, options?: Partial<RRuleStrOptions>): RRule | RRuleSet;
-}
+export declare function rrulestr(s: string, options?: Partial<RRuleStrOptions>): RRule | RRuleSet;

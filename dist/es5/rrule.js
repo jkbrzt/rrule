@@ -2298,243 +2298,237 @@ var rrulestr_DEFAULT_OPTIONS = {
     compatible: false,
     tzid: null
 };
-var rrulestr_RRuleStr = /** @class */ (function () {
-    function RRuleStr() {
+function _parseRfcRRule(line, options) {
+    if (options === void 0) { options = {}; }
+    options.dtstart = options.dtstart || null;
+    options.cache = options.cache || false;
+    var name;
+    var value;
+    var parts;
+    var nameRegex = /^([A-Z]+):(.*)$/;
+    var nameParts = nameRegex.exec(line);
+    if (nameParts && nameParts.length >= 3) {
+        name = nameParts[1];
+        value = nameParts[2];
+        if (name !== 'RRULE')
+            throw new Error("unknown parameter name " + name);
     }
-    RRuleStr.prototype._parseRfcRRule = function (line, options) {
-        if (options === void 0) { options = {}; }
-        options.dtstart = options.dtstart || null;
-        options.cache = options.cache || false;
-        var name;
-        var value;
-        var parts;
-        var nameRegex = /^([A-Z]+):(.*)$/;
-        var nameParts = nameRegex.exec(line);
-        if (nameParts && nameParts.length >= 3) {
-            name = nameParts[1];
-            value = nameParts[2];
-            if (name !== 'RRULE')
-                throw new Error("unknown parameter name " + name);
+    else {
+        value = line;
+    }
+    var rrkwargs = {};
+    var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
+    if (dtstart && dtstart.length > 0) {
+        var dtstartClause = dtstart[0];
+        handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
+    }
+    var pairs = value.split(';');
+    for (var i = 0; i < pairs.length; i++) {
+        parts = pairs[i].split('=');
+        name = parts[0].toUpperCase();
+        if (/DTSTART|TZID/.test(name)) {
+            continue;
         }
-        else {
+        value = parts[1].toUpperCase();
+        var paramHandler = handlers[name];
+        if (typeof paramHandler !== 'function') {
+            throw new Error("unknown parameter '" + name + "':" + value);
+        }
+        paramHandler(rrkwargs, name, value);
+    }
+    rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
+    rrkwargs.tzid = rrkwargs.tzid || options.tzid;
+    return new esm_rrule(rrkwargs, !options.cache);
+}
+function _parseRfc(s, options) {
+    if (options.compatible) {
+        options.forceset = true;
+        options.unfold = true;
+    }
+    s = s && s.trim();
+    if (!s)
+        throw new Error('Invalid empty string');
+    var i = 0;
+    var line;
+    var lines;
+    // More info about 'unfold' option
+    // Go head to http://www.ietf.org/rfc/rfc2445.txt
+    if (options.unfold) {
+        lines = s.split('\n');
+        while (i < lines.length) {
+            // TODO
+            line = lines[i] = lines[i].replace(/\s+$/g, '');
+            if (!line) {
+                lines.splice(i, 1);
+            }
+            else if (i > 0 && line[0] === ' ') {
+                lines[i - 1] += line.slice(1);
+                lines.splice(i, 1);
+            }
+            else {
+                i += 1;
+            }
+        }
+    }
+    else {
+        lines = s.split(/\s/);
+    }
+    if (!options.forceset &&
+        lines.length === 1 &&
+        (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
+        return _parseRfcRRule(lines[0], {
+            cache: options.cache,
+            dtstart: options.dtstart
+        });
+    }
+    var rrulevals = [];
+    var rdatevals = [];
+    var exrulevals = [];
+    var exdatevals = [];
+    var name;
+    var value;
+    var parts;
+    var dtstart;
+    var tzid;
+    var rset;
+    var j;
+    var k;
+    var datestrs;
+    var datestr;
+    for (var i_1 = 0; i_1 < lines.length; i_1++) {
+        line = lines[i_1];
+        if (!line)
+            continue;
+        if (line.indexOf(':') === -1) {
+            name = 'RRULE';
             value = line;
         }
-        var rrkwargs = {};
-        var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
-        if (dtstart && dtstart.length > 0) {
-            var dtstartClause = dtstart[0];
-            handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
+        else {
+            parts = Object(helpers["l" /* split */])(line, ':', 1);
+            name = parts[0];
+            value = parts[1];
         }
-        var pairs = value.split(';');
-        for (var i = 0; i < pairs.length; i++) {
-            parts = pairs[i].split('=');
-            name = parts[0].toUpperCase();
-            if (/DTSTART|TZID/.test(name)) {
-                continue;
+        var parms = name.split(';');
+        if (!parms)
+            throw new Error('empty property name');
+        name = parms[0].toUpperCase();
+        parms = parms.slice(1);
+        if (name === 'RRULE') {
+            for (j = 0; j < parms.length; j++) {
+                var parm = parms[j];
+                throw new Error('unsupported RRULE parm: ' + parm);
             }
-            value = parts[1].toUpperCase();
-            var paramHandler = handlers[name];
-            if (typeof paramHandler !== 'function') {
-                throw new Error("unknown parameter '" + name + "':" + value);
+            rrulevals.push(value);
+        }
+        else if (name === 'RDATE') {
+            for (j = 0; j < parms.length; j++) {
+                var parm = parms[j];
+                if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                    throw new Error('unsupported RDATE parm: ' + parm);
+                }
             }
-            paramHandler(rrkwargs, name, value);
+            rdatevals.push(value);
         }
-        rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
-        rrkwargs.tzid = rrkwargs.tzid || options.tzid;
-        return new esm_rrule(rrkwargs, !options.cache);
-    };
-    RRuleStr.prototype._parseRfc = function (s, options) {
-        if (options.compatible) {
-            options.forceset = true;
-            options.unfold = true;
+        else if (name === 'EXRULE') {
+            for (j = 0; j < parms.length; j++) {
+                var parm = parms[j];
+                throw new Error('unsupported EXRULE parm: ' + parm);
+            }
+            exrulevals.push(value);
         }
-        s = s && s.trim();
-        if (!s)
-            throw new Error('Invalid empty string');
-        var i = 0;
-        var line;
-        var lines;
-        // More info about 'unfold' option
-        // Go head to http://www.ietf.org/rfc/rfc2445.txt
-        if (options.unfold) {
-            lines = s.split('\n');
-            while (i < lines.length) {
-                // TODO
-                line = lines[i] = lines[i].replace(/\s+$/g, '');
-                if (!line) {
-                    lines.splice(i, 1);
+        else if (name === 'EXDATE') {
+            for (j = 0; j < parms.length; j++) {
+                var parm = parms[j];
+                if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                    throw new Error('unsupported EXDATE parm: ' + parm);
                 }
-                else if (i > 0 && line[0] === ' ') {
-                    lines[i - 1] += line.slice(1);
-                    lines.splice(i, 1);
-                }
-                else {
-                    i += 1;
+            }
+            exdatevals.push(value);
+        }
+        else if (name === 'DTSTART') {
+            dtstart = esm_dateutil.untilStringToDate(value);
+            if (parms.length) {
+                var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
+                if (key === 'TZID') {
+                    tzid = value_1;
                 }
             }
         }
         else {
-            lines = s.split(/\s/);
+            throw new Error('unsupported property: ' + name);
         }
-        if (!options.forceset &&
-            lines.length === 1 &&
-            (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
-            return this._parseRfcRRule(lines[0], {
-                cache: options.cache,
-                dtstart: options.dtstart
-            });
+    }
+    if (options.forceset ||
+        rrulevals.length > 1 ||
+        rdatevals.length ||
+        exrulevals.length ||
+        exdatevals.length) {
+        rset = new rruleset(!options.cache);
+        for (j = 0; j < rrulevals.length; j++) {
+            rset.rrule(_parseRfcRRule(rrulevals[j], {
+                // @ts-ignore
+                dtstart: options.dtstart || dtstart
+            }));
         }
-        var rrulevals = [];
-        var rdatevals = [];
-        var exrulevals = [];
-        var exdatevals = [];
-        var name;
-        var value;
-        var parts;
-        var dtstart;
-        var tzid;
-        var rset;
-        var j;
-        var k;
-        var datestrs;
-        var datestr;
-        for (var i_1 = 0; i_1 < lines.length; i_1++) {
-            line = lines[i_1];
-            if (!line)
-                continue;
-            if (line.indexOf(':') === -1) {
-                name = 'RRULE';
-                value = line;
-            }
-            else {
-                parts = Object(helpers["l" /* split */])(line, ':', 1);
-                name = parts[0];
-                value = parts[1];
-            }
-            var parms = name.split(';');
-            if (!parms)
-                throw new Error('empty property name');
-            name = parms[0].toUpperCase();
-            parms = parms.slice(1);
-            if (name === 'RRULE') {
-                for (j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    throw new Error('unsupported RRULE parm: ' + parm);
-                }
-                rrulevals.push(value);
-            }
-            else if (name === 'RDATE') {
-                for (j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                        throw new Error('unsupported RDATE parm: ' + parm);
-                    }
-                }
-                rdatevals.push(value);
-            }
-            else if (name === 'EXRULE') {
-                for (j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    throw new Error('unsupported EXRULE parm: ' + parm);
-                }
-                exrulevals.push(value);
-            }
-            else if (name === 'EXDATE') {
-                for (j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                        throw new Error('unsupported EXDATE parm: ' + parm);
-                    }
-                }
-                exdatevals.push(value);
-            }
-            else if (name === 'DTSTART') {
-                dtstart = esm_dateutil.untilStringToDate(value);
-                if (parms.length) {
-                    var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
-                    if (key === 'TZID') {
-                        tzid = value_1;
-                    }
-                }
-            }
-            else {
-                throw new Error('unsupported property: ' + name);
+        for (j = 0; j < rdatevals.length; j++) {
+            datestrs = rdatevals[j].split(',');
+            for (k = 0; k < datestrs.length; k++) {
+                datestr = datestrs[k];
+                rset.rdate(esm_dateutil.untilStringToDate(datestr));
             }
         }
-        if (options.forceset ||
-            rrulevals.length > 1 ||
-            rdatevals.length ||
-            exrulevals.length ||
-            exdatevals.length) {
-            rset = new rruleset(!options.cache);
-            for (j = 0; j < rrulevals.length; j++) {
-                rset.rrule(this._parseRfcRRule(rrulevals[j], {
-                    // @ts-ignore
-                    dtstart: options.dtstart || dtstart
-                }));
-            }
-            for (j = 0; j < rdatevals.length; j++) {
-                datestrs = rdatevals[j].split(',');
-                for (k = 0; k < datestrs.length; k++) {
-                    datestr = datestrs[k];
-                    rset.rdate(esm_dateutil.untilStringToDate(datestr));
-                }
-            }
-            for (j = 0; j < exrulevals.length; j++) {
-                rset.exrule(this._parseRfcRRule(exrulevals[j], {
-                    // @ts-ignore
-                    dtstart: options.dtstart || dtstart
-                }));
-            }
-            for (j = 0; j < exdatevals.length; j++) {
-                datestrs = exdatevals[j].split(',');
-                for (k = 0; k < datestrs.length; k++) {
-                    datestr = datestrs[k];
-                    rset.exdate(esm_dateutil.untilStringToDate(datestr));
-                }
-            }
-            // @ts-ignore
-            if (options.compatible && options.dtstart)
-                rset.rdate(dtstart);
-            return rset;
+        for (j = 0; j < exrulevals.length; j++) {
+            rset.exrule(_parseRfcRRule(exrulevals[j], {
+                // @ts-ignore
+                dtstart: options.dtstart || dtstart
+            }));
         }
-        return this._parseRfcRRule(rrulevals[0], {
-            // @ts-ignore
-            dtstart: options.dtstart || dtstart,
-            cache: options.cache,
-            // @ts-ignore
-            tzid: options.tzid || tzid
-        });
-    };
-    RRuleStr.prototype.parse = function (s, options) {
-        if (options === void 0) { options = {}; }
-        var invalid = [];
-        var keys = Object.keys(options);
-        var defaultKeys = Object.keys(rrulestr_DEFAULT_OPTIONS);
-        keys.forEach(function (key) {
-            if (!Object(helpers["c" /* includes */])(defaultKeys, key))
-                invalid.push(key);
-        }, this);
-        if (invalid.length) {
-            throw new Error('Invalid options: ' + invalid.join(', '));
+        for (j = 0; j < exdatevals.length; j++) {
+            datestrs = exdatevals[j].split(',');
+            for (k = 0; k < datestrs.length; k++) {
+                datestr = datestrs[k];
+                rset.exdate(esm_dateutil.untilStringToDate(datestr));
+            }
         }
-        // Merge in default options
-        defaultKeys.forEach(function (key) {
-            if (!Object(helpers["c" /* includes */])(keys, key))
-                options[key] = rrulestr_DEFAULT_OPTIONS[key];
-        });
-        return this._parseRfc(s, options);
-    };
-    return RRuleStr;
-}());
-/* harmony default export */ var rrulestr = (rrulestr_RRuleStr);
+        // @ts-ignore
+        if (options.compatible && options.dtstart)
+            rset.rdate(dtstart);
+        return rset;
+    }
+    return _parseRfcRRule(rrulevals[0], {
+        // @ts-ignore
+        dtstart: options.dtstart || dtstart,
+        cache: options.cache,
+        // @ts-ignore
+        tzid: options.tzid || tzid
+    });
+}
+function rrulestr(s, options) {
+    if (options === void 0) { options = {}; }
+    var invalid = [];
+    var keys = Object.keys(options);
+    var defaultKeys = Object.keys(rrulestr_DEFAULT_OPTIONS);
+    keys.forEach(function (key) {
+        if (!Object(helpers["c" /* includes */])(defaultKeys, key))
+            invalid.push(key);
+    });
+    if (invalid.length) {
+        throw new Error('Invalid options: ' + invalid.join(', '));
+    }
+    // Merge in default options
+    defaultKeys.forEach(function (key) {
+        if (!Object(helpers["c" /* includes */])(keys, key))
+            options[key] = rrulestr_DEFAULT_OPTIONS[key];
+    });
+    return _parseRfc(s, options);
+}
 //# sourceMappingURL=index.js.map
 // CONCATENATED MODULE: ./dist/esm/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rrulestr", function() { return esm_rrulestr; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return esm_rrule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "rrulestr", function() { return rrulestr; });
 /*!
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -2558,11 +2552,6 @@ var rrulestr_RRuleStr = /** @class */ (function () {
 // =============================================================================
 // Export
 // =============================================================================
-// Only one RRuleStr instance for all rrule string parsing work.
-var rruleStr = new rrulestr();
-var esm_rrulestr = function () {
-    return rruleStr.parse.apply(rruleStr, arguments);
-};
 
 /* harmony default export */ var esm = __webpack_exports__["default"] = (esm_rrule);
 //# sourceMappingURL=index.js.map

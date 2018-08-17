@@ -99,20 +99,21 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isPresent; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isNumber; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return range; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return isPresent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return range; });
 /* unused harmony export clone */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return repeat; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return toArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return padStart; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return split; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return pymod; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return divmod; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return empty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return notEmpty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return includes; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return repeat; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return toArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return compact; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return padStart; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return split; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return pymod; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return divmod; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return empty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return notEmpty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return includes; });
 // =============================================================================
 // Helper functions
 // =============================================================================
@@ -158,6 +159,15 @@ var toArray = function (item) {
         return item;
     }
     return [item];
+};
+var compact = function (o) {
+    var newObject = {};
+    Object.keys(o).forEach(function (k) {
+        if (typeof o[k] !== 'undefined') {
+            newObject[k] = (o)[k];
+        }
+    });
+    return newObject;
 };
 function padStart(item, targetLength, padString) {
     if (padString === void 0) { padString = ' '; }
@@ -371,13 +381,13 @@ var dateutil_dateutil;
         if (utc === void 0) { utc = true; }
         var date = new Date(time);
         return [
-            Object(helpers["h" /* padStart */])(date.getUTCFullYear().toString(), 4, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCMonth() + 1, 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCDate(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCFullYear().toString(), 4, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCMonth() + 1, 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCDate(), 2, '0'),
             'T',
-            Object(helpers["h" /* padStart */])(date.getUTCHours(), 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCMinutes(), 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCSeconds(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCHours(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCMinutes(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCSeconds(), 2, '0'),
             utc ? 'Z' : ''
         ].join('');
     };
@@ -445,7 +455,7 @@ var dateutil_dateutil;
             this.month += months;
             if (this.month > 12) {
                 var yearDiv = Math.floor(this.month / 12);
-                var monthMod = Object(helpers["i" /* pymod */])(this.month, 12);
+                var monthMod = Object(helpers["j" /* pymod */])(this.month, 12);
                 this.month = monthMod;
                 this.year += yearDiv;
                 if (this.month === 0) {
@@ -475,13 +485,13 @@ var dateutil_dateutil;
             }
             while (true) {
                 this.hour += hours;
-                var _a = Object(helpers["a" /* divmod */])(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
+                var _a = Object(helpers["b" /* divmod */])(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
                 if (dayDiv) {
                     this.hour = hourMod;
                     this.addDaily(dayDiv);
                     fixday = true;
                 }
-                if (Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour))
+                if (Object(helpers["c" /* empty */])(byhour) || Object(helpers["d" /* includes */])(byhour, this.hour))
                     break;
             }
             return fixday;
@@ -495,13 +505,13 @@ var dateutil_dateutil;
             }
             while (true) {
                 this.minute += minutes;
-                var _a = Object(helpers["a" /* divmod */])(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
+                var _a = Object(helpers["b" /* divmod */])(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
                 if (hourDiv) {
                     this.minute = minuteMod;
                     fixday = this.addHours(hourDiv, false, byhour);
                 }
-                if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
-                    (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute))) {
+                if ((Object(helpers["c" /* empty */])(byhour) || Object(helpers["d" /* includes */])(byhour, this.hour)) &&
+                    (Object(helpers["c" /* empty */])(byminute) || Object(helpers["d" /* includes */])(byminute, this.minute))) {
                     break;
                 }
             }
@@ -516,14 +526,14 @@ var dateutil_dateutil;
             }
             while (true) {
                 this.second += seconds;
-                var _a = Object(helpers["a" /* divmod */])(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
+                var _a = Object(helpers["b" /* divmod */])(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
                 if (minuteDiv) {
                     this.second = secondMod;
                     fixday = this.addMinutes(minuteDiv, false, byhour, byminute);
                 }
-                if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
-                    (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute)) &&
-                    (Object(helpers["b" /* empty */])(bysecond) || Object(helpers["c" /* includes */])(bysecond, this.second))) {
+                if ((Object(helpers["c" /* empty */])(byhour) || Object(helpers["d" /* includes */])(byhour, this.hour)) &&
+                    (Object(helpers["c" /* empty */])(byminute) || Object(helpers["d" /* includes */])(byminute, this.minute)) &&
+                    (Object(helpers["c" /* empty */])(bysecond) || Object(helpers["d" /* includes */])(bysecond, this.second))) {
                     break;
                 }
             }
@@ -562,18 +572,18 @@ var dateutil_dateutil;
 // Date masks
 // =============================================================================
 // Every mask is 7 days longer to handle cross-year weekly periods.
-var M365MASK = Object(helpers["k" /* repeat */])(1, 31).concat(Object(helpers["k" /* repeat */])(2, 28), Object(helpers["k" /* repeat */])(3, 31), Object(helpers["k" /* repeat */])(4, 30), Object(helpers["k" /* repeat */])(5, 31), Object(helpers["k" /* repeat */])(6, 30), Object(helpers["k" /* repeat */])(7, 31), Object(helpers["k" /* repeat */])(8, 31), Object(helpers["k" /* repeat */])(9, 30), Object(helpers["k" /* repeat */])(10, 31), Object(helpers["k" /* repeat */])(11, 30), Object(helpers["k" /* repeat */])(12, 31), Object(helpers["k" /* repeat */])(1, 7));
-var M366MASK = Object(helpers["k" /* repeat */])(1, 31).concat(Object(helpers["k" /* repeat */])(2, 29), Object(helpers["k" /* repeat */])(3, 31), Object(helpers["k" /* repeat */])(4, 30), Object(helpers["k" /* repeat */])(5, 31), Object(helpers["k" /* repeat */])(6, 30), Object(helpers["k" /* repeat */])(7, 31), Object(helpers["k" /* repeat */])(8, 31), Object(helpers["k" /* repeat */])(9, 30), Object(helpers["k" /* repeat */])(10, 31), Object(helpers["k" /* repeat */])(11, 30), Object(helpers["k" /* repeat */])(12, 31), Object(helpers["k" /* repeat */])(1, 7));
-var M28 = Object(helpers["j" /* range */])(1, 29);
-var M29 = Object(helpers["j" /* range */])(1, 30);
-var M30 = Object(helpers["j" /* range */])(1, 31);
-var M31 = Object(helpers["j" /* range */])(1, 32);
+var M365MASK = Object(helpers["l" /* repeat */])(1, 31).concat(Object(helpers["l" /* repeat */])(2, 28), Object(helpers["l" /* repeat */])(3, 31), Object(helpers["l" /* repeat */])(4, 30), Object(helpers["l" /* repeat */])(5, 31), Object(helpers["l" /* repeat */])(6, 30), Object(helpers["l" /* repeat */])(7, 31), Object(helpers["l" /* repeat */])(8, 31), Object(helpers["l" /* repeat */])(9, 30), Object(helpers["l" /* repeat */])(10, 31), Object(helpers["l" /* repeat */])(11, 30), Object(helpers["l" /* repeat */])(12, 31), Object(helpers["l" /* repeat */])(1, 7));
+var M366MASK = Object(helpers["l" /* repeat */])(1, 31).concat(Object(helpers["l" /* repeat */])(2, 29), Object(helpers["l" /* repeat */])(3, 31), Object(helpers["l" /* repeat */])(4, 30), Object(helpers["l" /* repeat */])(5, 31), Object(helpers["l" /* repeat */])(6, 30), Object(helpers["l" /* repeat */])(7, 31), Object(helpers["l" /* repeat */])(8, 31), Object(helpers["l" /* repeat */])(9, 30), Object(helpers["l" /* repeat */])(10, 31), Object(helpers["l" /* repeat */])(11, 30), Object(helpers["l" /* repeat */])(12, 31), Object(helpers["l" /* repeat */])(1, 7));
+var M28 = Object(helpers["k" /* range */])(1, 29);
+var M29 = Object(helpers["k" /* range */])(1, 30);
+var M30 = Object(helpers["k" /* range */])(1, 31);
+var M31 = Object(helpers["k" /* range */])(1, 32);
 var MDAY366MASK = M31.concat(M29, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
 var MDAY365MASK = M31.concat(M28, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
-var NM28 = Object(helpers["j" /* range */])(-28, 0);
-var NM29 = Object(helpers["j" /* range */])(-29, 0);
-var NM30 = Object(helpers["j" /* range */])(-30, 0);
-var NM31 = Object(helpers["j" /* range */])(-31, 0);
+var NM28 = Object(helpers["k" /* range */])(-28, 0);
+var NM29 = Object(helpers["k" /* range */])(-29, 0);
+var NM30 = Object(helpers["k" /* range */])(-30, 0);
+var NM31 = Object(helpers["k" /* range */])(-31, 0);
 var NMDAY366MASK = NM31.concat(NM29, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
 var NMDAY365MASK = NM31.concat(NM28, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
 var M366RANGE = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366];
@@ -581,7 +591,7 @@ var M365RANGE = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
 var WDAYMASK = (function () {
     var wdaymask = [];
     for (var i = 0; i < 55; i++)
-        wdaymask = wdaymask.concat(Object(helpers["j" /* range */])(7));
+        wdaymask = wdaymask.concat(Object(helpers["k" /* range */])(7));
     return wdaymask;
 })();
 
@@ -633,11 +643,11 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         if (year !== this.lastyear) {
             this.rebuildYear(year);
         }
-        if (Object(helpers["g" /* notEmpty */])(rr.options.bynweekday) &&
+        if (Object(helpers["h" /* notEmpty */])(rr.options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             this.rebuildMonth(year, month);
         }
-        if (Object(helpers["f" /* isPresent */])(rr.options.byeaster)) {
+        if (Object(helpers["g" /* isPresent */])(rr.options.byeaster)) {
             this.eastermask = this.easter(year, rr.options.byeaster);
         }
     };
@@ -663,21 +673,21 @@ var iterinfo_Iterinfo = /** @class */ (function () {
             this.wdaymask = WDAYMASK.slice(wday);
             this.mrange = M366RANGE;
         }
-        if (Object(helpers["b" /* empty */])(rr.options.byweekno)) {
+        if (Object(helpers["c" /* empty */])(rr.options.byweekno)) {
             this.wnomask = null;
         }
         else {
-            this.wnomask = Object(helpers["k" /* repeat */])(0, this.yearlen + 7);
+            this.wnomask = Object(helpers["l" /* repeat */])(0, this.yearlen + 7);
             var no1wkst = void 0;
             var firstwkst = void 0;
             var wyearlen = void 0;
-            no1wkst = firstwkst = Object(helpers["i" /* pymod */])(7 - this.yearweekday + rr.options.wkst, 7);
+            no1wkst = firstwkst = Object(helpers["j" /* pymod */])(7 - this.yearweekday + rr.options.wkst, 7);
             if (no1wkst >= 4) {
                 no1wkst = 0;
                 // Number of days in the year, plus the days we got
                 // from last year.
                 wyearlen =
-                    this.yearlen + Object(helpers["i" /* pymod */])(this.yearweekday - rr.options.wkst, 7);
+                    this.yearlen + Object(helpers["j" /* pymod */])(this.yearweekday - rr.options.wkst, 7);
             }
             else {
                 // Number of days in the year, minus the days we
@@ -685,7 +695,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
                 wyearlen = this.yearlen - no1wkst;
             }
             var div = Math.floor(wyearlen / 7);
-            var mod = Object(helpers["i" /* pymod */])(wyearlen, 7);
+            var mod = Object(helpers["j" /* pymod */])(wyearlen, 7);
             var numweeks = Math.floor(div + mod / 4);
             for (var j = 0; j < rr.options.byweekno.length; j++) {
                 var i = void 0;
@@ -712,7 +722,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
                         break;
                 }
             }
-            if (Object(helpers["c" /* includes */])(rr.options.byweekno, 1)) {
+            if (Object(helpers["d" /* includes */])(rr.options.byweekno, 1)) {
                 // Check week number 1 of next year as well
                 // orig-TODO : Check -numweeks for next year.
                 var i = no1wkst + numweeks * 7;
@@ -737,24 +747,24 @@ var iterinfo_Iterinfo = /** @class */ (function () {
                 // days from last year's last week number in
                 // this year.
                 var lnumweeks = void 0;
-                if (!Object(helpers["c" /* includes */])(rr.options.byweekno, -1)) {
+                if (!Object(helpers["d" /* includes */])(rr.options.byweekno, -1)) {
                     var lyearweekday = esm_dateutil.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
-                    var lno1wkst = Object(helpers["i" /* pymod */])(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                    var lno1wkst = Object(helpers["j" /* pymod */])(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
                     var lyearlen = esm_dateutil.isLeapYear(year - 1) ? 366 : 365;
                     if (lno1wkst >= 4) {
                         lno1wkst = 0;
                         lnumweeks = Math.floor(52 +
-                            Object(helpers["i" /* pymod */])(lyearlen + Object(helpers["i" /* pymod */])(lyearweekday - rr.options.wkst, 7), 7) /
+                            Object(helpers["j" /* pymod */])(lyearlen + Object(helpers["j" /* pymod */])(lyearweekday - rr.options.wkst, 7), 7) /
                                 4);
                     }
                     else {
-                        lnumweeks = Math.floor(52 + Object(helpers["i" /* pymod */])(this.yearlen - no1wkst, 7) / 4);
+                        lnumweeks = Math.floor(52 + Object(helpers["j" /* pymod */])(this.yearlen - no1wkst, 7) / 4);
                     }
                 }
                 else {
                     lnumweeks = -1;
                 }
-                if (Object(helpers["c" /* includes */])(rr.options.byweekno, lnumweeks)) {
+                if (Object(helpers["d" /* includes */])(rr.options.byweekno, lnumweeks)) {
                     for (var i = 0; i < no1wkst; i++)
                         this.wnomask[i] = 1;
                 }
@@ -765,7 +775,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         var rr = this.rrule;
         var ranges = [];
         if (rr.options.freq === esm_rrule.YEARLY) {
-            if (Object(helpers["g" /* notEmpty */])(rr.options.bymonth)) {
+            if (Object(helpers["h" /* notEmpty */])(rr.options.bymonth)) {
                 for (var j = 0; j < rr.options.bymonth.length; j++) {
                     month = rr.options.bymonth[j];
                     ranges.push(this.mrange.slice(month - 1, month + 1));
@@ -778,10 +788,10 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         else if (rr.options.freq === esm_rrule.MONTHLY) {
             ranges = [this.mrange.slice(month - 1, month + 1)];
         }
-        if (Object(helpers["g" /* notEmpty */])(ranges)) {
+        if (Object(helpers["h" /* notEmpty */])(ranges)) {
             // Weekly frequency won't get here, so we may not
             // care about cross-year weekly periods.
-            this.nwdaymask = Object(helpers["k" /* repeat */])(0, this.yearlen);
+            this.nwdaymask = Object(helpers["l" /* repeat */])(0, this.yearlen);
             for (var j = 0; j < ranges.length; j++) {
                 var rang = ranges[j];
                 var first = rang[0];
@@ -793,11 +803,11 @@ var iterinfo_Iterinfo = /** @class */ (function () {
                     var n = rr.options.bynweekday[k][1];
                     if (n < 0) {
                         i = last + (n + 1) * 7;
-                        i -= Object(helpers["i" /* pymod */])(this.wdaymask[i] - wday, 7);
+                        i -= Object(helpers["j" /* pymod */])(this.wdaymask[i] - wday, 7);
                     }
                     else {
                         i = first + (n - 1) * 7;
-                        i += Object(helpers["i" /* pymod */])(7 - this.wdaymask[i] + wday, 7);
+                        i += Object(helpers["j" /* pymod */])(7 - this.wdaymask[i] + wday, 7);
                     }
                     if (first <= i && i <= last)
                         this.nwdaymask[i] = 1;
@@ -808,19 +818,19 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         this.lastmonth = month;
     };
     Iterinfo.prototype.ydayset = function () {
-        return [Object(helpers["j" /* range */])(this.yearlen), 0, this.yearlen];
+        return [Object(helpers["k" /* range */])(this.yearlen), 0, this.yearlen];
     };
     Iterinfo.prototype.mdayset = function (_, month, __) {
         var start = this.mrange[month - 1];
         var end = this.mrange[month];
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen);
         for (var i = start; i < end; i++)
             set[i] = i;
         return [set, start, end];
     };
     Iterinfo.prototype.wdayset = function (year, month, day) {
         // We need to handle cross-year weeks here.
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen + 7);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen + 7);
         var i = esm_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
             this.yearordinal;
         var start = i;
@@ -833,7 +843,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         return [set, start, i];
     };
     Iterinfo.prototype.ddayset = function (year, month, day) {
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen);
         var i = esm_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
             this.yearordinal;
         set[i] = i;
@@ -1052,7 +1062,7 @@ function initializeOptions(options) {
     // Shallow copy for options and origOptions and check for invalid
     keys.forEach(function (key) {
         initializedOptions[key] = options[key];
-        if (!Object(helpers["c" /* includes */])(rrule_defaultKeys, key))
+        if (!Object(helpers["d" /* includes */])(rrule_defaultKeys, key))
             invalid.push(key);
     });
     if (invalid.length) {
@@ -1065,28 +1075,28 @@ function parseOptions(options) {
     var keys = Object.keys(options);
     // Merge in default options
     rrule_defaultKeys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(keys, key))
+        if (!Object(helpers["d" /* includes */])(keys, key))
             opts[key] = DEFAULT_OPTIONS[key];
     });
-    if (Object(helpers["f" /* isPresent */])(opts.byeaster))
+    if (Object(helpers["g" /* isPresent */])(opts.byeaster))
         opts.freq = esm_rrule.YEARLY;
-    if (!(Object(helpers["f" /* isPresent */])(opts.freq) && esm_rrule.FREQUENCIES[opts.freq])) {
+    if (!(Object(helpers["g" /* isPresent */])(opts.freq) && esm_rrule.FREQUENCIES[opts.freq])) {
         throw new Error("Invalid frequency: " + opts.freq);
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
     var millisecondModulo = opts.dtstart.getTime() % 1000;
-    if (!Object(helpers["f" /* isPresent */])(opts.wkst)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.wkst)) {
         opts.wkst = esm_rrule.MO.weekday;
     }
-    else if (Object(helpers["e" /* isNumber */])(opts.wkst)) {
+    else if (Object(helpers["f" /* isNumber */])(opts.wkst)) {
         // cool, just keep it like that
     }
     else {
         opts.wkst = opts.wkst.weekday;
     }
-    if (Object(helpers["f" /* isPresent */])(opts.bysetpos)) {
-        if (Object(helpers["e" /* isNumber */])(opts.bysetpos))
+    if (Object(helpers["g" /* isPresent */])(opts.bysetpos)) {
+        if (Object(helpers["f" /* isNumber */])(opts.bysetpos))
             opts.bysetpos = [opts.bysetpos];
         for (var i = 0; i < opts.bysetpos.length; i++) {
             var v = opts.bysetpos[i];
@@ -1096,12 +1106,12 @@ function parseOptions(options) {
         }
     }
     if (!(Boolean(opts.byweekno) ||
-        Object(helpers["g" /* notEmpty */])(opts.byweekno) ||
-        Object(helpers["g" /* notEmpty */])(opts.byyearday) ||
+        Object(helpers["h" /* notEmpty */])(opts.byweekno) ||
+        Object(helpers["h" /* notEmpty */])(opts.byyearday) ||
         Boolean(opts.bymonthday) ||
-        Object(helpers["g" /* notEmpty */])(opts.bymonthday) ||
-        Object(helpers["f" /* isPresent */])(opts.byweekday) ||
-        Object(helpers["f" /* isPresent */])(opts.byeaster))) {
+        Object(helpers["h" /* notEmpty */])(opts.bymonthday) ||
+        Object(helpers["g" /* isPresent */])(opts.byweekday) ||
+        Object(helpers["g" /* isPresent */])(opts.byeaster))) {
         switch (opts.freq) {
             case esm_rrule.YEARLY:
                 if (!opts.bymonth)
@@ -1117,21 +1127,21 @@ function parseOptions(options) {
         }
     }
     // bymonth
-    if (Object(helpers["f" /* isPresent */])(opts.bymonth) && !Object(helpers["d" /* isArray */])(opts.bymonth)) {
+    if (Object(helpers["g" /* isPresent */])(opts.bymonth) && !Object(helpers["e" /* isArray */])(opts.bymonth)) {
         opts.bymonth = [opts.bymonth];
     }
     // byyearday
-    if (Object(helpers["f" /* isPresent */])(opts.byyearday) &&
-        !Object(helpers["d" /* isArray */])(opts.byyearday) &&
-        Object(helpers["e" /* isNumber */])(opts.byyearday)) {
+    if (Object(helpers["g" /* isPresent */])(opts.byyearday) &&
+        !Object(helpers["e" /* isArray */])(opts.byyearday) &&
+        Object(helpers["f" /* isNumber */])(opts.byyearday)) {
         opts.byyearday = [opts.byyearday];
     }
     // bymonthday
-    if (!Object(helpers["f" /* isPresent */])(opts.bymonthday)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.bymonthday)) {
         opts.bymonthday = [];
         opts.bynmonthday = [];
     }
-    else if (Object(helpers["d" /* isArray */])(opts.bymonthday)) {
+    else if (Object(helpers["e" /* isArray */])(opts.bymonthday)) {
         var bymonthday = [];
         var bynmonthday = [];
         for (var i = 0; i < opts.bymonthday.length; i++) {
@@ -1155,14 +1165,14 @@ function parseOptions(options) {
         opts.bymonthday = [opts.bymonthday];
     }
     // byweekno
-    if (Object(helpers["f" /* isPresent */])(opts.byweekno) && !Object(helpers["d" /* isArray */])(opts.byweekno)) {
+    if (Object(helpers["g" /* isPresent */])(opts.byweekno) && !Object(helpers["e" /* isArray */])(opts.byweekno)) {
         opts.byweekno = [opts.byweekno];
     }
     // byweekday / bynweekday
-    if (!Object(helpers["f" /* isPresent */])(opts.byweekday)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.byweekday)) {
         opts.bynweekday = null;
     }
-    else if (Object(helpers["e" /* isNumber */])(opts.byweekday)) {
+    else if (Object(helpers["f" /* isNumber */])(opts.byweekday)) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
@@ -1181,7 +1191,7 @@ function parseOptions(options) {
         var bynweekday = [];
         for (var i = 0; i < opts.byweekday.length; i++) {
             var wday = opts.byweekday[i];
-            if (Object(helpers["e" /* isNumber */])(wday)) {
+            if (Object(helpers["f" /* isNumber */])(wday)) {
                 byweekday.push(wday);
                 continue;
             }
@@ -1193,31 +1203,31 @@ function parseOptions(options) {
                 bynweekday.push([wd.weekday, wd.n]);
             }
         }
-        opts.byweekday = Object(helpers["g" /* notEmpty */])(byweekday) ? byweekday : null;
-        opts.bynweekday = Object(helpers["g" /* notEmpty */])(bynweekday) ? bynweekday : null;
+        opts.byweekday = Object(helpers["h" /* notEmpty */])(byweekday) ? byweekday : null;
+        opts.bynweekday = Object(helpers["h" /* notEmpty */])(bynweekday) ? bynweekday : null;
     }
     // byhour
-    if (!Object(helpers["f" /* isPresent */])(opts.byhour)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.byhour)) {
         opts.byhour =
             opts.freq < esm_rrule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
-    else if (Object(helpers["e" /* isNumber */])(opts.byhour)) {
+    else if (Object(helpers["f" /* isNumber */])(opts.byhour)) {
         opts.byhour = [opts.byhour];
     }
     // byminute
-    if (!Object(helpers["f" /* isPresent */])(opts.byminute)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.byminute)) {
         opts.byminute =
             opts.freq < esm_rrule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     }
-    else if (Object(helpers["e" /* isNumber */])(opts.byminute)) {
+    else if (Object(helpers["f" /* isNumber */])(opts.byminute)) {
         opts.byminute = [opts.byminute];
     }
     // bysecond
-    if (!Object(helpers["f" /* isPresent */])(opts.bysecond)) {
+    if (!Object(helpers["g" /* isPresent */])(opts.bysecond)) {
         opts.bysecond =
             opts.freq < esm_rrule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     }
-    else if (Object(helpers["e" /* isNumber */])(opts.bysecond)) {
+    else if (Object(helpers["f" /* isNumber */])(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
     }
     var timeset;
@@ -1356,19 +1366,19 @@ function optionsToString(options) {
     for (var i = 0; i < keys.length; i++) {
         if (keys[i] === 'tzid')
             continue;
-        if (!Object(helpers["c" /* includes */])(defaultKeys, keys[i]))
+        if (!Object(helpers["d" /* includes */])(defaultKeys, keys[i]))
             continue;
         var key = keys[i].toUpperCase();
         var value = options[keys[i]];
         var outValue = '';
-        if (!Object(helpers["f" /* isPresent */])(value) || (Object(helpers["d" /* isArray */])(value) && !value.length))
+        if (!Object(helpers["g" /* isPresent */])(value) || (Object(helpers["e" /* isArray */])(value) && !value.length))
             continue;
         switch (key) {
             case 'FREQ':
                 outValue = esm_rrule.FREQUENCIES[options.freq];
                 break;
             case 'WKST':
-                if (Object(helpers["e" /* isNumber */])(value)) {
+                if (Object(helpers["f" /* isNumber */])(value)) {
                     outValue = new Weekday(value).toString();
                 }
                 else {
@@ -1388,12 +1398,12 @@ function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                var arrayValue = Object(helpers["m" /* toArray */])(value);
-                outValue = Object(helpers["m" /* toArray */])(value).map(function (wday) {
+                var arrayValue = Object(helpers["n" /* toArray */])(value);
+                outValue = Object(helpers["n" /* toArray */])(value).map(function (wday) {
                     if (wday instanceof Weekday) {
                         return wday;
                     }
-                    else if (Object(helpers["d" /* isArray */])(wday)) {
+                    else if (Object(helpers["e" /* isArray */])(wday)) {
                         return new Weekday(wday[0], wday[1]);
                     }
                     else {
@@ -1409,7 +1419,7 @@ function optionsToString(options) {
                 }
                 break;
             default:
-                if (Object(helpers["d" /* isArray */])(value)) {
+                if (Object(helpers["e" /* isArray */])(value)) {
                     var strValues = [];
                     for (var j = 0; j < value.length; j++) {
                         strValues[j] = String(value[j]);
@@ -1489,7 +1499,7 @@ var cache_Cache = /** @class */ (function () {
         if (what === 'all') {
             cached = this.all;
         }
-        else if (Object(helpers["d" /* isArray */])(cachedObject)) {
+        else if (Object(helpers["e" /* isArray */])(cachedObject)) {
             // Let's see whether we've already called the
             // 'what' method with the same 'args'
             for (var i = 0; i < cachedObject.length; i++) {
@@ -1511,7 +1521,7 @@ var cache_Cache = /** @class */ (function () {
             cached = iterResult.getValue();
             this._cacheAdd(what, cached, args);
         }
-        return Object(helpers["d" /* isArray */])(cached)
+        return Object(helpers["e" /* isArray */])(cached)
             ? esm_dateutil.cloneDates(cached)
             : cached instanceof Date
                 ? esm_dateutil.clone(cached)
@@ -1756,14 +1766,14 @@ var rrule_RRule = /** @class */ (function () {
                 _b[RRule.SECONDLY] = ii.stimeset,
                 _b)[freq];
             if ((freq >= RRule.HOURLY &&
-                Object(helpers["g" /* notEmpty */])(byhour) &&
-                !Object(helpers["c" /* includes */])(byhour, date.hour)) ||
+                Object(helpers["h" /* notEmpty */])(byhour) &&
+                !Object(helpers["d" /* includes */])(byhour, date.hour)) ||
                 (freq >= RRule.MINUTELY &&
-                    Object(helpers["g" /* notEmpty */])(byminute) &&
-                    !Object(helpers["c" /* includes */])(byminute, date.minute)) ||
+                    Object(helpers["h" /* notEmpty */])(byminute) &&
+                    !Object(helpers["d" /* includes */])(byminute, date.minute)) ||
                 (freq >= RRule.SECONDLY &&
-                    Object(helpers["g" /* notEmpty */])(bysecond) &&
-                    !Object(helpers["c" /* includes */])(bysecond, date.second))) {
+                    Object(helpers["h" /* notEmpty */])(bysecond) &&
+                    !Object(helpers["d" /* includes */])(bysecond, date.second))) {
                 timeset = [];
             }
             else {
@@ -1785,7 +1795,7 @@ var rrule_RRule = /** @class */ (function () {
                     dayset[currentDay] = null;
             }
             // Output results
-            if (Object(helpers["g" /* notEmpty */])(bysetpos) && Object(helpers["g" /* notEmpty */])(timeset)) {
+            if (Object(helpers["h" /* notEmpty */])(bysetpos) && Object(helpers["h" /* notEmpty */])(timeset)) {
                 var daypos = void 0;
                 var timepos = void 0;
                 var poslist = [];
@@ -1793,16 +1803,16 @@ var rrule_RRule = /** @class */ (function () {
                     pos = bysetpos[j];
                     if (pos < 0) {
                         daypos = Math.floor(pos / timeset.length);
-                        timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
+                        timepos = Object(helpers["j" /* pymod */])(pos, timeset.length);
                     }
                     else {
                         daypos = Math.floor((pos - 1) / timeset.length);
-                        timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
+                        timepos = Object(helpers["j" /* pymod */])(pos - 1, timeset.length);
                     }
                     var tmp = [];
                     for (var k = start; k < end; k++) {
                         var val = dayset[k];
-                        if (!Object(helpers["f" /* isPresent */])(val))
+                        if (!Object(helpers["g" /* isPresent */])(val))
                             continue;
                         tmp.push(val);
                     }
@@ -1819,7 +1829,7 @@ var rrule_RRule = /** @class */ (function () {
                     var res = esm_dateutil.combine(date_1, time);
                     // XXX: can this ever be in the array?
                     // - compare the actual date instead?
-                    if (!Object(helpers["c" /* includes */])(poslist, res))
+                    if (!Object(helpers["d" /* includes */])(poslist, res))
                         poslist.push(res);
                 }
                 esm_dateutil.sort(poslist);
@@ -1845,7 +1855,7 @@ var rrule_RRule = /** @class */ (function () {
             else {
                 for (var j = start; j < end; j++) {
                     currentDay = dayset[j];
-                    if (!Object(helpers["f" /* isPresent */])(currentDay)) {
+                    if (!Object(helpers["g" /* isPresent */])(currentDay)) {
                         continue;
                     }
                     var date_2 = esm_dateutil.fromOrdinal(ii.yearordinal + currentDay);
@@ -1960,21 +1970,21 @@ var rrule_RRule = /** @class */ (function () {
 }());
 /* harmony default export */ var esm_rrule = (rrule_RRule);
 function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
-    return ((Object(helpers["g" /* notEmpty */])(bymonth) && !Object(helpers["c" /* includes */])(bymonth, ii.mmask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(byweekno) && !ii.wnomask[currentDay]) ||
-        (Object(helpers["g" /* notEmpty */])(byweekday) && !Object(helpers["c" /* includes */])(byweekday, ii.wdaymask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
-        (byeaster !== null && !Object(helpers["c" /* includes */])(ii.eastermask, currentDay)) ||
-        ((Object(helpers["g" /* notEmpty */])(bymonthday) || Object(helpers["g" /* notEmpty */])(bynmonthday)) &&
-            !Object(helpers["c" /* includes */])(bymonthday, ii.mdaymask[currentDay]) &&
-            !Object(helpers["c" /* includes */])(bynmonthday, ii.nmdaymask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(byyearday) &&
+    return ((Object(helpers["h" /* notEmpty */])(bymonth) && !Object(helpers["d" /* includes */])(bymonth, ii.mmask[currentDay])) ||
+        (Object(helpers["h" /* notEmpty */])(byweekno) && !ii.wnomask[currentDay]) ||
+        (Object(helpers["h" /* notEmpty */])(byweekday) && !Object(helpers["d" /* includes */])(byweekday, ii.wdaymask[currentDay])) ||
+        (Object(helpers["h" /* notEmpty */])(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+        (byeaster !== null && !Object(helpers["d" /* includes */])(ii.eastermask, currentDay)) ||
+        ((Object(helpers["h" /* notEmpty */])(bymonthday) || Object(helpers["h" /* notEmpty */])(bynmonthday)) &&
+            !Object(helpers["d" /* includes */])(bymonthday, ii.mdaymask[currentDay]) &&
+            !Object(helpers["d" /* includes */])(bynmonthday, ii.nmdaymask[currentDay])) ||
+        (Object(helpers["h" /* notEmpty */])(byyearday) &&
             ((currentDay < ii.yearlen &&
-                !Object(helpers["c" /* includes */])(byyearday, currentDay + 1) &&
-                !Object(helpers["c" /* includes */])(byyearday, -ii.yearlen + currentDay)) ||
+                !Object(helpers["d" /* includes */])(byyearday, currentDay + 1) &&
+                !Object(helpers["d" /* includes */])(byyearday, -ii.yearlen + currentDay)) ||
                 (currentDay >= ii.yearlen &&
-                    !Object(helpers["c" /* includes */])(byyearday, currentDay + 1 - ii.yearlen) &&
-                    !Object(helpers["c" /* includes */])(byyearday, -ii.nextyearlen + currentDay - ii.yearlen)))));
+                    !Object(helpers["d" /* includes */])(byyearday, currentDay + 1 - ii.yearlen) &&
+                    !Object(helpers["d" /* includes */])(byyearday, -ii.nextyearlen + currentDay - ii.yearlen)))));
 }
 //# sourceMappingURL=rrule.js.map
 // CONCATENATED MODULE: ./dist/esm/rruleset.js
@@ -2020,7 +2030,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         if (!(rrule instanceof esm_rrule)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!Object(helpers["c" /* includes */])(this._rrule.map(String), String(rrule))) {
+        if (!Object(helpers["d" /* includes */])(this._rrule.map(String), String(rrule))) {
             this._rrule.push(rrule);
         }
     };
@@ -2033,7 +2043,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!Object(helpers["c" /* includes */])(this._rdate.map(Number), Number(date))) {
+        if (!Object(helpers["d" /* includes */])(this._rdate.map(Number), Number(date))) {
             this._rdate.push(date);
             esm_dateutil.sort(this._rdate);
         }
@@ -2047,7 +2057,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         if (!(rrule instanceof esm_rrule)) {
             throw new TypeError(String(rrule) + ' is not RRule instance');
         }
-        if (!Object(helpers["c" /* includes */])(this._exrule.map(String), String(rrule))) {
+        if (!Object(helpers["d" /* includes */])(this._exrule.map(String), String(rrule))) {
             this._exrule.push(rrule);
         }
     };
@@ -2060,7 +2070,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         if (!(date instanceof Date)) {
             throw new TypeError(String(date) + ' is not Date instance');
         }
-        if (!Object(helpers["c" /* includes */])(this._exdate.map(Number), Number(date))) {
+        if (!Object(helpers["d" /* includes */])(this._exdate.map(Number), Number(date))) {
             this._exdate.push(date);
             esm_dateutil.sort(this._exdate);
         }
@@ -2299,7 +2309,6 @@ function _parseRfcRRule(line, options) {
     options.cache = options.cache || false;
     var name;
     var value;
-    var parts;
     var nameRegex = /^([A-Z]+):(.*)$/;
     var nameParts = nameRegex.exec(line);
     if (nameParts && nameParts.length >= 3) {
@@ -2311,63 +2320,35 @@ function _parseRfcRRule(line, options) {
     else {
         value = line;
     }
-    var rrkwargs = {
-        dtstart: handle_DTSTART(line),
-        tzid: handle_TZID(line)
-    };
+    var rrkwargs = {};
+    rrkwargs.dtstart = handle_DTSTART(line) || options.dtstart;
+    rrkwargs.tzid = handle_TZID(line) || options.tzid;
     var pairs = value.split(';');
     for (var i = 0; i < pairs.length; i++) {
-        parts = pairs[i].split('=');
+        var parts = pairs[i].split('=');
         name = parts[0].toUpperCase();
         if (/DTSTART|TZID/.test(name)) {
             continue;
         }
-        value = parts[1].toUpperCase();
+        var value_1 = parts[1].toUpperCase();
         var paramHandler = handlers[name];
         if (typeof paramHandler !== 'function') {
-            throw new Error("unknown parameter '" + name + "':" + value);
+            throw new Error("unknown parameter '" + name + "':" + value_1);
         }
         if (name === 'BYDAY')
             name = 'BYWEEKDAY';
-        rrkwargs[name.toLowerCase()] = paramHandler(value);
+        rrkwargs[name.toLowerCase()] = paramHandler(value_1);
     }
     rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
     rrkwargs.tzid = rrkwargs.tzid || options.tzid;
-    return new esm_rrule(rrkwargs, !options.cache);
+    return new esm_rrule(Object(helpers["a" /* compact */])(rrkwargs), !options.cache);
 }
 function _parseRfc(s, options) {
     if (options.compatible) {
         options.forceset = true;
         options.unfold = true;
     }
-    s = s && s.trim();
-    if (!s)
-        throw new Error('Invalid empty string');
-    var i = 0;
-    var line;
-    var lines;
-    // More info about 'unfold' option
-    // Go head to http://www.ietf.org/rfc/rfc2445.txt
-    if (options.unfold) {
-        lines = s.split('\n');
-        while (i < lines.length) {
-            // TODO
-            line = lines[i] = lines[i].replace(/\s+$/g, '');
-            if (!line) {
-                lines.splice(i, 1);
-            }
-            else if (i > 0 && line[0] === ' ') {
-                lines[i - 1] += line.slice(1);
-                lines.splice(i, 1);
-            }
-            else {
-                i += 1;
-            }
-        }
-    }
-    else {
-        lines = s.split(/\s/);
-    }
+    var lines = splitIntoLines(s, options.unfold);
     if (!options.forceset &&
         lines.length === 1 &&
         (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
@@ -2380,109 +2361,86 @@ function _parseRfc(s, options) {
     var rdatevals = [];
     var exrulevals = [];
     var exdatevals = [];
-    var name;
-    var value;
-    var parts;
     var dtstart;
     var tzid;
-    var rset;
-    var j;
-    var k;
-    var datestrs;
-    var datestr;
-    for (var i_1 = 0; i_1 < lines.length; i_1++) {
-        line = lines[i_1];
+    lines.forEach(function (line) {
         if (!line)
-            continue;
-        if (line.indexOf(':') === -1) {
-            name = 'RRULE';
-            value = line;
-        }
-        else {
-            parts = Object(helpers["l" /* split */])(line, ':', 1);
-            name = parts[0];
-            value = parts[1];
-        }
-        var parms = name.split(';');
-        if (!parms)
-            throw new Error('empty property name');
-        name = parms[0].toUpperCase();
-        parms = parms.slice(1);
-        if (name === 'RRULE') {
-            for (j = 0; j < parms.length; j++) {
-                var parm = parms[j];
-                throw new Error('unsupported RRULE parm: ' + parm);
-            }
-            rrulevals.push(value);
-        }
-        else if (name === 'RDATE') {
-            for (j = 0; j < parms.length; j++) {
-                var parm = parms[j];
-                if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                    throw new Error('unsupported RDATE parm: ' + parm);
+            return;
+        var _a = breakDownLine(line), name = _a.name, parms = _a.parms, value = _a.value;
+        switch (name) {
+            case 'RRULE':
+                if (parms.length) {
+                    throw new Error("unsupported RRULE parm: " + parms.join(','));
                 }
-            }
-            rdatevals.push(value);
-        }
-        else if (name === 'EXRULE') {
-            for (j = 0; j < parms.length; j++) {
-                var parm = parms[j];
-                throw new Error('unsupported EXRULE parm: ' + parm);
-            }
-            exrulevals.push(value);
-        }
-        else if (name === 'EXDATE') {
-            for (j = 0; j < parms.length; j++) {
-                var parm = parms[j];
-                if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                    throw new Error('unsupported EXDATE parm: ' + parm);
+                rrulevals.push(value);
+                break;
+            case 'RDATE':
+                for (var j = 0; j < parms.length; j++) {
+                    var parm = parms[j];
+                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                        throw new Error('unsupported RDATE parm: ' + parm);
+                    }
                 }
-            }
-            exdatevals.push(value);
-        }
-        else if (name === 'DTSTART') {
-            dtstart = esm_dateutil.untilStringToDate(value);
-            if (parms.length) {
-                var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
-                if (key === 'TZID') {
-                    tzid = value_1;
+                rdatevals.push(value);
+                break;
+            case 'EXRULE':
+                if (parms.length) {
+                    throw new Error("unsupported EXRULE parm: " + parms.join(','));
                 }
-            }
+                exrulevals.push(value);
+                break;
+            case 'EXDATE':
+                for (var j = 0; j < parms.length; j++) {
+                    var parm = parms[j];
+                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                        throw new Error('unsupported EXDATE parm: ' + parm);
+                    }
+                }
+                exdatevals.push(value);
+                break;
+            case 'DTSTART':
+                dtstart = esm_dateutil.untilStringToDate(value);
+                if (parms.length) {
+                    var _b = parms[0].split('='), key = _b[0], value_2 = _b[1];
+                    if (key === 'TZID') {
+                        tzid = value_2;
+                    }
+                }
+                break;
+            default:
+                throw new Error('unsupported property: ' + name);
         }
-        else {
-            throw new Error('unsupported property: ' + name);
-        }
-    }
+    });
     if (options.forceset ||
         rrulevals.length > 1 ||
         rdatevals.length ||
         exrulevals.length ||
         exdatevals.length) {
-        rset = new rruleset(!options.cache);
+        var rset_1 = new rruleset(!options.cache);
         rrulevals.forEach(function (val) {
-            rset.rrule(_parseRfcRRule(val, {
+            rset_1.rrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
         });
         rdatevals.forEach(function (dates) {
             dates.split(',').forEach(function (datestr) {
-                rset.rdate(esm_dateutil.untilStringToDate(datestr));
+                rset_1.rdate(esm_dateutil.untilStringToDate(datestr));
             });
         });
         exrulevals.forEach(function (val) {
-            rset.exrule(_parseRfcRRule(val, {
+            rset_1.exrule(_parseRfcRRule(val, {
                 dtstart: options.dtstart || dtstart
             }));
         });
         exdatevals.forEach(function (dates) {
             dates.split(',').forEach(function (datestr) {
-                rset.exdate(esm_dateutil.untilStringToDate(datestr));
+                rset_1.exdate(esm_dateutil.untilStringToDate(datestr));
             });
         });
         // @ts-ignore
         if (options.compatible && options.dtstart)
-            rset.rdate(dtstart);
-        return rset;
+            rset_1.rdate(dtstart);
+        return rset_1;
     }
     return _parseRfcRRule(rrulevals[0], {
         // @ts-ignore
@@ -2498,7 +2456,7 @@ function rrulestr(s, options) {
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(rrulestr_DEFAULT_OPTIONS);
     keys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(defaultKeys, key))
+        if (!Object(helpers["d" /* includes */])(defaultKeys, key))
             invalid.push(key);
     });
     if (invalid.length) {
@@ -2506,10 +2464,64 @@ function rrulestr(s, options) {
     }
     // Merge in default options
     defaultKeys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(keys, key))
+        if (!Object(helpers["d" /* includes */])(keys, key))
             options[key] = rrulestr_DEFAULT_OPTIONS[key];
     });
     return _parseRfc(s, options);
+}
+function extractName(line) {
+    if (line.indexOf(':') === -1) {
+        return {
+            name: 'RRULE',
+            value: line
+        };
+    }
+    var _a = Object(helpers["m" /* split */])(line, ':', 1), name = _a[0], value = _a[1];
+    return {
+        name: name,
+        value: value
+    };
+}
+function breakDownLine(line) {
+    var _a = extractName(line), name = _a.name, value = _a.value;
+    var parms = name.split(';');
+    if (!parms)
+        throw new Error('empty property name');
+    return {
+        name: parms[0].toUpperCase(),
+        parms: parms.slice(1),
+        value: value
+    };
+}
+function splitIntoLines(s, unfold) {
+    if (unfold === void 0) { unfold = false; }
+    s = s && s.trim();
+    if (!s)
+        throw new Error('Invalid empty string');
+    // More info about 'unfold' option
+    // Go head to http://www.ietf.org/rfc/rfc2445.txt
+    if (unfold) {
+        var lines = s.split('\n');
+        var i = 0;
+        while (i < lines.length) {
+            // TODO
+            var line = (lines[i] = lines[i].replace(/\s+$/g, ''));
+            if (!line) {
+                lines.splice(i, 1);
+            }
+            else if (i > 0 && line[0] === ' ') {
+                lines[i - 1] += line.slice(1);
+                lines.splice(i, 1);
+            }
+            else {
+                i += 1;
+            }
+        }
+        return lines;
+    }
+    else {
+        return s.split(/\s/);
+    }
 }
 //# sourceMappingURL=index.js.map
 // CONCATENATED MODULE: ./dist/esm/index.js
@@ -10511,8 +10523,8 @@ var totext_ToText = /** @class */ (function () {
             if (!this.bymonthday.length)
                 this.bymonthday = null;
         }
-        if (Object(helpers["f" /* isPresent */])(this.origOptions.byweekday)) {
-            var byweekday = !Object(helpers["d" /* isArray */])(this.origOptions.byweekday)
+        if (Object(helpers["g" /* isPresent */])(this.origOptions.byweekday)) {
+            var byweekday = !Object(helpers["e" /* isArray */])(this.origOptions.byweekday)
                 ? [this.origOptions.byweekday]
                 : this.origOptions.byweekday;
             var days = String(byweekday);
@@ -10805,7 +10817,7 @@ var totext_ToText = /** @class */ (function () {
         return this.language.monthNames[m - 1];
     };
     ToText.prototype.weekdaytext = function (wday) {
-        var weekday = Object(helpers["e" /* isNumber */])(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
+        var weekday = Object(helpers["f" /* isNumber */])(wday) ? (wday + 1) % 7 : wday.getJsWeekday();
         return ((wday.n ? this.nth(wday.n) + ' ' : '') + this.language.dayNames[weekday]);
     };
     ToText.prototype.plural = function (n) {
@@ -10818,7 +10830,7 @@ var totext_ToText = /** @class */ (function () {
     };
     ToText.prototype.list = function (arr, callback, finalDelim, delim) {
         if (delim === void 0) { delim = ','; }
-        if (!Object(helpers["d" /* isArray */])(arr)) {
+        if (!Object(helpers["e" /* isArray */])(arr)) {
             arr = [arr];
         }
         var delimJoin = function (array, delimiter, finalDelimiter) {

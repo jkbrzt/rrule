@@ -182,9 +182,3 @@ export const testRecurring = function (msg: string, testObj: any, expectedDates:
 testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
-
-export const assertStrType = function (msg: string, obj: object, type: any) {
-  it(msg, function () {
-    expect(obj).to.be.instanceof(type)
-  })
-}

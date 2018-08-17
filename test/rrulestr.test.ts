@@ -1,4 +1,4 @@
-import { assertStrType, parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
+import { parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { expect } from 'chai'
 import { Days } from '../src/rrule';
@@ -18,33 +18,30 @@ describe('rrulestr', function () {
   // NOTE: can take a longer time.
   this.ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN = true
 
-  assertStrType('testStrType',
-    rrulestr(
+  it('parses an rrule', () => {
+    expect(rrulestr(
       'DTSTART:19970902T090000Z\n' +
       'RRULE:FREQ=YEARLY;COUNT=3\n'
-    ),
-    RRule
-  )
+    )).to.be.instanceof(RRule)
+  })
 
-  assertStrType('testStrForceSetType',
-    rrulestr(
+  it('parses an rruleset when forceset=true', () => {
+    expect(rrulestr(
       'DTSTART:19970902T090000Z\n' +
       'RRULE:FREQ=YEARLY;COUNT=3\n',
       {
         forceset: true
       }
-    ),
-    RRuleSet
-  )
+    )).to.be.instanceof(RRuleSet)
+  })
 
-  assertStrType('testStrSetType',
-    rrulestr(
+  it('parses an rruleset when there are multiple rrules', () => {
+    expect(rrulestr(
       'DTSTART:19970902T090000Z\n' +
       'RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n' +
       'RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n'
-    ),
-    RRuleSet
-  )
+    )).to.be.instanceof(RRuleSet)
+  })
 
   testRecurring('testStr',
     rrulestr(

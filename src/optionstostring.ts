@@ -5,7 +5,8 @@ import { Weekday } from './weekday'
 import dateutil from './dateutil'
 
 export function optionsToString (options: Partial<Options>) {
-  const pairs: string[][] = []
+  let rrule: string[][] = []
+  let dtstart: string = ''
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
   const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
@@ -43,7 +44,6 @@ export function optionsToString (options: Partial<Options>) {
 
           */
         key = 'BYDAY'
-        const arrayValue = toArray(value) as (Weekday | number[] | number)[]
         outValue = toArray<Weekday | number[] | number>(value).map(wday => {
           if (wday instanceof Weekday) {
             return wday
@@ -56,12 +56,13 @@ export function optionsToString (options: Partial<Options>) {
 
         break
       case 'DTSTART':
+        dtstart = buildDtstart(value, options.tzid)
+        break
+
       case 'UNTIL':
         outValue = dateutil.timeToUntilString(value, !options.tzid)
-        if (options.tzid) {
-          outValue = `;TZID=${options.tzid}:${outValue}`
-        }
         break
+
       default:
         if (isArray(value)) {
           const strValues: string[] = []
@@ -74,17 +75,29 @@ export function optionsToString (options: Partial<Options>) {
         }
     }
 
-    pairs.push([key, outValue])
-  }
-
-  const strings = []
-  for (let i = 0; i < pairs.length; i++) {
-    const [key, value] = pairs[i]
-    if (value.indexOf(';') === 0) {
-      strings.push(`${key}${value}`)
-    } else {
-      strings.push(`${key}=${value.toString()}`)
+    if (outValue) {
+      rrule.push([key, outValue])
     }
   }
-  return strings.join(';')
+
+  const rules = rrule.map(([key, value]) => `${key}=${value.toString()}`).join(';')
+  let ruleString = ''
+  if (rules !== '') {
+    ruleString = `RRULE:${rules}`
+  }
+
+  return [ dtstart, ruleString ].filter(x => !!x).join('\n')
+}
+
+function buildDtstart (dtstart?: number, tzid?: string | null) {
+  if (!dtstart) {
+    return ''
+  }
+
+  const dateString = dtstart ? dateutil.timeToUntilString(dtstart, !tzid) : ''
+  if (tzid) {
+    return `DTSTART;TZID=${tzid}:${dateString}`
+  }
+
+  return `DTSTART=${dateString}`
 }

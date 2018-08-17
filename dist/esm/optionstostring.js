@@ -3,7 +3,8 @@ import { includes, isPresent, isArray, isNumber, toArray } from './helpers';
 import { Weekday } from './weekday';
 import dateutil from './dateutil';
 export function optionsToString(options) {
-    var pairs = [];
+    var rrule = [];
+    var dtstart = '';
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(DEFAULT_OPTIONS);
     for (var i = 0; i < keys.length; i++) {
@@ -41,7 +42,6 @@ export function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                var arrayValue = toArray(value);
                 outValue = toArray(value).map(function (wday) {
                     if (wday instanceof Weekday) {
                         return wday;
@@ -55,11 +55,10 @@ export function optionsToString(options) {
                 }).toString();
                 break;
             case 'DTSTART':
+                dtstart = buildDtstart(value, options.tzid);
+                break;
             case 'UNTIL':
                 outValue = dateutil.timeToUntilString(value, !options.tzid);
-                if (options.tzid) {
-                    outValue = ";TZID=" + options.tzid + ":" + outValue;
-                }
                 break;
             default:
                 if (isArray(value)) {
@@ -73,18 +72,28 @@ export function optionsToString(options) {
                     outValue = String(value);
                 }
         }
-        pairs.push([key, outValue]);
-    }
-    var strings = [];
-    for (var i = 0; i < pairs.length; i++) {
-        var _a = pairs[i], key = _a[0], value = _a[1];
-        if (value.indexOf(';') === 0) {
-            strings.push("" + key + value);
-        }
-        else {
-            strings.push(key + "=" + value.toString());
+        if (outValue) {
+            rrule.push([key, outValue]);
         }
     }
-    return strings.join(';');
+    var rules = rrule.map(function (_a) {
+        var key = _a[0], value = _a[1];
+        return key + "=" + value.toString();
+    }).join(';');
+    var ruleString = '';
+    if (rules !== '') {
+        ruleString = "RRULE:" + rules;
+    }
+    return [dtstart, ruleString].filter(function (x) { return !!x; }).join('\n');
+}
+function buildDtstart(dtstart, tzid) {
+    if (!dtstart) {
+        return '';
+    }
+    var dateString = dtstart ? dateutil.timeToUntilString(dtstart, !tzid) : '';
+    if (tzid) {
+        return "DTSTART;TZID=" + tzid + ":" + dateString;
+    }
+    return "DTSTART=" + dateString;
 }
 //# sourceMappingURL=optionstostring.js.map

@@ -8,7 +8,7 @@ export declare function handle_int(value: string): number;
 export declare function handle_int_list(value: string): number[];
 export declare function handle_FREQ(value: FreqKey): Frequency;
 export declare function handle_UNTIL(value: string): Date;
-export declare function handle_WKST(value: WeekdayStr): number;
+export declare function handle_WKST(value: WeekdayStr): Weekday;
 export declare function handle_BYWEEKDAY(value: string): Weekday[];
 export declare const handlers: {
     [key: string]: Handler;

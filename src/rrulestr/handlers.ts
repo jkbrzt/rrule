@@ -1,11 +1,12 @@
 import { Frequency, ByWeekday } from '../types'
 import dateutil from '../dateutil'
 import { WeekdayStr, Weekday } from '../weekday'
+import { Days } from '../rrule'
 
 type FreqKey = keyof typeof Frequency
 
 // tslint:disable-next-line:variable-name
-const weekday_map = {
+const weekdays = {
   MO: 0,
   TU: 1,
   WE: 2,
@@ -52,28 +53,22 @@ export function handle_UNTIL (value: string) {
 }
 
 export function handle_WKST (value: WeekdayStr) {
-  return weekday_map[value]
+  return Days[value]
 }
 
 export function handle_BYWEEKDAY (value: string) {
-  // Two ways to specify this: +1MO or MO(+1)
-  let splt: string[]
-  let i: number
-  let j: number
-  let n: string | number | null
-  let w: WeekdayStr
-  let wday: string
-  const l = []
-  const wdays = value.split(',')
+  return value.split(',').map(wday => {
+    let n: string | number | null
+    let w: WeekdayStr
 
-  for (i = 0; i < wdays.length; i++) {
-    wday = wdays[i]
+    // Two ways to specify this: +1MO or MO(+1)
     if (wday.indexOf('(') > -1) {
       // If it's of the form TH(+1), etc.
-      splt = wday.split('(')
+      const splt = wday.split('(')
       w = splt[0] as WeekdayStr
       n = parseInt(splt.slice(1, -1)[0], 10)
     } else {
+      let j: number
       // # If it's of the form +1MO
       for (j = 0; j < wday.length; j++) {
         if ('+-0123456789'.indexOf(wday[j]) === -1) break
@@ -84,10 +79,8 @@ export function handle_BYWEEKDAY (value: string) {
       if (n) n = parseInt(n, 10)
     }
 
-    const weekday = new Weekday(weekday_map[w], n as number)
-    l.push(weekday)
-  }
-  return l
+    return new Weekday(weekdays[w], n as number)
+  })
 }
 
 export const handlers = {

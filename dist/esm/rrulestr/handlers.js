@@ -1,8 +1,9 @@
 import { Frequency } from '../types';
 import dateutil from '../dateutil';
 import { Weekday } from '../weekday';
+import { Days } from '../rrule';
 // tslint:disable-next-line:variable-name
-var weekday_map = {
+var weekdays = {
     MO: 0,
     TU: 1,
     WE: 2,
@@ -36,27 +37,21 @@ export function handle_UNTIL(value) {
     return dateutil.untilStringToDate(value);
 }
 export function handle_WKST(value) {
-    return weekday_map[value];
+    return Days[value];
 }
 export function handle_BYWEEKDAY(value) {
-    // Two ways to specify this: +1MO or MO(+1)
-    var splt;
-    var i;
-    var j;
-    var n;
-    var w;
-    var wday;
-    var l = [];
-    var wdays = value.split(',');
-    for (i = 0; i < wdays.length; i++) {
-        wday = wdays[i];
+    return value.split(',').map(function (wday) {
+        var n;
+        var w;
+        // Two ways to specify this: +1MO or MO(+1)
         if (wday.indexOf('(') > -1) {
             // If it's of the form TH(+1), etc.
-            splt = wday.split('(');
+            var splt = wday.split('(');
             w = splt[0];
             n = parseInt(splt.slice(1, -1)[0], 10);
         }
         else {
+            var j = void 0;
             // # If it's of the form +1MO
             for (j = 0; j < wday.length; j++) {
                 if ('+-0123456789'.indexOf(wday[j]) === -1)
@@ -67,10 +62,8 @@ export function handle_BYWEEKDAY(value) {
             if (n)
                 n = parseInt(n, 10);
         }
-        var weekday = new Weekday(weekday_map[w], n);
-        l.push(weekday);
-    }
-    return l;
+        return new Weekday(weekdays[w], n);
+    });
 }
 export var handlers = {
     BYDAY: handle_BYWEEKDAY,

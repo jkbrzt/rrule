@@ -1,20 +1,35 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 import { Frequency } from './types';
 import { Weekday } from './weekday';
 import dateutil from './dateutil';
 import { Days } from './rrule';
 export function parseString(rfcString) {
+    var options = rfcString.split('\n').map(parseLine).filter(function (x) { return x !== null; });
+    return __assign({}, options[0], options[1]);
+}
+function parseLine(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
     var options = {};
-    var dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString);
+    var dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(rfcString);
     if (dtstartWithZone) {
         var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
         options.tzid = tzid;
         options.dtstart = dateutil.untilStringToDate(dtstart);
         return options;
     }
-    var attrs = rfcString.split(';');
+    var attrs = rfcString.replace(/^RRULE:/, '').split(';');
     for (var i = 0; i < attrs.length; i++) {
         var attr = attrs[i].split('=');
         var key = attr[0];

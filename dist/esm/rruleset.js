@@ -116,7 +116,7 @@ var RRuleSet = /** @class */ (function (_super) {
         return result;
     };
     /**
-     * to generate recurrence field sush as:
+     * to generate recurrence field such as:
      *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
      */
     RRuleSet.prototype.toString = function () {

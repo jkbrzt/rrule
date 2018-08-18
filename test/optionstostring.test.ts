@@ -10,7 +10,7 @@ describe('optionsToString', () => {
       [{ dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)), tzid: 'America/New_York' }, 'DTSTART;TZID=America/New_York:19970902T090000' ],
       [
         { dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)), freq: RRule.WEEKLY },
-        'DTSTART:19970902T090000\n' +
+        'DTSTART:19970902T090000Z\n' +
         'RRULE:FREQ=WEEKLY'
       ],
       [

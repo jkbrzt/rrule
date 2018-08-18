@@ -3,13 +3,18 @@ import { Weekday } from './weekday'
 import dateutil from './dateutil'
 import { Days } from './rrule'
 
-export function parseString (rfcString: string) {
+export function parseString (rfcString: string): Partial<Options> {
+  const options = rfcString.split('\n').map(parseLine).filter(x => x !== null)
+  return { ...options[0], ...options[1] }
+}
+
+function parseLine (rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString)
+  const dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(rfcString)
   if (dtstartWithZone) {
     const [ _, tzid, dtstart ] = dtstartWithZone
     options.tzid = tzid
@@ -17,7 +22,7 @@ export function parseString (rfcString: string) {
     return options
   }
 
-  const attrs = rfcString.split(';')
+  const attrs = rfcString.replace(/^RRULE:/, '').split(';')
 
   for (let i = 0; i < attrs.length; i++) {
     const attr = attrs[i].split('=')

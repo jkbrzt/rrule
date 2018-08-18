@@ -42,4 +42,22 @@ describe('rezonedDate', () => {
 
     resetMockDate()
   })
+
+  it('recovers from an error if Luxon is missing', () => {
+    const origfromJSDate = DateTime.fromJSDate
+    DateTime.fromJSDate = () => {
+      throw new TypeError()
+    }
+
+    const targetZone = 'America/New_York'
+    const currentLocalDate = DateTime.local(2000, 2, 6, 1, 0, 0)
+    setMockDate(currentLocalDate.toJSDate())
+
+    const d = DateTime.fromISO('20101005T110000').toJSDate()
+    const dt = new DateWithZone(d, targetZone)
+    expect(dt.rezonedDate()).to.deep.equal(d)
+
+    DateTime.fromJSDate = origfromJSDate
+    resetMockDate()
+  })
 })

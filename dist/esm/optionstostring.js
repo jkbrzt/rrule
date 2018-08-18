@@ -2,6 +2,7 @@ import RRule, { DEFAULT_OPTIONS } from './rrule';
 import { includes, isPresent, isArray, isNumber, toArray } from './helpers';
 import { Weekday } from './weekday';
 import dateutil from './dateutil';
+import { DateWithZone } from './datewithzone';
 export function optionsToString(options) {
     var rrule = [];
     var dtstart = '';
@@ -90,10 +91,6 @@ function buildDtstart(dtstart, tzid) {
     if (!dtstart) {
         return '';
     }
-    var dateString = dtstart ? dateutil.timeToUntilString(dtstart, !tzid) : '';
-    if (tzid) {
-        return "DTSTART;TZID=" + tzid + ":" + dateString;
-    }
-    return "DTSTART:" + dateString;
+    return new DateWithZone(new Date(dtstart), tzid).toString();
 }
 //# sourceMappingURL=optionstostring.js.map

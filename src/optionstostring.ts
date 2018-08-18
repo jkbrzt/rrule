@@ -3,6 +3,7 @@ import RRule, { DEFAULT_OPTIONS } from './rrule'
 import { includes, isPresent, isArray, isNumber, toArray } from './helpers'
 import { Weekday } from './weekday'
 import dateutil from './dateutil'
+import { DateWithZone } from './datewithzone';
 
 export function optionsToString (options: Partial<Options>) {
   let rrule: string[][] = []
@@ -94,10 +95,5 @@ function buildDtstart (dtstart?: number, tzid?: string | null) {
     return ''
   }
 
-  const dateString = dtstart ? dateutil.timeToUntilString(dtstart, !tzid) : ''
-  if (tzid) {
-    return `DTSTART;TZID=${tzid}:${dateString}`
-  }
-
-  return `DTSTART:${dateString}`
+  return new DateWithZone(new Date(dtstart), tzid).toString()
 }

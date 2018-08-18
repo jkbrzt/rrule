@@ -1391,7 +1391,26 @@ function parseWeekday(value) {
     });
 }
 //# sourceMappingURL=parsestring.js.map
+// CONCATENATED MODULE: ./dist/esm/datewithzone.js
+
+var datewithzone_DateWithZone = /** @class */ (function () {
+    function DateWithZone(date, tzid) {
+        this.date = date;
+        this.tzid = tzid;
+    }
+    DateWithZone.prototype.toString = function () {
+        var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
+        if (this.tzid) {
+            return "DTSTART;TZID=" + this.tzid + ":" + datestr;
+        }
+        return "DTSTART:" + datestr;
+    };
+    return DateWithZone;
+}());
+
+//# sourceMappingURL=datewithzone.js.map
 // CONCATENATED MODULE: ./dist/esm/optionstostring.js
+
 
 
 
@@ -1484,11 +1503,7 @@ function buildDtstart(dtstart, tzid) {
     if (!dtstart) {
         return '';
     }
-    var dateString = dtstart ? esm_dateutil.timeToUntilString(dtstart, !tzid) : '';
-    if (tzid) {
-        return "DTSTART;TZID=" + tzid + ":" + dateString;
-    }
-    return "DTSTART:" + dateString;
+    return new datewithzone_DateWithZone(new Date(dtstart), tzid).toString();
 }
 //# sourceMappingURL=optionstostring.js.map
 // CONCATENATED MODULE: ./dist/esm/cache.js
@@ -10419,7 +10434,7 @@ var ENGLISH = {
 };
 /* harmony default export */ var i18n = (ENGLISH);
 //# sourceMappingURL=i18n.js.map
-// EXTERNAL MODULE: ./dist/esm/index.js + 14 modules
+// EXTERNAL MODULE: ./dist/esm/index.js + 15 modules
 var esm = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./dist/esm/helpers.js

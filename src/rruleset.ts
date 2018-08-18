@@ -86,7 +86,7 @@ export default class RRuleSet extends RRule {
     const result: string[] = []
     if (this._rrule.length) {
       this._rrule.forEach(function (rrule) {
-        result.push(rrule.toString())
+        rrule.toString().split('\n').map(str => result.push(str))
       })
     }
     if (this._rdate.length) {

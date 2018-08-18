@@ -2125,7 +2125,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         var result = [];
         if (this._rrule.length) {
             this._rrule.forEach(function (rrule) {
-                result.push(rrule.toString());
+                rrule.toString().split('\n').map(function (str) { return result.push(str); });
             });
         }
         if (this._rdate.length) {

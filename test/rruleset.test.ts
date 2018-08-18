@@ -367,7 +367,53 @@ describe('RRuleSet', function () {
         dtstart: parse('19600101T090000')
       }))
 
-      expect(set.valueOf()).to.deep.equal(["DTSTART:19600101T090000Z\nRRULE:FREQ=YEARLY;COUNT=2"])
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART:19600101T090000Z",
+        "RRULE:FREQ=YEARLY;COUNT=2"
+      ])
+    })
+
+    it('generates multiline rules', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000')
+      }))
+
+      set.rrule(new RRule({
+        freq: RRule.WEEKLY,
+        count: 3,
+      }))
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART:19600101T090000Z",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RRULE:FREQ=WEEKLY;COUNT=3"
+      ])
+    })
+
+    it('generates rules with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.rrule(new RRule({
+        freq: RRule.WEEKLY,
+        count: 3,
+      }))
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RRULE:FREQ=WEEKLY;COUNT=3"
+      ])
     })
   })
 })

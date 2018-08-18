@@ -1,5 +1,6 @@
 import { parse, datetime, testRecurring } from './lib/utils'
 import { RRule, RRuleSet } from '../src'
+import { expect } from 'chai';
 
 describe('RRuleSet', function () {
   // Enable additional toString() / fromString() tests
@@ -355,4 +356,18 @@ describe('RRuleSet', function () {
       datetime(1961, 1, 1, 9, 0)
     ]
   )
+
+  describe('valueOf', () => {
+    it('generates rrule strings correctly', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000')
+      }))
+
+      expect(set.valueOf()).to.deep.equal(["DTSTART:19600101T090000Z\nRRULE:FREQ=YEARLY;COUNT=2"])
+    })
+  })
 })

@@ -22,29 +22,26 @@ describe('RRule', function () {
   this.ctx.ALSO_TEST_SUBSECOND_PRECISION = true
 
   const texts = [
-    ['Every day', 'FREQ=DAILY'],
-    ['Every day at 10, 12 and 17', 'FREQ=DAILY;BYHOUR=10,12,17'],
-    ['Every week', 'FREQ=WEEKLY'],
-    ['Every hour', 'FREQ=HOURLY'],
-    ['Every 4 hours', 'INTERVAL=4;FREQ=HOURLY'],
-    ['Every week on Tuesday', 'FREQ=WEEKLY;BYDAY=TU'],
-    ['Every week on Monday, Wednesday', 'FREQ=WEEKLY;BYDAY=MO,WE'],
-    ['Every weekday', 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
-    ['Every 2 weeks', 'INTERVAL=2;FREQ=WEEKLY'],
-    ['Every month', 'FREQ=MONTHLY'],
-    ['Every 6 months', 'INTERVAL=6;FREQ=MONTHLY'],
-    ['Every year', 'FREQ=YEARLY'],
-    ['Every month on the 4th', 'FREQ=MONTHLY;BYMONTHDAY=4'],
-    ['Every month on the 4th last', 'FREQ=MONTHLY;BYMONTHDAY=-4'],
-    ['Every month on the 3rd Tuesday', 'FREQ=MONTHLY;BYDAY=+3TU'],
-    ['Every month on the 3rd last Tuesday', 'FREQ=MONTHLY;BYDAY=-3TU'],
-    ['Every month on the last Monday', 'FREQ=MONTHLY;BYDAY=-1MO'],
-    ['Every month on the 2nd last Friday', 'FREQ=MONTHLY;BYDAY=-2FR'],
-    // This one will fail.
-    // The text date should be treated as a floating one, but toString
-    // always returns UTC dates.
-    // ['Every week until January 1, 2007', 'FREQ=WEEKLY;UNTIL=20070101T000000Z'],
-    ['Every week for 20 times', 'FREQ=WEEKLY;COUNT=20']
+    ['Every day', 'RRULE:FREQ=DAILY'],
+    ['Every day at 10, 12 and 17', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
+    ['Every week', 'RRULE:FREQ=WEEKLY'],
+    ['Every hour', 'RRULE:FREQ=HOURLY'],
+    ['Every 4 hours', 'RRULE:INTERVAL=4;FREQ=HOURLY'],
+    ['Every week on Tuesday', 'RRULE:FREQ=WEEKLY;BYDAY=TU'],
+    ['Every week on Monday, Wednesday', 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE'],
+    ['Every weekday', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
+    ['Every 2 weeks', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
+    ['Every month', 'RRULE:FREQ=MONTHLY'],
+    ['Every 6 months', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
+    ['Every year', 'RRULE:FREQ=YEARLY'],
+    ['Every month on the 4th', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
+    ['Every month on the 4th last', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4'],
+    ['Every month on the 3rd Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],
+    ['Every month on the 3rd last Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=-3TU'],
+    ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
+    ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
+    ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T000000Z'],
+    ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20']
   ]
 
   it('fromText()', function () {
@@ -65,7 +62,7 @@ describe('RRule', function () {
   })
 
   it('rrulestr https://github.com/jkbrzt/rrule/pull/164', function () {
-    const s1 = 'FREQ=WEEKLY;WKST=WE'
+    const s1 = 'RRULE:FREQ=WEEKLY;WKST=WE'
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
@@ -3548,7 +3545,7 @@ describe('RRule', function () {
       })
 
       const rrstr = rr.toString()
-      expect(rrstr).equals('DTSTART=20171017T003000Z;UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
+      expect(rrstr).equals('DTSTART:20171017T003000Z\nRRULE:UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0')
       const newrr = RRule.fromString(rrstr)
       expect(rrstr).equals(newrr.toString())
     })
@@ -3556,8 +3553,8 @@ describe('RRule', function () {
 
   it('testByHourValues', function () {
     [
-      ['DTSTART=20171101T010000Z;UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11,12;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 and 12 until December 13, 2017'],
-      ['DTSTART=20171101T010000Z;UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 until December 13, 2017']
+      ['DTSTART:20171101T010000Z\nRRULE:UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11,12;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 and 12 until December 13, 2017'],
+      ['DTSTART:20171101T010000Z\nRRULE:UNTIL=20171214T013000Z;FREQ=DAILY;INTERVAL=2;WKST=MO;BYHOUR=11;BYMINUTE=30;BYSECOND=0', 'every 2 days at 11 until December 13, 2017']
     ].forEach(function (pair) {
       const rule = pair[0]
       const rr = RRule.fromString(rule)
@@ -3580,7 +3577,7 @@ describe('RRule', function () {
   })
 
   it('calculates weekly recurrences correctly across DST boundaries', () => {
-    const rrule = RRule.fromString('FREQ=WEEKLY;DTSTART=20181031T180000Z;UNTIL=20181115T050000Z')
+    const rrule = RRule.fromString('DTSTART=20181031T180000Z\nRRULE:FREQ=WEEKLY;UNTIL=20181115T050000Z')
     expect(rrule.all()).to.deep.equal([
       new Date('2018-10-31T18:00:00.000Z'),
       new Date('2018-11-07T18:00:00.000Z'),
@@ -3655,7 +3652,7 @@ describe('RRule', function () {
   })
 
   it('generates around dst (#249)', () => {
-    const ruleString = 'DTSTART=20181101T120000Z;FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=4;WKST=SU';
+    const ruleString = 'DTSTART:20181101T120000Z\nRRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=4;WKST=SU';
     const rrule = RRule.fromString(ruleString);
 
     expect(rrule.all()).to.deep.equal([
@@ -3674,7 +3671,7 @@ describe('RRule', function () {
     const ruleString = rrule.toString()
     const rrule2 = RRule.fromString(ruleString)
 
-    expect(ruleString).to.equal('COUNT=1;DTSTART=09900101T000000Z')
+    expect(ruleString).to.equal('DTSTART=09900101T000000Z\nRRULE:COUNT=1')
     expect(rrule2.count()).to.equal(1)
     expect(rrule2.all()).to.deep.equal([
       new Date(Date.UTC(990, 0, 1, 0, 0, 0))
@@ -3688,7 +3685,7 @@ describe('RRule', function () {
     })
 
     expect(rrule.toText()).to.equal('every week on Monday')
-    expect(rrule.toString()).to.equal('FREQ=WEEKLY;BYDAY=MO')
+    expect(rrule.toString()).to.equal('RRULE:FREQ=WEEKLY;BYDAY=MO')
   })
 
   it('sorts monthdays correctly (#101)', () => {

@@ -51,9 +51,9 @@ export const toArray = function<T>(item: T | T[]): T[] {
 
 export const compact = function<P>(o: P) {
   const newObject: Partial<P> = {} as P
-  Object.keys(o as P).forEach(k => {
+  Object.keys(o).forEach(k => {
     if (typeof o[k as keyof typeof o] !== 'undefined') {
-      newObject[k as keyof P] = (o as P)[k as keyof P]
+      newObject[k as keyof P] = (o)[k as keyof P]
     }
   })
 

@@ -1451,7 +1451,7 @@ function buildDtstart(dtstart, tzid) {
     if (tzid) {
         return "DTSTART;TZID=" + tzid + ":" + dateString;
     }
-    return "DTSTART=" + dateString;
+    return "DTSTART:" + dateString;
 }
 //# sourceMappingURL=optionstostring.js.map
 // CONCATENATED MODULE: ./dist/esm/cache.js

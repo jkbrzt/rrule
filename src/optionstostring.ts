@@ -99,5 +99,5 @@ function buildDtstart (dtstart?: number, tzid?: string | null) {
     return `DTSTART;TZID=${tzid}:${dateString}`
   }
 
-  return `DTSTART=${dateString}`
+  return `DTSTART:${dateString}`
 }

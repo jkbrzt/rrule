@@ -91,6 +91,6 @@ function buildDtstart(dtstart, tzid) {
     if (!dtstart) {
         return '';
     }
-    return new DateWithZone(new Date(dtstart), tzid).toString();
+    return 'DTSTART' + new DateWithZone(new Date(dtstart), tzid).toString();
 }
 //# sourceMappingURL=optionstostring.js.map

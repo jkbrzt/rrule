@@ -1,4 +1,4 @@
-import dateutil from "./dateutil";
+import dateutil from './dateutil'
 
 export class DateWithZone {
   public date: Date
@@ -12,9 +12,13 @@ export class DateWithZone {
   public toString () {
     const datestr = dateutil.timeToUntilString(this.date.getTime(), !this.tzid)
     if (this.tzid) {
-      return `DTSTART;TZID=${this.tzid}:${datestr}`
+      return `;TZID=${this.tzid}:${datestr}`
     }
 
-    return `DTSTART:${datestr}`
+    return `:${datestr}`
+  }
+
+  public getTime () {
+    return this.date.getTime()
   }
 }

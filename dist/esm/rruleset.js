@@ -14,14 +14,14 @@ var __extends = (this && this.__extends) || (function () {
 import RRule from './rrule';
 import dateutil from './dateutil';
 import { includes } from './helpers';
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
 var RRuleSet = /** @class */ (function (_super) {
     __extends(RRuleSet, _super);
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
     function RRuleSet(noCache) {
         if (noCache === void 0) { noCache = false; }
         var _this = _super.call(this, {}, noCache) || this;
@@ -31,6 +31,15 @@ var RRuleSet = /** @class */ (function (_super) {
         _this._exdate = [];
         return _this;
     }
+    RRuleSet.prototype.tzid = function () {
+        for (var i = 0; i < this._rrule.length; i++) {
+            var tzid = this._rrule[i].origOptions.tzid;
+            if (tzid) {
+                return tzid;
+            }
+        }
+        return undefined;
+    };
     /**
      * Adds an RRule to the set
      *
@@ -85,7 +94,15 @@ var RRuleSet = /** @class */ (function (_super) {
             dateutil.sort(this._exdate);
         }
     };
+    RRuleSet.prototype.header = function (param) {
+        var tzid = this.tzid();
+        if (tzid) {
+            return param + ";TZID=" + tzid + ":";
+        }
+        return param + ":";
+    };
     RRuleSet.prototype.valueOf = function () {
+        var _this = this;
         var result = [];
         if (this._rrule.length) {
             this._rrule.forEach(function (rrule) {
@@ -93,11 +110,9 @@ var RRuleSet = /** @class */ (function (_super) {
             });
         }
         if (this._rdate.length) {
-            result.push('RDATE:' +
+            result.push(this.header('RDATE') +
                 this._rdate
-                    .map(function (rdate) {
-                    return dateutil.timeToUntilString(rdate.valueOf());
-                })
+                    .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
                     .join(','));
         }
         if (this._exrule.length) {
@@ -106,11 +121,9 @@ var RRuleSet = /** @class */ (function (_super) {
             });
         }
         if (this._exdate.length) {
-            result.push('EXDATE:' +
+            result.push(this.header('EXDATE') +
                 this._exdate
-                    .map(function (exdate) {
-                    return dateutil.timeToUntilString(exdate.valueOf());
-                })
+                    .map(function (exdate) { return dateutil.timeToUntilString(exdate.valueOf(), !_this.tzid()); })
                     .join(','));
         }
         return result;
@@ -159,7 +172,7 @@ var RRuleSet = /** @class */ (function (_super) {
             };
         }
         for (var i = 0; i < this._rdate.length; i++) {
-            if (!iterResult.accept(new Date(this._rdate[i].valueOf())))
+            if (!iterResult.accept(new Date(this._rdate[i].getTime())))
                 break;
         }
         this._rrule.forEach(function (rrule) {
@@ -189,13 +202,13 @@ var RRuleSet = /** @class */ (function (_super) {
             rrs.rrule(this._rrule[i].clone());
         }
         for (i = 0; i < this._rdate.length; i++) {
-            rrs.rdate(new Date(this._rdate[i].valueOf()));
+            rrs.rdate(new Date(this._rdate[i].getTime()));
         }
         for (i = 0; i < this._exrule.length; i++) {
             rrs.exrule(this._exrule[i].clone());
         }
         for (i = 0; i < this._exdate.length; i++) {
-            rrs.exdate(new Date(this._exdate[i].valueOf()));
+            rrs.exdate(new Date(this._exdate[i].getTime()));
         }
         return rrs;
     };

@@ -3,4 +3,5 @@ export declare class DateWithZone {
     tzid?: string | null;
     constructor(date: Date, tzid?: string | null);
     toString(): string;
+    getTime(): number;
 }

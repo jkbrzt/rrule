@@ -1401,9 +1401,12 @@ var datewithzone_DateWithZone = /** @class */ (function () {
     DateWithZone.prototype.toString = function () {
         var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
         if (this.tzid) {
-            return "DTSTART;TZID=" + this.tzid + ":" + datestr;
+            return ";TZID=" + this.tzid + ":" + datestr;
         }
-        return "DTSTART:" + datestr;
+        return ":" + datestr;
+    };
+    DateWithZone.prototype.getTime = function () {
+        return this.date.getTime();
     };
     return DateWithZone;
 }());
@@ -1503,7 +1506,7 @@ function buildDtstart(dtstart, tzid) {
     if (!dtstart) {
         return '';
     }
-    return new datewithzone_DateWithZone(new Date(dtstart), tzid).toString();
+    return 'DTSTART' + new datewithzone_DateWithZone(new Date(dtstart), tzid).toString();
 }
 //# sourceMappingURL=optionstostring.js.map
 // CONCATENATED MODULE: ./dist/esm/cache.js
@@ -2065,14 +2068,14 @@ var rruleset_extends = (undefined && undefined.__extends) || (function () {
 
 
 
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
 var rruleset_RRuleSet = /** @class */ (function (_super) {
     rruleset_extends(RRuleSet, _super);
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
     function RRuleSet(noCache) {
         if (noCache === void 0) { noCache = false; }
         var _this = _super.call(this, {}, noCache) || this;
@@ -2082,6 +2085,15 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         _this._exdate = [];
         return _this;
     }
+    RRuleSet.prototype.tzid = function () {
+        for (var i = 0; i < this._rrule.length; i++) {
+            var tzid = this._rrule[i].origOptions.tzid;
+            if (tzid) {
+                return tzid;
+            }
+        }
+        return undefined;
+    };
     /**
      * Adds an RRule to the set
      *
@@ -2136,7 +2148,15 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             esm_dateutil.sort(this._exdate);
         }
     };
+    RRuleSet.prototype.header = function (param) {
+        var tzid = this.tzid();
+        if (tzid) {
+            return param + ";TZID=" + tzid + ":";
+        }
+        return param + ":";
+    };
     RRuleSet.prototype.valueOf = function () {
+        var _this = this;
         var result = [];
         if (this._rrule.length) {
             this._rrule.forEach(function (rrule) {
@@ -2144,11 +2164,9 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             });
         }
         if (this._rdate.length) {
-            result.push('RDATE:' +
+            result.push(this.header('RDATE') +
                 this._rdate
-                    .map(function (rdate) {
-                    return esm_dateutil.timeToUntilString(rdate.valueOf());
-                })
+                    .map(function (rdate) { return esm_dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
                     .join(','));
         }
         if (this._exrule.length) {
@@ -2157,11 +2175,9 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             });
         }
         if (this._exdate.length) {
-            result.push('EXDATE:' +
+            result.push(this.header('EXDATE') +
                 this._exdate
-                    .map(function (exdate) {
-                    return esm_dateutil.timeToUntilString(exdate.valueOf());
-                })
+                    .map(function (exdate) { return esm_dateutil.timeToUntilString(exdate.valueOf(), !_this.tzid()); })
                     .join(','));
         }
         return result;
@@ -2210,7 +2226,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             };
         }
         for (var i = 0; i < this._rdate.length; i++) {
-            if (!iterResult.accept(new Date(this._rdate[i].valueOf())))
+            if (!iterResult.accept(new Date(this._rdate[i].getTime())))
                 break;
         }
         this._rrule.forEach(function (rrule) {
@@ -2240,13 +2256,13 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             rrs.rrule(this._rrule[i].clone());
         }
         for (i = 0; i < this._rdate.length; i++) {
-            rrs.rdate(new Date(this._rdate[i].valueOf()));
+            rrs.rdate(new Date(this._rdate[i].getTime()));
         }
         for (i = 0; i < this._exrule.length; i++) {
             rrs.exrule(this._exrule[i].clone());
         }
         for (i = 0; i < this._exdate.length; i++) {
-            rrs.exdate(new Date(this._exdate[i].valueOf()));
+            rrs.exdate(new Date(this._exdate[i].getTime()));
         }
         return rrs;
     };

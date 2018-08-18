@@ -357,7 +357,7 @@ describe('RRuleSet', function () {
     ]
   )
 
-  describe('valueOf', () => {
+  describe.only('valueOf', () => {
     it('generates rrule strings correctly', () => {
       const set = new RRuleSet()
 
@@ -413,6 +413,56 @@ describe('RRuleSet', function () {
         "DTSTART;TZID=America/New_York:19600101T090000",
         "RRULE:FREQ=YEARLY;COUNT=2",
         "RRULE:FREQ=WEEKLY;COUNT=3"
+      ])
+    })
+
+    it('generates RDATE with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.rdate(
+        parse('19610201T090000'),
+      )
+
+      set.rdate(
+        parse('19610301T090000'),
+      )
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RDATE;TZID=America/New_York:19610201T090000,19610301T090000"
+      ])
+    })
+
+    it('generates EXDATE with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.exdate(
+        parse('19610201T090000'),
+      )
+
+      set.exdate(
+        parse('19610301T090000'),
+      )
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "EXDATE;TZID=America/New_York:19610201T090000,19610301T090000"
       ])
     })
   })

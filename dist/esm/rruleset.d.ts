@@ -1,17 +1,18 @@
 import RRule from './rrule';
 import IterResult from './iterresult';
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
 export default class RRuleSet extends RRule {
     readonly _rrule: RRule[];
     readonly _rdate: Date[];
     readonly _exrule: RRule[];
     readonly _exdate: Date[];
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
     constructor(noCache?: boolean);
+    tzid(): string | undefined;
     /**
      * Adds an RRule to the set
      *
@@ -36,6 +37,7 @@ export default class RRuleSet extends RRule {
      * @param {Date}
      */
     exdate(date: Date): void;
+    private header;
     valueOf(): string[];
     /**
      * to generate recurrence field such as:

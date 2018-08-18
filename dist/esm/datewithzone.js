@@ -7,9 +7,12 @@ var DateWithZone = /** @class */ (function () {
     DateWithZone.prototype.toString = function () {
         var datestr = dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
         if (this.tzid) {
-            return "DTSTART;TZID=" + this.tzid + ":" + datestr;
+            return ";TZID=" + this.tzid + ":" + datestr;
         }
-        return "DTSTART:" + datestr;
+        return ":" + datestr;
+    };
+    DateWithZone.prototype.getTime = function () {
+        return this.date.getTime();
     };
     return DateWithZone;
 }());

@@ -3,18 +3,18 @@ import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
 
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
-
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]
   public readonly _exdate: Date[]
+
+  /**
+   *
+   * @param {Boolean?} noCache
+   *  The same stratagy as RRule on cache, default to false
+   * @constructor
+   */
   constructor (noCache: boolean = false) {
     super({}, noCache)
 
@@ -22,6 +22,16 @@ export default class RRuleSet extends RRule {
     this._rdate = []
     this._exrule = []
     this._exdate = []
+  }
+
+  tzid () {
+    for (let i = 0; i < this._rrule.length; i++) {
+      const tzid = this._rrule[i].origOptions.tzid
+      if (tzid) {
+        return tzid
+      }
+    }
+    return undefined
   }
 
   /**
@@ -82,6 +92,15 @@ export default class RRuleSet extends RRule {
     }
   }
 
+  private header (param: string) {
+    const tzid = this.tzid()
+    if (tzid) {
+      return `${param};TZID=${tzid}:`
+    }
+
+    return `${param}:`
+  }
+
   valueOf () {
     const result: string[] = []
     if (this._rrule.length) {
@@ -91,11 +110,9 @@ export default class RRuleSet extends RRule {
     }
     if (this._rdate.length) {
       result.push(
-        'RDATE:' +
+        this.header('RDATE') +
           this._rdate
-            .map(function (rdate) {
-              return dateutil.timeToUntilString(rdate.valueOf())
-            })
+            .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
             .join(',')
       )
     }
@@ -106,11 +123,9 @@ export default class RRuleSet extends RRule {
     }
     if (this._exdate.length) {
       result.push(
-        'EXDATE:' +
+        this.header('EXDATE') +
           this._exdate
-            .map(function (exdate) {
-              return dateutil.timeToUntilString(exdate.valueOf())
-            })
+            .map(exdate => dateutil.timeToUntilString(exdate.valueOf(), !this.tzid()))
             .join(',')
       )
     }
@@ -167,7 +182,7 @@ export default class RRuleSet extends RRule {
     }
 
     for (let i = 0; i < this._rdate.length; i++) {
-      if (!iterResult.accept(new Date(this._rdate[i].valueOf()))) break
+      if (!iterResult.accept(new Date(this._rdate[i].getTime()))) break
     }
 
     this._rrule.forEach(function (rrule) {
@@ -199,13 +214,13 @@ export default class RRuleSet extends RRule {
       rrs.rrule(this._rrule[i].clone())
     }
     for (i = 0; i < this._rdate.length; i++) {
-      rrs.rdate(new Date(this._rdate[i].valueOf()))
+      rrs.rdate(new Date(this._rdate[i].getTime()))
     }
     for (i = 0; i < this._exrule.length; i++) {
       rrs.exrule(this._exrule[i].clone())
     }
     for (i = 0; i < this._exdate.length; i++) {
-      rrs.exdate(new Date(this._exdate[i].valueOf()))
+      rrs.exdate(new Date(this._exdate[i].getTime()))
     }
     return rrs
   }

@@ -1,9 +1,8 @@
-import RRule from '../rrule'
-import RRuleSet from '../rruleset'
-import dateutil from '../dateutil'
-import { includes, split, compact } from '../helpers'
-import { handlers, handle_DTSTART, handle_TZID } from './handlers'
-import { Options } from '../types'
+import RRule from './rrule'
+import RRuleSet from './rruleset'
+import dateutil from './dateutil'
+import { includes, split } from './helpers'
+import { parseString } from './parsestring'
 
 export interface RRuleStrOptions {
   dtstart: Date | null
@@ -27,52 +26,21 @@ const DEFAULT_OPTIONS: RRuleStrOptions = {
   tzid: null
 }
 
-function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions> = {}) {
-  options.dtstart = options.dtstart || null
-  options.cache = options.cache || false
-
-  let name: string
-  let value: string
-  const nameRegex = /^([A-Z]+):(.*)$/
-  const nameParts = nameRegex.exec(line)
-  if (nameParts && nameParts.length >= 3) {
-    name = nameParts[1]
-    value = nameParts[2]
-
-    if (name !== 'RRULE') throw new Error(`unknown parameter name ${name}`)
-  } else {
-    value = line
+function _parseRfcRRuleOptions (line: string, options: Partial<RRuleStrOptions> = {}) {
+  const parsedOptions = parseString(line)
+  if (options.dtstart) {
+    parsedOptions.dtstart = options.dtstart
   }
 
-  const rrkwargs: Partial<Options> = {}
-
-  rrkwargs.dtstart = handle_DTSTART(line) || options.dtstart
-  rrkwargs.tzid = handle_TZID(line) || options.tzid
-
-  const pairs = value.split(';')
-
-  for (let i = 0; i < pairs.length; i++) {
-    const parts = pairs[i].split('=')
-    name = parts[0].toUpperCase()
-    if (/DTSTART|TZID/.test(name)) {
-      continue
-    }
-
-    const value = parts[1].toUpperCase()
-
-    const paramHandler = handlers[name as keyof typeof handlers]
-    if (typeof paramHandler !== 'function') {
-      throw new Error(`unknown parameter '${name}':${value}`)
-    }
-
-    if (name === 'BYDAY') name = 'BYWEEKDAY'
-    rrkwargs[name.toLowerCase() as keyof typeof rrkwargs] = paramHandler(value)
+  if (options.tzid) {
+    parsedOptions.tzid = options.tzid
   }
 
-  rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart
-  rrkwargs.tzid = rrkwargs.tzid || options.tzid
+  return parsedOptions
+}
 
-  return new RRule(compact(rrkwargs), !options.cache)
+function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions>) {
+  return new RRule(_parseRfcRRuleOptions(line, options))
 }
 
 function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
@@ -83,12 +51,13 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
 
   const lines = splitIntoLines(s, options.unfold)
 
+  const rrules = s.toUpperCase().match(/RRULE:/ig)
   if (
     !options.forceset &&
-    lines.length === 1 &&
-    (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)
+    !s.toUpperCase().match(/RDATE|EXDATE|EXRULE/ig) &&
+    (!rrules || rrules.length === 1)
   ) {
-    return _parseRfcRRule(lines[0], {
+    return _parseRfcRRule(lines.join('\n'), {
       cache: options.cache,
       dtstart: options.dtstart
     })
@@ -106,7 +75,7 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     if (!line) return
     const { name, parms, value } = breakDownLine(line)
 
-    switch (name) {
+    switch (name.toUpperCase()) {
       case 'RRULE':
         if (parms.length) {
           throw new Error(`unsupported RRULE parm: ${parms.join(',')}`)
@@ -214,6 +183,10 @@ export function rrulestr (
   s: string,
   options: Partial<RRuleStrOptions> = {}
 ): RRule | RRuleSet {
+  return _parseRfc(s, initializeOptions(options))
+}
+
+function initializeOptions (options: Partial<RRuleStrOptions>) {
   const invalid: string[] = []
   const keys = Object.keys(options) as (keyof typeof options)[]
   const defaultKeys = Object.keys(
@@ -228,12 +201,14 @@ export function rrulestr (
     throw new Error('Invalid options: ' + invalid.join(', '))
   }
 
+  const initializedOptions = { ...options }
+
   // Merge in default options
   defaultKeys.forEach(function (key) {
-    if (!includes(keys, key)) options[key] = DEFAULT_OPTIONS[key]
+    if (!includes(keys, key)) initializedOptions[key] = DEFAULT_OPTIONS[key]
   })
 
-  return _parseRfc(s, options)
+  return initializedOptions
 }
 
 function extractName (line: string) {

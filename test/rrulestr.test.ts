@@ -291,11 +291,11 @@ describe('rrulestr', function () {
 
   it('parses a DTSTART if it is the first param', () => {
     const rrule = rrulestr(
-      "RRULE:DTSTART;TZID=America/Los_Angeles:20180819T111500;FREQ=DAILY;INTERVAL=1"
+      "RRULE:DTSTART;TZID=America/Los_Angeles:20180719T111500;FREQ=DAILY;INTERVAL=1"
     )
 
     expect(rrule.options).to.deep.include({
-      dtstart: new Date(Date.UTC(2018, 7, 19, 11, 15, 0)),
+      dtstart: new Date(Date.UTC(2018, 6, 19, 11, 15, 0)),
       freq: Frequency.DAILY,
       interval: 1,
       tzid: 'America/Los_Angeles'

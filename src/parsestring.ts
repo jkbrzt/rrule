@@ -11,7 +11,7 @@ export function parseString (rfcString: string): Partial<Options> {
 function parseDtstart (line: string) {
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(line)
+  const dtstartWithZone = /DTSTART(?:;TZID=([^:]+?))?:([^;]+)/i.exec(line)
 
   if (!dtstartWithZone) {
     return options
@@ -19,7 +19,9 @@ function parseDtstart (line: string) {
 
   const [ _, tzid, dtstart ] = dtstartWithZone
 
-  options.tzid = tzid
+  if (tzid) {
+    options.tzid = tzid
+  }
   options.dtstart = dateutil.untilStringToDate(dtstart)
   return options
 }
@@ -28,13 +30,13 @@ function parseLine (rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
-  const header = /^([A-Z]+)[:;]/.exec(rfcString)
+  const header = /^([A-Za-z]+)[:;]/.exec(rfcString)
   if (!header) {
     return parseRrule(rfcString)
   }
 
   const [ _, key ] = header
-  switch (key) {
+  switch (key.toUpperCase()) {
     case 'RRULE':
       return parseRrule(rfcString)
     case 'DTSTART':
@@ -45,18 +47,19 @@ function parseLine (rfcString: string) {
 }
 
 function parseRrule (line: string) {
-  const options: Partial<Options> = {}
+  const strippedLine = line.replace(/^RRULE:/i, '')
+  const options = parseDtstart(strippedLine)
 
-  const attrs = line.replace(/^RRULE:/, '').split(';')
+  const attrs = strippedLine.split(';')
 
   attrs.forEach(attr => {
     const [ key, value ] = attr.split('=')
-    switch (key) {
+    switch (key.toUpperCase()) {
       case 'FREQ':
-        options.freq = Frequency[value as keyof typeof Frequency]
+        options.freq = Frequency[value.toUpperCase() as keyof typeof Frequency]
         break
       case 'WKST':
-        options.wkst = Days[value as keyof typeof Days]
+        options.wkst = Days[value.toUpperCase() as keyof typeof Days]
         break
       case 'COUNT':
       case 'INTERVAL':
@@ -74,11 +77,15 @@ function parseRrule (line: string) {
         options[optionKey] = num
         break
       case 'BYDAY': // => byweekday
+      case 'BYWEEKDAY':
         options.byweekday = parseWeekday(value)
         break
       case 'DTSTART':
-        // for backwards compatibility
-        options.dtstart = dateutil.untilStringToDate(value)
+        if (value) {
+          options.dtstart = dateutil.untilStringToDate(value) || options.dtstart
+        }
+        break
+      case 'TZID':
         break
       case 'UNTIL':
         options.until = dateutil.untilStringToDate(value)

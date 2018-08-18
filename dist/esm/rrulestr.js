@@ -1,352 +1,228 @@
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 import RRule from './rrule';
 import RRuleSet from './rruleset';
 import dateutil from './dateutil';
-import { Weekday } from './weekday';
 import { includes, split } from './helpers';
+import { parseString } from './parsestring';
 /**
  * RRuleStr
  *  To parse a set of rrule strings
  */
-var RRuleStr = /** @class */ (function () {
-    function RRuleStr() {
-        // tslint:disable:variable-name
-        this._handle_BYDAY = this._handle_BYWEEKDAY;
-        this._handle_INTERVAL = this._handle_int;
-        this._handle_COUNT = this._handle_int;
-        this._handle_BYSETPOS = this._handle_int_list;
-        this._handle_BYMONTH = this._handle_int_list;
-        this._handle_BYMONTHDAY = this._handle_int_list;
-        this._handle_BYYEARDAY = this._handle_int_list;
-        this._handle_BYEASTER = this._handle_int_list;
-        this._handle_BYWEEKNO = this._handle_int_list;
-        this._handle_BYHOUR = this._handle_int_list;
-        this._handle_BYMINUTE = this._handle_int_list;
-        this._handle_BYSECOND = this._handle_int_list;
-        // tslint:enable:variable-name
+var DEFAULT_OPTIONS = {
+    dtstart: null,
+    cache: false,
+    unfold: false,
+    forceset: false,
+    compatible: false,
+    tzid: null
+};
+function _parseRfcRRuleOptions(line, options) {
+    if (options === void 0) { options = {}; }
+    var parsedOptions = parseString(line);
+    if (options.dtstart) {
+        parsedOptions.dtstart = options.dtstart;
     }
-    // tslint:disable-next-line:variable-name
-    RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
-        var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
-        var ___ = parms[0], tzid = parms[1], dtstart = parms[2];
-        rrkwargs['dtstart'] = dateutil.untilStringToDate(dtstart);
-        if (tzid) {
-            rrkwargs['tzid'] = tzid;
-        }
-    };
-    RRuleStr.prototype._handle_int = function (rrkwargs, name, value) {
-        // @ts-ignore
-        rrkwargs[name.toLowerCase()] = parseInt(value, 10);
-    };
-    RRuleStr.prototype._handle_int_list = function (rrkwargs, name, value) {
-        // @ts-ignore
-        rrkwargs[name.toLowerCase()] = value.split(',').map(function (x) { return parseInt(x, 10); });
-    };
-    RRuleStr.prototype._handle_FREQ = function (rrkwargs, _, value, __) {
-        rrkwargs['freq'] = RRuleStr._freq_map[value];
-    };
-    RRuleStr.prototype._handle_UNTIL = function (rrkwargs, _, value, __) {
-        try {
-            rrkwargs['until'] = dateutil.untilStringToDate(value);
-        }
-        catch (error) {
-            throw new Error('invalid until date');
-        }
-    };
-    RRuleStr.prototype._handle_WKST = function (rrkwargs, _, value, __) {
-        rrkwargs['wkst'] = RRuleStr._weekday_map[value];
-    };
-    RRuleStr.prototype._handle_BYWEEKDAY = function (rrkwargs, _, value, __) {
-        // Two ways to specify this: +1MO or MO(+1)
-        var splt;
-        var i;
-        var j;
-        var n;
-        var w;
-        var wday;
-        var l = [];
-        var wdays = value.split(',');
-        for (i = 0; i < wdays.length; i++) {
-            wday = wdays[i];
-            if (wday.indexOf('(') > -1) {
-                // If it's of the form TH(+1), etc.
-                splt = wday.split('(');
-                w = splt[0];
-                n = parseInt(splt.slice(1, -1)[0], 10);
-            }
-            else {
-                // # If it's of the form +1MO
-                for (j = 0; j < wday.length; j++) {
-                    if ('+-0123456789'.indexOf(wday[j]) === -1)
-                        break;
-                }
-                n = wday.slice(0, j) || null;
-                w = wday.slice(j);
-                if (n)
-                    n = parseInt(n, 10);
-            }
-            var weekday = new Weekday(RRuleStr._weekday_map[w], n);
-            l.push(weekday);
-        }
-        rrkwargs['byweekday'] = l;
-    };
-    RRuleStr.prototype._parseRfcRRule = function (line, options) {
-        if (options === void 0) { options = {}; }
-        options.dtstart = options.dtstart || null;
-        options.cache = options.cache || false;
-        var name;
-        var value;
-        var parts;
-        var nameRegex = /^([A-Z]+):(.*)$/;
-        var nameParts = nameRegex.exec(line);
-        if (nameParts && nameParts.length >= 3) {
-            name = nameParts[1];
-            value = nameParts[2];
-            if (name !== 'RRULE')
-                throw new Error("unknown parameter name " + name);
-        }
-        else {
-            value = line;
-        }
-        var rrkwargs = {};
-        var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
-        if (dtstart && dtstart.length > 0) {
-            var dtstartClause = dtstart[0];
-            this._handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
-        }
-        var pairs = value.split(';');
-        for (var i = 0; i < pairs.length; i++) {
-            parts = pairs[i].split('=');
-            name = parts[0].toUpperCase();
-            if (/DTSTART|TZID/.test(name)) {
-                continue;
-            }
-            value = parts[1].toUpperCase();
-            // @ts-ignore
-            var paramHandler = this["_handle_" + name];
-            if (typeof paramHandler !== 'function') {
-                throw new Error("unknown parameter '" + name + "':" + value);
-            }
-            paramHandler(rrkwargs, name, value);
-        }
-        rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
-        rrkwargs.tzid = rrkwargs.tzid || options.tzid;
-        return new RRule(rrkwargs, !options.cache);
-    };
-    RRuleStr.prototype._parseRfc = function (s, options) {
-        if (options.compatible) {
-            options.forceset = true;
-            options.unfold = true;
-        }
-        s = s && s.trim();
-        if (!s)
-            throw new Error('Invalid empty string');
-        var i = 0;
-        var line;
-        var lines;
-        // More info about 'unfold' option
-        // Go head to http://www.ietf.org/rfc/rfc2445.txt
-        if (options.unfold) {
-            lines = s.split('\n');
-            while (i < lines.length) {
-                // TODO
-                line = lines[i] = lines[i].replace(/\s+$/g, '');
-                if (!line) {
-                    lines.splice(i, 1);
-                }
-                else if (i > 0 && line[0] === ' ') {
-                    lines[i - 1] += line.slice(1);
-                    lines.splice(i, 1);
-                }
-                else {
-                    i += 1;
-                }
-            }
-        }
-        else {
-            lines = s.split(/\s/);
-        }
-        var rrulevals = [];
-        var rdatevals = [];
-        var exrulevals = [];
-        var exdatevals = [];
-        var name;
-        var value;
-        var parts;
-        var dtstart;
-        var tzid;
-        var rset;
-        var j;
-        var k;
-        var datestrs;
-        var datestr;
-        if (!options.forceset &&
-            lines.length === 1 &&
-            (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
-            return this._parseRfcRRule(lines[0], {
-                cache: options.cache,
-                dtstart: options.dtstart
-            });
-        }
-        else {
-            for (var i_1 = 0; i_1 < lines.length; i_1++) {
-                line = lines[i_1];
-                if (!line)
-                    continue;
-                if (line.indexOf(':') === -1) {
-                    name = 'RRULE';
-                    value = line;
-                }
-                else {
-                    parts = split(line, ':', 1);
-                    name = parts[0];
-                    value = parts[1];
-                }
-                var parms = name.split(';');
-                if (!parms)
-                    throw new Error('empty property name');
-                name = parms[0].toUpperCase();
-                parms = parms.slice(1);
-                if (name === 'RRULE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        throw new Error('unsupported RRULE parm: ' + parm);
-                    }
-                    rrulevals.push(value);
-                }
-                else if (name === 'RDATE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                            throw new Error('unsupported RDATE parm: ' + parm);
-                        }
-                    }
-                    rdatevals.push(value);
-                }
-                else if (name === 'EXRULE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        throw new Error('unsupported EXRULE parm: ' + parm);
-                    }
-                    exrulevals.push(value);
-                }
-                else if (name === 'EXDATE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                            throw new Error('unsupported EXDATE parm: ' + parm);
-                        }
-                    }
-                    exdatevals.push(value);
-                }
-                else if (name === 'DTSTART') {
-                    dtstart = dateutil.untilStringToDate(value);
-                    if (parms.length) {
-                        var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
-                        if (key === 'TZID') {
-                            tzid = value_1;
-                        }
-                    }
-                }
-                else {
-                    throw new Error('unsupported property: ' + name);
-                }
-            }
-            if (options.forceset ||
-                rrulevals.length > 1 ||
-                rdatevals.length ||
-                exrulevals.length ||
-                exdatevals.length) {
-                rset = new RRuleSet(!options.cache);
-                for (j = 0; j < rrulevals.length; j++) {
-                    rset.rrule(this._parseRfcRRule(rrulevals[j], {
-                        // @ts-ignore
-                        dtstart: options.dtstart || dtstart
-                    }));
-                }
-                for (j = 0; j < rdatevals.length; j++) {
-                    datestrs = rdatevals[j].split(',');
-                    for (k = 0; k < datestrs.length; k++) {
-                        datestr = datestrs[k];
-                        rset.rdate(dateutil.untilStringToDate(datestr));
-                    }
-                }
-                for (j = 0; j < exrulevals.length; j++) {
-                    rset.exrule(this._parseRfcRRule(exrulevals[j], {
-                        // @ts-ignore
-                        dtstart: options.dtstart || dtstart
-                    }));
-                }
-                for (j = 0; j < exdatevals.length; j++) {
-                    datestrs = exdatevals[j].split(',');
-                    for (k = 0; k < datestrs.length; k++) {
-                        datestr = datestrs[k];
-                        rset.exdate(dateutil.untilStringToDate(datestr));
-                    }
-                }
-                // @ts-ignore
-                if (options.compatible && options.dtstart)
-                    rset.rdate(dtstart);
-                return rset;
-            }
-            else {
-                return this._parseRfcRRule(rrulevals[0], {
-                    // @ts-ignore
-                    dtstart: options.dtstart || dtstart,
-                    cache: options.cache,
-                    // @ts-ignore
-                    tzid: options.tzid || tzid
-                });
-            }
-        }
-    };
-    RRuleStr.prototype.parse = function (s, options) {
-        if (options === void 0) { options = {}; }
-        var invalid = [];
-        var keys = Object.keys(options);
-        var defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS);
-        keys.forEach(function (key) {
-            if (!includes(defaultKeys, key))
-                invalid.push(key);
-        }, this);
-        if (invalid.length) {
-            throw new Error('Invalid options: ' + invalid.join(', '));
-        }
-        // Merge in default options
-        defaultKeys.forEach(function (key) {
-            if (!includes(keys, key))
-                options[key] = RRuleStr.DEFAULT_OPTIONS[key];
+    if (options.tzid) {
+        parsedOptions.tzid = options.tzid;
+    }
+    return parsedOptions;
+}
+function _parseRfcRRule(line, options) {
+    return new RRule(_parseRfcRRuleOptions(line, options));
+}
+function _parseRfc(s, options) {
+    if (options.compatible) {
+        options.forceset = true;
+        options.unfold = true;
+    }
+    var lines = splitIntoLines(s, options.unfold);
+    var rrules = s.toUpperCase().match(/RRULE:/ig);
+    if (!options.forceset &&
+        !s.toUpperCase().match(/RDATE|EXDATE|EXRULE/ig) &&
+        (!rrules || rrules.length === 1)) {
+        return _parseRfcRRule(lines.join('\n'), {
+            cache: options.cache,
+            dtstart: options.dtstart
         });
-        return this._parseRfc(s, options);
+    }
+    var rrulevals = [];
+    var rdatevals = [];
+    var exrulevals = [];
+    var exdatevals = [];
+    var dtstart;
+    var tzid;
+    lines.forEach(function (line) {
+        if (!line)
+            return;
+        var _a = breakDownLine(line), name = _a.name, parms = _a.parms, value = _a.value;
+        switch (name.toUpperCase()) {
+            case 'RRULE':
+                if (parms.length) {
+                    throw new Error("unsupported RRULE parm: " + parms.join(','));
+                }
+                rrulevals.push(value);
+                break;
+            case 'RDATE':
+                for (var j = 0; j < parms.length; j++) {
+                    var parm = parms[j];
+                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                        throw new Error('unsupported RDATE parm: ' + parm);
+                    }
+                }
+                rdatevals.push(value);
+                break;
+            case 'EXRULE':
+                if (parms.length) {
+                    throw new Error("unsupported EXRULE parm: " + parms.join(','));
+                }
+                exrulevals.push(value);
+                break;
+            case 'EXDATE':
+                for (var j = 0; j < parms.length; j++) {
+                    var parm = parms[j];
+                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
+                        throw new Error('unsupported EXDATE parm: ' + parm);
+                    }
+                }
+                exdatevals.push(value);
+                break;
+            case 'DTSTART':
+                dtstart = dateutil.untilStringToDate(value);
+                if (parms.length) {
+                    var _b = parms[0].split('='), key = _b[0], value_1 = _b[1];
+                    if (key === 'TZID') {
+                        tzid = value_1;
+                    }
+                }
+                break;
+            default:
+                throw new Error('unsupported property: ' + name);
+        }
+    });
+    if (options.forceset ||
+        rrulevals.length > 1 ||
+        rdatevals.length ||
+        exrulevals.length ||
+        exdatevals.length) {
+        var rset_1 = new RRuleSet(!options.cache);
+        rrulevals.forEach(function (val) {
+            rset_1.rrule(_parseRfcRRule(val, {
+                dtstart: options.dtstart || dtstart
+            }));
+        });
+        rdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
+                rset_1.rdate(dateutil.untilStringToDate(datestr));
+            });
+        });
+        exrulevals.forEach(function (val) {
+            rset_1.exrule(_parseRfcRRule(val, {
+                dtstart: options.dtstart || dtstart
+            }));
+        });
+        exdatevals.forEach(function (dates) {
+            dates.split(',').forEach(function (datestr) {
+                rset_1.exdate(dateutil.untilStringToDate(datestr));
+            });
+        });
+        // @ts-ignore
+        if (options.compatible && options.dtstart)
+            rset_1.rdate(dtstart);
+        return rset_1;
+    }
+    return _parseRfcRRule(rrulevals[0], {
+        // @ts-ignore
+        dtstart: options.dtstart || dtstart,
+        cache: options.cache,
+        // @ts-ignore
+        tzid: options.tzid || tzid
+    });
+}
+export function rrulestr(s, options) {
+    if (options === void 0) { options = {}; }
+    return _parseRfc(s, initializeOptions(options));
+}
+function initializeOptions(options) {
+    var invalid = [];
+    var keys = Object.keys(options);
+    var defaultKeys = Object.keys(DEFAULT_OPTIONS);
+    keys.forEach(function (key) {
+        if (!includes(defaultKeys, key))
+            invalid.push(key);
+    });
+    if (invalid.length) {
+        throw new Error('Invalid options: ' + invalid.join(', '));
+    }
+    var initializedOptions = __assign({}, options);
+    // Merge in default options
+    defaultKeys.forEach(function (key) {
+        if (!includes(keys, key))
+            initializedOptions[key] = DEFAULT_OPTIONS[key];
+    });
+    return initializedOptions;
+}
+function extractName(line) {
+    if (line.indexOf(':') === -1) {
+        return {
+            name: 'RRULE',
+            value: line
+        };
+    }
+    var _a = split(line, ':', 1), name = _a[0], value = _a[1];
+    return {
+        name: name,
+        value: value
     };
-    // tslint:disable-next-line:variable-name
-    RRuleStr._weekday_map = {
-        MO: 0,
-        TU: 1,
-        WE: 2,
-        TH: 3,
-        FR: 4,
-        SA: 5,
-        SU: 6
+}
+function breakDownLine(line) {
+    var _a = extractName(line), name = _a.name, value = _a.value;
+    var parms = name.split(';');
+    if (!parms)
+        throw new Error('empty property name');
+    return {
+        name: parms[0].toUpperCase(),
+        parms: parms.slice(1),
+        value: value
     };
-    // tslint:disable-next-line:variable-name
-    RRuleStr._freq_map = {
-        YEARLY: RRule.YEARLY,
-        MONTHLY: RRule.MONTHLY,
-        WEEKLY: RRule.WEEKLY,
-        DAILY: RRule.DAILY,
-        HOURLY: RRule.HOURLY,
-        MINUTELY: RRule.MINUTELY,
-        SECONDLY: RRule.SECONDLY
-    };
-    RRuleStr.DEFAULT_OPTIONS = {
-        dtstart: null,
-        cache: false,
-        unfold: false,
-        forceset: false,
-        compatible: false,
-        tzid: null
-    };
-    return RRuleStr;
-}());
-export default RRuleStr;
+}
+function splitIntoLines(s, unfold) {
+    if (unfold === void 0) { unfold = false; }
+    s = s && s.trim();
+    if (!s)
+        throw new Error('Invalid empty string');
+    // More info about 'unfold' option
+    // Go head to http://www.ietf.org/rfc/rfc2445.txt
+    if (unfold) {
+        var lines = s.split('\n');
+        var i = 0;
+        while (i < lines.length) {
+            // TODO
+            var line = (lines[i] = lines[i].replace(/\s+$/g, ''));
+            if (!line) {
+                lines.splice(i, 1);
+            }
+            else if (i > 0 && line[0] === ' ') {
+                lines[i - 1] += line.slice(1);
+                lines.splice(i, 1);
+            }
+            else {
+                i += 1;
+            }
+        }
+        return lines;
+    }
+    else {
+        return s.split(/\s/);
+    }
+}
 //# sourceMappingURL=rrulestr.js.map

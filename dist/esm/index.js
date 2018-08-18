@@ -15,7 +15,7 @@
  */
 import RRule from './rrule';
 import RRuleSet from './rruleset';
-import { rrulestr } from './rrulestr/index';
+import { rrulestr } from './rrulestr';
 export { Frequency } from './types';
 export { Weekday } from './weekday';
 // =============================================================================

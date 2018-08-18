@@ -4,4 +4,5 @@ export declare class DateWithZone {
     constructor(date: Date, tzid?: string | null);
     toString(): string;
     getTime(): number;
+    rezonedDate(): Date;
 }

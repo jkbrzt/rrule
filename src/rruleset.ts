@@ -2,6 +2,7 @@ import RRule from './rrule'
 import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
+import { DateWithZone } from './datewithzone'
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
@@ -144,6 +145,7 @@ export default class RRuleSet extends RRule {
     const _exdateHash: { [k: number]: boolean } = {}
     const _exrule = this._exrule
     const _accept = iterResult.accept
+    const tzid = this.tzid()
 
     function evalExdate (after: Date, before: Date) {
       _exrule.forEach(function (rrule) {
@@ -154,7 +156,8 @@ export default class RRuleSet extends RRule {
     }
 
     this._exdate.forEach(function (date) {
-      _exdateHash[Number(date)] = true
+      const zonedDate = new DateWithZone(date, tzid).rezonedDate()
+      _exdateHash[Number(zonedDate)] = true
     })
 
     iterResult.accept = function (date) {
@@ -182,7 +185,8 @@ export default class RRuleSet extends RRule {
     }
 
     for (let i = 0; i < this._rdate.length; i++) {
-      if (!iterResult.accept(new Date(this._rdate[i].getTime()))) break
+      const zonedDate = new DateWithZone(this._rdate[i], tzid).rezonedDate()
+      if (!iterResult.accept(new Date(zonedDate.getTime()))) break
     }
 
     this._rrule.forEach(function (rrule) {

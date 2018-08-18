@@ -1,6 +1,8 @@
-import { parse, datetime, testRecurring } from './lib/utils'
+import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
 import { RRule, RRuleSet } from '../src'
-import { expect } from 'chai';
+import { expect } from 'chai'
+import { DateTime } from 'luxon'
+import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRuleSet', function () {
   // Enable additional toString() / fromString() tests
@@ -464,6 +466,38 @@ describe('RRuleSet', function () {
         "RRULE:FREQ=YEARLY;COUNT=2",
         "EXDATE;TZID=America/New_York:19610201T090000,19610301T090000"
       ])
+    })
+
+    it('generates correcty zoned recurrences when a tzid is present', () => {
+      const targetZone = 'America/New_York'
+      const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
+
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 4,
+        dtstart: DateTime.fromISO('20000101T090000').toJSDate(),
+        tzid: targetZone
+      }))
+
+      set.exdate(
+        DateTime.fromISO('20010101T090000').toJSDate(),
+      )
+
+      set.rdate(
+        DateTime.fromISO('20020301T090000').toJSDate(),
+      )     
+
+      expect(set.all()).to.deep.equal([
+        expectedDate(DateTime.fromISO('20000101T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20020101T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20030101T090000'), currentLocalDate, targetZone),
+      ])
+
+      resetMockDate()
     })
   })
 })

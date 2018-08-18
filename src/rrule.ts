@@ -13,7 +13,7 @@ import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
-import { DateTime } from 'luxon'
+import { DateWithZone } from './datewithzone'
 
 interface GetNlp {
   _nlp: Nlp
@@ -526,25 +526,7 @@ export default class RRule implements QueryMethods {
   }
 
   private rezoneIfNeeded (date: Date) {
-    const { tzid } = this.options
-
-    if (!tzid) {
-      return date
-    }
-
-    try {
-      const datetime = DateTime
-        .fromJSDate(date)
-
-      const rezoned = datetime.setZone(tzid, { keepLocalTime: true })
-
-      return rezoned.toJSDate()
-    } catch (e) {
-      if (e instanceof TypeError) {
-        console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone')
-      }
-      return date
-    }
+    return new DateWithZone(date, this.options.tzid).rezonedDate()
   }
 }
 

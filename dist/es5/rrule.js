@@ -106,7 +106,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* unused harmony export clone */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return repeat; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return toArray; });
-/* unused harmony export compact */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return padStart; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return split; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return pymod; });
@@ -159,15 +158,6 @@ var toArray = function (item) {
         return item;
     }
     return [item];
-};
-var compact = function (o) {
-    var newObject = {};
-    Object.keys(o).forEach(function (k) {
-        if (typeof o[k] !== 'undefined') {
-            newObject[k] = (o)[k];
-        }
-    });
-    return newObject;
 };
 function padStart(item, targetLength, padString) {
     if (padString === void 0) { padString = ' '; }

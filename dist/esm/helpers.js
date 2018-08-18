@@ -44,15 +44,6 @@ export var toArray = function (item) {
     }
     return [item];
 };
-export var compact = function (o) {
-    var newObject = {};
-    Object.keys(o).forEach(function (k) {
-        if (typeof o[k] !== 'undefined') {
-            newObject[k] = (o)[k];
-        }
-    });
-    return newObject;
-};
 export function padStart(item, targetLength, padString) {
     if (padString === void 0) { padString = ' '; }
     var str = String(item);

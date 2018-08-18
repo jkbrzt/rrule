@@ -49,17 +49,6 @@ export const toArray = function<T>(item: T | T[]): T[] {
   return [ item ]
 }
 
-export const compact = function<P>(o: P) {
-  const newObject: Partial<P> = {} as P
-  Object.keys(o).forEach(k => {
-    if (typeof o[k as keyof typeof o] !== 'undefined') {
-      newObject[k as keyof P] = (o)[k as keyof P]
-    }
-  })
-
-  return newObject
-}
-
 export function padStart (item: string | number, targetLength: number, padString: string = ' ') {
   const str = String(item)
   targetLength = targetLength >> 0

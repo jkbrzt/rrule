@@ -301,4 +301,36 @@ describe('rrulestr', function () {
       tzid: 'America/Los_Angeles'
     })
   })
+
+  it('parses an RDATE with no TZID param', () => {
+    const rruleset = rrulestr(
+      "DTSTART:20180719T111500Z\n"+
+      "RRULE:FREQ=DAILY;INTERVAL=1\n" +
+      "RDATE:20180720T111500Z\n"+
+      "EXDATE:20180721T111500Z"
+    ) as RRuleSet
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      "DTSTART:20180719T111500Z",
+      "RRULE:FREQ=DAILY;INTERVAL=1",
+      "RDATE:20180720T111500Z",
+      "EXDATE:20180721T111500Z"
+    ]) 
+  })
+
+  it('parses an RDATE with a TZID param', () => {
+    const rruleset = rrulestr(
+      "DTSTART;TZID=America/Los_Angeles:20180719T111500\n"+
+      "RRULE:FREQ=DAILY;INTERVAL=1\n" +
+      "RDATE;TZID=America/Los_Angeles:20180720T111500\n"+
+      "EXDATE;TZID=America/Los_Angeles:20180721T111500"
+    ) as RRuleSet
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      "DTSTART;TZID=America/Los_Angeles:20180719T111500",
+      "RRULE:FREQ=DAILY;INTERVAL=1",
+      "RDATE;TZID=America/Los_Angeles:20180720T111500",
+      "EXDATE;TZID=America/Los_Angeles:20180721T111500"
+    ]) 
+  })
 })

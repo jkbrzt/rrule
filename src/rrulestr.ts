@@ -85,13 +85,7 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'RDATE':
-        for (let j = 0; j < parms.length; j++) {
-          const parm = parms[j]
-          if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-            throw new Error('unsupported RDATE parm: ' + parm)
-          }
-        }
-
+        validateDateParm(parms)
         rdatevals.push(value)
         break
 
@@ -104,13 +98,7 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'EXDATE':
-        for (let j = 0; j < parms.length; j++) {
-          const parm = parms[j]
-          if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-            throw new Error('unsupported EXDATE parm: ' + parm)
-          }
-        }
-
+        validateDateParm(parms)
         exdatevals.push(value)
         break
 
@@ -140,7 +128,8 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     rrulevals.forEach(val => {
       rset.rrule(
         _parseRfcRRule(val, {
-          dtstart: options.dtstart || dtstart
+          dtstart: options.dtstart || dtstart,
+          tzid: options.tzid || tzid
         })
       )
     })
@@ -154,7 +143,8 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         _parseRfcRRule(val, {
-          dtstart: options.dtstart || dtstart
+          dtstart: options.dtstart || dtstart,
+          tzid: options.tzid || tzid
         })
       )
     })
@@ -244,23 +234,33 @@ function splitIntoLines (s: string, unfold = false) {
 
   // More info about 'unfold' option
   // Go head to http://www.ietf.org/rfc/rfc2445.txt
-  if (unfold) {
-    const lines = s.split('\n')
-    let i = 0
-    while (i < lines.length) {
-      // TODO
-      const line = (lines[i] = lines[i].replace(/\s+$/g, ''))
-      if (!line) {
-        lines.splice(i, 1)
-      } else if (i > 0 && line[0] === ' ') {
-        lines[i - 1] += line.slice(1)
-        lines.splice(i, 1)
-      } else {
-        i += 1
-      }
-    }
-    return lines
-  } else {
+  if (!unfold) {
     return s.split(/\s/)
+  }
+
+  const lines = s.split('\n')
+  let i = 0
+  while (i < lines.length) {
+    // TODO
+    const line = (lines[i] = lines[i].replace(/\s+$/g, ''))
+    if (!line) {
+      lines.splice(i, 1)
+    } else if (i > 0 && line[0] === ' ') {
+      lines[i - 1] += line.slice(1)
+      lines.splice(i, 1)
+    } else {
+      i += 1
+    }
+  }
+
+  return lines
+}
+
+function validateDateParm (parms: string[]) {
+  for (let j = 0; j < parms.length; j++) {
+    const parm = parms[j]
+    if (!/(VALUE=DATE-TIME)|(VALUE=DATE)|(TZID=)/.test(parm)) {
+      throw new Error('unsupported RDATE/EXDATE parm: ' + parm)
+    }
   }
 }

@@ -73,12 +73,7 @@ function _parseRfc(s, options) {
                 rrulevals.push(value);
                 break;
             case 'RDATE':
-                for (var j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                        throw new Error('unsupported RDATE parm: ' + parm);
-                    }
-                }
+                validateDateParm(parms);
                 rdatevals.push(value);
                 break;
             case 'EXRULE':
@@ -88,12 +83,7 @@ function _parseRfc(s, options) {
                 exrulevals.push(value);
                 break;
             case 'EXDATE':
-                for (var j = 0; j < parms.length; j++) {
-                    var parm = parms[j];
-                    if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                        throw new Error('unsupported EXDATE parm: ' + parm);
-                    }
-                }
+                validateDateParm(parms);
                 exdatevals.push(value);
                 break;
             case 'DTSTART':
@@ -117,7 +107,8 @@ function _parseRfc(s, options) {
         var rset_1 = new RRuleSet(!options.cache);
         rrulevals.forEach(function (val) {
             rset_1.rrule(_parseRfcRRule(val, {
-                dtstart: options.dtstart || dtstart
+                dtstart: options.dtstart || dtstart,
+                tzid: options.tzid || tzid
             }));
         });
         rdatevals.forEach(function (dates) {
@@ -127,7 +118,8 @@ function _parseRfc(s, options) {
         });
         exrulevals.forEach(function (val) {
             rset_1.exrule(_parseRfcRRule(val, {
-                dtstart: options.dtstart || dtstart
+                dtstart: options.dtstart || dtstart,
+                tzid: options.tzid || tzid
             }));
         });
         exdatevals.forEach(function (dates) {
@@ -202,27 +194,33 @@ function splitIntoLines(s, unfold) {
         throw new Error('Invalid empty string');
     // More info about 'unfold' option
     // Go head to http://www.ietf.org/rfc/rfc2445.txt
-    if (unfold) {
-        var lines = s.split('\n');
-        var i = 0;
-        while (i < lines.length) {
-            // TODO
-            var line = (lines[i] = lines[i].replace(/\s+$/g, ''));
-            if (!line) {
-                lines.splice(i, 1);
-            }
-            else if (i > 0 && line[0] === ' ') {
-                lines[i - 1] += line.slice(1);
-                lines.splice(i, 1);
-            }
-            else {
-                i += 1;
-            }
-        }
-        return lines;
-    }
-    else {
+    if (!unfold) {
         return s.split(/\s/);
+    }
+    var lines = s.split('\n');
+    var i = 0;
+    while (i < lines.length) {
+        // TODO
+        var line = (lines[i] = lines[i].replace(/\s+$/g, ''));
+        if (!line) {
+            lines.splice(i, 1);
+        }
+        else if (i > 0 && line[0] === ' ') {
+            lines[i - 1] += line.slice(1);
+            lines.splice(i, 1);
+        }
+        else {
+            i += 1;
+        }
+    }
+    return lines;
+}
+function validateDateParm(parms) {
+    for (var j = 0; j < parms.length; j++) {
+        var parm = parms[j];
+        if (!/(VALUE=DATE-TIME)|(VALUE=DATE)|(TZID=)/.test(parm)) {
+            throw new Error('unsupported RDATE/EXDATE parm: ' + parm);
+        }
     }
 }
 //# sourceMappingURL=rrulestr.js.map

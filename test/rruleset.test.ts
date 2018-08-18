@@ -357,7 +357,7 @@ describe('RRuleSet', function () {
     ]
   )
 
-  describe.only('valueOf', () => {
+  describe('valueOf', () => {
     it('generates rrule strings correctly', () => {
       const set = new RRuleSet()
 

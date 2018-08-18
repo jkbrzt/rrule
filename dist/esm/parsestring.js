@@ -17,23 +17,40 @@ export function parseString(rfcString) {
     var options = rfcString.split('\n').map(parseLine).filter(function (x) { return x !== null; });
     return __assign({}, options[0], options[1]);
 }
+function parseDtstart(line) {
+    var options = {};
+    var dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(line);
+    if (!dtstartWithZone) {
+        return options;
+    }
+    var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
+    options.tzid = tzid;
+    options.dtstart = dateutil.untilStringToDate(dtstart);
+    return options;
+}
 function parseLine(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
-    var options = {};
-    var dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(rfcString);
-    if (dtstartWithZone) {
-        var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
-        options.tzid = tzid;
-        options.dtstart = dateutil.untilStringToDate(dtstart);
-        return options;
+    var header = /^([A-Z]+)[:;]/.exec(rfcString);
+    if (!header) {
+        return parseRrule(rfcString);
     }
-    var attrs = rfcString.replace(/^RRULE:/, '').split(';');
-    for (var i = 0; i < attrs.length; i++) {
-        var attr = attrs[i].split('=');
-        var key = attr[0];
-        var value = attr[1];
+    var _ = header[0], key = header[1];
+    switch (key) {
+        case 'RRULE':
+            return parseRrule(rfcString);
+        case 'DTSTART':
+            return parseDtstart(rfcString);
+        default:
+            throw new Error("Unsupported RFC prop " + key + " in " + rfcString);
+    }
+}
+function parseRrule(line) {
+    var options = {};
+    var attrs = line.replace(/^RRULE:/, '').split(';');
+    attrs.forEach(function (attr) {
+        var _a = attr.split('='), key = _a[0], value = _a[1];
         switch (key) {
             case 'FREQ':
                 options.freq = Frequency[value];
@@ -51,52 +68,16 @@ function parseLine(rfcString) {
             case 'BYHOUR':
             case 'BYMINUTE':
             case 'BYSECOND':
-                var num = void 0;
-                if (value.indexOf(',') !== -1) {
-                    var values = value.split(',');
-                    num = values.map(function (val) {
-                        if (/^[+-]?\d+$/.test(val.toString())) {
-                            return Number(val);
-                        }
-                        else {
-                            return val;
-                        }
-                    });
-                }
-                else if (/^[+-]?\d+$/.test(value)) {
-                    num = Number(value);
-                }
-                else {
-                    num = value;
-                }
+                var num = parseNumber(value);
                 var optionKey = key.toLowerCase();
                 // @ts-ignore
                 options[optionKey] = num;
                 break;
             case 'BYDAY': // => byweekday
-                var n = void 0;
-                var wday = void 0;
-                var day = void 0;
-                var days = value.split(',');
-                options.byweekday = [];
-                for (var j = 0; j < days.length; j++) {
-                    day = days[j];
-                    if (day.length === 2) {
-                        // MO, TU, ...
-                        wday = Days[day]; // wday instanceof Weekday
-                        options.byweekday.push(wday);
-                    }
-                    else {
-                        // -1MO, +3FR, 1SO, ...
-                        var parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
-                        n = Number(parts[1]);
-                        var wdaypart = parts[2];
-                        wday = Days[wdaypart].weekday;
-                        options.byweekday.push(new Weekday(wday, n));
-                    }
-                }
+                options.byweekday = parseWeekday(value);
                 break;
             case 'DTSTART':
+                // for backwards compatibility
                 options.dtstart = dateutil.untilStringToDate(value);
                 break;
             case 'UNTIL':
@@ -108,7 +89,41 @@ function parseLine(rfcString) {
             default:
                 throw new Error("Unknown RRULE property '" + key + "'");
         }
-    }
+    });
     return options;
+}
+function parseNumber(value) {
+    if (value.indexOf(',') !== -1) {
+        var values = value.split(',');
+        return values.map(function (val) {
+            if (/^[+-]?\d+$/.test(val.toString())) {
+                return Number(val);
+            }
+            else {
+                return val;
+            }
+        });
+    }
+    else if (/^[+-]?\d+$/.test(value)) {
+        return Number(value);
+    }
+    return value;
+}
+function parseWeekday(value) {
+    var days = value.split(',');
+    return days.map(function (day) {
+        if (day.length === 2) {
+            // MO, TU, ...
+            return Days[day]; // wday instanceof Weekday
+        }
+        else {
+            // -1MO, +3FR, 1SO, ...
+            var parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
+            var n = Number(parts[1]);
+            var wdaypart = parts[2];
+            var wday = Days[wdaypart].weekday;
+            return new Weekday(wday, n);
+        }
+    });
 }
 //# sourceMappingURL=parsestring.js.map

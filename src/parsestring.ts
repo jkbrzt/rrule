@@ -8,26 +8,49 @@ export function parseString (rfcString: string): Partial<Options> {
   return { ...options[0], ...options[1] }
 }
 
+function parseDtstart (line: string) {
+  const options: Partial<Options> = {}
+
+  const dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(line)
+
+  if (!dtstartWithZone) {
+    return options
+  }
+
+  const [ _, tzid, dtstart ] = dtstartWithZone
+
+  options.tzid = tzid
+  options.dtstart = dateutil.untilStringToDate(dtstart)
+  return options
+}
+
 function parseLine (rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
-  const options: Partial<Options> = {}
-
-  const dtstartWithZone = /^DTSTART(?:;TZID=([^:]+?))?:([^;]+)$/.exec(rfcString)
-  if (dtstartWithZone) {
-    const [ _, tzid, dtstart ] = dtstartWithZone
-    options.tzid = tzid
-    options.dtstart = dateutil.untilStringToDate(dtstart)
-    return options
+  const header = /^([A-Z]+)[:;]/.exec(rfcString)
+  if (!header) {
+    return parseRrule(rfcString)
   }
 
-  const attrs = rfcString.replace(/^RRULE:/, '').split(';')
+  const [ _, key ] = header
+  switch (key) {
+    case 'RRULE':
+      return parseRrule(rfcString)
+    case 'DTSTART':
+      return parseDtstart(rfcString)
+    default:
+      throw new Error(`Unsupported RFC prop ${key} in ${rfcString}`)
+  }
+}
 
-  for (let i = 0; i < attrs.length; i++) {
-    const attr = attrs[i].split('=')
-    const key = attr[0]
-    const value = attr[1]
+function parseRrule (line: string) {
+  const options: Partial<Options> = {}
+
+  const attrs = line.replace(/^RRULE:/, '').split(';')
+
+  attrs.forEach(attr => {
+    const [ key, value ] = attr.split('=')
     switch (key) {
       case 'FREQ':
         options.freq = Frequency[value as keyof typeof Frequency]
@@ -45,49 +68,16 @@ function parseLine (rfcString: string) {
       case 'BYHOUR':
       case 'BYMINUTE':
       case 'BYSECOND':
-        let num: number | string | (number | string)[]
-        if (value.indexOf(',') !== -1) {
-          const values = value.split(',')
-          num = values.map(val => {
-            if (/^[+-]?\d+$/.test(val.toString())) {
-              return Number(val)
-            } else {
-              return val
-            }
-          })
-        } else if (/^[+-]?\d+$/.test(value)) {
-          num = Number(value)
-        } else {
-          num = value
-        }
+        const num = parseNumber(value)
         const optionKey = key.toLowerCase()
         // @ts-ignore
         options[optionKey] = num
         break
       case 'BYDAY': // => byweekday
-        let n: number
-        let wday: Weekday | number
-        let day: string
-        const days = value.split(',')
-
-        options.byweekday = []
-        for (let j = 0; j < days.length; j++) {
-          day = days[j]
-          if (day.length === 2) {
-            // MO, TU, ...
-            wday = Days[day as keyof typeof Days] // wday instanceof Weekday
-            options.byweekday.push(wday)
-          } else {
-            // -1MO, +3FR, 1SO, ...
-            const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
-            n = Number(parts[1])
-            const wdaypart = parts[2] as keyof typeof Days
-            wday = Days[wdaypart].weekday
-            options.byweekday.push(new Weekday(wday, n))
-          }
-        }
+        options.byweekday = parseWeekday(value)
         break
       case 'DTSTART':
+        // for backwards compatibility
         options.dtstart = dateutil.untilStringToDate(value)
         break
       case 'UNTIL':
@@ -99,6 +89,42 @@ function parseLine (rfcString: string) {
       default:
         throw new Error("Unknown RRULE property '" + key + "'")
     }
-  }
+  })
+
   return options
+}
+
+function parseNumber (value: string) {
+  if (value.indexOf(',') !== -1) {
+    const values = value.split(',')
+    return values.map(val => {
+      if (/^[+-]?\d+$/.test(val.toString())) {
+        return Number(val)
+      } else {
+        return val
+      }
+    })
+  } else if (/^[+-]?\d+$/.test(value)) {
+    return Number(value)
+  }
+
+  return value
+}
+
+function parseWeekday (value: string) {
+  const days = value.split(',')
+
+  return days.map(day => {
+    if (day.length === 2) {
+      // MO, TU, ...
+      return Days[day as keyof typeof Days] // wday instanceof Weekday
+    } else {
+      // -1MO, +3FR, 1SO, ...
+      const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
+      const n = Number(parts[1])
+      const wdaypart = parts[2] as keyof typeof Days
+      const wday = Days[wdaypart].weekday
+      return new Weekday(wday, n)
+    }
+  })
 }

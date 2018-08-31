@@ -1,7 +1,7 @@
 import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
-import { RRule, RRuleSet } from '../src'
-import { expect } from 'chai'
+import { RRule, RRuleSet, rrulestr } from '../src'
 import { DateTime } from 'luxon'
+import { expect } from 'chai'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRuleSet', function () {
@@ -499,5 +499,83 @@ describe('RRuleSet', function () {
 
       resetMockDate()
     })
+  })
+
+  describe('with end date', () => {
+    let cursor: DateTime
+
+    beforeEach(() => {
+      cursor = DateTime.utc(2017, 12, 25, 16, 0, 0)
+    })
+
+    it('updates a never-ending recurrence with an end date', () => {
+      const legacy = ['RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY']
+      const original = ['DTSTART:20171201T080000Z', 'RRULE:FREQ=WEEKLY']
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ])
+    })
+
+    it('replaces an existing end date with a new one', () => {
+      const legacy = [
+        'RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY;UNTIL=20180301T080000Z',
+      ]
+      const original = [
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20180301T080000Z',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ])
+    })
+
+    it('handles rule in a timezone', () => {
+      const legacy = [
+        'RRULE:DTSTART;TZID=America/New_York:20171201T080000;FREQ=WEEKLY',
+      ]
+      const original = [
+        'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
+      ])
+    })
+
+    const updateRoutineWithEndDate = (
+      recurrence: string[],
+      updatedCursor: DateTime,
+    ): string[] => {
+      const newEndDate = updatedCursor.minus({ days: 1 }).endOf('day')
+
+      const rrule = rrulestr(recurrence.join('\n'))
+
+      const newRuleSet = new RRuleSet()
+      const rule = new RRule({
+          ...rrule.origOptions,
+          until: newEndDate.toJSDate(),
+        })
+
+      newRuleSet.rrule(rule)
+
+      return newRuleSet.valueOf()
+    }
+
+    function expectRecurrence(recurrences: string[][]) {
+      return {
+        toBeUpdatedWithEndDate(expected: string[]) {
+          recurrences.forEach(recurrence => {
+            const actual = updateRoutineWithEndDate(recurrence, cursor)
+            expect(actual).to.deep.equal(expected)
+          })
+        },
+      }
+    }
   })
 })

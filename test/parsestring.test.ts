@@ -1,7 +1,7 @@
 import RRule from '../src/rrule'
 import { expect } from 'chai'
 import { parseString } from '../src/parsestring'
-import { Options } from '../src/types';
+import { Options, Frequency } from '../src/types';
 
 describe('parseString', () => {
   it('parses valid single lines of rrules', function () {
@@ -48,6 +48,21 @@ describe('parseString', () => {
       const s2 = item[1]
       expect(parseString(s), s).to.deep.equal(s2)
     })
+  })
 
+  it('parses legacy dtstart in rrule', () => {
+    const expectations: ([ string, Partial<Options>][]) = [
+      ['RRULE:FREQ=WEEKLY;DTSTART;TZID=America/New_York:19970902T090000', {
+        freq: Frequency.WEEKLY,
+        dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+        tzid: 'America/New_York'
+      }]
+    ]
+
+    expectations.forEach(function (item) {
+      const s = item[0]
+      const s2 = item[1]
+      expect(parseString(s), s).to.deep.equal(s2)
+    })
   })
 })

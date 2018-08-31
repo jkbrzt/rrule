@@ -103,12 +103,11 @@ export default class RRuleSet extends RRule {
   }
 
   valueOf () {
-    const result: string[] = []
-    if (this._rrule.length) {
-      this._rrule.forEach(function (rrule) {
-        rrule.toString().split('\n').map(str => result.push(str))
-      })
-    }
+    let result: string[] = []
+    this._rrule.forEach(function (rrule) {
+      result = result.concat(rrule.toString().split('\n'))
+    })
+
     if (this._rdate.length) {
       result.push(
         this.header('RDATE') +
@@ -117,11 +116,11 @@ export default class RRuleSet extends RRule {
             .join(',')
       )
     }
-    if (this._exrule.length) {
-      this._exrule.forEach(function (exrule) {
-        result.push('EXRULE:' + exrule)
-      })
-    }
+
+    this._exrule.forEach(function (exrule) {
+      result.push('EXRULE:' + exrule.toString().replace(/^RRULE:/, ''))
+    })
+
     if (this._exdate.length) {
       result.push(
         this.header('EXDATE') +

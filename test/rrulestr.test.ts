@@ -2,6 +2,7 @@ import { parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { expect } from 'chai'
 import { Days } from '../src/rrule';
+import { parseInput } from '../src/rrulestr';
 
 describe('rrulestr', function () {
   // Enable additional toString() / fromString() tests
@@ -253,13 +254,29 @@ describe('rrulestr', function () {
     ]
   )
 
+  it('parses without TZID', () => {
+    const rrule = rrulestr(
+      'DTSTART:19970902T090000\nRRULE:FREQ=WEEKLY'
+    )
+
+    expect(rrule.origOptions).to.deep.include({
+      freq: Frequency.WEEKLY,
+      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+    })
+  })
+
   it('parses TZID', () => {
     const rrule = rrulestr(
       'DTSTART;TZID=America/New_York:19970902T090000\n' +
-      'RRULE:FREQ=DAILY'
+      'RRULE:FREQ=DAILY;UNTIL=19980902T090000'
     )
 
-    expect(rrule.options.tzid).to.equal('America/New_York')
+    expect(rrule.origOptions).to.deep.include({
+      tzid: 'America/New_York',
+      freq: Frequency.DAILY,
+      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0))
+    })
   })
 
   it('parses a DTSTART inside an RRULE', () => {
@@ -332,5 +349,38 @@ describe('rrulestr', function () {
       "RDATE;TZID=America/Los_Angeles:20180720T111500",
       "EXDATE;TZID=America/Los_Angeles:20180721T111500"
     ]) 
+  })
+})
+
+describe('parseInput', () => {
+  it('parses an input into a structure', () => {
+    const output = parseInput(
+      'DTSTART;TZID=America/New_York:19970902T090000\n' +
+      'RRULE:FREQ=DAILY;UNTIL=19980902T090000;INTERVAL=1\n' +
+      'RDATE:19970902T090000Z\n' +
+      'RDATE:19970904T090000Z\n' +
+      'EXDATE:19970904T090000Z\n' +
+      'EXRULE:FREQ=WEEKLY;INTERVAL=2\n'
+    , {})
+    expect(output).to.deep.include({
+      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      tzid: 'America/New_York',
+      rrulevals: [{
+        interval: 1,
+        freq: Frequency.DAILY,
+        until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0))
+      }],
+      exdatevals: [
+        new Date(Date.UTC(1997, 8, 4, 9, 0, 0)),
+      ],
+      rdatevals: [
+        new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+        new Date(Date.UTC(1997, 8, 4, 9, 0, 0)),
+      ],
+      exrulevals: [{
+        interval: 2,
+        freq: Frequency.WEEKLY
+      }]
+    })
   })
 })

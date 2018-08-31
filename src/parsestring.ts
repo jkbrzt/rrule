@@ -11,7 +11,7 @@ export function parseString (rfcString: string): Partial<Options> {
 function parseDtstart (line: string) {
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /DTSTART(?:;TZID=([^:]+?))?:([^;]+)/i.exec(line)
+  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;]+)/i.exec(line)
 
   if (!dtstartWithZone) {
     return options
@@ -30,7 +30,7 @@ function parseLine (rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
-  const header = /^([A-Za-z]+)[:;]/.exec(rfcString)
+  const header = /^([A-Z]+?)[:;]/.exec(rfcString.toUpperCase())
   if (!header) {
     return parseRrule(rfcString)
   }
@@ -38,6 +38,7 @@ function parseLine (rfcString: string) {
   const [ _, key ] = header
   switch (key.toUpperCase()) {
     case 'RRULE':
+    case 'EXRULE':
       return parseRrule(rfcString)
     case 'DTSTART':
       return parseDtstart(rfcString)
@@ -50,7 +51,7 @@ function parseRrule (line: string) {
   const strippedLine = line.replace(/^RRULE:/i, '')
   const options = parseDtstart(strippedLine)
 
-  const attrs = strippedLine.split(';')
+  const attrs = line.replace(/^(?:RRULE|EXRULE):/i, '').split(';')
 
   attrs.forEach(attr => {
     const [ key, value ] = attr.split('=')
@@ -76,16 +77,16 @@ function parseRrule (line: string) {
         // @ts-ignore
         options[optionKey] = num
         break
-      case 'BYDAY': // => byweekday
       case 'BYWEEKDAY':
+      case 'BYDAY':
         options.byweekday = parseWeekday(value)
         break
       case 'DTSTART':
-        if (value) {
-          options.dtstart = dateutil.untilStringToDate(value) || options.dtstart
-        }
-        break
       case 'TZID':
+        // for backwards compatibility
+        const dtstart = parseDtstart(line)
+        options.tzid = dtstart.tzid
+        options.dtstart = dtstart.dtstart
         break
       case 'UNTIL':
         options.until = dateutil.untilStringToDate(value)

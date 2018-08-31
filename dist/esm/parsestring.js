@@ -19,7 +19,7 @@ export function parseString(rfcString) {
 }
 function parseDtstart(line) {
     var options = {};
-    var dtstartWithZone = /DTSTART(?:;TZID=([^:]+?))?:([^;]+)/i.exec(line);
+    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;]+)/i.exec(line);
     if (!dtstartWithZone) {
         return options;
     }
@@ -34,13 +34,14 @@ function parseLine(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
-    var header = /^([A-Za-z]+)[:;]/.exec(rfcString);
+    var header = /^([A-Z]+?)[:;]/.exec(rfcString.toUpperCase());
     if (!header) {
         return parseRrule(rfcString);
     }
     var _ = header[0], key = header[1];
     switch (key.toUpperCase()) {
         case 'RRULE':
+        case 'EXRULE':
             return parseRrule(rfcString);
         case 'DTSTART':
             return parseDtstart(rfcString);
@@ -51,7 +52,7 @@ function parseLine(rfcString) {
 function parseRrule(line) {
     var strippedLine = line.replace(/^RRULE:/i, '');
     var options = parseDtstart(strippedLine);
-    var attrs = strippedLine.split(';');
+    var attrs = line.replace(/^(?:RRULE|EXRULE):/i, '').split(';');
     attrs.forEach(function (attr) {
         var _a = attr.split('='), key = _a[0], value = _a[1];
         switch (key.toUpperCase()) {
@@ -76,16 +77,16 @@ function parseRrule(line) {
                 // @ts-ignore
                 options[optionKey] = num;
                 break;
-            case 'BYDAY': // => byweekday
             case 'BYWEEKDAY':
+            case 'BYDAY':
                 options.byweekday = parseWeekday(value);
                 break;
             case 'DTSTART':
-                if (value) {
-                    options.dtstart = dateutil.untilStringToDate(value) || options.dtstart;
-                }
-                break;
             case 'TZID':
+                // for backwards compatibility
+                var dtstart = parseDtstart(line);
+                options.tzid = dtstart.tzid;
+                options.dtstart = dtstart.dtstart;
                 break;
             case 'UNTIL':
                 options.until = dateutil.untilStringToDate(value);

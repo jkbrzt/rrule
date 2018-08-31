@@ -105,22 +105,18 @@ var RRuleSet = /** @class */ (function (_super) {
     RRuleSet.prototype.valueOf = function () {
         var _this = this;
         var result = [];
-        if (this._rrule.length) {
-            this._rrule.forEach(function (rrule) {
-                rrule.toString().split('\n').map(function (str) { return result.push(str); });
-            });
-        }
+        this._rrule.forEach(function (rrule) {
+            result = result.concat(rrule.toString().split('\n'));
+        });
         if (this._rdate.length) {
             result.push(this.header('RDATE') +
                 this._rdate
                     .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
                     .join(','));
         }
-        if (this._exrule.length) {
-            this._exrule.forEach(function (exrule) {
-                result.push('EXRULE:' + exrule);
-            });
-        }
+        this._exrule.forEach(function (exrule) {
+            result.push('EXRULE:' + exrule.toString().replace(/^RRULE:/, ''));
+        });
         if (this._exdate.length) {
             result.push(this.header('EXDATE') +
                 this._exdate

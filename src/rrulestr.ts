@@ -2,6 +2,7 @@ import RRule from './rrule'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import { includes, split } from './helpers'
+import { Options } from './types'
 import { parseString } from './parsestring'
 
 export interface RRuleStrOptions {
@@ -26,50 +27,16 @@ const DEFAULT_OPTIONS: RRuleStrOptions = {
   tzid: null
 }
 
-function _parseRfcRRuleOptions (line: string, options: Partial<RRuleStrOptions> = {}) {
-  const parsedOptions = parseString(line)
-  if (options.dtstart) {
-    parsedOptions.dtstart = options.dtstart
-  }
-
-  if (options.tzid) {
-    parsedOptions.tzid = options.tzid
-  }
-
-  return parsedOptions
-}
-
-function _parseRfcRRule (line: string, options: Partial<RRuleStrOptions>) {
-  return new RRule(_parseRfcRRuleOptions(line, options))
-}
-
-function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
-  if (options.compatible) {
-    options.forceset = true
-    options.unfold = true
-  }
-
-  const lines = splitIntoLines(s, options.unfold)
-
-  const rrules = s.toUpperCase().match(/RRULE:/ig)
-  if (
-    !options.forceset &&
-    !s.toUpperCase().match(/RDATE|EXDATE|EXRULE/ig) &&
-    (!rrules || rrules.length === 1)
-  ) {
-    return _parseRfcRRule(lines.join('\n'), {
-      cache: options.cache,
-      dtstart: options.dtstart
-    })
-  }
-
-  const rrulevals: string[] = []
-  const rdatevals: string[] = []
-  const exrulevals: string[] = []
-  const exdatevals: string[] = []
+export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
+  let rrulevals: Partial<Options>[] = []
+  let rdatevals: Date[] = []
+  let exrulevals: Partial<Options>[] = []
+  let exdatevals: Date[] = []
 
   let dtstart: Date
   let tzid: string
+
+  const lines = splitIntoLines(s, options.unfold)
 
   lines.forEach(line => {
     if (!line) return
@@ -81,12 +48,11 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
           throw new Error(`unsupported RRULE parm: ${parms.join(',')}`)
         }
 
-        rrulevals.push(value)
+        rrulevals.push(parseString(line))
         break
 
       case 'RDATE':
-        validateDateParm(parms)
-        rdatevals.push(value)
+        rdatevals = rdatevals.concat(parseRDate(value, parms))
         break
 
       case 'EXRULE':
@@ -94,12 +60,11 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
           throw new Error(`unsupported EXRULE parm: ${parms.join(',')}`)
         }
 
-        exrulevals.push(value)
+        exrulevals.push(parseString(value))
         break
 
       case 'EXDATE':
-        validateDateParm(parms)
-        exdatevals.push(value)
+        exdatevals = exdatevals.concat(parseRDate(value, parms))
         break
 
       case 'DTSTART':
@@ -117,6 +82,35 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     }
   })
 
+  return {
+    // @ts-ignore
+    dtstart,
+    // @ts-ignore
+    tzid,
+    rrulevals,
+    rdatevals,
+    exrulevals,
+    exdatevals
+  }
+}
+
+function buildRule (s: string, options: Partial<RRuleStrOptions>) {
+  const {
+    rrulevals,
+    rdatevals,
+    exrulevals,
+    exdatevals,
+    dtstart,
+    tzid
+  } = parseInput(s, options)
+
+  const noCache = options.cache === false
+
+  if (options.compatible) {
+    options.forceset = true
+    options.unfold = true
+  }
+
   if (
     options.forceset ||
     rrulevals.length > 1 ||
@@ -124,35 +118,43 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.length ||
     exdatevals.length
   ) {
-    const rset = new RRuleSet(!options.cache)
+    const rset = new RRuleSet(noCache)
     rrulevals.forEach(val => {
       rset.rrule(
-        _parseRfcRRule(val, {
-          dtstart: options.dtstart || dtstart,
-          tzid: options.tzid || tzid
-        })
+        new RRule(
+          {
+            ...val,
+            // @ts-ignore
+            dtstart: val.dtstart || options.dtstart || dtstart,
+            // @ts-ignore
+            tzid: val.tzid || options.tzid || tzid
+          },
+          noCache
+        )
       )
     })
 
-    rdatevals.forEach(dates => {
-      dates.split(',').forEach(datestr => {
-        rset.rdate(dateutil.untilStringToDate(datestr))
-      })
+    rdatevals.forEach(date => {
+      rset.rdate(date)
     })
 
     exrulevals.forEach(val => {
       rset.exrule(
-        _parseRfcRRule(val, {
-          dtstart: options.dtstart || dtstart,
-          tzid: options.tzid || tzid
-        })
+        new RRule(
+          {
+            ...val,
+            // @ts-ignore
+            dtstart: val.dtstart || options.dtstart || dtstart,
+            // @ts-ignore
+            tzid: val.tzid || options.tzid || tzid
+          },
+          noCache
+        )
       )
     })
 
-    exdatevals.forEach(dates => {
-      dates.split(',').forEach(datestr => {
-        rset.exdate(dateutil.untilStringToDate(datestr))
-      })
+    exdatevals.forEach(date => {
+      rset.exdate(date)
     })
 
     // @ts-ignore
@@ -160,20 +162,23 @@ function _parseRfc (s: string, options: Partial<RRuleStrOptions>) {
     return rset
   }
 
-  return _parseRfcRRule(rrulevals[0], {
+  const val = rrulevals[0]
+  const ruleOptions = {
+    ...val,
     // @ts-ignore
-    dtstart: options.dtstart || dtstart,
-    cache: options.cache,
+    dtstart: val.dtstart || options.dtstart || dtstart,
     // @ts-ignore
-    tzid: options.tzid || tzid
-  })
+    tzid: val.tzid || options.tzid || tzid
+  }
+
+  return new RRule(ruleOptions, noCache)
 }
 
 export function rrulestr (
   s: string,
   options: Partial<RRuleStrOptions> = {}
 ): RRule | RRuleSet {
-  return _parseRfc(s, initializeOptions(options))
+  return buildRule(s, initializeOptions(options))
 }
 
 function initializeOptions (options: Partial<RRuleStrOptions>) {
@@ -263,4 +268,12 @@ function validateDateParm (parms: string[]) {
       throw new Error('unsupported RDATE/EXDATE parm: ' + parm)
     }
   }
+}
+
+function parseRDate (rdateval: string, parms: string[]) {
+  validateDateParm(parms)
+
+  return rdateval
+    .split(',')
+    .map(datestr => dateutil.untilStringToDate(datestr))
 }

@@ -3727,7 +3727,7 @@ describe('RRule', function () {
       resetMockDate()
     })
 
-  it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
+    it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
       const currentLocalDate = DateTime.local(2013, 8, 6, 11, 0, 0)
       setMockDate(currentLocalDate.toJSDate())
 

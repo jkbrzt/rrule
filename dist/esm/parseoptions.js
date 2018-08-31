@@ -22,13 +22,13 @@ export function parseOptions(options) {
     var keys = Object.keys(options);
     // Merge in default options
     defaultKeys.forEach(function (key) {
-        if (!includes(keys, key))
+        if (!includes(keys, key) || !isPresent(opts[key]))
             opts[key] = DEFAULT_OPTIONS[key];
     });
     if (isPresent(opts.byeaster))
         opts.freq = RRule.YEARLY;
     if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
-        throw new Error("Invalid frequency: " + opts.freq);
+        throw new Error("Invalid frequency: " + opts.freq + " " + options.freq);
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));

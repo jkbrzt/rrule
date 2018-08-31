@@ -8,10 +8,10 @@ export function parseString (rfcString: string): Partial<Options> {
   return { ...options[0], ...options[1] }
 }
 
-function parseDtstart (line: string) {
+export function parseDtstart (line: string) {
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;]+)/i.exec(line)
+  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
 
   if (!dtstartWithZone) {
     return options

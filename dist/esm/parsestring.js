@@ -17,9 +17,9 @@ export function parseString(rfcString) {
     var options = rfcString.split('\n').map(parseLine).filter(function (x) { return x !== null; });
     return __assign({}, options[0], options[1]);
 }
-function parseDtstart(line) {
+export function parseDtstart(line) {
     var options = {};
-    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;]+)/i.exec(line);
+    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line);
     if (!dtstartWithZone) {
         return options;
     }

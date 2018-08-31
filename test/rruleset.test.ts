@@ -508,6 +508,19 @@ describe('RRuleSet', function () {
       cursor = DateTime.utc(2017, 12, 25, 16, 0, 0)
     })
 
+    it('updates the ruleset to exclude recurrence date', () => {
+      const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
+      const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
+
+      const recurrenceDate = DateTime.utc(2017, 8, 21, 16, 0, 0)
+
+      expectRecurrence([repeat, legacy]).toAmendExdate(recurrenceDate, [
+        'DTSTART:19990104T110000Z',
+        'RRULE:FREQ=DAILY;INTERVAL=1',
+        'EXDATE:20170821T160000Z',
+      ])
+    })
+
     it('updates a never-ending recurrence with an end date', () => {
       const legacy = ['RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY']
       const original = ['DTSTART:20171201T080000Z', 'RRULE:FREQ=WEEKLY']
@@ -567,8 +580,23 @@ describe('RRuleSet', function () {
       return newRuleSet.valueOf()
     }
 
+    const amendRuleSetWithExceptionDate = (
+      recurrence: string[],
+      cursor: DateTime,
+    ): string[] => {
+      const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
+      ruleSet.exdate(cursor.toJSDate())
+      return ruleSet.valueOf()
+    }
+
     function expectRecurrence(recurrences: string[][]) {
       return {
+        toAmendExdate(excluded: DateTime, expected: string[]) {
+          recurrences.forEach(recurrence => {
+            const actual = amendRuleSetWithExceptionDate(recurrence, excluded)
+            expect(actual).to.deep.equal(expected)
+          })
+        },
         toBeUpdatedWithEndDate(expected: string[]) {
           recurrences.forEach(recurrence => {
             const actual = updateRoutineWithEndDate(recurrence, cursor)

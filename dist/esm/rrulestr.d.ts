@@ -10,8 +10,8 @@ export interface RRuleStrOptions {
     tzid: string | null;
 }
 export declare function parseInput(s: string, options: Partial<RRuleStrOptions>): {
-    dtstart: Date;
-    tzid: string;
+    dtstart: Date | null | undefined;
+    tzid: string | null | undefined;
     rrulevals: Partial<Options>[];
     rdatevals: Date[];
     exrulevals: Partial<Options>[];

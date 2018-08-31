@@ -1266,7 +1266,7 @@ function parseString(rfcString) {
 }
 function parseDtstart(line) {
     var options = {};
-    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;]+)/i.exec(line);
+    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line);
     if (!dtstartWithZone) {
         return options;
     }
@@ -2298,8 +2298,7 @@ function parseInput(s, options) {
     var rdatevals = [];
     var exrulevals = [];
     var exdatevals = [];
-    var dtstart;
-    var tzid;
+    var _a = parseDtstart(s), dtstart = _a.dtstart, tzid = _a.tzid;
     var lines = splitIntoLines(s, options.unfold);
     lines.forEach(function (line) {
         if (!line)
@@ -2325,13 +2324,6 @@ function parseInput(s, options) {
                 exdatevals = exdatevals.concat(parseRDate(value, parms));
                 break;
             case 'DTSTART':
-                dtstart = esm_dateutil.untilStringToDate(value);
-                if (parms.length) {
-                    var _b = parms[0].split('='), key = _b[0], value_1 = _b[1];
-                    if (key === 'TZID') {
-                        tzid = value_1;
-                    }
-                }
                 break;
             default:
                 throw new Error('unsupported property: ' + name);

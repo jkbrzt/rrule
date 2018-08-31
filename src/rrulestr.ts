@@ -3,7 +3,7 @@ import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import { includes, split } from './helpers'
 import { Options } from './types'
-import { parseString } from './parsestring'
+import { parseString, parseDtstart } from './parsestring'
 
 export interface RRuleStrOptions {
   dtstart: Date | null
@@ -33,8 +33,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   let exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let dtstart: Date
-  let tzid: string
+  const { dtstart, tzid } = parseDtstart(s)
 
   const lines = splitIntoLines(s, options.unfold)
 
@@ -68,13 +67,6 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'DTSTART':
-        dtstart = dateutil.untilStringToDate(value)
-        if (parms.length) {
-          const [key, value] = parms[0].split('=')
-          if (key === 'TZID') {
-            tzid = value
-          }
-        }
         break
 
       default:
@@ -165,7 +157,7 @@ export function rrulestr (
   return buildRule(s, initializeOptions(options))
 }
 
-function groomRruleOptions (val: Partial<Options>, dtstart: Date, tzid: string) {
+function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, tzid?: string | null) {
   return {
     ...val,
     dtstart,

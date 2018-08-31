@@ -13,7 +13,7 @@ import RRule from './rrule';
 import RRuleSet from './rruleset';
 import dateutil from './dateutil';
 import { includes, split } from './helpers';
-import { parseString } from './parsestring';
+import { parseString, parseDtstart } from './parsestring';
 /**
  * RRuleStr
  *  To parse a set of rrule strings
@@ -31,8 +31,7 @@ export function parseInput(s, options) {
     var rdatevals = [];
     var exrulevals = [];
     var exdatevals = [];
-    var dtstart;
-    var tzid;
+    var _a = parseDtstart(s), dtstart = _a.dtstart, tzid = _a.tzid;
     var lines = splitIntoLines(s, options.unfold);
     lines.forEach(function (line) {
         if (!line)
@@ -58,13 +57,6 @@ export function parseInput(s, options) {
                 exdatevals = exdatevals.concat(parseRDate(value, parms));
                 break;
             case 'DTSTART':
-                dtstart = dateutil.untilStringToDate(value);
-                if (parms.length) {
-                    var _b = parms[0].split('='), key = _b[0], value_1 = _b[1];
-                    if (key === 'TZID') {
-                        tzid = value_1;
-                    }
-                }
                 break;
             default:
                 throw new Error('unsupported property: ' + name);

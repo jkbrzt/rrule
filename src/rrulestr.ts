@@ -122,13 +122,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(
-          {
-            ...val,
-            // @ts-ignore
-            dtstart: val.dtstart || options.dtstart || dtstart,
-            // @ts-ignore
-            tzid: val.tzid || options.tzid || tzid
-          },
+          groomRruleOptions(val, dtstart, tzid),
           noCache
         )
       )
@@ -141,13 +135,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         new RRule(
-          {
-            ...val,
-            // @ts-ignore
-            dtstart: val.dtstart || options.dtstart || dtstart,
-            // @ts-ignore
-            tzid: val.tzid || options.tzid || tzid
-          },
+          groomRruleOptions(val, dtstart, tzid),
           noCache
         )
       )
@@ -163,15 +151,11 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
   }
 
   const val = rrulevals[0]
-  const ruleOptions = {
-    ...val,
-    // @ts-ignore
-    dtstart: val.dtstart || options.dtstart || dtstart,
-    // @ts-ignore
-    tzid: val.tzid || options.tzid || tzid
-  }
-
-  return new RRule(ruleOptions, noCache)
+  return new RRule(groomRruleOptions(
+    val,
+    val.dtstart || options.dtstart || dtstart,
+    val.tzid || options.tzid || tzid
+  ), noCache)
 }
 
 export function rrulestr (
@@ -179,6 +163,14 @@ export function rrulestr (
   options: Partial<RRuleStrOptions> = {}
 ): RRule | RRuleSet {
   return buildRule(s, initializeOptions(options))
+}
+
+function groomRruleOptions (val: Partial<Options>, dtstart: Date, tzid: string) {
+  return {
+    ...val,
+    dtstart,
+    tzid
+  }
 }
 
 function initializeOptions (options: Partial<RRuleStrOptions>) {
@@ -262,12 +254,11 @@ function splitIntoLines (s: string, unfold = false) {
 }
 
 function validateDateParm (parms: string[]) {
-  for (let j = 0; j < parms.length; j++) {
-    const parm = parms[j]
-    if (!/(VALUE=DATE-TIME)|(VALUE=DATE)|(TZID=)/.test(parm)) {
+  parms.forEach(parm => {
+    if (!/(VALUE=DATE(-TIME)?)|(TZID=)/.test(parm)) {
       throw new Error('unsupported RDATE/EXDATE parm: ' + parm)
     }
-  }
+  })
 }
 
 function parseRDate (rdateval: string, parms: string[]) {

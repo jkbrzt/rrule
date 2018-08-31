@@ -95,21 +95,13 @@ function buildRule(s, options) {
         exdatevals.length) {
         var rset_1 = new RRuleSet(noCache);
         rrulevals.forEach(function (val) {
-            rset_1.rrule(new RRule(__assign({}, val, { 
-                // @ts-ignore
-                dtstart: val.dtstart || options.dtstart || dtstart, 
-                // @ts-ignore
-                tzid: val.tzid || options.tzid || tzid }), noCache));
+            rset_1.rrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         rdatevals.forEach(function (date) {
             rset_1.rdate(date);
         });
         exrulevals.forEach(function (val) {
-            rset_1.exrule(new RRule(__assign({}, val, { 
-                // @ts-ignore
-                dtstart: val.dtstart || options.dtstart || dtstart, 
-                // @ts-ignore
-                tzid: val.tzid || options.tzid || tzid }), noCache));
+            rset_1.exrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         exdatevals.forEach(function (date) {
             rset_1.exdate(date);
@@ -120,16 +112,15 @@ function buildRule(s, options) {
         return rset_1;
     }
     var val = rrulevals[0];
-    var ruleOptions = __assign({}, val, { 
-        // @ts-ignore
-        dtstart: val.dtstart || options.dtstart || dtstart, 
-        // @ts-ignore
-        tzid: val.tzid || options.tzid || tzid });
-    return new RRule(ruleOptions, noCache);
+    return new RRule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
 }
 export function rrulestr(s, options) {
     if (options === void 0) { options = {}; }
     return buildRule(s, initializeOptions(options));
+}
+function groomRruleOptions(val, dtstart, tzid) {
+    return __assign({}, val, { dtstart: dtstart,
+        tzid: tzid });
 }
 function initializeOptions(options) {
     var invalid = [];
@@ -203,20 +194,14 @@ function splitIntoLines(s, unfold) {
     return lines;
 }
 function validateDateParm(parms) {
-    for (var j = 0; j < parms.length; j++) {
-        var parm = parms[j];
-        if (!/(VALUE=DATE-TIME)|(VALUE=DATE)|(TZID=)/.test(parm)) {
+    parms.forEach(function (parm) {
+        if (!/(VALUE=DATE(-TIME)?)|(TZID=)/.test(parm)) {
             throw new Error('unsupported RDATE/EXDATE parm: ' + parm);
         }
-    }
+    });
 }
 function parseRDate(rdateval, parms) {
-    for (var j = 0; j < parms.length; j++) {
-        var parm = parms[j];
-        if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-            throw new Error('unsupported RDATE parm: ' + parm);
-        }
-    }
+    validateDateParm(parms);
     return rdateval
         .split(',')
         .map(function (datestr) { return dateutil.untilStringToDate(datestr); });

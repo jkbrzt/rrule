@@ -117,7 +117,11 @@ export default class RRuleSet extends RRule {
     }
 
     this._exrule.forEach(function (exrule) {
-      result.push('EXRULE:' + exrule.toString().replace(/^RRULE:/, ''))
+      result = result.concat(
+        exrule.toString().split('\n')
+          .map(line => line.replace(/^RRULE:/, 'EXRULE:'))
+          .filter(line => !/^DTSTART/.test(line))
+      )
     })
 
     if (this._exdate.length) {

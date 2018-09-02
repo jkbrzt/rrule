@@ -1,5 +1,5 @@
 import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
-import { RRule, RRuleSet, rrulestr } from '../src'
+import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { DateTime } from 'luxon'
 import { expect } from 'chai'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
@@ -521,6 +521,24 @@ describe('RRuleSet', function () {
       ])
     })
 
+    it('updates the ruleset to exclude recurrence rule', () => {
+      const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
+      const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
+
+      const exrule = new RRule({
+        dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+        freq: Frequency.WEEKLY,
+        interval: 2,
+        count: 1
+      })
+
+      expectRecurrence([repeat, legacy]).toAmendExrule(exrule, [
+        'DTSTART:19990104T110000Z',
+        'RRULE:FREQ=DAILY;INTERVAL=1',
+        'EXRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=1'
+      ])
+    })
+
     it('updates a never-ending recurrence with an end date', () => {
       const legacy = ['RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY']
       const original = ['DTSTART:20171201T080000Z', 'RRULE:FREQ=WEEKLY']
@@ -583,18 +601,33 @@ describe('RRuleSet', function () {
     const amendRuleSetWithExceptionDate = (
       recurrence: string[],
       cursor: DateTime,
-    ): string[] => {
+    ): string => {
       const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
       ruleSet.exdate(cursor.toJSDate())
-      return ruleSet.valueOf()
+      return ruleSet.toString()
+    }
+
+    const amendRuleSetWithExceptionRule = (
+      recurrence: string[],
+      exrule: RRule,
+    ): string => {
+      const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
+      ruleSet.exrule(exrule)
+      return ruleSet.toString()
     }
 
     function expectRecurrence(recurrences: string[][]) {
       return {
+        toAmendExrule(excluded: RRule, expected: string[]) {
+          recurrences.forEach(recurrence => {
+            const actual = amendRuleSetWithExceptionRule(recurrence, excluded)
+            expect(actual).to.equal(expected.join('\n'))
+          })
+        },
         toAmendExdate(excluded: DateTime, expected: string[]) {
           recurrences.forEach(recurrence => {
             const actual = amendRuleSetWithExceptionDate(recurrence, excluded)
-            expect(actual).to.deep.equal(expected)
+            expect(actual).to.equal(expected.join('\n'))
           })
         },
         toBeUpdatedWithEndDate(expected: string) {

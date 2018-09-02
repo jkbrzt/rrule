@@ -113,7 +113,9 @@ var RRuleSet = /** @class */ (function (_super) {
             result.push(this.rdatesToString('RDATE', this._rdate));
         }
         this._exrule.forEach(function (exrule) {
-            result.push('EXRULE:' + exrule.toString().replace(/^RRULE:/, ''));
+            result = result.concat(exrule.toString().split('\n')
+                .map(function (line) { return line.replace(/^RRULE:/, 'EXRULE:'); })
+                .filter(function (line) { return !/^DTSTART/.test(line); }));
         });
         if (this._exdate.length) {
             result.push(this.rdatesToString('EXDATE', this._exdate));

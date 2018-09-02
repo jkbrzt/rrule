@@ -93,13 +93,15 @@ export default class RRuleSet extends RRule {
     }
   }
 
-  private header (param: string) {
+  private rdatesToString (param: string, rdates: Date[]) {
     const tzid = this.tzid()
-    if (tzid) {
-      return `${param};TZID=${tzid}:`
-    }
+    const header = tzid ? `${param};TZID=${tzid}:` : `${param}:`
 
-    return `${param}:`
+    const dateString = rdates
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
+      .join(',')
+
+    return `${header}${dateString}`
   }
 
   valueOf () {
@@ -110,10 +112,7 @@ export default class RRuleSet extends RRule {
 
     if (this._rdate.length) {
       result.push(
-        this.header('RDATE') +
-          this._rdate
-            .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
-            .join(',')
+        this.rdatesToString('RDATE', this._rdate)
       )
     }
 
@@ -123,10 +122,7 @@ export default class RRuleSet extends RRule {
 
     if (this._exdate.length) {
       result.push(
-        this.header('EXDATE') +
-          this._exdate
-            .map(exdate => dateutil.timeToUntilString(exdate.valueOf(), !this.tzid()))
-            .join(',')
+        this.rdatesToString('EXDATE', this._exdate)
       )
     }
     return result
@@ -137,7 +133,7 @@ export default class RRuleSet extends RRule {
    *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
    */
   toString () {
-    return JSON.stringify(this.valueOf())
+    return this.valueOf().join('\n')
   }
 
   _iter (iterResult: IterResult) {

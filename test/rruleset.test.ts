@@ -528,7 +528,7 @@ describe('RRuleSet', function () {
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
         'DTSTART:20171201T080000Z',
         'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
-      ])
+      ].join('\n'))
     })
 
     it('replaces an existing end date with a new one', () => {
@@ -543,7 +543,7 @@ describe('RRuleSet', function () {
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
         'DTSTART:20171201T080000Z',
         'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
-      ])
+      ].join('\n'))
     })
 
     it('handles rule in a timezone', () => {
@@ -558,13 +558,13 @@ describe('RRuleSet', function () {
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
         'DTSTART;TZID=America/New_York:20171201T080000',
         'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
-      ])
+      ].join('\n'))
     })
 
-    const updateRoutineWithEndDate = (
+    const updateWithEndDate = (
       recurrence: string[],
       updatedCursor: DateTime,
-    ): string[] => {
+    ): string => {
       const newEndDate = updatedCursor.minus({ days: 1 }).endOf('day')
 
       const rrule = rrulestr(recurrence.join('\n'))
@@ -577,7 +577,7 @@ describe('RRuleSet', function () {
 
       newRuleSet.rrule(rule)
 
-      return newRuleSet.valueOf()
+      return newRuleSet.toString()
     }
 
     const amendRuleSetWithExceptionDate = (
@@ -597,10 +597,10 @@ describe('RRuleSet', function () {
             expect(actual).to.deep.equal(expected)
           })
         },
-        toBeUpdatedWithEndDate(expected: string[]) {
+        toBeUpdatedWithEndDate(expected: string) {
           recurrences.forEach(recurrence => {
-            const actual = updateRoutineWithEndDate(recurrence, cursor)
-            expect(actual).to.deep.equal(expected)
+            const actual = updateWithEndDate(recurrence, cursor)
+            expect(actual).to.equal(expected)
           })
         },
       }

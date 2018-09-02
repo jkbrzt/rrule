@@ -95,33 +95,28 @@ var RRuleSet = /** @class */ (function (_super) {
             dateutil.sort(this._exdate);
         }
     };
-    RRuleSet.prototype.header = function (param) {
+    RRuleSet.prototype.rdatesToString = function (param, rdates) {
+        var _this = this;
         var tzid = this.tzid();
-        if (tzid) {
-            return param + ";TZID=" + tzid + ":";
-        }
-        return param + ":";
+        var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
+        var dateString = rdates
+            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
+            .join(',');
+        return "" + header + dateString;
     };
     RRuleSet.prototype.valueOf = function () {
-        var _this = this;
         var result = [];
         this._rrule.forEach(function (rrule) {
             result = result.concat(rrule.toString().split('\n'));
         });
         if (this._rdate.length) {
-            result.push(this.header('RDATE') +
-                this._rdate
-                    .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
-                    .join(','));
+            result.push(this.rdatesToString('RDATE', this._rdate));
         }
         this._exrule.forEach(function (exrule) {
             result.push('EXRULE:' + exrule.toString().replace(/^RRULE:/, ''));
         });
         if (this._exdate.length) {
-            result.push(this.header('EXDATE') +
-                this._exdate
-                    .map(function (exdate) { return dateutil.timeToUntilString(exdate.valueOf(), !_this.tzid()); })
-                    .join(','));
+            result.push(this.rdatesToString('EXDATE', this._exdate));
         }
         return result;
     };
@@ -130,7 +125,7 @@ var RRuleSet = /** @class */ (function (_super) {
      *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
      */
     RRuleSet.prototype.toString = function () {
-        return JSON.stringify(this.valueOf());
+        return this.valueOf().join('\n');
     };
     RRuleSet.prototype._iter = function (iterResult) {
         var _exdateHash = {};

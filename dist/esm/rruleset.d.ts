@@ -37,7 +37,7 @@ export default class RRuleSet extends RRule {
      * @param {Date}
      */
     exdate(date: Date): void;
-    private header;
+    private rdatesToString;
     valueOf(): string[];
     /**
      * to generate recurrence field such as:

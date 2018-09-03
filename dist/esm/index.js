@@ -15,17 +15,12 @@
  */
 import RRule from './rrule';
 import RRuleSet from './rruleset';
-import RRuleStr from './rrulestr';
+import { rrulestr } from './rrulestr';
 export { Frequency } from './types';
 export { Weekday } from './weekday';
 // =============================================================================
 // Export
 // =============================================================================
-// Only one RRuleStr instance for all rrule string parsing work.
-var rruleStr = new RRuleStr();
-var rrulestr = function () {
-    return rruleStr.parse.apply(rruleStr, arguments);
-};
 export { RRule, RRuleSet, rrulestr };
 export default RRule;
 //# sourceMappingURL=index.js.map

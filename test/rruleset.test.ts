@@ -1,5 +1,8 @@
-import { parse, datetime, testRecurring } from './lib/utils'
-import { RRule, RRuleSet } from '../src'
+import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
+import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
+import { DateTime } from 'luxon'
+import { expect } from 'chai'
+import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRuleSet', function () {
   // Enable additional toString() / fromString() tests
@@ -355,4 +358,285 @@ describe('RRuleSet', function () {
       datetime(1961, 1, 1, 9, 0)
     ]
   )
+
+  describe('valueOf', () => {
+    it('generates rrule strings correctly', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000')
+      }))
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART:19600101T090000Z",
+        "RRULE:FREQ=YEARLY;COUNT=2"
+      ])
+    })
+
+    it('generates multiline rules', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000')
+      }))
+
+      set.rrule(new RRule({
+        freq: RRule.WEEKLY,
+        count: 3,
+      }))
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART:19600101T090000Z",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RRULE:FREQ=WEEKLY;COUNT=3"
+      ])
+    })
+
+    it('generates rules with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.rrule(new RRule({
+        freq: RRule.WEEKLY,
+        count: 3,
+      }))
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RRULE:FREQ=WEEKLY;COUNT=3"
+      ])
+    })
+
+    it('generates RDATE with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.rdate(
+        parse('19610201T090000'),
+      )
+
+      set.rdate(
+        parse('19610301T090000'),
+      )
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "RDATE;TZID=America/New_York:19610201T090000,19610301T090000"
+      ])
+    })
+
+    it('generates EXDATE with tzid', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      }))
+
+      set.exdate(
+        parse('19610201T090000'),
+      )
+
+      set.exdate(
+        parse('19610301T090000'),
+      )
+
+      expect(set.valueOf()).to.deep.equal([
+        "DTSTART;TZID=America/New_York:19600101T090000",
+        "RRULE:FREQ=YEARLY;COUNT=2",
+        "EXDATE;TZID=America/New_York:19610201T090000,19610301T090000"
+      ])
+    })
+
+    it('generates correcty zoned recurrences when a tzid is present', () => {
+      const targetZone = 'America/New_York'
+      const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
+
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.YEARLY,
+        count: 4,
+        dtstart: DateTime.fromISO('20000101T090000').toJSDate(),
+        tzid: targetZone
+      }))
+
+      set.exdate(
+        DateTime.fromISO('20010101T090000').toJSDate(),
+      )
+
+      set.rdate(
+        DateTime.fromISO('20020301T090000').toJSDate(),
+      )     
+
+      expect(set.all()).to.deep.equal([
+        expectedDate(DateTime.fromISO('20000101T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20020101T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone),
+        expectedDate(DateTime.fromISO('20030101T090000'), currentLocalDate, targetZone),
+      ])
+
+      resetMockDate()
+    })
+  })
+
+  describe('with end date', () => {
+    let cursor: DateTime
+
+    beforeEach(() => {
+      cursor = DateTime.utc(2017, 12, 25, 16, 0, 0)
+    })
+
+    it('updates the ruleset to exclude recurrence date', () => {
+      const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
+      const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
+
+      const recurrenceDate = DateTime.utc(2017, 8, 21, 16, 0, 0)
+
+      expectRecurrence([repeat, legacy]).toAmendExdate(recurrenceDate, [
+        'DTSTART:19990104T110000Z',
+        'RRULE:FREQ=DAILY;INTERVAL=1',
+        'EXDATE:20170821T160000Z',
+      ])
+    })
+
+    it('updates the ruleset to exclude recurrence rule', () => {
+      const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
+      const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
+
+      const exrule = new RRule({
+        dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+        freq: Frequency.WEEKLY,
+        interval: 2,
+        count: 1
+      })
+
+      expectRecurrence([repeat, legacy]).toAmendExrule(exrule, [
+        'DTSTART:19990104T110000Z',
+        'RRULE:FREQ=DAILY;INTERVAL=1',
+        'EXRULE:FREQ=WEEKLY;INTERVAL=2;COUNT=1'
+      ])
+    })
+
+    it('updates a never-ending recurrence with an end date', () => {
+      const legacy = ['RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY']
+      const original = ['DTSTART:20171201T080000Z', 'RRULE:FREQ=WEEKLY']
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ].join('\n'))
+    })
+
+    it('replaces an existing end date with a new one', () => {
+      const legacy = [
+        'RRULE:DTSTART=20171201T080000Z;FREQ=WEEKLY;UNTIL=20180301T080000Z',
+      ]
+      const original = [
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20180301T080000Z',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000Z',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ].join('\n'))
+    })
+
+    it('handles rule in a timezone', () => {
+      const legacy = [
+        'RRULE:DTSTART;TZID=America/New_York:20171201T080000;FREQ=WEEKLY',
+      ]
+      const original = [
+        'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
+      ].join('\n'))
+    })
+
+    const updateWithEndDate = (
+      recurrence: string[],
+      updatedCursor: DateTime,
+    ): string => {
+      const newEndDate = updatedCursor.minus({ days: 1 }).endOf('day')
+
+      const rrule = rrulestr(recurrence.join('\n'))
+
+      const newRuleSet = new RRuleSet()
+      const rule = new RRule({
+          ...rrule.origOptions,
+          until: newEndDate.toJSDate(),
+        })
+
+      newRuleSet.rrule(rule)
+
+      return newRuleSet.toString()
+    }
+
+    const amendRuleSetWithExceptionDate = (
+      recurrence: string[],
+      cursor: DateTime,
+    ): string => {
+      const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
+      ruleSet.exdate(cursor.toJSDate())
+      return ruleSet.toString()
+    }
+
+    const amendRuleSetWithExceptionRule = (
+      recurrence: string[],
+      exrule: RRule,
+    ): string => {
+      const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
+      ruleSet.exrule(exrule)
+      return ruleSet.toString()
+    }
+
+    function expectRecurrence(recurrences: string[][]) {
+      return {
+        toAmendExrule(excluded: RRule, expected: string[]) {
+          recurrences.forEach(recurrence => {
+            const actual = amendRuleSetWithExceptionRule(recurrence, excluded)
+            expect(actual).to.equal(expected.join('\n'))
+          })
+        },
+        toAmendExdate(excluded: DateTime, expected: string[]) {
+          recurrences.forEach(recurrence => {
+            const actual = amendRuleSetWithExceptionDate(recurrence, excluded)
+            expect(actual).to.equal(expected.join('\n'))
+          })
+        },
+        toBeUpdatedWithEndDate(expected: string) {
+          recurrences.forEach(recurrence => {
+            const actual = updateWithEndDate(recurrence, cursor)
+            expect(actual).to.equal(expected)
+          })
+        },
+      }
+    }
+  })
 })

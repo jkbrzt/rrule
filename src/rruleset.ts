@@ -2,19 +2,20 @@ import RRule from './rrule'
 import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
-
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
+import { DateWithZone } from './datewithzone'
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]
   public readonly _exdate: Date[]
+
+  /**
+   *
+   * @param {Boolean?} noCache
+   *  The same stratagy as RRule on cache, default to false
+   * @constructor
+   */
   constructor (noCache: boolean = false) {
     super({}, noCache)
 
@@ -22,6 +23,16 @@ export default class RRuleSet extends RRule {
     this._rdate = []
     this._exrule = []
     this._exdate = []
+  }
+
+  tzid () {
+    for (let i = 0; i < this._rrule.length; i++) {
+      const tzid = this._rrule[i].origOptions.tzid
+      if (tzid) {
+        return tzid
+      }
+    }
+    return undefined
   }
 
   /**
@@ -82,53 +93,58 @@ export default class RRuleSet extends RRule {
     }
   }
 
+  private rdatesToString (param: string, rdates: Date[]) {
+    const tzid = this.tzid()
+    const header = tzid ? `${param};TZID=${tzid}:` : `${param}:`
+
+    const dateString = rdates
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
+      .join(',')
+
+    return `${header}${dateString}`
+  }
+
   valueOf () {
-    const result: string[] = []
-    if (this._rrule.length) {
-      this._rrule.forEach(function (rrule) {
-        result.push('RRULE:' + rrule)
-      })
-    }
+    let result: string[] = []
+    this._rrule.forEach(function (rrule) {
+      result = result.concat(rrule.toString().split('\n'))
+    })
+
     if (this._rdate.length) {
       result.push(
-        'RDATE:' +
-          this._rdate
-            .map(function (rdate) {
-              return dateutil.timeToUntilString(rdate.valueOf())
-            })
-            .join(',')
+        this.rdatesToString('RDATE', this._rdate)
       )
     }
-    if (this._exrule.length) {
-      this._exrule.forEach(function (exrule) {
-        result.push('EXRULE:' + exrule)
-      })
-    }
+
+    this._exrule.forEach(function (exrule) {
+      result = result.concat(
+        exrule.toString().split('\n')
+          .map(line => line.replace(/^RRULE:/, 'EXRULE:'))
+          .filter(line => !/^DTSTART/.test(line))
+      )
+    })
+
     if (this._exdate.length) {
       result.push(
-        'EXDATE:' +
-          this._exdate
-            .map(function (exdate) {
-              return dateutil.timeToUntilString(exdate.valueOf())
-            })
-            .join(',')
+        this.rdatesToString('EXDATE', this._exdate)
       )
     }
     return result
   }
 
   /**
-   * to generate recurrence field sush as:
+   * to generate recurrence field such as:
    *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
    */
   toString () {
-    return JSON.stringify(this.valueOf())
+    return this.valueOf().join('\n')
   }
 
   _iter (iterResult: IterResult) {
     const _exdateHash: { [k: number]: boolean } = {}
     const _exrule = this._exrule
     const _accept = iterResult.accept
+    const tzid = this.tzid()
 
     function evalExdate (after: Date, before: Date) {
       _exrule.forEach(function (rrule) {
@@ -139,7 +155,8 @@ export default class RRuleSet extends RRule {
     }
 
     this._exdate.forEach(function (date) {
-      _exdateHash[Number(date)] = true
+      const zonedDate = new DateWithZone(date, tzid).rezonedDate()
+      _exdateHash[Number(zonedDate)] = true
     })
 
     iterResult.accept = function (date) {
@@ -167,7 +184,8 @@ export default class RRuleSet extends RRule {
     }
 
     for (let i = 0; i < this._rdate.length; i++) {
-      if (!iterResult.accept(new Date(this._rdate[i].valueOf()))) break
+      const zonedDate = new DateWithZone(this._rdate[i], tzid).rezonedDate()
+      if (!iterResult.accept(new Date(zonedDate.getTime()))) break
     }
 
     this._rrule.forEach(function (rrule) {
@@ -199,13 +217,13 @@ export default class RRuleSet extends RRule {
       rrs.rrule(this._rrule[i].clone())
     }
     for (i = 0; i < this._rdate.length; i++) {
-      rrs.rdate(new Date(this._rdate[i].valueOf()))
+      rrs.rdate(new Date(this._rdate[i].getTime()))
     }
     for (i = 0; i < this._exrule.length; i++) {
       rrs.exrule(this._exrule[i].clone())
     }
     for (i = 0; i < this._exdate.length; i++) {
-      rrs.exdate(new Date(this._exdate[i].valueOf()))
+      rrs.exdate(new Date(this._exdate[i].getTime()))
     }
     return rrs
   }

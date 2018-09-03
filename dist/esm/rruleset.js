@@ -14,14 +14,15 @@ var __extends = (this && this.__extends) || (function () {
 import RRule from './rrule';
 import dateutil from './dateutil';
 import { includes } from './helpers';
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
+import { DateWithZone } from './datewithzone';
 var RRuleSet = /** @class */ (function (_super) {
     __extends(RRuleSet, _super);
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
     function RRuleSet(noCache) {
         if (noCache === void 0) { noCache = false; }
         var _this = _super.call(this, {}, noCache) || this;
@@ -31,6 +32,15 @@ var RRuleSet = /** @class */ (function (_super) {
         _this._exdate = [];
         return _this;
     }
+    RRuleSet.prototype.tzid = function () {
+        for (var i = 0; i < this._rrule.length; i++) {
+            var tzid = this._rrule[i].origOptions.tzid;
+            if (tzid) {
+                return tzid;
+            }
+        }
+        return undefined;
+    };
     /**
      * Adds an RRule to the set
      *
@@ -85,47 +95,45 @@ var RRuleSet = /** @class */ (function (_super) {
             dateutil.sort(this._exdate);
         }
     };
+    RRuleSet.prototype.rdatesToString = function (param, rdates) {
+        var _this = this;
+        var tzid = this.tzid();
+        var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
+        var dateString = rdates
+            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
+            .join(',');
+        return "" + header + dateString;
+    };
     RRuleSet.prototype.valueOf = function () {
         var result = [];
-        if (this._rrule.length) {
-            this._rrule.forEach(function (rrule) {
-                result.push('RRULE:' + rrule);
-            });
-        }
+        this._rrule.forEach(function (rrule) {
+            result = result.concat(rrule.toString().split('\n'));
+        });
         if (this._rdate.length) {
-            result.push('RDATE:' +
-                this._rdate
-                    .map(function (rdate) {
-                    return dateutil.timeToUntilString(rdate.valueOf());
-                })
-                    .join(','));
+            result.push(this.rdatesToString('RDATE', this._rdate));
         }
-        if (this._exrule.length) {
-            this._exrule.forEach(function (exrule) {
-                result.push('EXRULE:' + exrule);
-            });
-        }
+        this._exrule.forEach(function (exrule) {
+            result = result.concat(exrule.toString().split('\n')
+                .map(function (line) { return line.replace(/^RRULE:/, 'EXRULE:'); })
+                .filter(function (line) { return !/^DTSTART/.test(line); }));
+        });
         if (this._exdate.length) {
-            result.push('EXDATE:' +
-                this._exdate
-                    .map(function (exdate) {
-                    return dateutil.timeToUntilString(exdate.valueOf());
-                })
-                    .join(','));
+            result.push(this.rdatesToString('EXDATE', this._exdate));
         }
         return result;
     };
     /**
-     * to generate recurrence field sush as:
+     * to generate recurrence field such as:
      *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
      */
     RRuleSet.prototype.toString = function () {
-        return JSON.stringify(this.valueOf());
+        return this.valueOf().join('\n');
     };
     RRuleSet.prototype._iter = function (iterResult) {
         var _exdateHash = {};
         var _exrule = this._exrule;
         var _accept = iterResult.accept;
+        var tzid = this.tzid();
         function evalExdate(after, before) {
             _exrule.forEach(function (rrule) {
                 rrule.between(after, before, true).forEach(function (date) {
@@ -134,7 +142,8 @@ var RRuleSet = /** @class */ (function (_super) {
             });
         }
         this._exdate.forEach(function (date) {
-            _exdateHash[Number(date)] = true;
+            var zonedDate = new DateWithZone(date, tzid).rezonedDate();
+            _exdateHash[Number(zonedDate)] = true;
         });
         iterResult.accept = function (date) {
             var dt = Number(date);
@@ -159,7 +168,8 @@ var RRuleSet = /** @class */ (function (_super) {
             };
         }
         for (var i = 0; i < this._rdate.length; i++) {
-            if (!iterResult.accept(new Date(this._rdate[i].valueOf())))
+            var zonedDate = new DateWithZone(this._rdate[i], tzid).rezonedDate();
+            if (!iterResult.accept(new Date(zonedDate.getTime())))
                 break;
         }
         this._rrule.forEach(function (rrule) {
@@ -189,13 +199,13 @@ var RRuleSet = /** @class */ (function (_super) {
             rrs.rrule(this._rrule[i].clone());
         }
         for (i = 0; i < this._rdate.length; i++) {
-            rrs.rdate(new Date(this._rdate[i].valueOf()));
+            rrs.rdate(new Date(this._rdate[i].getTime()));
         }
         for (i = 0; i < this._exrule.length; i++) {
             rrs.exrule(this._exrule[i].clone());
         }
         for (i = 0; i < this._exdate.length; i++) {
-            rrs.exdate(new Date(this._exdate[i].valueOf()));
+            rrs.exdate(new Date(this._exdate[i].getTime()));
         }
         return rrs;
     };

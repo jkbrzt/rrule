@@ -9,7 +9,7 @@ import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache } from './cache';
 import { Weekday } from './weekday';
-import { DateTime } from 'luxon';
+import { DateWithZone } from './datewithzone';
 var getnlp = function () {
     // Lazy, runtime import to avoid circular refs.
     if (!getnlp._nlp) {
@@ -386,22 +386,7 @@ var RRule = /** @class */ (function () {
         return iterResult.getValue();
     };
     RRule.prototype.rezoneIfNeeded = function (date) {
-        var tzid = this.options.tzid;
-        if (!tzid) {
-            return date;
-        }
-        try {
-            var datetime = DateTime
-                .fromJSDate(date);
-            var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
-            return rezoned.toJSDate();
-        }
-        catch (e) {
-            if (e instanceof TypeError) {
-                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
-            }
-            return date;
-        }
+        return new DateWithZone(date, this.options.tzid).rezonedDate();
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [

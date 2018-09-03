@@ -1,5 +1,6 @@
 import { expect } from 'chai'
 import { RRule, RRuleSet } from '../../src'
+import { DateTime } from 'luxon';
 
 const assertDatesEqual = function (actual: Date | Date[], expected: Date | Date[], msg?: string) {
   msg = msg ? ' [' + msg + '] ' : ''
@@ -183,8 +184,15 @@ testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
 
-export const assertStrType = function (msg: string, obj: object, type: any) {
-  it(msg, function () {
-    expect(obj).to.be.instanceof(type)
-  })
+export function expectedDate(startDate: DateTime, currentLocalDate: DateTime, targetZone: string): Date {
+  const targetOffset = startDate.setZone(targetZone).offset
+  const { zoneName: systemZone } = currentLocalDate
+  const {
+    offset: systemOffset,
+  } = startDate.setZone(systemZone)
+
+  const netOffset = targetOffset - systemOffset
+  const hours = -((netOffset / 60) % 24)
+  const minutes = -(netOffset % 60)
+  return startDate.plus({ hours, minutes }).toJSDate()
 }

@@ -1065,13 +1065,13 @@ function parseOptions(options) {
     var keys = Object.keys(options);
     // Merge in default options
     rrule_defaultKeys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(keys, key))
+        if (!Object(helpers["c" /* includes */])(keys, key) || !Object(helpers["f" /* isPresent */])(opts[key]))
             opts[key] = DEFAULT_OPTIONS[key];
     });
     if (Object(helpers["f" /* isPresent */])(opts.byeaster))
         opts.freq = esm_rrule.YEARLY;
     if (!(Object(helpers["f" /* isPresent */])(opts.freq) && esm_rrule.FREQUENCIES[opts.freq])) {
-        throw new Error("Invalid frequency: " + opts.freq);
+        throw new Error("Invalid frequency: " + opts.freq + " " + options.freq);
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
@@ -1245,33 +1245,69 @@ function parseOptions(options) {
 }
 //# sourceMappingURL=parseoptions.js.map
 // CONCATENATED MODULE: ./dist/esm/parsestring.js
+var __assign = (undefined && undefined.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 
 
 
 
 function parseString(rfcString) {
+    var options = rfcString.split('\n').map(parseLine).filter(function (x) { return x !== null; });
+    return __assign({}, options[0], options[1]);
+}
+function parseDtstart(line) {
+    var options = {};
+    var dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line);
+    if (!dtstartWithZone) {
+        return options;
+    }
+    var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
+    if (tzid) {
+        options.tzid = tzid;
+    }
+    options.dtstart = esm_dateutil.untilStringToDate(dtstart);
+    return options;
+}
+function parseLine(rfcString) {
     rfcString = rfcString.replace(/^\s+|\s+$/, '');
     if (!rfcString.length)
         return null;
-    var options = {};
-    var dtstartWithZone = /^DTSTART;TZID=(.+?):([^;]+)$/.exec(rfcString);
-    if (dtstartWithZone) {
-        var _ = dtstartWithZone[0], tzid = dtstartWithZone[1], dtstart = dtstartWithZone[2];
-        options.tzid = tzid;
-        options.dtstart = esm_dateutil.untilStringToDate(dtstart);
-        return options;
+    var header = /^([A-Z]+?)[:;]/.exec(rfcString.toUpperCase());
+    if (!header) {
+        return parseRrule(rfcString);
     }
-    var attrs = rfcString.split(';');
-    for (var i = 0; i < attrs.length; i++) {
-        var attr = attrs[i].split('=');
-        var key = attr[0];
-        var value = attr[1];
-        switch (key) {
+    var _ = header[0], key = header[1];
+    switch (key.toUpperCase()) {
+        case 'RRULE':
+        case 'EXRULE':
+            return parseRrule(rfcString);
+        case 'DTSTART':
+            return parseDtstart(rfcString);
+        default:
+            throw new Error("Unsupported RFC prop " + key + " in " + rfcString);
+    }
+}
+function parseRrule(line) {
+    var strippedLine = line.replace(/^RRULE:/i, '');
+    var options = parseDtstart(strippedLine);
+    var attrs = line.replace(/^(?:RRULE|EXRULE):/i, '').split(';');
+    attrs.forEach(function (attr) {
+        var _a = attr.split('='), key = _a[0], value = _a[1];
+        switch (key.toUpperCase()) {
             case 'FREQ':
-                options.freq = Frequency[value];
+                options.freq = Frequency[value.toUpperCase()];
                 break;
             case 'WKST':
-                options.wkst = Days[value];
+                options.wkst = Days[value.toUpperCase()];
                 break;
             case 'COUNT':
             case 'INTERVAL':
@@ -1283,53 +1319,21 @@ function parseString(rfcString) {
             case 'BYHOUR':
             case 'BYMINUTE':
             case 'BYSECOND':
-                var num = void 0;
-                if (value.indexOf(',') !== -1) {
-                    var values = value.split(',');
-                    num = values.map(function (val) {
-                        if (/^[+-]?\d+$/.test(val.toString())) {
-                            return Number(val);
-                        }
-                        else {
-                            return val;
-                        }
-                    });
-                }
-                else if (/^[+-]?\d+$/.test(value)) {
-                    num = Number(value);
-                }
-                else {
-                    num = value;
-                }
+                var num = parseNumber(value);
                 var optionKey = key.toLowerCase();
                 // @ts-ignore
                 options[optionKey] = num;
                 break;
-            case 'BYDAY': // => byweekday
-                var n = void 0;
-                var wday = void 0;
-                var day = void 0;
-                var days = value.split(',');
-                options.byweekday = [];
-                for (var j = 0; j < days.length; j++) {
-                    day = days[j];
-                    if (day.length === 2) {
-                        // MO, TU, ...
-                        wday = Days[day]; // wday instanceof Weekday
-                        options.byweekday.push(wday);
-                    }
-                    else {
-                        // -1MO, +3FR, 1SO, ...
-                        var parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
-                        n = Number(parts[1]);
-                        var wdaypart = parts[2];
-                        wday = Days[wdaypart].weekday;
-                        options.byweekday.push(new Weekday(wday, n));
-                    }
-                }
+            case 'BYWEEKDAY':
+            case 'BYDAY':
+                options.byweekday = parseWeekday(value);
                 break;
             case 'DTSTART':
-                options.dtstart = esm_dateutil.untilStringToDate(value);
+            case 'TZID':
+                // for backwards compatibility
+                var dtstart = parseDtstart(line);
+                options.tzid = dtstart.tzid;
+                options.dtstart = dtstart.dtstart;
                 break;
             case 'UNTIL':
                 options.until = esm_dateutil.untilStringToDate(value);
@@ -1340,17 +1344,95 @@ function parseString(rfcString) {
             default:
                 throw new Error("Unknown RRULE property '" + key + "'");
         }
-    }
+    });
     return options;
 }
+function parseNumber(value) {
+    if (value.indexOf(',') !== -1) {
+        var values = value.split(',');
+        return values.map(function (val) {
+            if (/^[+-]?\d+$/.test(val.toString())) {
+                return Number(val);
+            }
+            else {
+                return val;
+            }
+        });
+    }
+    else if (/^[+-]?\d+$/.test(value)) {
+        return Number(value);
+    }
+    return value;
+}
+function parseWeekday(value) {
+    var days = value.split(',');
+    return days.map(function (day) {
+        if (day.length === 2) {
+            // MO, TU, ...
+            return Days[day]; // wday instanceof Weekday
+        }
+        else {
+            // -1MO, +3FR, 1SO, ...
+            var parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
+            var n = Number(parts[1]);
+            var wdaypart = parts[2];
+            var wday = Days[wdaypart].weekday;
+            return new Weekday(wday, n);
+        }
+    });
+}
 //# sourceMappingURL=parsestring.js.map
+// EXTERNAL MODULE: ./node_modules/luxon/build/cjs-browser/luxon.js
+var luxon = __webpack_require__(2);
+
+// CONCATENATED MODULE: ./dist/esm/datewithzone.js
+
+
+var datewithzone_DateWithZone = /** @class */ (function () {
+    function DateWithZone(date, tzid) {
+        this.date = date;
+        this.tzid = tzid;
+    }
+    DateWithZone.prototype.toString = function () {
+        var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
+        if (this.tzid) {
+            return ";TZID=" + this.tzid + ":" + datestr;
+        }
+        return ":" + datestr;
+    };
+    DateWithZone.prototype.getTime = function () {
+        return this.date.getTime();
+    };
+    DateWithZone.prototype.rezonedDate = function () {
+        if (!this.tzid) {
+            return this.date;
+        }
+        try {
+            var datetime = luxon["DateTime"]
+                .fromJSDate(this.date);
+            var rezoned = datetime.setZone(this.tzid, { keepLocalTime: true });
+            return rezoned.toJSDate();
+        }
+        catch (e) {
+            if (e instanceof TypeError) {
+                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
+            }
+            return this.date;
+        }
+    };
+    return DateWithZone;
+}());
+
+//# sourceMappingURL=datewithzone.js.map
 // CONCATENATED MODULE: ./dist/esm/optionstostring.js
 
 
 
 
+
 function optionsToString(options) {
-    var pairs = [];
+    var rrule = [];
+    var dtstart = '';
     var keys = Object.keys(options);
     var defaultKeys = Object.keys(DEFAULT_OPTIONS);
     for (var i = 0; i < keys.length; i++) {
@@ -1388,7 +1470,6 @@ function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                var arrayValue = Object(helpers["m" /* toArray */])(value);
                 outValue = Object(helpers["m" /* toArray */])(value).map(function (wday) {
                     if (wday instanceof Weekday) {
                         return wday;
@@ -1402,11 +1483,10 @@ function optionsToString(options) {
                 }).toString();
                 break;
             case 'DTSTART':
+                dtstart = buildDtstart(value, options.tzid);
+                break;
             case 'UNTIL':
                 outValue = esm_dateutil.timeToUntilString(value, !options.tzid);
-                if (options.tzid) {
-                    outValue = ";TZID=" + options.tzid + ":" + outValue;
-                }
                 break;
             default:
                 if (Object(helpers["d" /* isArray */])(value)) {
@@ -1420,19 +1500,25 @@ function optionsToString(options) {
                     outValue = String(value);
                 }
         }
-        pairs.push([key, outValue]);
-    }
-    var strings = [];
-    for (var i = 0; i < pairs.length; i++) {
-        var _a = pairs[i], key = _a[0], value = _a[1];
-        if (value.indexOf(';') === 0) {
-            strings.push("" + key + value);
-        }
-        else {
-            strings.push(key + "=" + value.toString());
+        if (outValue) {
+            rrule.push([key, outValue]);
         }
     }
-    return strings.join(';');
+    var rules = rrule.map(function (_a) {
+        var key = _a[0], value = _a[1];
+        return key + "=" + value.toString();
+    }).join(';');
+    var ruleString = '';
+    if (rules !== '') {
+        ruleString = "RRULE:" + rules;
+    }
+    return [dtstart, ruleString].filter(function (x) { return !!x; }).join('\n');
+}
+function buildDtstart(dtstart, tzid) {
+    if (!dtstart) {
+        return '';
+    }
+    return 'DTSTART' + new datewithzone_DateWithZone(new Date(dtstart), tzid).toString();
 }
 //# sourceMappingURL=optionstostring.js.map
 // CONCATENATED MODULE: ./dist/esm/cache.js
@@ -1521,9 +1607,6 @@ var cache_Cache = /** @class */ (function () {
 }());
 
 //# sourceMappingURL=cache.js.map
-// EXTERNAL MODULE: ./node_modules/luxon/build/cjs-browser/luxon.js
-var luxon = __webpack_require__(2);
-
 // CONCATENATED MODULE: ./dist/esm/rrule.js
 
 
@@ -1913,22 +1996,7 @@ var rrule_RRule = /** @class */ (function () {
         return iterResult.getValue();
     };
     RRule.prototype.rezoneIfNeeded = function (date) {
-        var tzid = this.options.tzid;
-        if (!tzid) {
-            return date;
-        }
-        try {
-            var datetime = luxon["DateTime"]
-                .fromJSDate(date);
-            var rezoned = datetime.setZone(tzid, { keepLocalTime: true });
-            return rezoned.toJSDate();
-        }
-        catch (e) {
-            if (e instanceof TypeError) {
-                console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone');
-            }
-            return date;
-        }
+        return new datewithzone_DateWithZone(date, this.options.tzid).rezonedDate();
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [
@@ -1994,14 +2062,15 @@ var rruleset_extends = (undefined && undefined.__extends) || (function () {
 
 
 
-/**
- *
- * @param {Boolean?} noCache
- *  The same stratagy as RRule on cache, default to false
- * @constructor
- */
+
 var rruleset_RRuleSet = /** @class */ (function (_super) {
     rruleset_extends(RRuleSet, _super);
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
     function RRuleSet(noCache) {
         if (noCache === void 0) { noCache = false; }
         var _this = _super.call(this, {}, noCache) || this;
@@ -2011,6 +2080,15 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         _this._exdate = [];
         return _this;
     }
+    RRuleSet.prototype.tzid = function () {
+        for (var i = 0; i < this._rrule.length; i++) {
+            var tzid = this._rrule[i].origOptions.tzid;
+            if (tzid) {
+                return tzid;
+            }
+        }
+        return undefined;
+    };
     /**
      * Adds an RRule to the set
      *
@@ -2065,47 +2143,45 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             esm_dateutil.sort(this._exdate);
         }
     };
+    RRuleSet.prototype.rdatesToString = function (param, rdates) {
+        var _this = this;
+        var tzid = this.tzid();
+        var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
+        var dateString = rdates
+            .map(function (rdate) { return esm_dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
+            .join(',');
+        return "" + header + dateString;
+    };
     RRuleSet.prototype.valueOf = function () {
         var result = [];
-        if (this._rrule.length) {
-            this._rrule.forEach(function (rrule) {
-                result.push('RRULE:' + rrule);
-            });
-        }
+        this._rrule.forEach(function (rrule) {
+            result = result.concat(rrule.toString().split('\n'));
+        });
         if (this._rdate.length) {
-            result.push('RDATE:' +
-                this._rdate
-                    .map(function (rdate) {
-                    return esm_dateutil.timeToUntilString(rdate.valueOf());
-                })
-                    .join(','));
+            result.push(this.rdatesToString('RDATE', this._rdate));
         }
-        if (this._exrule.length) {
-            this._exrule.forEach(function (exrule) {
-                result.push('EXRULE:' + exrule);
-            });
-        }
+        this._exrule.forEach(function (exrule) {
+            result = result.concat(exrule.toString().split('\n')
+                .map(function (line) { return line.replace(/^RRULE:/, 'EXRULE:'); })
+                .filter(function (line) { return !/^DTSTART/.test(line); }));
+        });
         if (this._exdate.length) {
-            result.push('EXDATE:' +
-                this._exdate
-                    .map(function (exdate) {
-                    return esm_dateutil.timeToUntilString(exdate.valueOf());
-                })
-                    .join(','));
+            result.push(this.rdatesToString('EXDATE', this._exdate));
         }
         return result;
     };
     /**
-     * to generate recurrence field sush as:
+     * to generate recurrence field such as:
      *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
      */
     RRuleSet.prototype.toString = function () {
-        return JSON.stringify(this.valueOf());
+        return this.valueOf().join('\n');
     };
     RRuleSet.prototype._iter = function (iterResult) {
         var _exdateHash = {};
         var _exrule = this._exrule;
         var _accept = iterResult.accept;
+        var tzid = this.tzid();
         function evalExdate(after, before) {
             _exrule.forEach(function (rrule) {
                 rrule.between(after, before, true).forEach(function (date) {
@@ -2114,7 +2190,8 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             });
         }
         this._exdate.forEach(function (date) {
-            _exdateHash[Number(date)] = true;
+            var zonedDate = new datewithzone_DateWithZone(date, tzid).rezonedDate();
+            _exdateHash[Number(zonedDate)] = true;
         });
         iterResult.accept = function (date) {
             var dt = Number(date);
@@ -2139,7 +2216,8 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             };
         }
         for (var i = 0; i < this._rdate.length; i++) {
-            if (!iterResult.accept(new Date(this._rdate[i].valueOf())))
+            var zonedDate = new datewithzone_DateWithZone(this._rdate[i], tzid).rezonedDate();
+            if (!iterResult.accept(new Date(zonedDate.getTime())))
                 break;
         }
         this._rrule.forEach(function (rrule) {
@@ -2169,13 +2247,13 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             rrs.rrule(this._rrule[i].clone());
         }
         for (i = 0; i < this._rdate.length; i++) {
-            rrs.rdate(new Date(this._rdate[i].valueOf()));
+            rrs.rdate(new Date(this._rdate[i].getTime()));
         }
         for (i = 0; i < this._exrule.length; i++) {
             rrs.exrule(this._exrule[i].clone());
         }
         for (i = 0; i < this._exdate.length; i++) {
-            rrs.exdate(new Date(this._exdate[i].valueOf()));
+            rrs.exdate(new Date(this._exdate[i].getTime()));
         }
         return rrs;
     };
@@ -2184,6 +2262,17 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
 /* harmony default export */ var rruleset = (rruleset_RRuleSet);
 //# sourceMappingURL=rruleset.js.map
 // CONCATENATED MODULE: ./dist/esm/rrulestr.js
+var rrulestr_assign = (undefined && undefined.__assign) || function () {
+    rrulestr_assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return rrulestr_assign.apply(this, arguments);
+};
 
 
 
@@ -2193,355 +2282,193 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
  * RRuleStr
  *  To parse a set of rrule strings
  */
-var rrulestr_RRuleStr = /** @class */ (function () {
-    function RRuleStr() {
-        // tslint:disable:variable-name
-        this._handle_BYDAY = this._handle_BYWEEKDAY;
-        this._handle_INTERVAL = this._handle_int;
-        this._handle_COUNT = this._handle_int;
-        this._handle_BYSETPOS = this._handle_int_list;
-        this._handle_BYMONTH = this._handle_int_list;
-        this._handle_BYMONTHDAY = this._handle_int_list;
-        this._handle_BYYEARDAY = this._handle_int_list;
-        this._handle_BYEASTER = this._handle_int_list;
-        this._handle_BYWEEKNO = this._handle_int_list;
-        this._handle_BYHOUR = this._handle_int_list;
-        this._handle_BYMINUTE = this._handle_int_list;
-        this._handle_BYSECOND = this._handle_int_list;
-        // tslint:enable:variable-name
+var rrulestr_DEFAULT_OPTIONS = {
+    dtstart: null,
+    cache: false,
+    unfold: false,
+    forceset: false,
+    compatible: false,
+    tzid: null
+};
+function parseInput(s, options) {
+    var rrulevals = [];
+    var rdatevals = [];
+    var exrulevals = [];
+    var exdatevals = [];
+    var _a = parseDtstart(s), dtstart = _a.dtstart, tzid = _a.tzid;
+    var lines = splitIntoLines(s, options.unfold);
+    lines.forEach(function (line) {
+        if (!line)
+            return;
+        var _a = breakDownLine(line), name = _a.name, parms = _a.parms, value = _a.value;
+        switch (name.toUpperCase()) {
+            case 'RRULE':
+                if (parms.length) {
+                    throw new Error("unsupported RRULE parm: " + parms.join(','));
+                }
+                rrulevals.push(parseString(line));
+                break;
+            case 'RDATE':
+                rdatevals = rdatevals.concat(parseRDate(value, parms));
+                break;
+            case 'EXRULE':
+                if (parms.length) {
+                    throw new Error("unsupported EXRULE parm: " + parms.join(','));
+                }
+                exrulevals.push(parseString(value));
+                break;
+            case 'EXDATE':
+                exdatevals = exdatevals.concat(parseRDate(value, parms));
+                break;
+            case 'DTSTART':
+                break;
+            default:
+                throw new Error('unsupported property: ' + name);
+        }
+    });
+    return {
+        // @ts-ignore
+        dtstart: dtstart,
+        // @ts-ignore
+        tzid: tzid,
+        rrulevals: rrulevals,
+        rdatevals: rdatevals,
+        exrulevals: exrulevals,
+        exdatevals: exdatevals
+    };
+}
+function buildRule(s, options) {
+    var _a = parseInput(s, options), rrulevals = _a.rrulevals, rdatevals = _a.rdatevals, exrulevals = _a.exrulevals, exdatevals = _a.exdatevals, dtstart = _a.dtstart, tzid = _a.tzid;
+    var noCache = options.cache === false;
+    if (options.compatible) {
+        options.forceset = true;
+        options.unfold = true;
     }
-    // tslint:disable-next-line:variable-name
-    RRuleStr.prototype._handle_DTSTART = function (rrkwargs, _, value, __) {
-        var parms = /^DTSTART(?:;TZID=([^:=]+))?(?::|=)(.*)/.exec(value);
-        var ___ = parms[0], tzid = parms[1], dtstart = parms[2];
-        rrkwargs['dtstart'] = esm_dateutil.untilStringToDate(dtstart);
-        if (tzid) {
-            rrkwargs['tzid'] = tzid;
-        }
-    };
-    RRuleStr.prototype._handle_int = function (rrkwargs, name, value) {
-        // @ts-ignore
-        rrkwargs[name.toLowerCase()] = parseInt(value, 10);
-    };
-    RRuleStr.prototype._handle_int_list = function (rrkwargs, name, value) {
-        // @ts-ignore
-        rrkwargs[name.toLowerCase()] = value.split(',').map(function (x) { return parseInt(x, 10); });
-    };
-    RRuleStr.prototype._handle_FREQ = function (rrkwargs, _, value, __) {
-        rrkwargs['freq'] = RRuleStr._freq_map[value];
-    };
-    RRuleStr.prototype._handle_UNTIL = function (rrkwargs, _, value, __) {
-        try {
-            rrkwargs['until'] = esm_dateutil.untilStringToDate(value);
-        }
-        catch (error) {
-            throw new Error('invalid until date');
-        }
-    };
-    RRuleStr.prototype._handle_WKST = function (rrkwargs, _, value, __) {
-        rrkwargs['wkst'] = RRuleStr._weekday_map[value];
-    };
-    RRuleStr.prototype._handle_BYWEEKDAY = function (rrkwargs, _, value, __) {
-        // Two ways to specify this: +1MO or MO(+1)
-        var splt;
-        var i;
-        var j;
-        var n;
-        var w;
-        var wday;
-        var l = [];
-        var wdays = value.split(',');
-        for (i = 0; i < wdays.length; i++) {
-            wday = wdays[i];
-            if (wday.indexOf('(') > -1) {
-                // If it's of the form TH(+1), etc.
-                splt = wday.split('(');
-                w = splt[0];
-                n = parseInt(splt.slice(1, -1)[0], 10);
-            }
-            else {
-                // # If it's of the form +1MO
-                for (j = 0; j < wday.length; j++) {
-                    if ('+-0123456789'.indexOf(wday[j]) === -1)
-                        break;
-                }
-                n = wday.slice(0, j) || null;
-                w = wday.slice(j);
-                if (n)
-                    n = parseInt(n, 10);
-            }
-            var weekday = new Weekday(RRuleStr._weekday_map[w], n);
-            l.push(weekday);
-        }
-        rrkwargs['byweekday'] = l;
-    };
-    RRuleStr.prototype._parseRfcRRule = function (line, options) {
-        if (options === void 0) { options = {}; }
-        options.dtstart = options.dtstart || null;
-        options.cache = options.cache || false;
-        var name;
-        var value;
-        var parts;
-        var nameRegex = /^([A-Z]+):(.*)$/;
-        var nameParts = nameRegex.exec(line);
-        if (nameParts && nameParts.length >= 3) {
-            name = nameParts[1];
-            value = nameParts[2];
-            if (name !== 'RRULE')
-                throw new Error("unknown parameter name " + name);
-        }
-        else {
-            value = line;
-        }
-        var rrkwargs = {};
-        var dtstart = /DTSTART(?:;TZID=[^:]+:)?[^;]+/.exec(line);
-        if (dtstart && dtstart.length > 0) {
-            var dtstartClause = dtstart[0];
-            this._handle_DTSTART(rrkwargs, 'DTSTART', dtstartClause);
-        }
-        var pairs = value.split(';');
-        for (var i = 0; i < pairs.length; i++) {
-            parts = pairs[i].split('=');
-            name = parts[0].toUpperCase();
-            if (/DTSTART|TZID/.test(name)) {
-                continue;
-            }
-            value = parts[1].toUpperCase();
-            // @ts-ignore
-            var paramHandler = this["_handle_" + name];
-            if (typeof paramHandler !== 'function') {
-                throw new Error("unknown parameter '" + name + "':" + value);
-            }
-            paramHandler(rrkwargs, name, value);
-        }
-        rrkwargs.dtstart = rrkwargs.dtstart || options.dtstart;
-        rrkwargs.tzid = rrkwargs.tzid || options.tzid;
-        return new esm_rrule(rrkwargs, !options.cache);
-    };
-    RRuleStr.prototype._parseRfc = function (s, options) {
-        if (options.compatible) {
-            options.forceset = true;
-            options.unfold = true;
-        }
-        s = s && s.trim();
-        if (!s)
-            throw new Error('Invalid empty string');
-        var i = 0;
-        var line;
-        var lines;
-        // More info about 'unfold' option
-        // Go head to http://www.ietf.org/rfc/rfc2445.txt
-        if (options.unfold) {
-            lines = s.split('\n');
-            while (i < lines.length) {
-                // TODO
-                line = lines[i] = lines[i].replace(/\s+$/g, '');
-                if (!line) {
-                    lines.splice(i, 1);
-                }
-                else if (i > 0 && line[0] === ' ') {
-                    lines[i - 1] += line.slice(1);
-                    lines.splice(i, 1);
-                }
-                else {
-                    i += 1;
-                }
-            }
-        }
-        else {
-            lines = s.split(/\s/);
-        }
-        var rrulevals = [];
-        var rdatevals = [];
-        var exrulevals = [];
-        var exdatevals = [];
-        var name;
-        var value;
-        var parts;
-        var dtstart;
-        var tzid;
-        var rset;
-        var j;
-        var k;
-        var datestrs;
-        var datestr;
-        if (!options.forceset &&
-            lines.length === 1 &&
-            (s.indexOf(':') === -1 || s.indexOf('RRULE:') === 0)) {
-            return this._parseRfcRRule(lines[0], {
-                cache: options.cache,
-                dtstart: options.dtstart
-            });
-        }
-        else {
-            for (var i_1 = 0; i_1 < lines.length; i_1++) {
-                line = lines[i_1];
-                if (!line)
-                    continue;
-                if (line.indexOf(':') === -1) {
-                    name = 'RRULE';
-                    value = line;
-                }
-                else {
-                    parts = Object(helpers["l" /* split */])(line, ':', 1);
-                    name = parts[0];
-                    value = parts[1];
-                }
-                var parms = name.split(';');
-                if (!parms)
-                    throw new Error('empty property name');
-                name = parms[0].toUpperCase();
-                parms = parms.slice(1);
-                if (name === 'RRULE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        throw new Error('unsupported RRULE parm: ' + parm);
-                    }
-                    rrulevals.push(value);
-                }
-                else if (name === 'RDATE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                            throw new Error('unsupported RDATE parm: ' + parm);
-                        }
-                    }
-                    rdatevals.push(value);
-                }
-                else if (name === 'EXRULE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        throw new Error('unsupported EXRULE parm: ' + parm);
-                    }
-                    exrulevals.push(value);
-                }
-                else if (name === 'EXDATE') {
-                    for (j = 0; j < parms.length; j++) {
-                        var parm = parms[j];
-                        if (parm !== 'VALUE=DATE-TIME' && parm !== 'VALUE=DATE') {
-                            throw new Error('unsupported EXDATE parm: ' + parm);
-                        }
-                    }
-                    exdatevals.push(value);
-                }
-                else if (name === 'DTSTART') {
-                    dtstart = esm_dateutil.untilStringToDate(value);
-                    if (parms.length) {
-                        var _a = parms[0].split('='), key = _a[0], value_1 = _a[1];
-                        if (key === 'TZID') {
-                            tzid = value_1;
-                        }
-                    }
-                }
-                else {
-                    throw new Error('unsupported property: ' + name);
-                }
-            }
-            if (options.forceset ||
-                rrulevals.length > 1 ||
-                rdatevals.length ||
-                exrulevals.length ||
-                exdatevals.length) {
-                rset = new rruleset(!options.cache);
-                for (j = 0; j < rrulevals.length; j++) {
-                    rset.rrule(this._parseRfcRRule(rrulevals[j], {
-                        // @ts-ignore
-                        dtstart: options.dtstart || dtstart
-                    }));
-                }
-                for (j = 0; j < rdatevals.length; j++) {
-                    datestrs = rdatevals[j].split(',');
-                    for (k = 0; k < datestrs.length; k++) {
-                        datestr = datestrs[k];
-                        rset.rdate(esm_dateutil.untilStringToDate(datestr));
-                    }
-                }
-                for (j = 0; j < exrulevals.length; j++) {
-                    rset.exrule(this._parseRfcRRule(exrulevals[j], {
-                        // @ts-ignore
-                        dtstart: options.dtstart || dtstart
-                    }));
-                }
-                for (j = 0; j < exdatevals.length; j++) {
-                    datestrs = exdatevals[j].split(',');
-                    for (k = 0; k < datestrs.length; k++) {
-                        datestr = datestrs[k];
-                        rset.exdate(esm_dateutil.untilStringToDate(datestr));
-                    }
-                }
-                // @ts-ignore
-                if (options.compatible && options.dtstart)
-                    rset.rdate(dtstart);
-                return rset;
-            }
-            else {
-                return this._parseRfcRRule(rrulevals[0], {
-                    // @ts-ignore
-                    dtstart: options.dtstart || dtstart,
-                    cache: options.cache,
-                    // @ts-ignore
-                    tzid: options.tzid || tzid
-                });
-            }
-        }
-    };
-    RRuleStr.prototype.parse = function (s, options) {
-        if (options === void 0) { options = {}; }
-        var invalid = [];
-        var keys = Object.keys(options);
-        var defaultKeys = Object.keys(RRuleStr.DEFAULT_OPTIONS);
-        keys.forEach(function (key) {
-            if (!Object(helpers["c" /* includes */])(defaultKeys, key))
-                invalid.push(key);
-        }, this);
-        if (invalid.length) {
-            throw new Error('Invalid options: ' + invalid.join(', '));
-        }
-        // Merge in default options
-        defaultKeys.forEach(function (key) {
-            if (!Object(helpers["c" /* includes */])(keys, key))
-                options[key] = RRuleStr.DEFAULT_OPTIONS[key];
+    if (options.forceset ||
+        rrulevals.length > 1 ||
+        rdatevals.length ||
+        exrulevals.length ||
+        exdatevals.length) {
+        var rset_1 = new rruleset(noCache);
+        rrulevals.forEach(function (val) {
+            rset_1.rrule(new esm_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
-        return this._parseRfc(s, options);
+        rdatevals.forEach(function (date) {
+            rset_1.rdate(date);
+        });
+        exrulevals.forEach(function (val) {
+            rset_1.exrule(new esm_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
+        });
+        exdatevals.forEach(function (date) {
+            rset_1.exdate(date);
+        });
+        // @ts-ignore
+        if (options.compatible && options.dtstart)
+            rset_1.rdate(dtstart);
+        return rset_1;
+    }
+    var val = rrulevals[0];
+    return new esm_rrule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
+}
+function rrulestr(s, options) {
+    if (options === void 0) { options = {}; }
+    return buildRule(s, rrulestr_initializeOptions(options));
+}
+function groomRruleOptions(val, dtstart, tzid) {
+    return rrulestr_assign({}, val, { dtstart: dtstart,
+        tzid: tzid });
+}
+function rrulestr_initializeOptions(options) {
+    var invalid = [];
+    var keys = Object.keys(options);
+    var defaultKeys = Object.keys(rrulestr_DEFAULT_OPTIONS);
+    keys.forEach(function (key) {
+        if (!Object(helpers["c" /* includes */])(defaultKeys, key))
+            invalid.push(key);
+    });
+    if (invalid.length) {
+        throw new Error('Invalid options: ' + invalid.join(', '));
+    }
+    var initializedOptions = rrulestr_assign({}, options);
+    // Merge in default options
+    defaultKeys.forEach(function (key) {
+        if (!Object(helpers["c" /* includes */])(keys, key))
+            initializedOptions[key] = rrulestr_DEFAULT_OPTIONS[key];
+    });
+    return initializedOptions;
+}
+function extractName(line) {
+    if (line.indexOf(':') === -1) {
+        return {
+            name: 'RRULE',
+            value: line
+        };
+    }
+    var _a = Object(helpers["l" /* split */])(line, ':', 1), name = _a[0], value = _a[1];
+    return {
+        name: name,
+        value: value
     };
-    // tslint:disable-next-line:variable-name
-    RRuleStr._weekday_map = {
-        MO: 0,
-        TU: 1,
-        WE: 2,
-        TH: 3,
-        FR: 4,
-        SA: 5,
-        SU: 6
+}
+function breakDownLine(line) {
+    var _a = extractName(line), name = _a.name, value = _a.value;
+    var parms = name.split(';');
+    if (!parms)
+        throw new Error('empty property name');
+    return {
+        name: parms[0].toUpperCase(),
+        parms: parms.slice(1),
+        value: value
     };
-    // tslint:disable-next-line:variable-name
-    RRuleStr._freq_map = {
-        YEARLY: esm_rrule.YEARLY,
-        MONTHLY: esm_rrule.MONTHLY,
-        WEEKLY: esm_rrule.WEEKLY,
-        DAILY: esm_rrule.DAILY,
-        HOURLY: esm_rrule.HOURLY,
-        MINUTELY: esm_rrule.MINUTELY,
-        SECONDLY: esm_rrule.SECONDLY
-    };
-    RRuleStr.DEFAULT_OPTIONS = {
-        dtstart: null,
-        cache: false,
-        unfold: false,
-        forceset: false,
-        compatible: false,
-        tzid: null
-    };
-    return RRuleStr;
-}());
-/* harmony default export */ var rrulestr = (rrulestr_RRuleStr);
+}
+function splitIntoLines(s, unfold) {
+    if (unfold === void 0) { unfold = false; }
+    s = s && s.trim();
+    if (!s)
+        throw new Error('Invalid empty string');
+    // More info about 'unfold' option
+    // Go head to http://www.ietf.org/rfc/rfc2445.txt
+    if (!unfold) {
+        return s.split(/\s/);
+    }
+    var lines = s.split('\n');
+    var i = 0;
+    while (i < lines.length) {
+        // TODO
+        var line = (lines[i] = lines[i].replace(/\s+$/g, ''));
+        if (!line) {
+            lines.splice(i, 1);
+        }
+        else if (i > 0 && line[0] === ' ') {
+            lines[i - 1] += line.slice(1);
+            lines.splice(i, 1);
+        }
+        else {
+            i += 1;
+        }
+    }
+    return lines;
+}
+function validateDateParm(parms) {
+    parms.forEach(function (parm) {
+        if (!/(VALUE=DATE(-TIME)?)|(TZID=)/.test(parm)) {
+            throw new Error('unsupported RDATE/EXDATE parm: ' + parm);
+        }
+    });
+}
+function parseRDate(rdateval, parms) {
+    validateDateParm(parms);
+    return rdateval
+        .split(',')
+        .map(function (datestr) { return esm_dateutil.untilStringToDate(datestr); });
+}
 //# sourceMappingURL=rrulestr.js.map
 // CONCATENATED MODULE: ./dist/esm/index.js
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rrulestr", function() { return esm_rrulestr; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return esm_rrule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "rrulestr", function() { return rrulestr; });
 /*!
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -2565,11 +2492,6 @@ var rrulestr_RRuleStr = /** @class */ (function () {
 // =============================================================================
 // Export
 // =============================================================================
-// Only one RRuleStr instance for all rrule string parsing work.
-var rruleStr = new rrulestr();
-var esm_rrulestr = function () {
-    return rruleStr.parse.apply(rruleStr, arguments);
-};
 
 /* harmony default export */ var esm = __webpack_exports__["default"] = (esm_rrule);
 //# sourceMappingURL=index.js.map
@@ -10492,7 +10414,7 @@ var ENGLISH = {
 };
 /* harmony default export */ var i18n = (ENGLISH);
 //# sourceMappingURL=i18n.js.map
-// EXTERNAL MODULE: ./dist/esm/index.js + 14 modules
+// EXTERNAL MODULE: ./dist/esm/index.js + 15 modules
 var esm = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./dist/esm/helpers.js

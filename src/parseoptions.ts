@@ -28,13 +28,13 @@ export function parseOptions (options: Partial<Options>) {
 
   // Merge in default options
   defaultKeys.forEach(key => {
-    if (!includes(keys, key)) opts[key] = DEFAULT_OPTIONS[key]
+    if (!includes(keys, key) || !isPresent(opts[key])) opts[key] = DEFAULT_OPTIONS[key]
   })
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
 
   if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
-    throw new Error(`Invalid frequency: ${opts.freq}`)
+    throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)
   }
 
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))

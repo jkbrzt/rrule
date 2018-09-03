@@ -16,7 +16,7 @@
 
 import RRule from './rrule'
 import RRuleSet from './rruleset'
-import RRuleStr from './rrulestr'
+import { rrulestr } from './rrulestr'
 export { Frequency, ByWeekday, Options } from './types'
 export { Weekday, WeekdayStr } from './weekday'
 export { RRuleStrOptions } from './rrulestr'
@@ -24,12 +24,6 @@ export { RRuleStrOptions } from './rrulestr'
 // =============================================================================
 // Export
 // =============================================================================
-
-// Only one RRuleStr instance for all rrule string parsing work.
-const rruleStr = new RRuleStr()
-const rrulestr: typeof rruleStr.parse = function () {
-  return rruleStr.parse.apply(rruleStr, arguments)
-}
 
 export {
   RRule,

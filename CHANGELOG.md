@@ -1,5 +1,8 @@
 ### Changelog
 
+- 2.5.1 (2018-09-02)
+  - Bugfixes:
+    - Conformed output & parsing to RFC 5545 (#295)
 - 2.4.1 (2018-08-16)
   - Features:
     - Added codecov (#265)

@@ -32,11 +32,17 @@ var RRuleSet = /** @class */ (function (_super) {
         _this._exdate = [];
         return _this;
     }
-    RRuleSet.prototype.tzid = function () {
+    RRuleSet.prototype.tzid = function (tzid) {
+        if (tzid !== undefined) {
+            this._tzid = tzid;
+        }
+        if (this._tzid !== undefined) {
+            return this._tzid;
+        }
         for (var i = 0; i < this._rrule.length; i++) {
-            var tzid = this._rrule[i].origOptions.tzid;
-            if (tzid) {
-                return tzid;
+            var tzid_1 = this._rrule[i].origOptions.tzid;
+            if (tzid_1) {
+                return tzid_1;
             }
         }
         return undefined;
@@ -96,11 +102,10 @@ var RRuleSet = /** @class */ (function (_super) {
         }
     };
     RRuleSet.prototype.rdatesToString = function (param, rdates) {
-        var _this = this;
         var tzid = this.tzid();
         var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
         var dateString = rdates
-            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
+            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !tzid); })
             .join(',');
         return "" + header + dateString;
     };
@@ -124,7 +129,9 @@ var RRuleSet = /** @class */ (function (_super) {
     };
     /**
      * to generate recurrence field such as:
-     *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
+     *   DTSTART:19970902T010000Z
+     *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
+     *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
      */
     RRuleSet.prototype.toString = function () {
         return this.valueOf().join('\n');

@@ -9,6 +9,7 @@ export default class RRuleSet extends RRule {
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]
   public readonly _exdate: Date[]
+  private _tzid?: string
 
   /**
    *
@@ -25,7 +26,15 @@ export default class RRuleSet extends RRule {
     this._exdate = []
   }
 
-  tzid () {
+  tzid (tzid?: string) {
+    if (tzid !== undefined) {
+      this._tzid = tzid
+    }
+
+    if (this._tzid !== undefined) {
+      return this._tzid
+    }
+
     for (let i = 0; i < this._rrule.length; i++) {
       const tzid = this._rrule[i].origOptions.tzid
       if (tzid) {
@@ -98,7 +107,7 @@ export default class RRuleSet extends RRule {
     const header = tzid ? `${param};TZID=${tzid}:` : `${param}:`
 
     const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !tzid))
       .join(',')
 
     return `${header}${dateString}`
@@ -129,12 +138,15 @@ export default class RRuleSet extends RRule {
         this.rdatesToString('EXDATE', this._exdate)
       )
     }
+
     return result
   }
 
   /**
    * to generate recurrence field such as:
-   *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
+   *   DTSTART:19970902T010000Z
+   *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
+   *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
    */
   toString () {
     return this.valueOf().join('\n')

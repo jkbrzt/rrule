@@ -2150,11 +2150,10 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         }
     };
     RRuleSet.prototype.rdatesToString = function (param, rdates) {
-        var _this = this;
         var tzid = this.tzid();
         var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
         var dateString = rdates
-            .map(function (rdate) { return esm_dateutil.timeToUntilString(rdate.valueOf(), !_this.tzid()); })
+            .map(function (rdate) { return esm_dateutil.timeToUntilString(rdate.valueOf(), !tzid); })
             .join(',');
         return "" + header + dateString;
     };

@@ -107,7 +107,7 @@ export default class RRuleSet extends RRule {
     const header = tzid ? `${param};TZID=${tzid}:` : `${param}:`
 
     const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !this.tzid()))
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !tzid))
       .join(',')
 
     return `${header}${dateString}`
@@ -138,6 +138,7 @@ export default class RRuleSet extends RRule {
         this.rdatesToString('EXDATE', this._exdate)
       )
     }
+
     return result
   }
 

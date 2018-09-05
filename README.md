@@ -142,7 +142,7 @@ rruleSet.valueOf()
 
 // To string
 rruleSet.toString()
-'["RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z","RDATE:20120701T023000Z,20120702T023000Z","EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z","EXDATE:20120601T023000Z"]'
+'["DTSTART:20120201T023000Z","RRULE:FREQ=MONTHLY;COUNT=5","RDATE:20120701T023000Z,20120702T023000Z","EXRULE:FREQ=MONTHLY;COUNT=2","EXDATE:20120601T023000Z"]'
 ```
 
 **rrulestr:**
@@ -154,7 +154,7 @@ rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z')
 rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true})
 
 // Parse a RRuleSet string, return a RRuleSet object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z')
+rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z')
 
 ```
 
@@ -608,6 +608,10 @@ some inclusive rrule or rdate matches them.
 Include the given datetime instance in the recurrence set exclusion list. Dates
 included that way will not be generated, even if some inclusive rrule or
 rdate matches them.
+
+##### `RRuleSet.prototype.tzid(tz?)`
+Sets or overrides the timezone identifier. Useful if there are no rrules in this
+RRuleSet and thus no DTSTART.
 
 ##### `RRuleSet.prototype.all([iterator])`
 

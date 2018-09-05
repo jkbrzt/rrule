@@ -45,6 +45,10 @@ export function parseInput(s, options) {
                 rrulevals.push(parseString(line));
                 break;
             case 'RDATE':
+                var _b = /RDATE(?:;TZID=([^:=]+))?/i.exec(line), _ = _b[0], rdateTzid = _b[1];
+                if (rdateTzid && !tzid) {
+                    tzid = rdateTzid;
+                }
                 rdatevals = rdatevals.concat(parseRDate(value, parms));
                 break;
             case 'EXRULE':
@@ -86,6 +90,7 @@ function buildRule(s, options) {
         exrulevals.length ||
         exdatevals.length) {
         var rset_1 = new RRuleSet(noCache);
+        rset_1.tzid(tzid || undefined);
         rrulevals.forEach(function (val) {
             rset_1.rrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
         });

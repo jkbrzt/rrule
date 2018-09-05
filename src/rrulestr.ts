@@ -33,7 +33,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   let exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  const { dtstart, tzid } = parseDtstart(s)
+  let { dtstart, tzid } = parseDtstart(s)
 
   const lines = splitIntoLines(s, options.unfold)
 
@@ -51,6 +51,10 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'RDATE':
+        const [ _, rdateTzid ] = /RDATE(?:;TZID=([^:=]+))?/i.exec(line)!
+        if (rdateTzid && !tzid) {
+          tzid = rdateTzid
+        }
         rdatevals = rdatevals.concat(parseRDate(value, parms))
         break
 
@@ -111,6 +115,8 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exdatevals.length
   ) {
     const rset = new RRuleSet(noCache)
+    rset.tzid(tzid || undefined)
+
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(

@@ -5,6 +5,7 @@ export default class RRuleSet extends RRule {
     readonly _rdate: Date[];
     readonly _exrule: RRule[];
     readonly _exdate: Date[];
+    private _tzid?;
     /**
      *
      * @param {Boolean?} noCache
@@ -12,7 +13,7 @@ export default class RRuleSet extends RRule {
      * @constructor
      */
     constructor(noCache?: boolean);
-    tzid(): string | undefined;
+    tzid(tzid?: string): string | undefined;
     /**
      * Adds an RRule to the set
      *
@@ -41,7 +42,9 @@ export default class RRuleSet extends RRule {
     valueOf(): string[];
     /**
      * to generate recurrence field such as:
-     *   ["RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU;DTSTART=19970902T010000Z","RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH;DTSTART=19970902T010000Z"]
+     *   DTSTART:19970902T010000Z
+     *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
+     *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
      */
     toString(): string;
     _iter(iterResult: IterResult): Date | Date[] | null;

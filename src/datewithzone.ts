@@ -10,9 +10,13 @@ export class DateWithZone {
     this.tzid = tzid
   }
 
+  private get isUTC () {
+    return !this.tzid || this.tzid.toUpperCase() === 'UTC'
+  }
+
   public toString () {
-    const datestr = dateutil.timeToUntilString(this.date.getTime(), !this.tzid)
-    if (this.tzid) {
+    const datestr = dateutil.timeToUntilString(this.date.getTime(), this.isUTC)
+    if (!this.isUTC) {
       return `;TZID=${this.tzid}:${datestr}`
     }
 
@@ -24,7 +28,7 @@ export class DateWithZone {
   }
 
   public rezonedDate () {
-    if (!this.tzid) {
+    if (this.isUTC) {
       return this.date
     }
 
@@ -32,7 +36,7 @@ export class DateWithZone {
       const datetime = DateTime
         .fromJSDate(this.date)
 
-      const rezoned = datetime.setZone(this.tzid, { keepLocalTime: true })
+      const rezoned = datetime.setZone(this.tzid!, { keepLocalTime: true })
 
       return rezoned.toJSDate()
     } catch (e) {

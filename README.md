@@ -11,7 +11,7 @@ rrule.js
 [![codecov.io](http://codecov.io/github/jakubroztocil/rrule/coverage.svg?branch=master)](http://codecov.io/github/jakubroztocil/rrule?branch=master)
 
 rrule.js supports recurrence rules as defined in the [iCalendar
-RFC](http://www.ietf.org/rfc/rfc2445.txt), with a few important
+RFC](https://tools.ietf.org/html/rfc5545), with a few important
 [differences](#differences-from-icalendar-rfc). It is a partial port of the
 `rrule` module from the excellent
 [python-dateutil](http://labix.org/python-dateutil/) library. On top of
@@ -86,7 +86,7 @@ rule.between(new Date(Date.UTC(2012, 7, 1)), new Date(Date.UTC(2012, 8, 1)))
 // Get an iCalendar RRULE string representation:
 // The output can be used with RRule.fromString().
 rule.toString()
-"FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
+"DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 // Get a human-friendly text representation:
 // The output can be used with RRule.fromText().
@@ -135,9 +135,10 @@ rruleSet.between(new Date(Date.UTC(2012, 2, 1)), new Date(Date.UTC(2012, 6, 2)))
 
  // To string
 rruleSet.valueOf()
-['RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z',
+['DTSTART:20120201T023000Z',
+ 'RRULE:FREQ=MONTHLY;COUNT=5',
  'RDATE:20120701T023000Z,20120702T023000Z',
- 'EXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z',
+ 'EXRULE:FREQ=MONTHLY;COUNT=2',
  'EXDATE:20120601T023000Z']
 
 // To string
@@ -148,13 +149,13 @@ rruleSet.toString()
 **rrulestr:**
 ```js
 // Parse a RRule string, return a RRule object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z')
+rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5')
 
 // Parse a RRule string, return a RRuleSet object
-rrulestr('RRULE:FREQ=MONTHLY;COUNT=5;DTSTART=20120201T023000Z', {forceset: true})
+rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5', {forceset: true})
 
 // Parse a RRuleSet string, return a RRuleSet object
-rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2;DTSTART=20120301T023000Z\nEXDATE:20120601T023000Z')
+rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5\nRDATE:20120701T023000Z,20120702T023000Z\nEXRULE:FREQ=MONTHLY;COUNT=2\nEXDATE:20120601T023000Z')
 
 ```
 
@@ -166,9 +167,9 @@ For more examples see
 ### Timezone Support
 
 By default, `RRule` only correctly supports
-["floating" times or UTC timezones](https://tools.ietf.org/html/rfc2445#section-4.2.19).
+["floating" times or UTC timezones](https://tools.ietf.org/html/rfc5545#section-3.2.19).
 Optionally, it also supports use of the `TZID` parameter in the
-[RFC](https://tools.ietf.org/html/rfc2445#section-4.2.19)
+[RFC](https://tools.ietf.org/html/rfc5545#section-3.2.19)
 when the [Luxon](https://github.com/moment/luxon) library is provided. The 
 [specification](https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone)
 and [support matrix](https://moment.github.io/luxon/docs/manual/matrix.html) for Luxon apply.
@@ -484,7 +485,7 @@ Only properties explicitly specified in `options` are included:
 
 ```javascript
 rule.toString()
-"FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
+"DTSTART:20120201T093000Z\nFREQ=WEEKLY;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 rule.toString() == RRule.optionsToString(rule.origOptions)
 true
@@ -498,14 +499,14 @@ Converts `options` to iCalendar RFC `RRULE` string:
 // Get full a string representation of all options,
 // including the default and inferred ones.
 RRule.optionsToString(rule.options)
-"FREQ=WEEKLY;DTSTART=20120201T093000Z;INTERVAL=5;WKST=0;UNTIL=20130130T230000Z;BYDAY=MO,FR;BYHOUR=10;BYMINUTE=30;BYSECOND=0"
+"DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY;INTERVAL=5;WKST=0;UNTIL=20130130T230000Z;BYDAY=MO,FR;BYHOUR=10;BYMINUTE=30;BYSECOND=0"
 
 // Cherry-pick only some options from an rrule:
 RRule.optionsToString({
   freq: rule.options.freq,
   dtstart: rule.options.dtstart
 })
-"FREQ=WEEKLY;DTSTART=20120201T093000Z"
+"DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY;"
 ```
 
 ##### `RRule.fromString(rfcString)`
@@ -513,10 +514,10 @@ RRule.optionsToString({
 Constructs an `RRule` instance from a complete `rfcString`:
 
 ```javascript
-var rule = RRule.fromString("FREQ=WEEKLY;DTSTART=20120201T093000Z")
+var rule = RRule.fromString("DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY;")
 
 // This is equivalent
-var rule = new RRule(RRule.parseString("FREQ=WEEKLY;DTSTART=20120201T093000Z"))
+var rule = new RRule(RRule.parseString("DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY"))
 ```
 
 ##### `RRule.parseString(rfcString)`
@@ -602,7 +603,9 @@ Include the given datetime instance in the recurrence set generation.
 ##### `RRuleSet.prototype.exrule(rrule)`
 Include the given rrule instance in the recurrence set exclusion list. Dates
 which are part of the given recurrence rules will not be generated, even if
-some inclusive rrule or rdate matches them.
+some inclusive rrule or rdate matches them. NOTE: EXRULE has been (deprecated
+in RFC 5545)[https://icalendar.org/iCalendar-RFC-5545/a-3-deprecated-features.html]
+and does not support a DTSTART property.
 
 ##### `RRuleSet.prototype.exdate(dt)`
 Include the given datetime instance in the recurrence set exclusion list. Dates

@@ -106,7 +106,7 @@ var RRuleSet = /** @class */ (function (_super) {
         var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
         var header = isUTC ? param + ":" : param + ";TZID=" + tzid + ":";
         var dateString = rdates
-            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !tzid); })
+            .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), isUTC); })
             .join(',');
         return "" + header + dateString;
     };

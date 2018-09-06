@@ -475,7 +475,7 @@ describe('RRuleSet', function () {
       )
 
       expect(set.toString()).to.deep.equal(
-        "RDATE:19610201T090000,19610301T090000"
+        "RDATE:19610201T090000Z,19610301T090000Z"
       )
     })
 

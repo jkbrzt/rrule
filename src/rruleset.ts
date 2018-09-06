@@ -108,7 +108,7 @@ export default class RRuleSet extends RRule {
     const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
 
     const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !tzid))
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
       .join(',')
 
     return `${header}${dateString}`

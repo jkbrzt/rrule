@@ -5,9 +5,16 @@ var DateWithZone = /** @class */ (function () {
         this.date = date;
         this.tzid = tzid;
     }
+    Object.defineProperty(DateWithZone.prototype, "isUTC", {
+        get: function () {
+            return !this.tzid || this.tzid.toUpperCase() === 'UTC';
+        },
+        enumerable: true,
+        configurable: true
+    });
     DateWithZone.prototype.toString = function () {
-        var datestr = dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
-        if (this.tzid) {
+        var datestr = dateutil.timeToUntilString(this.date.getTime(), this.isUTC);
+        if (!this.isUTC) {
             return ";TZID=" + this.tzid + ":" + datestr;
         }
         return ":" + datestr;
@@ -16,7 +23,7 @@ var DateWithZone = /** @class */ (function () {
         return this.date.getTime();
     };
     DateWithZone.prototype.rezonedDate = function () {
-        if (!this.tzid) {
+        if (this.isUTC) {
             return this.date;
         }
         try {

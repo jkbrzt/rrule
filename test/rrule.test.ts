@@ -3746,5 +3746,25 @@ describe('RRule', function () {
 
       resetMockDate()
     })
+
+    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+      const currentLocalDate = DateTime.local(2013, 2, 6, 11, 0, 0)
+      setMockDate(currentLocalDate.toJSDate())
+
+      const rule = new RRule({
+        dtstart,
+        count: 1,
+        tzid: targetZone
+      })
+      const recurrence = rule.after(new Date(0))
+      const expected = expectedDate(startDate, currentLocalDate, targetZone)
+
+      expect(recurrence)
+        .to.deep.equal(
+          expected 
+        )
+
+      resetMockDate()
+    })
   })
 })

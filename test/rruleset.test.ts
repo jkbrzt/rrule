@@ -492,7 +492,7 @@ describe('RRuleSet', function () {
       ])
     })
 
-    it('generates correcty zoned recurrences when a tzid is present', () => {
+    it('generates correctly zoned recurrences when a tzid is present', () => {
       const targetZone = 'America/New_York'
       const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
       setMockDate(currentLocalDate.toJSDate())
@@ -507,11 +507,11 @@ describe('RRuleSet', function () {
       }))
 
       set.exdate(
-        DateTime.fromISO('20010101T090000').toJSDate(),
+        DateTime.fromISO('20010101T090000', { zone: targetZone }).toJSDate(),
       )
 
       set.rdate(
-        DateTime.fromISO('20020301T090000').toJSDate(),
+        DateTime.fromISO('20020301T090000', { zone: targetZone }).toJSDate(),
       )     
 
       expect(set.all()).to.deep.equal([
@@ -536,7 +536,7 @@ describe('RRuleSet', function () {
       expect(set2.toString()).to.equal('RDATE;TZID=America/Los_Angeles:20101110T100000')
     })
 
-    it('generates correcty zoned recurrences when a tzid is present but no rrule is present', () => {
+    it('generates correctly zoned recurrences when a tzid is present but no rrule is present', () => {
       const targetZone = 'America/New_York'
       const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
       setMockDate(currentLocalDate.toJSDate())
@@ -546,7 +546,7 @@ describe('RRuleSet', function () {
       set.tzid(targetZone)
 
       set.rdate(
-        DateTime.fromISO('20020301T090000').toJSDate(),
+        DateTime.fromISO('20020301T090000', { zone: targetZone }).toJSDate(),
       )
 
       expect(set.all()).to.deep.equal([

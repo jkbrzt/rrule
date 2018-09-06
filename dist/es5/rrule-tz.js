@@ -1393,9 +1393,16 @@ var datewithzone_DateWithZone = /** @class */ (function () {
         this.date = date;
         this.tzid = tzid;
     }
+    Object.defineProperty(DateWithZone.prototype, "isUTC", {
+        get: function () {
+            return !this.tzid || this.tzid.toUpperCase() === 'UTC';
+        },
+        enumerable: true,
+        configurable: true
+    });
     DateWithZone.prototype.toString = function () {
-        var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), !this.tzid);
-        if (this.tzid) {
+        var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), this.isUTC);
+        if (!this.isUTC) {
             return ";TZID=" + this.tzid + ":" + datestr;
         }
         return ":" + datestr;
@@ -1404,7 +1411,7 @@ var datewithzone_DateWithZone = /** @class */ (function () {
         return this.date.getTime();
     };
     DateWithZone.prototype.rezonedDate = function () {
-        if (!this.tzid) {
+        if (this.isUTC) {
             return this.date;
         }
         try {
@@ -2062,7 +2069,6 @@ var rruleset_extends = (undefined && undefined.__extends) || (function () {
 
 
 
-
 var rruleset_RRuleSet = /** @class */ (function (_super) {
     rruleset_extends(RRuleSet, _super);
     /**
@@ -2197,8 +2203,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             });
         }
         this._exdate.forEach(function (date) {
-            var zonedDate = new datewithzone_DateWithZone(date, tzid).rezonedDate();
-            _exdateHash[Number(zonedDate)] = true;
+            _exdateHash[Number(date)] = true;
         });
         iterResult.accept = function (date) {
             var dt = Number(date);
@@ -2223,8 +2228,7 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
             };
         }
         for (var i = 0; i < this._rdate.length; i++) {
-            var zonedDate = new datewithzone_DateWithZone(this._rdate[i], tzid).rezonedDate();
-            if (!iterResult.accept(new Date(zonedDate.getTime())))
+            if (!iterResult.accept(new Date(this._rdate[i].getTime())))
                 break;
         }
         this._rrule.forEach(function (rrule) {

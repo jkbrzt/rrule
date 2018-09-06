@@ -104,7 +104,8 @@ export default class RRuleSet extends RRule {
 
   private rdatesToString (param: string, rdates: Date[]) {
     const tzid = this.tzid()
-    const header = tzid ? `${param};TZID=${tzid}:` : `${param}:`
+    const isUTC = !tzid || tzid.toUpperCase() === 'UTC'
+    const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
 
     const dateString = rdates
       .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), !tzid))

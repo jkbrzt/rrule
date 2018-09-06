@@ -461,6 +461,24 @@ describe('RRuleSet', function () {
       )
     })
 
+    it('generates a string with RDATE in UTC when no RRULE is present', () => {
+      const set = new RRuleSet()
+
+      set.tzid('UTC')
+
+      set.rdate(
+        parse('19610201T090000'),
+      )
+
+      set.rdate(
+        parse('19610301T090000'),
+      )
+
+      expect(set.toString()).to.deep.equal(
+        "RDATE:19610201T090000,19610301T090000"
+      )
+    })
+
     it('parses RDATE strings without an RRULE', () => {
       const set = rrulestr("RDATE;TZID=America/New_York:19610201T090000,19610301T090000") as RRuleSet
       expect(set).to.be.instanceof(RRuleSet)

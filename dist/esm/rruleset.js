@@ -103,7 +103,8 @@ var RRuleSet = /** @class */ (function (_super) {
     };
     RRuleSet.prototype.rdatesToString = function (param, rdates) {
         var tzid = this.tzid();
-        var header = tzid ? param + ";TZID=" + tzid + ":" : param + ":";
+        var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
+        var header = isUTC ? param + ":" : param + ";TZID=" + tzid + ":";
         var dateString = rdates
             .map(function (rdate) { return dateutil.timeToUntilString(rdate.valueOf(), !tzid); })
             .join(',');

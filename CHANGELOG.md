@@ -1,5 +1,11 @@
 ### Changelog
 
+- 2.5.3 (2018-09-06)
+  - Bugfixes:
+    - Prevented emitting `DTSTART;TZID=UTC` when UTC is explicitly set as tzid
+- 2.5.2 (2018-09-05)
+  - Bugfixes:
+    - Permitted RRuleSets with no rrules to have tzid
 - 2.5.1 (2018-09-02)
   - Bugfixes:
     - Conformed output & parsing to RFC 5545 (#295)

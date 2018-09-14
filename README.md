@@ -485,7 +485,7 @@ Only properties explicitly specified in `options` are included:
 
 ```javascript
 rule.toString()
-"DTSTART:20120201T093000Z\nFREQ=WEEKLY;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
+"DTSTART:20120201T093000Z\nRRULE:FREQ=WEEKLY;INTERVAL=5;UNTIL=20130130T230000Z;BYDAY=MO,FR"
 
 rule.toString() == RRule.optionsToString(rule.origOptions)
 true

@@ -252,6 +252,7 @@ iCalendar RFC. Only `freq` is required.
             recurrence, missing parameters in the final recurrence
             instances will also be extracted from this date. If not
             given, <code>new Date</code> will be used instead.
+            **IMPORTANT:** See the discussion under <a href="#timezone-support">timezone support</a>
         </td>
     </tr>
     <tr>
@@ -574,7 +575,7 @@ Parse `text` into `options`:
 ```javascript
 options = RRule.parseText('every day for 3 times')
 // {freq: 3, count: "3"}
-options.dtstart = new Date(2000, 1, 1)
+options.dtstart = new Date(Date.UTC(2000, 1, 1))
 var rule = new RRule(options)
 ```
 

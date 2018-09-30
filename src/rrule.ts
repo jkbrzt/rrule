@@ -182,6 +182,7 @@ export default class RRule implements QueryMethods {
     inc: boolean = false,
     iterator?: (d: Date, len: number) => boolean
   ): Date[] {
+    if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before)) throw new Error('Invalid date passed in to RRule.between')
     const args = {
       before,
       after,
@@ -209,6 +210,7 @@ export default class RRule implements QueryMethods {
    * @return Date or null
    */
   before (dt: Date, inc = false): Date {
+    if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.before')
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
@@ -225,6 +227,7 @@ export default class RRule implements QueryMethods {
    * @return Date or null
    */
   after (dt: Date, inc = false): Date {
+    if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.after')
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {

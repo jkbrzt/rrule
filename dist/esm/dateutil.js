@@ -51,6 +51,12 @@ export var dateutil;
     dateutil.isLeapYear = function (year) {
         return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
     };
+    dateutil.isDate = function (value) {
+        return value instanceof Date;
+    };
+    dateutil.isValidDate = function (value) {
+        return dateutil.isDate(value) && !isNaN(value.getTime());
+    };
     /**
      * @return {Number} the date's timezone offset in ms
      */

@@ -291,6 +291,12 @@ var dateutil_dateutil;
     dateutil.isLeapYear = function (year) {
         return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
     };
+    dateutil.isDate = function (value) {
+        return value instanceof Date;
+    };
+    dateutil.isValidDate = function (value) {
+        return dateutil.isDate(value) && !isNaN(value.getTime());
+    };
     /**
      * @return {Number} the date's timezone offset in ms
      */
@@ -1051,8 +1057,11 @@ function initializeOptions(options) {
     var initializedOptions = {};
     // Shallow copy for options and origOptions and check for invalid
     keys.forEach(function (key) {
-        initializedOptions[key] = options[key];
+        var value = options[key];
+        initializedOptions[key] = value;
         if (!Object(helpers["c" /* includes */])(rrule_defaultKeys, key))
+            invalid.push(key);
+        if (esm_dateutil.isDate(value) && !esm_dateutil.isValidDate(value))
             invalid.push(key);
     });
     if (invalid.length) {
@@ -1734,6 +1743,8 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.between = function (after, before, inc, iterator) {
         if (inc === void 0) { inc = false; }
+        if (!esm_dateutil.isValidDate(after) || !esm_dateutil.isValidDate(before))
+            throw new Error('Invalid date passed in to RRule.between');
         var args = {
             before: before,
             after: after,
@@ -1757,6 +1768,8 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.before = function (dt, inc) {
         if (inc === void 0) { inc = false; }
+        if (!esm_dateutil.isValidDate(dt))
+            throw new Error('Invalid date passed in to RRule.before');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('before', args);
         if (result === false) {
@@ -1773,6 +1786,8 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.after = function (dt, inc) {
         if (inc === void 0) { inc = false; }
+        if (!esm_dateutil.isValidDate(dt))
+            throw new Error('Invalid date passed in to RRule.after');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('after', args);
         if (result === false) {

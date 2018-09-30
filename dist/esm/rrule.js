@@ -117,6 +117,8 @@ var RRule = /** @class */ (function () {
      */
     RRule.prototype.between = function (after, before, inc, iterator) {
         if (inc === void 0) { inc = false; }
+        if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before))
+            throw new Error('Invalid date passed in to RRule.between');
         var args = {
             before: before,
             after: after,
@@ -140,6 +142,8 @@ var RRule = /** @class */ (function () {
      */
     RRule.prototype.before = function (dt, inc) {
         if (inc === void 0) { inc = false; }
+        if (!dateutil.isValidDate(dt))
+            throw new Error('Invalid date passed in to RRule.before');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('before', args);
         if (result === false) {
@@ -156,6 +160,8 @@ var RRule = /** @class */ (function () {
      */
     RRule.prototype.after = function (dt, inc) {
         if (inc === void 0) { inc = false; }
+        if (!dateutil.isValidDate(dt))
+            throw new Error('Invalid date passed in to RRule.after');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('after', args);
         if (result === false) {

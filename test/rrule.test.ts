@@ -3767,4 +3767,22 @@ describe('RRule', function () {
       resetMockDate()
     })
   })
+
+  it('throws an error when dtstart is invalid', () => {
+    const invalidDate = new Date(undefined)
+    const validDate = new Date(Date.UTC(2017, 0, 1))
+    expect(() => new RRule({ dtstart: invalidDate })).to.throw('Invalid options: dtstart')
+    expect(() => new RRule({ dtstart: validDate, until: invalidDate })).to.throw('Invalid options: until')
+
+    const rule = new RRule({
+      dtstart: new Date(Date.UTC(2017, 0, 1)),
+      freq: Frequency.DAILY,
+      interval: 1
+    })
+
+    expect(() => rule.after(invalidDate)).to.throw('Invalid date passed in to RRule.after')
+    expect(() => rule.before(invalidDate)).to.throw('Invalid date passed in to RRule.before')
+    expect(() => rule.between(invalidDate, validDate)).to.throw('Invalid date passed in to RRule.between')
+    expect(() => rule.between(validDate, invalidDate)).to.throw('Invalid date passed in to RRule.between')
+  })
 })

@@ -8,8 +8,11 @@ export function initializeOptions(options) {
     var initializedOptions = {};
     // Shallow copy for options and origOptions and check for invalid
     keys.forEach(function (key) {
-        initializedOptions[key] = options[key];
+        var value = options[key];
+        initializedOptions[key] = value;
         if (!includes(defaultKeys, key))
+            invalid.push(key);
+        if (dateutil.isDate(value) && !dateutil.isValidDate(value))
             invalid.push(key);
     });
     if (invalid.length) {

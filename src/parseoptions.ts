@@ -11,8 +11,10 @@ export function initializeOptions (options: Partial<Options>) {
 
   // Shallow copy for options and origOptions and check for invalid
   keys.forEach(key => {
-    initializedOptions[key] = options[key]
+    const value = options[key]
+    initializedOptions[key] = value
     if (!includes(defaultKeys, key)) invalid.push(key)
+    if (dateutil.isDate(value) && !dateutil.isValidDate(value)) invalid.push(key)
   })
 
   if (invalid.length) {

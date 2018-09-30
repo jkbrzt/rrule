@@ -29,6 +29,8 @@ export declare namespace dateutil {
      */
     const getYearDay: (date: Date) => number;
     const isLeapYear: (year: number) => boolean;
+    const isDate: (value: any) => value is Date;
+    const isValidDate: (value: any) => value is Date;
     /**
      * @return {Number} the date's timezone offset in ms
      */

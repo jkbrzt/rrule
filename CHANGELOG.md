@@ -1,5 +1,11 @@
 ### Changelog
 
+- 2.5.6 (2018-09-30)
+  - Bugfixes:
+    - Validate date inputs (#281)
+- 2.5.5 (2018-09-06)
+  - Bugfixes:
+    - Don't emit `RDATE;TZID=UTC` for rdates
 - 2.5.3 (2018-09-06)
   - Bugfixes:
     - Prevented emitting `DTSTART;TZID=UTC` when UTC is explicitly set as tzid

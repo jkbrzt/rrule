@@ -20,7 +20,7 @@ import {
   isPresent,
   empty
 } from './helpers'
-import { ParsedOptions } from './types'
+import { ParsedOptions, Frequency } from './types'
 
 export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
@@ -335,5 +335,23 @@ export default class Iterinfo {
 
   stimeset (hour: number, minute: number, second: number, millisecond: number) {
     return [new dateutil.Time(hour, minute, second, millisecond)]
+  }
+
+  getdayset (freq: Frequency): (y: number, m: number, d: number) => DaySet {
+    switch (freq) {
+      case Frequency.YEARLY: return this.ydayset.bind(this)
+      case Frequency.MONTHLY: return this.mdayset.bind(this)
+      case Frequency.WEEKLY: return this.wdayset.bind(this)
+      case Frequency.DAILY: return this.ddayset.bind(this)
+      default: return this.ddayset.bind(this)
+    }
+  }
+
+  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY) {
+    switch (freq) {
+      case Frequency.HOURLY: return this.htimeset.bind(this)
+      case Frequency.MINUTELY: return this.mtimeset.bind(this)
+      case Frequency.SECONDLY: return this.stimeset.bind(this)
+    }
   }
 }

@@ -1,5 +1,5 @@
 import dateutil from './dateutil';
-import { ParsedOptions } from './types';
+import { ParsedOptions, Frequency } from './types';
 export declare type DaySet = [(number | null)[], number, number];
 export declare type GetDayset = () => DaySet;
 export default class Iterinfo {
@@ -30,4 +30,6 @@ export default class Iterinfo {
     htimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     mtimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     stimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
+    getdayset(freq: Frequency): (y: number, m: number, d: number) => DaySet;
+    gettimeset(freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): any;
 }

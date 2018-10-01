@@ -1,7 +1,7 @@
 import IterResult from './iterresult'
 import { ParsedOptions, Frequency } from './types'
 import dateutil from './dateutil'
-import Iterinfo, { GetDayset, DaySet } from './iterinfo'
+import Iterinfo from './iterinfo'
 import RRule from './rrule'
 import { buildTimeset } from './parseoptions'
 import { notEmpty, includes, pymod, isPresent } from './helpers'
@@ -20,77 +20,18 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     interval,
     wkst,
     until,
-    bymonth,
-    byweekno,
-    byyearday,
-    byweekday,
-    byeaster,
-    bymonthday,
-    bynmonthday,
     bysetpos,
     byhour,
     byminute,
     bysecond
   } = options
 
-  let counterDate = new dateutil.DateTime(
-    dtstart.getUTCFullYear(),
-    dtstart.getUTCMonth() + 1,
-    dtstart.getUTCDate(),
-    dtstart.getUTCHours(),
-    dtstart.getUTCMinutes(),
-    dtstart.getUTCSeconds(),
-    dtstart.valueOf() % 1000
-  )
+  let counterDate = dateutil.DateTime.fromDate(dtstart)
 
   const ii = new Iterinfo(options)
   ii.rebuild(counterDate.year, counterDate.month)
 
-  const getdayset = {
-    [RRule.YEARLY]: ii.ydayset,
-    [RRule.MONTHLY]: ii.mdayset,
-    [RRule.WEEKLY]: ii.wdayset,
-    [RRule.DAILY]: ii.ddayset,
-    [RRule.HOURLY]: ii.ddayset,
-    [RRule.MINUTELY]: ii.ddayset,
-    [RRule.SECONDLY]: ii.ddayset
-  }[freq] as GetDayset
-
-  let timeset: dateutil.Time[] | null
-  let gettimeset: () => typeof timeset
-  if (freq < RRule.HOURLY) {
-    timeset = buildTimeset(options)
-  } else {
-    gettimeset = {
-      [RRule.HOURLY]: ii.htimeset,
-      [RRule.MINUTELY]: ii.mtimeset,
-      [RRule.SECONDLY]: ii.stimeset
-    }[
-      freq as Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY
-    ] as typeof gettimeset
-
-    if (
-      (freq >= RRule.HOURLY &&
-        notEmpty(byhour) &&
-        !includes(byhour, counterDate.hour)) ||
-      (freq >= RRule.MINUTELY &&
-        notEmpty(byminute) &&
-        !includes(byminute, counterDate.minute)) ||
-      (freq >= RRule.SECONDLY &&
-        notEmpty(bysecond) &&
-        !includes(bysecond, counterDate.second))
-    ) {
-      timeset = []
-    } else {
-      timeset = gettimeset.call(
-        ii,
-        counterDate.hour,
-        counterDate.minute,
-        counterDate.second,
-        counterDate.millisecond
-      )
-    }
-  }
+  let timeset = makeTimeset(ii, counterDate, options)
 
   let currentDay: number
   let count = options.count
@@ -98,12 +39,11 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
 
   while (true) {
     // Get dayset with the right frequency
-    let [dayset, start, end] = getdayset.call(
-      ii,
+    let [dayset, start, end] = ii.getdayset(freq)(
       counterDate.year,
       counterDate.month,
       counterDate.day
-    ) as DaySet
+    )
 
     // Do the "hard" work ;-)
     let filtered = removeFilteredDays(dayset, start, end, ii, options)
@@ -212,22 +152,19 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     } else if (freq === RRule.HOURLY) {
       counterDate.addHours(interval, filtered, byhour)
 
-      // @ts-ignore
-      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
+      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
     } else if (freq === RRule.MINUTELY) {
       if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
         filtered = false
       }
 
-      // @ts-ignore
-      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
+      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
     } else if (freq === RRule.SECONDLY) {
       if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
         filtered = false
       }
 
-      // @ts-ignore
-      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
+      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
     }
 
     if (counterDate.year > dateutil.MAXYEAR) {
@@ -295,4 +232,40 @@ function removeFilteredDays (dayset: (number | null)[], start: number, end: numb
   }
 
   return filtered
+}
+
+function freqIsDailyOrGreater (freq: Frequency): freq is Frequency.YEARLY | Frequency.MONTHLY | Frequency.WEEKLY | Frequency.DAILY {
+  return freq < Frequency.HOURLY
+}
+
+function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: ParsedOptions): dateutil.Time[] | null {
+  const {
+    freq,
+    byhour,
+    byminute,
+    bysecond
+  } = options
+
+  if (freqIsDailyOrGreater(freq)) {
+    return buildTimeset(options)
+  } else if (
+    (freq >= RRule.HOURLY &&
+      notEmpty(byhour) &&
+      !includes(byhour, counterDate.hour)) ||
+    (freq >= RRule.MINUTELY &&
+      notEmpty(byminute) &&
+      !includes(byminute, counterDate.minute)) ||
+    (freq >= RRule.SECONDLY &&
+      notEmpty(bysecond) &&
+      !includes(bysecond, counterDate.second))
+  ) {
+    return []
+  } else {
+    return ii.gettimeset(freq)(
+      counterDate.hour,
+      counterDate.minute,
+      counterDate.second,
+      counterDate.millisecond
+    )
+  }
 }

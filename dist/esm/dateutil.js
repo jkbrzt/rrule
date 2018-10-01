@@ -189,6 +189,9 @@ export var dateutil;
             _this.day = day;
             return _this;
         }
+        DateTime.fromDate = function (date) {
+            return new this(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.valueOf() % 1000);
+        };
         DateTime.prototype.getWeekday = function () {
             return dateutil.getWeekday(new Date(this.getTime()));
         };

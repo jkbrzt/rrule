@@ -84,6 +84,7 @@ export declare namespace dateutil {
         day: number;
         month: number;
         year: number;
+        static fromDate(date: Date): DateTime;
         constructor(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number);
         getWeekday(): number;
         getTime(): number;

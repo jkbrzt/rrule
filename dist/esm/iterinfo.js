@@ -2,6 +2,7 @@ import { WDAYMASK, M365MASK, M365RANGE, M366MASK, M366RANGE, MDAY365MASK, MDAY36
 import RRule from './rrule';
 import dateutil from './dateutil';
 import { notEmpty, repeat, pymod, includes, range, isPresent, empty } from './helpers';
+import { Frequency } from './types';
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -275,6 +276,22 @@ var Iterinfo = /** @class */ (function () {
     };
     Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
         return [new dateutil.Time(hour, minute, second, millisecond)];
+    };
+    Iterinfo.prototype.getdayset = function (freq) {
+        switch (freq) {
+            case Frequency.YEARLY: return this.ydayset.bind(this);
+            case Frequency.MONTHLY: return this.mdayset.bind(this);
+            case Frequency.WEEKLY: return this.wdayset.bind(this);
+            case Frequency.DAILY: return this.ddayset.bind(this);
+            default: return this.ddayset.bind(this);
+        }
+    };
+    Iterinfo.prototype.gettimeset = function (freq) {
+        switch (freq) {
+            case Frequency.HOURLY: return this.htimeset.bind(this);
+            case Frequency.MINUTELY: return this.mtimeset.bind(this);
+            case Frequency.SECONDLY: return this.stimeset.bind(this);
+        }
     };
     return Iterinfo;
 }());

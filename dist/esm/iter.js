@@ -1,3 +1,4 @@
+import { Frequency } from './types';
 import dateutil from './dateutil';
 import Iterinfo from './iterinfo';
 import RRule from './rrule';
@@ -9,53 +10,18 @@ export function iter(iterResult, options) {
         we use the IterResult object that tells us when to stop iterating.
   
     */
-    var _a, _b;
     // Some local variables to speed things up a bit
-    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bymonth = options.bymonth, byweekno = options.byweekno, byyearday = options.byyearday, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
-    var counterDate = new dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
+    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    var counterDate = dateutil.DateTime.fromDate(dtstart);
     var ii = new Iterinfo(options);
     ii.rebuild(counterDate.year, counterDate.month);
-    var getdayset = (_a = {},
-        _a[RRule.YEARLY] = ii.ydayset,
-        _a[RRule.MONTHLY] = ii.mdayset,
-        _a[RRule.WEEKLY] = ii.wdayset,
-        _a[RRule.DAILY] = ii.ddayset,
-        _a[RRule.HOURLY] = ii.ddayset,
-        _a[RRule.MINUTELY] = ii.ddayset,
-        _a[RRule.SECONDLY] = ii.ddayset,
-        _a)[freq];
-    var timeset;
-    var gettimeset;
-    if (freq < RRule.HOURLY) {
-        timeset = buildTimeset(options);
-    }
-    else {
-        gettimeset = (_b = {},
-            _b[RRule.HOURLY] = ii.htimeset,
-            _b[RRule.MINUTELY] = ii.mtimeset,
-            _b[RRule.SECONDLY] = ii.stimeset,
-            _b)[freq];
-        if ((freq >= RRule.HOURLY &&
-            notEmpty(byhour) &&
-            !includes(byhour, counterDate.hour)) ||
-            (freq >= RRule.MINUTELY &&
-                notEmpty(byminute) &&
-                !includes(byminute, counterDate.minute)) ||
-            (freq >= RRule.SECONDLY &&
-                notEmpty(bysecond) &&
-                !includes(bysecond, counterDate.second))) {
-            timeset = [];
-        }
-        else {
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
-        }
-    }
+    var timeset = makeTimeset(ii, counterDate, options);
     var currentDay;
     var count = options.count;
     var pos;
     while (true) {
         // Get dayset with the right frequency
-        var _c = getdayset.call(ii, counterDate.year, counterDate.month, counterDate.day), dayset = _c[0], start = _c[1], end = _c[2];
+        var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
         // Do the "hard" work ;-)
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
         // Output results
@@ -159,22 +125,19 @@ export function iter(iterResult, options) {
         }
         else if (freq === RRule.HOURLY) {
             counterDate.addHours(interval, filtered, byhour);
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === RRule.MINUTELY) {
             if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
                 filtered = false;
             }
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === RRule.SECONDLY) {
             if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
                 filtered = false;
             }
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         if (counterDate.year > dateutil.MAXYEAR) {
             return emitResult(iterResult);
@@ -215,5 +178,28 @@ function removeFilteredDays(dayset, start, end, ii, options) {
             dayset[currentDay] = null;
     }
     return filtered;
+}
+function freqIsDailyOrGreater(freq) {
+    return freq < Frequency.HOURLY;
+}
+function makeTimeset(ii, counterDate, options) {
+    var freq = options.freq, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    if (freqIsDailyOrGreater(freq)) {
+        return buildTimeset(options);
+    }
+    else if ((freq >= RRule.HOURLY &&
+        notEmpty(byhour) &&
+        !includes(byhour, counterDate.hour)) ||
+        (freq >= RRule.MINUTELY &&
+            notEmpty(byminute) &&
+            !includes(byminute, counterDate.minute)) ||
+        (freq >= RRule.SECONDLY &&
+            notEmpty(bysecond) &&
+            !includes(bysecond, counterDate.second))) {
+        return [];
+    }
+    else {
+        return ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
+    }
 }
 //# sourceMappingURL=iter.js.map

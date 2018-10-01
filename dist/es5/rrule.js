@@ -429,6 +429,9 @@ var dateutil_dateutil;
             _this.day = day;
             return _this;
         }
+        DateTime.fromDate = function (date) {
+            return new this(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.valueOf() % 1000);
+        };
         DateTime.prototype.getWeekday = function () {
             return dateutil.getWeekday(new Date(this.getTime()));
         };
@@ -1348,6 +1351,7 @@ var WDAYMASK = (function () {
 
 
 
+
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -1622,6 +1626,22 @@ var iterinfo_Iterinfo = /** @class */ (function () {
     Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
         return [new esm_dateutil.Time(hour, minute, second, millisecond)];
     };
+    Iterinfo.prototype.getdayset = function (freq) {
+        switch (freq) {
+            case Frequency.YEARLY: return this.ydayset.bind(this);
+            case Frequency.MONTHLY: return this.mdayset.bind(this);
+            case Frequency.WEEKLY: return this.wdayset.bind(this);
+            case Frequency.DAILY: return this.ddayset.bind(this);
+            default: return this.ddayset.bind(this);
+        }
+    };
+    Iterinfo.prototype.gettimeset = function (freq) {
+        switch (freq) {
+            case Frequency.HOURLY: return this.htimeset.bind(this);
+            case Frequency.MINUTELY: return this.mtimeset.bind(this);
+            case Frequency.SECONDLY: return this.stimeset.bind(this);
+        }
+    };
     return Iterinfo;
 }());
 /* harmony default export */ var iterinfo = (iterinfo_Iterinfo);
@@ -1633,58 +1653,24 @@ var iterinfo_Iterinfo = /** @class */ (function () {
 
 
 
+
 function iter(iterResult, options) {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
   
     */
-    var _a, _b;
     // Some local variables to speed things up a bit
-    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bymonth = options.bymonth, byweekno = options.byweekno, byyearday = options.byyearday, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
-    var counterDate = new esm_dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
+    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    var counterDate = esm_dateutil.DateTime.fromDate(dtstart);
     var ii = new iterinfo(options);
     ii.rebuild(counterDate.year, counterDate.month);
-    var getdayset = (_a = {},
-        _a[esm_rrule.YEARLY] = ii.ydayset,
-        _a[esm_rrule.MONTHLY] = ii.mdayset,
-        _a[esm_rrule.WEEKLY] = ii.wdayset,
-        _a[esm_rrule.DAILY] = ii.ddayset,
-        _a[esm_rrule.HOURLY] = ii.ddayset,
-        _a[esm_rrule.MINUTELY] = ii.ddayset,
-        _a[esm_rrule.SECONDLY] = ii.ddayset,
-        _a)[freq];
-    var timeset;
-    var gettimeset;
-    if (freq < esm_rrule.HOURLY) {
-        timeset = buildTimeset(options);
-    }
-    else {
-        gettimeset = (_b = {},
-            _b[esm_rrule.HOURLY] = ii.htimeset,
-            _b[esm_rrule.MINUTELY] = ii.mtimeset,
-            _b[esm_rrule.SECONDLY] = ii.stimeset,
-            _b)[freq];
-        if ((freq >= esm_rrule.HOURLY &&
-            Object(helpers["g" /* notEmpty */])(byhour) &&
-            !Object(helpers["c" /* includes */])(byhour, counterDate.hour)) ||
-            (freq >= esm_rrule.MINUTELY &&
-                Object(helpers["g" /* notEmpty */])(byminute) &&
-                !Object(helpers["c" /* includes */])(byminute, counterDate.minute)) ||
-            (freq >= esm_rrule.SECONDLY &&
-                Object(helpers["g" /* notEmpty */])(bysecond) &&
-                !Object(helpers["c" /* includes */])(bysecond, counterDate.second))) {
-            timeset = [];
-        }
-        else {
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
-        }
-    }
+    var timeset = makeTimeset(ii, counterDate, options);
     var currentDay;
     var count = options.count;
     var pos;
     while (true) {
         // Get dayset with the right frequency
-        var _c = getdayset.call(ii, counterDate.year, counterDate.month, counterDate.day), dayset = _c[0], start = _c[1], end = _c[2];
+        var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
         // Do the "hard" work ;-)
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
         // Output results
@@ -1788,22 +1774,19 @@ function iter(iterResult, options) {
         }
         else if (freq === esm_rrule.HOURLY) {
             counterDate.addHours(interval, filtered, byhour);
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === esm_rrule.MINUTELY) {
             if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
                 filtered = false;
             }
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === esm_rrule.SECONDLY) {
             if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
                 filtered = false;
             }
-            // @ts-ignore
-            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         if (counterDate.year > esm_dateutil.MAXYEAR) {
             return emitResult(iterResult);
@@ -1844,6 +1827,29 @@ function removeFilteredDays(dayset, start, end, ii, options) {
             dayset[currentDay] = null;
     }
     return filtered;
+}
+function freqIsDailyOrGreater(freq) {
+    return freq < Frequency.HOURLY;
+}
+function makeTimeset(ii, counterDate, options) {
+    var freq = options.freq, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    if (freqIsDailyOrGreater(freq)) {
+        return buildTimeset(options);
+    }
+    else if ((freq >= esm_rrule.HOURLY &&
+        Object(helpers["g" /* notEmpty */])(byhour) &&
+        !Object(helpers["c" /* includes */])(byhour, counterDate.hour)) ||
+        (freq >= esm_rrule.MINUTELY &&
+            Object(helpers["g" /* notEmpty */])(byminute) &&
+            !Object(helpers["c" /* includes */])(byminute, counterDate.minute)) ||
+        (freq >= esm_rrule.SECONDLY &&
+            Object(helpers["g" /* notEmpty */])(bysecond) &&
+            !Object(helpers["c" /* includes */])(bysecond, counterDate.second))) {
+        return [];
+    }
+    else {
+        return ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
+    }
 }
 //# sourceMappingURL=iter.js.map
 // CONCATENATED MODULE: ./dist/esm/rrule.js

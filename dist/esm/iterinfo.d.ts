@@ -1,9 +1,9 @@
-import RRule from './rrule';
 import dateutil from './dateutil';
+import { ParsedOptions } from './types';
 export declare type DaySet = [(number | null)[], number, number];
 export declare type GetDayset = () => DaySet;
 export default class Iterinfo {
-    rrule: RRule;
+    private options;
     lastyear: number;
     lastmonth: number;
     yearlen: 365 | 366;
@@ -18,7 +18,7 @@ export default class Iterinfo {
     wnomask: number[] | null;
     nwdaymask: number[] | null;
     eastermask: number[] | null;
-    constructor(rrule: RRule);
+    constructor(options: ParsedOptions);
     easter(y: number, offset?: number): number[];
     rebuild(year: number, month: number): void;
     private rebuildYear;

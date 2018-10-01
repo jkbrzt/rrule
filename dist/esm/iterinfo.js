@@ -6,10 +6,10 @@ import { notEmpty, repeat, pymod, includes, range, isPresent, empty } from './he
 // Iterinfo
 // =============================================================================
 var Iterinfo = /** @class */ (function () {
-    function Iterinfo(rrule) {
+    function Iterinfo(options) {
+        this.options = options;
         this.yearlen = 365;
         this.nextyearlen = 365;
-        this.rrule = rrule;
         this.mmask = null;
         this.mrange = null;
         this.mdaymask = null;
@@ -40,20 +40,20 @@ var Iterinfo = /** @class */ (function () {
         return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
     };
     Iterinfo.prototype.rebuild = function (year, month) {
-        var rr = this.rrule;
+        var options = this.options;
         if (year !== this.lastyear) {
             this.rebuildYear(year);
         }
-        if (notEmpty(rr.options.bynweekday) &&
+        if (notEmpty(options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             this.rebuildMonth(year, month);
         }
-        if (isPresent(rr.options.byeaster)) {
-            this.eastermask = this.easter(year, rr.options.byeaster);
+        if (isPresent(options.byeaster)) {
+            this.eastermask = this.easter(year, options.byeaster);
         }
     };
     Iterinfo.prototype.rebuildYear = function (year) {
-        var rr = this.rrule;
+        var options = this.options;
         this.yearlen = dateutil.isLeapYear(year) ? 366 : 365;
         this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365;
         var firstyday = new Date(Date.UTC(year, 0, 1));
@@ -74,7 +74,7 @@ var Iterinfo = /** @class */ (function () {
             this.wdaymask = WDAYMASK.slice(wday);
             this.mrange = M366RANGE;
         }
-        if (empty(rr.options.byweekno)) {
+        if (empty(options.byweekno)) {
             this.wnomask = null;
         }
         else {
@@ -82,13 +82,13 @@ var Iterinfo = /** @class */ (function () {
             var no1wkst = void 0;
             var firstwkst = void 0;
             var wyearlen = void 0;
-            no1wkst = firstwkst = pymod(7 - this.yearweekday + rr.options.wkst, 7);
+            no1wkst = firstwkst = pymod(7 - this.yearweekday + options.wkst, 7);
             if (no1wkst >= 4) {
                 no1wkst = 0;
                 // Number of days in the year, plus the days we got
                 // from last year.
                 wyearlen =
-                    this.yearlen + pymod(this.yearweekday - rr.options.wkst, 7);
+                    this.yearlen + pymod(this.yearweekday - options.wkst, 7);
             }
             else {
                 // Number of days in the year, minus the days we
@@ -98,9 +98,9 @@ var Iterinfo = /** @class */ (function () {
             var div = Math.floor(wyearlen / 7);
             var mod = pymod(wyearlen, 7);
             var numweeks = Math.floor(div + mod / 4);
-            for (var j = 0; j < rr.options.byweekno.length; j++) {
+            for (var j = 0; j < options.byweekno.length; j++) {
                 var i = void 0;
-                var n = rr.options.byweekno[j];
+                var n = options.byweekno[j];
                 if (n < 0) {
                     n += numweeks + 1;
                 }
@@ -119,11 +119,11 @@ var Iterinfo = /** @class */ (function () {
                 for (var k = 0; k < 7; k++) {
                     this.wnomask[i] = 1;
                     i++;
-                    if (this.wdaymask[i] === rr.options.wkst)
+                    if (this.wdaymask[i] === options.wkst)
                         break;
                 }
             }
-            if (includes(rr.options.byweekno, 1)) {
+            if (includes(options.byweekno, 1)) {
                 // Check week number 1 of next year as well
                 // orig-TODO : Check -numweeks for next year.
                 var i = no1wkst + numweeks * 7;
@@ -135,7 +135,7 @@ var Iterinfo = /** @class */ (function () {
                     for (var j = 0; j < 7; j++) {
                         this.wnomask[i] = 1;
                         i += 1;
-                        if (this.wdaymask[i] === rr.options.wkst)
+                        if (this.wdaymask[i] === options.wkst)
                             break;
                     }
                 }
@@ -148,14 +148,14 @@ var Iterinfo = /** @class */ (function () {
                 // days from last year's last week number in
                 // this year.
                 var lnumweeks = void 0;
-                if (!includes(rr.options.byweekno, -1)) {
+                if (!includes(options.byweekno, -1)) {
                     var lyearweekday = dateutil.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
-                    var lno1wkst = pymod(7 - lyearweekday.valueOf() + rr.options.wkst, 7);
+                    var lno1wkst = pymod(7 - lyearweekday.valueOf() + options.wkst, 7);
                     var lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365;
                     if (lno1wkst >= 4) {
                         lno1wkst = 0;
                         lnumweeks = Math.floor(52 +
-                            pymod(lyearlen + pymod(lyearweekday - rr.options.wkst, 7), 7) /
+                            pymod(lyearlen + pymod(lyearweekday - options.wkst, 7), 7) /
                                 4);
                     }
                     else {
@@ -165,7 +165,7 @@ var Iterinfo = /** @class */ (function () {
                 else {
                     lnumweeks = -1;
                 }
-                if (includes(rr.options.byweekno, lnumweeks)) {
+                if (includes(options.byweekno, lnumweeks)) {
                     for (var i = 0; i < no1wkst; i++)
                         this.wnomask[i] = 1;
                 }
@@ -173,12 +173,12 @@ var Iterinfo = /** @class */ (function () {
         }
     };
     Iterinfo.prototype.rebuildMonth = function (year, month) {
-        var rr = this.rrule;
+        var options = this.options;
         var ranges = [];
-        if (rr.options.freq === RRule.YEARLY) {
-            if (notEmpty(rr.options.bymonth)) {
-                for (var j = 0; j < rr.options.bymonth.length; j++) {
-                    month = rr.options.bymonth[j];
+        if (options.freq === RRule.YEARLY) {
+            if (notEmpty(options.bymonth)) {
+                for (var j = 0; j < options.bymonth.length; j++) {
+                    month = options.bymonth[j];
                     ranges.push(this.mrange.slice(month - 1, month + 1));
                 }
             }
@@ -186,7 +186,7 @@ var Iterinfo = /** @class */ (function () {
                 ranges = [[0, this.yearlen]];
             }
         }
-        else if (rr.options.freq === RRule.MONTHLY) {
+        else if (options.freq === RRule.MONTHLY) {
             ranges = [this.mrange.slice(month - 1, month + 1)];
         }
         if (notEmpty(ranges)) {
@@ -198,10 +198,10 @@ var Iterinfo = /** @class */ (function () {
                 var first = rang[0];
                 var last = rang[1];
                 last -= 1;
-                for (var k = 0; k < rr.options.bynweekday.length; k++) {
+                for (var k = 0; k < options.bynweekday.length; k++) {
                     var i = void 0;
-                    var wday = rr.options.bynweekday[k][0];
-                    var n = rr.options.bynweekday[k][1];
+                    var wday = options.bynweekday[k][0];
+                    var n = options.bynweekday[k][1];
                     if (n < 0) {
                         i = last + (n + 1) * 7;
                         i -= pymod(this.wdaymask[i] - wday, 7);
@@ -238,7 +238,7 @@ var Iterinfo = /** @class */ (function () {
         for (var j = 0; j < 7; j++) {
             set[i] = i;
             ++i;
-            if (this.wdaymask[i] === this.rrule.options.wkst)
+            if (this.wdaymask[i] === this.options.wkst)
                 break;
         }
         return [set, start, i];
@@ -252,11 +252,11 @@ var Iterinfo = /** @class */ (function () {
     };
     Iterinfo.prototype.htimeset = function (hour, minute, second, millisecond) {
         var set = [];
-        var rr = this.rrule;
-        for (var i = 0; i < rr.options.byminute.length; i++) {
-            minute = rr.options.byminute[i];
-            for (var j = 0; j < rr.options.bysecond.length; j++) {
-                second = rr.options.bysecond[j];
+        var options = this.options;
+        for (var i = 0; i < options.byminute.length; i++) {
+            minute = options.byminute[i];
+            for (var j = 0; j < options.bysecond.length; j++) {
+                second = options.bysecond[j];
                 set.push(new dateutil.Time(hour, minute, second, millisecond));
             }
         }
@@ -265,9 +265,9 @@ var Iterinfo = /** @class */ (function () {
     };
     Iterinfo.prototype.mtimeset = function (hour, minute, second, millisecond) {
         var set = [];
-        var rr = this.rrule;
-        for (var j = 0; j < rr.options.bysecond.length; j++) {
-            second = rr.options.bysecond[j];
+        var options = this.options;
+        for (var j = 0; j < options.bysecond.length; j++) {
+            second = options.bysecond[j];
             set.push(new dateutil.Time(hour, minute, second, millisecond));
         }
         dateutil.sort(set);

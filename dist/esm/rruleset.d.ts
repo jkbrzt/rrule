@@ -14,6 +14,7 @@ export default class RRuleSet extends RRule {
      */
     constructor(noCache?: boolean);
     tzid(tzid?: string): string | undefined;
+    _iter(iterResult: IterResult): Date | Date[] | null;
     /**
      * Adds an RRule to the set
      *
@@ -47,7 +48,6 @@ export default class RRuleSet extends RRule {
      *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
      */
     toString(): string;
-    _iter(iterResult: IterResult): Date | Date[] | null;
     /**
      * Create a new RRuleSet Object completely base on current instance
      */

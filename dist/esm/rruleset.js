@@ -15,6 +15,7 @@ import RRule from './rrule';
 import dateutil from './dateutil';
 import { includes } from './helpers';
 import { DateWithZone } from './datewithzone';
+import { iter } from './iter';
 var RRuleSet = /** @class */ (function (_super) {
     __extends(RRuleSet, _super);
     /**
@@ -46,6 +47,9 @@ var RRuleSet = /** @class */ (function (_super) {
             }
         }
         return undefined;
+    };
+    RRuleSet.prototype._iter = function (iterResult) {
+        return iterSet(iterResult, this._rrule, this._exrule, this._rdate, this._exdate, this.tzid());
     };
     /**
      * Adds an RRule to the set
@@ -137,66 +141,6 @@ var RRuleSet = /** @class */ (function (_super) {
     RRuleSet.prototype.toString = function () {
         return this.valueOf().join('\n');
     };
-    RRuleSet.prototype._iter = function (iterResult) {
-        var _exdateHash = {};
-        var _exrule = this._exrule;
-        var _accept = iterResult.accept;
-        var tzid = this.tzid();
-        function evalExdate(after, before) {
-            _exrule.forEach(function (rrule) {
-                rrule.between(after, before, true).forEach(function (date) {
-                    _exdateHash[Number(date)] = true;
-                });
-            });
-        }
-        this._exdate.forEach(function (date) {
-            var zonedDate = new DateWithZone(date, tzid).rezonedDate();
-            _exdateHash[Number(zonedDate)] = true;
-        });
-        iterResult.accept = function (date) {
-            var dt = Number(date);
-            if (!_exdateHash[dt]) {
-                evalExdate(new Date(dt - 1), new Date(dt + 1));
-                if (!_exdateHash[dt]) {
-                    _exdateHash[dt] = true;
-                    return _accept.call(this, date);
-                }
-            }
-            return true;
-        };
-        if (iterResult.method === 'between') {
-            evalExdate(iterResult.args.after, iterResult.args.before);
-            iterResult.accept = function (date) {
-                var dt = Number(date);
-                if (!_exdateHash[dt]) {
-                    _exdateHash[dt] = true;
-                    return _accept.call(this, date);
-                }
-                return true;
-            };
-        }
-        for (var i = 0; i < this._rdate.length; i++) {
-            var zonedDate = new DateWithZone(this._rdate[i], tzid).rezonedDate();
-            if (!iterResult.accept(new Date(zonedDate.getTime())))
-                break;
-        }
-        this._rrule.forEach(function (rrule) {
-            rrule._iter(iterResult, rrule.options);
-        });
-        var res = iterResult._result;
-        dateutil.sort(res);
-        switch (iterResult.method) {
-            case 'all':
-            case 'between':
-                return res;
-            case 'before':
-                return (res.length && res[res.length - 1]) || null;
-            case 'after':
-                return (res.length && res[0]) || null;
-            default:
-                return null;
-        }
-    };
     /**
      * Create a new RRuleSet Object completely base on current instance
      */
@@ -220,4 +164,62 @@ var RRuleSet = /** @class */ (function (_super) {
     return RRuleSet;
 }(RRule));
 export default RRuleSet;
+function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
+    var _exdateHash = {};
+    var _accept = iterResult.accept;
+    function evalExdate(after, before) {
+        _exrule.forEach(function (rrule) {
+            rrule.between(after, before, true).forEach(function (date) {
+                _exdateHash[Number(date)] = true;
+            });
+        });
+    }
+    _exdate.forEach(function (date) {
+        var zonedDate = new DateWithZone(date, tzid).rezonedDate();
+        _exdateHash[Number(zonedDate)] = true;
+    });
+    iterResult.accept = function (date) {
+        var dt = Number(date);
+        if (!_exdateHash[dt]) {
+            evalExdate(new Date(dt - 1), new Date(dt + 1));
+            if (!_exdateHash[dt]) {
+                _exdateHash[dt] = true;
+                return _accept.call(this, date);
+            }
+        }
+        return true;
+    };
+    if (iterResult.method === 'between') {
+        evalExdate(iterResult.args.after, iterResult.args.before);
+        iterResult.accept = function (date) {
+            var dt = Number(date);
+            if (!_exdateHash[dt]) {
+                _exdateHash[dt] = true;
+                return _accept.call(this, date);
+            }
+            return true;
+        };
+    }
+    for (var i = 0; i < _rdate.length; i++) {
+        var zonedDate = new DateWithZone(_rdate[i], tzid).rezonedDate();
+        if (!iterResult.accept(new Date(zonedDate.getTime())))
+            break;
+    }
+    _rrule.forEach(function (rrule) {
+        iter(iterResult, rrule.options);
+    });
+    var res = iterResult._result;
+    dateutil.sort(res);
+    switch (iterResult.method) {
+        case 'all':
+        case 'between':
+            return res;
+        case 'before':
+            return (res.length && res[res.length - 1]) || null;
+        case 'after':
+            return (res.length && res[0]) || null;
+        default:
+            return null;
+    }
+}
 //# sourceMappingURL=rruleset.js.map

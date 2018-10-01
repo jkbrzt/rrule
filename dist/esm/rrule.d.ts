@@ -50,6 +50,7 @@ export default class RRule implements QueryMethods {
     static parseString: typeof parseString;
     static fromString(str: string): RRule;
     static optionsToString: typeof optionsToString;
+    protected _iter(iterResult: IterResult): Date | Date[] | null;
     private _cacheGet;
     _cacheAdd(what: CacheKeys | 'all', value: Date[] | Date | null, args?: Partial<IterArgs>): void;
     /**
@@ -103,5 +104,4 @@ export default class RRule implements QueryMethods {
      *          as this one (cache is not cloned)
      */
     clone(): RRule;
-    _iter(iterResult: IterResult, options: ParsedOptions): Date | Date[] | null;
 }

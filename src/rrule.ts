@@ -116,7 +116,7 @@ export default class RRule implements QueryMethods {
     this.options = parsedOptions
   }
 
-  static parseText (text: string, language: Language) {
+  static parseText (text: string, language?: Language) {
     return getnlp().parseText(text, language)
   }
 

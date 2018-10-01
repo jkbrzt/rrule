@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
+import { optionsToString } from '../src/optionstostring';
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -58,6 +59,14 @@ describe('RRule', function () {
       const str = item[1]
       expect(RRule.fromString(str).toText().toLowerCase()).equals(text.toLowerCase(),
         str + ' => ' + text)
+    })
+  })
+
+  it('parseText()', function () {
+    texts.forEach(function (item) {
+      const text = item[0]
+      const str = item[1]
+      expect(optionsToString(RRule.parseText(text))).equals(str, text + ' => ' + str)
     })
   })
 

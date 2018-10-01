@@ -237,7 +237,6 @@ export var dateutil;
             this.fixDay();
         };
         DateTime.prototype.addHours = function (hours, filtered, byhour) {
-            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.hour += Math.floor((23 - this.hour) / hours) * hours;
@@ -248,15 +247,12 @@ export var dateutil;
                 if (dayDiv) {
                     this.hour = hourMod;
                     this.addDaily(dayDiv);
-                    dayChanged = true;
                 }
                 if (empty(byhour) || includes(byhour, this.hour))
                     break;
             }
-            return dayChanged;
         };
         DateTime.prototype.addMinutes = function (minutes, filtered, byhour, byminute) {
-            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.minute +=
@@ -267,17 +263,15 @@ export var dateutil;
                 var _a = divmod(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
                 if (hourDiv) {
                     this.minute = minuteMod;
-                    dayChanged = this.addHours(hourDiv, false, byhour);
+                    this.addHours(hourDiv, false, byhour);
                 }
                 if ((empty(byhour) || includes(byhour, this.hour)) &&
                     (empty(byminute) || includes(byminute, this.minute))) {
                     break;
                 }
             }
-            return dayChanged;
         };
         DateTime.prototype.addSeconds = function (seconds, filtered, byhour, byminute, bysecond) {
-            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.second +=
@@ -288,7 +282,7 @@ export var dateutil;
                 var _a = divmod(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
                 if (minuteDiv) {
                     this.second = secondMod;
-                    dayChanged = this.addMinutes(minuteDiv, false, byhour, byminute);
+                    this.addMinutes(minuteDiv, false, byhour, byminute);
                 }
                 if ((empty(byhour) || includes(byhour, this.hour)) &&
                     (empty(byminute) || includes(byminute, this.minute)) &&
@@ -296,7 +290,6 @@ export var dateutil;
                     break;
                 }
             }
-            return dayChanged;
         };
         DateTime.prototype.fixDay = function () {
             if (this.day <= 28) {

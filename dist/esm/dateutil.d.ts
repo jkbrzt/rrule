@@ -95,9 +95,9 @@ export declare namespace dateutil {
         addMonths(months: number): void;
         addWeekly(days: number, wkst: number): void;
         addDaily(days: number): void;
-        addHours(hours: number, filtered: boolean, byhour: number[]): boolean;
-        addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): boolean;
-        addSeconds(seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]): boolean;
+        addHours(hours: number, filtered: boolean, byhour: number[]): void;
+        addMinutes(minutes: number, filtered: boolean, byhour: number[], byminute: number[]): void;
+        addSeconds(seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]): void;
         fixDay(): void;
     }
 }

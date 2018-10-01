@@ -33,7 +33,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     bysecond
   } = options
 
-  let date = new dateutil.DateTime(
+  let counterDate = new dateutil.DateTime(
     dtstart.getUTCFullYear(),
     dtstart.getUTCMonth() + 1,
     dtstart.getUTCDate(),
@@ -44,7 +44,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
   )
 
   const ii = new Iterinfo(options)
-  ii.rebuild(date.year, date.month)
+  ii.rebuild(counterDate.year, counterDate.month)
 
   const getdayset = {
     [RRule.YEARLY]: ii.ydayset,
@@ -72,22 +72,22 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     if (
       (freq >= RRule.HOURLY &&
         notEmpty(byhour) &&
-        !includes(byhour, date.hour)) ||
+        !includes(byhour, counterDate.hour)) ||
       (freq >= RRule.MINUTELY &&
         notEmpty(byminute) &&
-        !includes(byminute, date.minute)) ||
+        !includes(byminute, counterDate.minute)) ||
       (freq >= RRule.SECONDLY &&
         notEmpty(bysecond) &&
-        !includes(bysecond, date.second))
+        !includes(bysecond, counterDate.second))
     ) {
       timeset = []
     } else {
       timeset = gettimeset.call(
         ii,
-        date.hour,
-        date.minute,
-        date.second,
-        date.millisecond
+        counterDate.hour,
+        counterDate.minute,
+        counterDate.second,
+        counterDate.millisecond
       )
     }
   }
@@ -98,32 +98,15 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
 
   while (true) {
     // Get dayset with the right frequency
-    const [dayset, start, end] = getdayset.call(
+    let [dayset, start, end] = getdayset.call(
       ii,
-      date.year,
-      date.month,
-      date.day
+      counterDate.year,
+      counterDate.month,
+      counterDate.day
     ) as DaySet
 
     // Do the "hard" work ;-)
-    let filtered = false
-    for (let dayCounter = start; dayCounter < end; dayCounter++) {
-      currentDay = dayset[dayCounter] as number
-
-      filtered = isFiltered(
-        bymonth,
-        ii,
-        currentDay,
-        byweekno,
-        byweekday,
-        byeaster,
-        bymonthday,
-        bynmonthday,
-        byyearday
-      )
-
-      if (filtered) dayset[currentDay] = null
-    }
+    let filtered = removeFilteredDays(dayset, start, end, ii, options)
 
     // Output results
     if (notEmpty(bysetpos) && notEmpty(timeset)) {
@@ -219,53 +202,57 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
 
     // Handle frequency and interval
     if (freq === RRule.YEARLY) {
-      date.addYears(interval)
+      counterDate.addYears(interval)
     } else if (freq === RRule.MONTHLY) {
-      date.addMonths(interval)
+      counterDate.addMonths(interval)
     } else if (freq === RRule.WEEKLY) {
-      date.addWeekly(interval, wkst)
+      counterDate.addWeekly(interval, wkst)
     } else if (freq === RRule.DAILY) {
-      date.addDaily(interval)
+      counterDate.addDaily(interval)
     } else if (freq === RRule.HOURLY) {
-      date.addHours(interval, filtered, byhour)
+      counterDate.addHours(interval, filtered, byhour)
 
       // @ts-ignore
-      timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
+      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
     } else if (freq === RRule.MINUTELY) {
-      if (date.addMinutes(interval, filtered, byhour, byminute)) {
+      if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
         filtered = false
       }
 
       // @ts-ignore
-      timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
+      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
     } else if (freq === RRule.SECONDLY) {
-      if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
+      if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
         filtered = false
       }
 
       // @ts-ignore
-      timeset = gettimeset.call(ii, date.hour, date.minute, date.second)
+      timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second)
     }
 
-    if (date.year > dateutil.MAXYEAR) {
+    if (counterDate.year > dateutil.MAXYEAR) {
       return emitResult(iterResult)
     }
 
-    ii.rebuild(date.year, date.month)
+    ii.rebuild(counterDate.year, counterDate.month)
   }
 }
 
 function isFiltered (
-  bymonth: number[],
   ii: Iterinfo,
   currentDay: number,
-  byweekno: number[],
-  byweekday: number[],
-  byeaster: number | null,
-  bymonthday: number[],
-  bynmonthday: number[],
-  byyearday: number[]
+  options: ParsedOptions
 ): boolean {
+  const {
+    bymonth,
+    byweekno,
+    byweekday,
+    byeaster,
+    bymonthday,
+    bynmonthday,
+    byyearday
+  } = options
+
   return (
     (notEmpty(bymonth) && !includes(bymonth, ii.mmask![currentDay])) ||
     (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
@@ -291,4 +278,21 @@ function rezoneIfNeeded (date: Date, options: ParsedOptions) {
 
 function emitResult (iterResult: IterResult) {
   return iterResult.getValue() as Date[]
+}
+
+function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {
+  let filtered = false
+  for (let dayCounter = start; dayCounter < end; dayCounter++) {
+    let currentDay = dayset[dayCounter] as number
+
+    filtered = isFiltered(
+      ii,
+      currentDay,
+      options
+    )
+
+    if (filtered) dayset[currentDay] = null
+  }
+
+  return filtered
 }

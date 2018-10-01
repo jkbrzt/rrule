@@ -1641,9 +1641,9 @@ function iter(iterResult, options) {
     var _a, _b;
     // Some local variables to speed things up a bit
     var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bymonth = options.bymonth, byweekno = options.byweekno, byyearday = options.byyearday, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
-    var date = new esm_dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
+    var counterDate = new esm_dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
     var ii = new iterinfo(options);
-    ii.rebuild(date.year, date.month);
+    ii.rebuild(counterDate.year, counterDate.month);
     var getdayset = (_a = {},
         _a[esm_rrule.YEARLY] = ii.ydayset,
         _a[esm_rrule.MONTHLY] = ii.mdayset,
@@ -1666,17 +1666,17 @@ function iter(iterResult, options) {
             _b)[freq];
         if ((freq >= esm_rrule.HOURLY &&
             Object(helpers["g" /* notEmpty */])(byhour) &&
-            !Object(helpers["c" /* includes */])(byhour, date.hour)) ||
+            !Object(helpers["c" /* includes */])(byhour, counterDate.hour)) ||
             (freq >= esm_rrule.MINUTELY &&
                 Object(helpers["g" /* notEmpty */])(byminute) &&
-                !Object(helpers["c" /* includes */])(byminute, date.minute)) ||
+                !Object(helpers["c" /* includes */])(byminute, counterDate.minute)) ||
             (freq >= esm_rrule.SECONDLY &&
                 Object(helpers["g" /* notEmpty */])(bysecond) &&
-                !Object(helpers["c" /* includes */])(bysecond, date.second))) {
+                !Object(helpers["c" /* includes */])(bysecond, counterDate.second))) {
             timeset = [];
         }
         else {
-            timeset = gettimeset.call(ii, date.hour, date.minute, date.second, date.millisecond);
+            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
         }
     }
     var currentDay;
@@ -1684,15 +1684,9 @@ function iter(iterResult, options) {
     var pos;
     while (true) {
         // Get dayset with the right frequency
-        var _c = getdayset.call(ii, date.year, date.month, date.day), dayset = _c[0], start = _c[1], end = _c[2];
+        var _c = getdayset.call(ii, counterDate.year, counterDate.month, counterDate.day), dayset = _c[0], start = _c[1], end = _c[2];
         // Do the "hard" work ;-)
-        var filtered = false;
-        for (var dayCounter = start; dayCounter < end; dayCounter++) {
-            currentDay = dayset[dayCounter];
-            filtered = isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday);
-            if (filtered)
-                dayset[currentDay] = null;
-        }
+        var filtered = removeFilteredDays(dayset, start, end, ii, options);
         // Output results
         if (Object(helpers["g" /* notEmpty */])(bysetpos) && Object(helpers["g" /* notEmpty */])(timeset)) {
             var daypos = void 0;
@@ -1724,8 +1718,8 @@ function iter(iterResult, options) {
                     i = tmp[daypos];
                 }
                 var time = timeset[timepos];
-                var date_1 = esm_dateutil.fromOrdinal(ii.yearordinal + i);
-                var res = esm_dateutil.combine(date_1, time);
+                var date = esm_dateutil.fromOrdinal(ii.yearordinal + i);
+                var res = esm_dateutil.combine(date, time);
                 // XXX: can this ever be in the array?
                 // - compare the actual date instead?
                 if (!Object(helpers["c" /* includes */])(poslist, res))
@@ -1757,10 +1751,10 @@ function iter(iterResult, options) {
                 if (!Object(helpers["f" /* isPresent */])(currentDay)) {
                     continue;
                 }
-                var date_2 = esm_dateutil.fromOrdinal(ii.yearordinal + currentDay);
+                var date = esm_dateutil.fromOrdinal(ii.yearordinal + currentDay);
                 for (var k = 0; k < timeset.length; k++) {
                     var time = timeset[k];
-                    var res = esm_dateutil.combine(date_2, time);
+                    var res = esm_dateutil.combine(date, time);
                     if (until && res > until) {
                         return emitResult(iterResult);
                     }
@@ -1781,43 +1775,44 @@ function iter(iterResult, options) {
         }
         // Handle frequency and interval
         if (freq === esm_rrule.YEARLY) {
-            date.addYears(interval);
+            counterDate.addYears(interval);
         }
         else if (freq === esm_rrule.MONTHLY) {
-            date.addMonths(interval);
+            counterDate.addMonths(interval);
         }
         else if (freq === esm_rrule.WEEKLY) {
-            date.addWeekly(interval, wkst);
+            counterDate.addWeekly(interval, wkst);
         }
         else if (freq === esm_rrule.DAILY) {
-            date.addDaily(interval);
+            counterDate.addDaily(interval);
         }
         else if (freq === esm_rrule.HOURLY) {
-            date.addHours(interval, filtered, byhour);
+            counterDate.addHours(interval, filtered, byhour);
             // @ts-ignore
-            timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
+            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === esm_rrule.MINUTELY) {
-            if (date.addMinutes(interval, filtered, byhour, byminute)) {
+            if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
                 filtered = false;
             }
             // @ts-ignore
-            timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
+            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
         }
         else if (freq === esm_rrule.SECONDLY) {
-            if (date.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
+            if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
                 filtered = false;
             }
             // @ts-ignore
-            timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
+            timeset = gettimeset.call(ii, counterDate.hour, counterDate.minute, counterDate.second);
         }
-        if (date.year > esm_dateutil.MAXYEAR) {
+        if (counterDate.year > esm_dateutil.MAXYEAR) {
             return emitResult(iterResult);
         }
-        ii.rebuild(date.year, date.month);
+        ii.rebuild(counterDate.year, counterDate.month);
     }
 }
-function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymonthday, bynmonthday, byyearday) {
+function isFiltered(ii, currentDay, options) {
+    var bymonth = options.bymonth, byweekno = options.byweekno, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, byyearday = options.byyearday;
     return ((Object(helpers["g" /* notEmpty */])(bymonth) && !Object(helpers["c" /* includes */])(bymonth, ii.mmask[currentDay])) ||
         (Object(helpers["g" /* notEmpty */])(byweekno) && !ii.wnomask[currentDay]) ||
         (Object(helpers["g" /* notEmpty */])(byweekday) && !Object(helpers["c" /* includes */])(byweekday, ii.wdaymask[currentDay])) ||
@@ -1839,6 +1834,16 @@ function rezoneIfNeeded(date, options) {
 }
 function emitResult(iterResult) {
     return iterResult.getValue();
+}
+function removeFilteredDays(dayset, start, end, ii, options) {
+    var filtered = false;
+    for (var dayCounter = start; dayCounter < end; dayCounter++) {
+        var currentDay = dayset[dayCounter];
+        filtered = isFiltered(ii, currentDay, options);
+        if (filtered)
+            dayset[currentDay] = null;
+    }
+    return filtered;
 }
 //# sourceMappingURL=iter.js.map
 // CONCATENATED MODULE: ./dist/esm/rrule.js

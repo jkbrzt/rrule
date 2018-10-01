@@ -79,9 +79,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   })
 
   return {
-    // @ts-ignore
     dtstart,
-    // @ts-ignore
     tzid,
     rrulevals,
     rdatevals,
@@ -143,8 +141,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
       rset.exdate(date)
     })
 
-    // @ts-ignore
-    if (options.compatible && options.dtstart) rset.rdate(dtstart)
+    if (options.compatible && options.dtstart) rset.rdate(dtstart!)
     return rset
   }
 

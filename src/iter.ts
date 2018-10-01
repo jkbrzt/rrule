@@ -188,14 +188,14 @@ function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: Par
       !includes(bysecond, counterDate.second))
   ) {
     return []
-  } else {
-    return ii.gettimeset(freq)(
-      counterDate.hour,
-      counterDate.minute,
-      counterDate.second,
-      counterDate.millisecond
-    )
   }
+
+  return ii.gettimeset(freq)(
+    counterDate.hour,
+    counterDate.minute,
+    counterDate.second,
+    counterDate.millisecond
+  )
 }
 
 function addToCounter (options: ParsedOptions, ii: Iterinfo, filtered: boolean, counterDate: dateutil.DateTime) {

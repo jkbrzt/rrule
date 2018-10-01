@@ -477,7 +477,7 @@ var dateutil_dateutil;
             this.fixDay();
         };
         DateTime.prototype.addHours = function (hours, filtered, byhour) {
-            var fixday = false;
+            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.hour += Math.floor((23 - this.hour) / hours) * hours;
@@ -488,15 +488,15 @@ var dateutil_dateutil;
                 if (dayDiv) {
                     this.hour = hourMod;
                     this.addDaily(dayDiv);
-                    fixday = true;
+                    dayChanged = true;
                 }
                 if (Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour))
                     break;
             }
-            return fixday;
+            return dayChanged;
         };
         DateTime.prototype.addMinutes = function (minutes, filtered, byhour, byminute) {
-            var fixday = false;
+            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.minute +=
@@ -507,17 +507,17 @@ var dateutil_dateutil;
                 var _a = Object(helpers["a" /* divmod */])(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
                 if (hourDiv) {
                     this.minute = minuteMod;
-                    fixday = this.addHours(hourDiv, false, byhour);
+                    dayChanged = this.addHours(hourDiv, false, byhour);
                 }
                 if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
                     (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute))) {
                     break;
                 }
             }
-            return fixday;
+            return dayChanged;
         };
         DateTime.prototype.addSeconds = function (seconds, filtered, byhour, byminute, bysecond) {
-            var fixday = false;
+            var dayChanged = false;
             if (filtered) {
                 // Jump to one iteration before next day
                 this.second +=
@@ -528,7 +528,7 @@ var dateutil_dateutil;
                 var _a = Object(helpers["a" /* divmod */])(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
                 if (minuteDiv) {
                     this.second = secondMod;
-                    fixday = this.addMinutes(minuteDiv, false, byhour, byminute);
+                    dayChanged = this.addMinutes(minuteDiv, false, byhour, byminute);
                 }
                 if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
                     (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute)) &&
@@ -536,7 +536,7 @@ var dateutil_dateutil;
                     break;
                 }
             }
-            return fixday;
+            return dayChanged;
         };
         DateTime.prototype.fixDay = function () {
             if (this.day <= 28) {
@@ -1655,11 +1655,6 @@ var iterinfo_Iterinfo = /** @class */ (function () {
 
 
 function iter(iterResult, options) {
-    /* Since JavaScript doesn't have the python's yield operator (<1.7),
-        we use the IterResult object that tells us when to stop iterating.
-  
-    */
-    // Some local variables to speed things up a bit
     var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
     var counterDate = esm_dateutil.DateTime.fromDate(dtstart);
     var ii = new iterinfo(options);
@@ -1669,11 +1664,8 @@ function iter(iterResult, options) {
     var count = options.count;
     var pos;
     while (true) {
-        // Get dayset with the right frequency
         var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
-        // Do the "hard" work ;-)
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
-        // Output results
         if (Object(helpers["g" /* notEmpty */])(bysetpos) && Object(helpers["g" /* notEmpty */])(timeset)) {
             var daypos = void 0;
             var timepos = void 0;
@@ -1697,7 +1689,6 @@ function iter(iterResult, options) {
                 }
                 var i = void 0;
                 if (daypos < 0) {
-                    // we're trying to emulate python's aList[-n]
                     i = tmp.slice(daypos)[0];
                 }
                 else {
@@ -1760,32 +1751,8 @@ function iter(iterResult, options) {
             }
         }
         // Handle frequency and interval
-        if (freq === esm_rrule.YEARLY) {
-            counterDate.addYears(interval);
-        }
-        else if (freq === esm_rrule.MONTHLY) {
-            counterDate.addMonths(interval);
-        }
-        else if (freq === esm_rrule.WEEKLY) {
-            counterDate.addWeekly(interval, wkst);
-        }
-        else if (freq === esm_rrule.DAILY) {
-            counterDate.addDaily(interval);
-        }
-        else if (freq === esm_rrule.HOURLY) {
-            counterDate.addHours(interval, filtered, byhour);
-            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
-        }
-        else if (freq === esm_rrule.MINUTELY) {
-            if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
-                filtered = false;
-            }
-            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
-        }
-        else if (freq === esm_rrule.SECONDLY) {
-            if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
-                filtered = false;
-            }
+        addToCounter(options, ii, filtered, counterDate);
+        if (!freqIsDailyOrGreater(freq)) {
             timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         if (counterDate.year > esm_dateutil.MAXYEAR) {
@@ -1849,6 +1816,18 @@ function makeTimeset(ii, counterDate, options) {
     }
     else {
         return ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
+    }
+}
+function addToCounter(options, ii, filtered, counterDate) {
+    var freq = options.freq, interval = options.interval, wkst = options.wkst, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    switch (freq) {
+        case Frequency.YEARLY: return counterDate.addYears(interval);
+        case Frequency.MONTHLY: return counterDate.addMonths(interval);
+        case Frequency.WEEKLY: return counterDate.addWeekly(interval, wkst);
+        case Frequency.DAILY: return counterDate.addDaily(interval);
+        case Frequency.HOURLY: return counterDate.addHours(interval, filtered, byhour);
+        case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute);
+        case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond);
     }
 }
 //# sourceMappingURL=iter.js.map

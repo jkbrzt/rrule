@@ -6,11 +6,6 @@ import { buildTimeset } from './parseoptions';
 import { notEmpty, includes, pymod, isPresent } from './helpers';
 import { DateWithZone } from './datewithzone';
 export function iter(iterResult, options) {
-    /* Since JavaScript doesn't have the python's yield operator (<1.7),
-        we use the IterResult object that tells us when to stop iterating.
-  
-    */
-    // Some local variables to speed things up a bit
     var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
     var counterDate = dateutil.DateTime.fromDate(dtstart);
     var ii = new Iterinfo(options);
@@ -20,11 +15,8 @@ export function iter(iterResult, options) {
     var count = options.count;
     var pos;
     while (true) {
-        // Get dayset with the right frequency
         var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
-        // Do the "hard" work ;-)
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
-        // Output results
         if (notEmpty(bysetpos) && notEmpty(timeset)) {
             var daypos = void 0;
             var timepos = void 0;
@@ -48,7 +40,6 @@ export function iter(iterResult, options) {
                 }
                 var i = void 0;
                 if (daypos < 0) {
-                    // we're trying to emulate python's aList[-n]
                     i = tmp.slice(daypos)[0];
                 }
                 else {
@@ -111,32 +102,8 @@ export function iter(iterResult, options) {
             }
         }
         // Handle frequency and interval
-        if (freq === RRule.YEARLY) {
-            counterDate.addYears(interval);
-        }
-        else if (freq === RRule.MONTHLY) {
-            counterDate.addMonths(interval);
-        }
-        else if (freq === RRule.WEEKLY) {
-            counterDate.addWeekly(interval, wkst);
-        }
-        else if (freq === RRule.DAILY) {
-            counterDate.addDaily(interval);
-        }
-        else if (freq === RRule.HOURLY) {
-            counterDate.addHours(interval, filtered, byhour);
-            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
-        }
-        else if (freq === RRule.MINUTELY) {
-            if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
-                filtered = false;
-            }
-            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
-        }
-        else if (freq === RRule.SECONDLY) {
-            if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
-                filtered = false;
-            }
+        addToCounter(options, ii, filtered, counterDate);
+        if (!freqIsDailyOrGreater(freq)) {
             timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
         }
         if (counterDate.year > dateutil.MAXYEAR) {
@@ -200,6 +167,18 @@ function makeTimeset(ii, counterDate, options) {
     }
     else {
         return ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
+    }
+}
+function addToCounter(options, ii, filtered, counterDate) {
+    var freq = options.freq, interval = options.interval, wkst = options.wkst, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    switch (freq) {
+        case Frequency.YEARLY: return counterDate.addYears(interval);
+        case Frequency.MONTHLY: return counterDate.addMonths(interval);
+        case Frequency.WEEKLY: return counterDate.addWeekly(interval, wkst);
+        case Frequency.DAILY: return counterDate.addDaily(interval);
+        case Frequency.HOURLY: return counterDate.addHours(interval, filtered, byhour);
+        case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute);
+        case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond);
     }
 }
 //# sourceMappingURL=iter.js.map

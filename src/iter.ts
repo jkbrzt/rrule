@@ -8,12 +8,6 @@ import { notEmpty, includes, pymod, isPresent } from './helpers'
 import { DateWithZone } from './datewithzone'
 
 export function iter (iterResult: IterResult, options: ParsedOptions): Date | Date[] | null {
-  /* Since JavaScript doesn't have the python's yield operator (<1.7),
-      we use the IterResult object that tells us when to stop iterating.
-
-  */
-
-  // Some local variables to speed things up a bit
   const {
     dtstart,
     freq,
@@ -38,17 +32,14 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
   let pos: number
 
   while (true) {
-    // Get dayset with the right frequency
     let [dayset, start, end] = ii.getdayset(freq)(
       counterDate.year,
       counterDate.month,
       counterDate.day
     )
 
-    // Do the "hard" work ;-)
     let filtered = removeFilteredDays(dayset, start, end, ii, options)
 
-    // Output results
     if (notEmpty(bysetpos) && notEmpty(timeset)) {
       let daypos: number
       let timepos: number
@@ -73,7 +64,6 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
         }
         let i: number
         if (daypos < 0) {
-          // we're trying to emulate python's aList[-n]
           i = tmp.slice(daypos)[0]
         } else {
           i = tmp[daypos]
@@ -141,29 +131,9 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     }
 
     // Handle frequency and interval
-    if (freq === RRule.YEARLY) {
-      counterDate.addYears(interval)
-    } else if (freq === RRule.MONTHLY) {
-      counterDate.addMonths(interval)
-    } else if (freq === RRule.WEEKLY) {
-      counterDate.addWeekly(interval, wkst)
-    } else if (freq === RRule.DAILY) {
-      counterDate.addDaily(interval)
-    } else if (freq === RRule.HOURLY) {
-      counterDate.addHours(interval, filtered, byhour)
+    addToCounter(options, ii, filtered, counterDate)
 
-      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
-    } else if (freq === RRule.MINUTELY) {
-      if (counterDate.addMinutes(interval, filtered, byhour, byminute)) {
-        filtered = false
-      }
-
-      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
-    } else if (freq === RRule.SECONDLY) {
-      if (counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)) {
-        filtered = false
-      }
-
+    if (!freqIsDailyOrGreater(freq)) {
       timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
     }
 
@@ -267,5 +237,26 @@ function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: Par
       counterDate.second,
       counterDate.millisecond
     )
+  }
+}
+
+function addToCounter (options: ParsedOptions, ii: Iterinfo, filtered: boolean, counterDate: dateutil.DateTime) {
+  const {
+    freq,
+    interval,
+    wkst,
+    byhour,
+    byminute,
+    bysecond
+  } = options
+
+  switch (freq) {
+    case Frequency.YEARLY: return counterDate.addYears(interval)
+    case Frequency.MONTHLY: return counterDate.addMonths(interval)
+    case Frequency.WEEKLY: return counterDate.addWeekly(interval, wkst)
+    case Frequency.DAILY: return counterDate.addDaily(interval)
+    case Frequency.HOURLY: return counterDate.addHours(interval, filtered, byhour)
+    case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute)
+    case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)
   }
 }

@@ -713,4 +713,18 @@ describe('RRuleSet', function () {
       }
     }
   })
+
+  it('throws an error if non-rrules are added via rrule or exrule', () => {
+    const set = new RRuleSet()
+
+    expect(() => set.rrule('foo' as any)).to.throw()
+    expect(() => set.exrule('foo' as any)).to.throw()
+  })
+
+  it('throws an error if non-dates are added via rdate or exdate', () => {
+    const set = new RRuleSet()
+
+    expect(() => set.rdate('foo' as any)).to.throw()
+    expect(() => set.exdate('foo' as any)).to.throw()
+  })
 })

@@ -240,6 +240,18 @@ export namespace dateutil {
     public month: number
     public year: number
 
+    static fromDate (date: Date) {
+      return new this(
+        date.getUTCFullYear(),
+        date.getUTCMonth() + 1,
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds(),
+        date.valueOf() % 1000
+      )
+    }
+
     constructor (
       year: number,
       month: number,
@@ -313,9 +325,8 @@ export namespace dateutil {
     }
 
     public addHours (hours: number, filtered: boolean, byhour: number[]) {
-      let fixday = false
       if (filtered) {
-          // Jump to one iteration before next day
+        // Jump to one iteration before next day
         this.hour += Math.floor((23 - this.hour) / hours) * hours
       }
 
@@ -325,19 +336,15 @@ export namespace dateutil {
         if (dayDiv) {
           this.hour = hourMod
           this.addDaily(dayDiv)
-          fixday = true
         }
 
         if (empty(byhour) || includes(byhour, this.hour)) break
       }
-
-      return fixday
     }
 
     public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
-      let fixday = false
       if (filtered) {
-            // Jump to one iteration before next day
+        // Jump to one iteration before next day
         this.minute +=
               Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
       }
@@ -347,22 +354,19 @@ export namespace dateutil {
         const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
         if (hourDiv) {
           this.minute = minuteMod
-          fixday = this.addHours(hourDiv, false, byhour)
+          this.addHours(hourDiv, false, byhour)
         }
 
         if (
-              (empty(byhour) || includes(byhour, this.hour)) &&
-              (empty(byminute) || includes(byminute, this.minute))
-            ) {
+          (empty(byhour) || includes(byhour, this.hour)) &&
+          (empty(byminute) || includes(byminute, this.minute))
+        ) {
           break
         }
       }
-
-      return fixday
     }
 
     public addSeconds (seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]) {
-      let fixday = false
       if (filtered) {
         // Jump to one iteration before next day
         this.second +=
@@ -376,7 +380,7 @@ export namespace dateutil {
         const { div: minuteDiv, mod: secondMod } = divmod(this.second, 60)
         if (minuteDiv) {
           this.second = secondMod
-          fixday = this.addMinutes(minuteDiv, false, byhour, byminute)
+          this.addMinutes(minuteDiv, false, byhour, byminute)
         }
 
         if (
@@ -387,8 +391,6 @@ export namespace dateutil {
           break
         }
       }
-
-      return fixday
     }
 
     public fixDay () {

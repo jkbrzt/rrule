@@ -1,4 +1,4 @@
-import { Options, ParsedOptions } from './types'
+import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
 import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
@@ -41,7 +41,6 @@ export function parseOptions (options: Partial<Options>) {
 
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
-  const millisecondModulo = opts.dtstart.getTime() % 1000
   if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday
   } else if (isNumber(opts.wkst)) {
@@ -194,28 +193,23 @@ export function parseOptions (options: Partial<Options>) {
     opts.bysecond = [opts.bysecond]
   }
 
-  let timeset: dateutil.Time[] | null
-  if (opts.freq >= RRule.HOURLY) {
-    timeset = null
-  } else {
-    timeset = []
-    for (let i = 0; i < opts.byhour!.length; i++) {
-      const hour = opts.byhour![i]
-      for (let j = 0; j < opts.byminute!.length; j++) {
-        const minute = opts.byminute![j]
-        for (let k = 0; k < opts.bysecond!.length; k++) {
-          const second = opts.bysecond![k]
-          // python:
-          // datetime.time(hour, minute, second,
-          // tzinfo=self._tzinfo))
-          timeset.push(
-            new dateutil.Time(hour, minute, second, millisecondModulo)
-          )
-        }
-      }
-    }
-    dateutil.sort(timeset)
+  return { parsedOptions: opts as ParsedOptions }
+}
+
+export function buildTimeset (opts: ParsedOptions) {
+  const millisecondModulo = opts.dtstart.getTime() % 1000
+  if (!freqIsDailyOrGreater(opts.freq)) {
+    return []
   }
 
-  return { parsedOptions: opts as ParsedOptions, timeset }
+  const timeset: dateutil.Time[] = []
+  opts.byhour.forEach(hour => {
+    opts.byminute.forEach(minute => {
+      opts.bysecond.forEach(second => {
+        timeset.push(new dateutil.Time(hour, minute, second, millisecondModulo))
+      })
+    })
+  })
+
+  return timeset
 }

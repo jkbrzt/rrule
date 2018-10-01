@@ -315,7 +315,7 @@ export namespace dateutil {
     public addHours (hours: number, filtered: boolean, byhour: number[]) {
       let fixday = false
       if (filtered) {
-          // Jump to one iteration before next day
+        // Jump to one iteration before next day
         this.hour += Math.floor((23 - this.hour) / hours) * hours
       }
 
@@ -337,7 +337,7 @@ export namespace dateutil {
     public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
       let fixday = false
       if (filtered) {
-            // Jump to one iteration before next day
+        // Jump to one iteration before next day
         this.minute +=
               Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
       }

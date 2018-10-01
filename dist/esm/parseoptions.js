@@ -185,7 +185,7 @@ export function buildTimeset(opts) {
     var millisecondModulo = opts.dtstart.getTime() % 1000;
     var timeset;
     if (opts.freq >= RRule.HOURLY) {
-        timeset = null;
+        return [];
     }
     else {
         timeset = [];

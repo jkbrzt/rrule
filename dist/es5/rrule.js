@@ -917,7 +917,7 @@ function buildTimeset(opts) {
     var millisecondModulo = opts.dtstart.getTime() % 1000;
     var timeset;
     if (opts.freq >= esm_rrule.HOURLY) {
-        timeset = null;
+        return [];
     }
     else {
         timeset = [];
@@ -1633,6 +1633,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
             case Frequency.HOURLY: return this.htimeset.bind(this);
             case Frequency.MINUTELY: return this.mtimeset.bind(this);
             case Frequency.SECONDLY: return this.stimeset.bind(this);
+            default: return function () { return []; };
         }
     };
     return Iterinfo;
@@ -1648,54 +1649,17 @@ var iterinfo_Iterinfo = /** @class */ (function () {
 
 
 function iter(iterResult, options) {
-    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+    var dtstart = options.dtstart, freq = options.freq, until = options.until, bysetpos = options.bysetpos;
     var counterDate = esm_dateutil.DateTime.fromDate(dtstart);
     var ii = new iterinfo(options);
     ii.rebuild(counterDate.year, counterDate.month);
     var timeset = makeTimeset(ii, counterDate, options);
-    var currentDay;
     var count = options.count;
-    var pos;
     while (true) {
         var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
-        if (Object(helpers["g" /* notEmpty */])(bysetpos) && Object(helpers["g" /* notEmpty */])(timeset)) {
-            var daypos = void 0;
-            var timepos = void 0;
-            var poslist = [];
-            for (var j = 0; j < bysetpos.length; j++) {
-                pos = bysetpos[j];
-                if (pos < 0) {
-                    daypos = Math.floor(pos / timeset.length);
-                    timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
-                }
-                else {
-                    daypos = Math.floor((pos - 1) / timeset.length);
-                    timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
-                }
-                var tmp = [];
-                for (var k = start; k < end; k++) {
-                    var val = dayset[k];
-                    if (!Object(helpers["f" /* isPresent */])(val))
-                        continue;
-                    tmp.push(val);
-                }
-                var i = void 0;
-                if (daypos < 0) {
-                    i = tmp.slice(daypos)[0];
-                }
-                else {
-                    i = tmp[daypos];
-                }
-                var time = timeset[timepos];
-                var date = esm_dateutil.fromOrdinal(ii.yearordinal + i);
-                var res = esm_dateutil.combine(date, time);
-                // XXX: can this ever be in the array?
-                // - compare the actual date instead?
-                if (!Object(helpers["c" /* includes */])(poslist, res))
-                    poslist.push(res);
-            }
-            esm_dateutil.sort(poslist);
+        if (Object(helpers["g" /* notEmpty */])(bysetpos)) {
+            var poslist = buildPoslist(bysetpos, timeset, start, end, ii, dayset);
             for (var j = 0; j < poslist.length; j++) {
                 var res = poslist[j];
                 if (until && res > until) {
@@ -1717,7 +1681,7 @@ function iter(iterResult, options) {
         }
         else {
             for (var j = start; j < end; j++) {
-                currentDay = dayset[j];
+                var currentDay = dayset[j];
                 if (!Object(helpers["f" /* isPresent */])(currentDay)) {
                     continue;
                 }
@@ -1746,7 +1710,7 @@ function iter(iterResult, options) {
         // Handle frequency and interval
         addToCounter(options, ii, filtered, counterDate);
         if (!freqIsDailyOrGreater(freq)) {
-            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second);
+            timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, 0);
         }
         if (counterDate.year > esm_dateutil.MAXYEAR) {
             return emitResult(iterResult);
@@ -1822,6 +1786,45 @@ function addToCounter(options, ii, filtered, counterDate) {
         case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute);
         case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond);
     }
+}
+function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
+    var poslist = [];
+    for (var j = 0; j < bysetpos.length; j++) {
+        var daypos = void 0;
+        var timepos = void 0;
+        var pos = bysetpos[j];
+        if (pos < 0) {
+            daypos = Math.floor(pos / timeset.length);
+            timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
+        }
+        else {
+            daypos = Math.floor((pos - 1) / timeset.length);
+            timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
+        }
+        var tmp = [];
+        for (var k = start; k < end; k++) {
+            var val = dayset[k];
+            if (!Object(helpers["f" /* isPresent */])(val))
+                continue;
+            tmp.push(val);
+        }
+        var i = void 0;
+        if (daypos < 0) {
+            i = tmp.slice(daypos)[0];
+        }
+        else {
+            i = tmp[daypos];
+        }
+        var time = timeset[timepos];
+        var date = esm_dateutil.fromOrdinal(ii.yearordinal + i);
+        var res = esm_dateutil.combine(date, time);
+        // XXX: can this ever be in the array?
+        // - compare the actual date instead?
+        if (!Object(helpers["c" /* includes */])(poslist, res))
+            poslist.push(res);
+    }
+    esm_dateutil.sort(poslist);
+    return poslist;
 }
 //# sourceMappingURL=iter.js.map
 // CONCATENATED MODULE: ./dist/esm/rrule.js

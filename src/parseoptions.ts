@@ -200,7 +200,7 @@ export function buildTimeset (opts: ParsedOptions) {
   const millisecondModulo = opts.dtstart.getTime() % 1000
   let timeset: dateutil.Time[] | null
   if (opts.freq >= RRule.HOURLY) {
-    timeset = null
+    return []
   } else {
     timeset = []
     for (let i = 0; i < opts.byhour.length; i++) {

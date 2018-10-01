@@ -291,6 +291,7 @@ var Iterinfo = /** @class */ (function () {
             case Frequency.HOURLY: return this.htimeset.bind(this);
             case Frequency.MINUTELY: return this.mtimeset.bind(this);
             case Frequency.SECONDLY: return this.stimeset.bind(this);
+            default: return function () { return []; };
         }
     };
     return Iterinfo;

@@ -31,5 +31,5 @@ export default class Iterinfo {
     mtimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     stimeset(hour: number, minute: number, second: number, millisecond: number): dateutil.Time[];
     getdayset(freq: Frequency): (y: number, m: number, d: number) => DaySet;
-    gettimeset(freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): any;
+    gettimeset(freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): (h: number, m: number, s: number, ms: number) => dateutil.Time[];
 }

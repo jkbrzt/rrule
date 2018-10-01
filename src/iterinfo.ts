@@ -347,11 +347,12 @@ export default class Iterinfo {
     }
   }
 
-  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY) {
+  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): (h: number, m: number, s: number, ms: number) => dateutil.Time[] {
     switch (freq) {
       case Frequency.HOURLY: return this.htimeset.bind(this)
       case Frequency.MINUTELY: return this.mtimeset.bind(this)
       case Frequency.SECONDLY: return this.stimeset.bind(this)
+      default: return () => []
     }
   }
 }

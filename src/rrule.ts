@@ -132,7 +132,7 @@ export default class RRule implements QueryMethods {
 
   static optionsToString = optionsToString
 
-  protected _iter (iterResult: IterResult) {
+  protected _iter (iterResult: IterResult): Date | Date[] | null {
     return iter(iterResult, this.options)
   }
 
@@ -197,7 +197,7 @@ export default class RRule implements QueryMethods {
 
     let result = this._cacheGet('between', args)
     if (result === false) {
-      result = this._iter(new IterResult('between', args))!
+      result = this._iter(new IterResult('between', args))
       this._cacheAdd('between', result, args)
     }
     return result as Date[]
@@ -214,7 +214,7 @@ export default class RRule implements QueryMethods {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
-      result = this._iter(new IterResult('before', args))!
+      result = this._iter(new IterResult('before', args))
       this._cacheAdd('before', result, args)
     }
     return result as Date
@@ -231,7 +231,7 @@ export default class RRule implements QueryMethods {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {
-      result = this._iter(new IterResult('after', args))!
+      result = this._iter(new IterResult('after', args))
       this._cacheAdd('after', result, args)
     }
     return result as Date

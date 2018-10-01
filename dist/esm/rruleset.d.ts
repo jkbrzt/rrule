@@ -22,17 +22,17 @@ export default class RRuleSet extends RRule {
      */
     rrule(rrule: RRule | string): void;
     /**
-     * Adds an RDate to the set
-     *
-     * @param {Date}
-     */
-    rdate(date: Date): void;
-    /**
      * Adds an EXRULE to the set
      *
      * @param {RRule}
      */
     exrule(rrule: RRule): void;
+    /**
+     * Adds an RDate to the set
+     *
+     * @param {Date}
+     */
+    rdate(date: Date): void;
     /**
      * Adds an EXDATE to the set
      *

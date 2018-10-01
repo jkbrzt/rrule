@@ -14,8 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 import RRule from './rrule';
 import dateutil from './dateutil';
 import { includes } from './helpers';
-import { DateWithZone } from './datewithzone';
-import { iter } from './iter';
+import { iterSet } from './iterset';
 var RRuleSet = /** @class */ (function (_super) {
     __extends(RRuleSet, _super);
     /**
@@ -65,6 +64,19 @@ var RRuleSet = /** @class */ (function (_super) {
         }
     };
     /**
+     * Adds an EXRULE to the set
+     *
+     * @param {RRule}
+     */
+    RRuleSet.prototype.exrule = function (rrule) {
+        if (!(rrule instanceof RRule)) {
+            throw new TypeError(String(rrule) + ' is not RRule instance');
+        }
+        if (!includes(this._exrule.map(String), String(rrule))) {
+            this._exrule.push(rrule);
+        }
+    };
+    /**
      * Adds an RDate to the set
      *
      * @param {Date}
@@ -76,19 +88,6 @@ var RRuleSet = /** @class */ (function (_super) {
         if (!includes(this._rdate.map(Number), Number(date))) {
             this._rdate.push(date);
             dateutil.sort(this._rdate);
-        }
-    };
-    /**
-     * Adds an EXRULE to the set
-     *
-     * @param {RRule}
-     */
-    RRuleSet.prototype.exrule = function (rrule) {
-        if (!(rrule instanceof RRule)) {
-            throw new TypeError(String(rrule) + ' is not RRule instance');
-        }
-        if (!includes(this._exrule.map(String), String(rrule))) {
-            this._exrule.push(rrule);
         }
     };
     /**
@@ -146,80 +145,13 @@ var RRuleSet = /** @class */ (function (_super) {
      */
     RRuleSet.prototype.clone = function () {
         var rrs = new RRuleSet(!!this._cache);
-        var i;
-        for (i = 0; i < this._rrule.length; i++) {
-            rrs.rrule(this._rrule[i].clone());
-        }
-        for (i = 0; i < this._rdate.length; i++) {
-            rrs.rdate(new Date(this._rdate[i].getTime()));
-        }
-        for (i = 0; i < this._exrule.length; i++) {
-            rrs.exrule(this._exrule[i].clone());
-        }
-        for (i = 0; i < this._exdate.length; i++) {
-            rrs.exdate(new Date(this._exdate[i].getTime()));
-        }
+        this._rrule.forEach(function (rule) { return rrs.rrule(rule.clone()); });
+        this._exrule.forEach(function (rule) { return rrs.exrule(rule.clone()); });
+        this._rdate.forEach(function (date) { return rrs.rdate(new Date(date.getTime())); });
+        this._exdate.forEach(function (date) { return rrs.exdate(new Date(date.getTime())); });
         return rrs;
     };
     return RRuleSet;
 }(RRule));
 export default RRuleSet;
-function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
-    var _exdateHash = {};
-    var _accept = iterResult.accept;
-    function evalExdate(after, before) {
-        _exrule.forEach(function (rrule) {
-            rrule.between(after, before, true).forEach(function (date) {
-                _exdateHash[Number(date)] = true;
-            });
-        });
-    }
-    _exdate.forEach(function (date) {
-        var zonedDate = new DateWithZone(date, tzid).rezonedDate();
-        _exdateHash[Number(zonedDate)] = true;
-    });
-    iterResult.accept = function (date) {
-        var dt = Number(date);
-        if (!_exdateHash[dt]) {
-            evalExdate(new Date(dt - 1), new Date(dt + 1));
-            if (!_exdateHash[dt]) {
-                _exdateHash[dt] = true;
-                return _accept.call(this, date);
-            }
-        }
-        return true;
-    };
-    if (iterResult.method === 'between') {
-        evalExdate(iterResult.args.after, iterResult.args.before);
-        iterResult.accept = function (date) {
-            var dt = Number(date);
-            if (!_exdateHash[dt]) {
-                _exdateHash[dt] = true;
-                return _accept.call(this, date);
-            }
-            return true;
-        };
-    }
-    for (var i = 0; i < _rdate.length; i++) {
-        var zonedDate = new DateWithZone(_rdate[i], tzid).rezonedDate();
-        if (!iterResult.accept(new Date(zonedDate.getTime())))
-            break;
-    }
-    _rrule.forEach(function (rrule) {
-        iter(iterResult, rrule.options);
-    });
-    var res = iterResult._result;
-    dateutil.sort(res);
-    switch (iterResult.method) {
-        case 'all':
-        case 'between':
-            return res;
-        case 'before':
-            return (res.length && res[res.length - 1]) || null;
-        case 'after':
-            return (res.length && res[0]) || null;
-        default:
-            return null;
-    }
-}
 //# sourceMappingURL=rruleset.js.map

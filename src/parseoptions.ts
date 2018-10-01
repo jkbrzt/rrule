@@ -203,12 +203,12 @@ export function buildTimeset (opts: ParsedOptions) {
     timeset = null
   } else {
     timeset = []
-    for (let i = 0; i < opts.byhour!.length; i++) {
-      const hour = opts.byhour![i]
-      for (let j = 0; j < opts.byminute!.length; j++) {
-        const minute = opts.byminute![j]
-        for (let k = 0; k < opts.bysecond!.length; k++) {
-          const second = opts.bysecond![k]
+    for (let i = 0; i < opts.byhour.length; i++) {
+      const hour = opts.byhour[i]
+      for (let j = 0; j < opts.byminute.length; j++) {
+        const minute = opts.byminute[j]
+        for (let k = 0; k < opts.bysecond.length; k++) {
+          const second = opts.bysecond[k]
           // python:
           // datetime.time(hour, minute, second,
           // tzinfo=self._tzinfo))

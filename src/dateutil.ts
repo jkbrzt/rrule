@@ -325,7 +325,6 @@ export namespace dateutil {
     }
 
     public addHours (hours: number, filtered: boolean, byhour: number[]) {
-      let dayChanged = false
       if (filtered) {
         // Jump to one iteration before next day
         this.hour += Math.floor((23 - this.hour) / hours) * hours
@@ -337,17 +336,13 @@ export namespace dateutil {
         if (dayDiv) {
           this.hour = hourMod
           this.addDaily(dayDiv)
-          dayChanged = true
         }
 
         if (empty(byhour) || includes(byhour, this.hour)) break
       }
-
-      return dayChanged
     }
 
     public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
-      let dayChanged = false
       if (filtered) {
         // Jump to one iteration before next day
         this.minute +=
@@ -359,22 +354,19 @@ export namespace dateutil {
         const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
         if (hourDiv) {
           this.minute = minuteMod
-          dayChanged = this.addHours(hourDiv, false, byhour)
+          this.addHours(hourDiv, false, byhour)
         }
 
         if (
-              (empty(byhour) || includes(byhour, this.hour)) &&
-              (empty(byminute) || includes(byminute, this.minute))
-            ) {
+          (empty(byhour) || includes(byhour, this.hour)) &&
+          (empty(byminute) || includes(byminute, this.minute))
+        ) {
           break
         }
       }
-
-      return dayChanged
     }
 
     public addSeconds (seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]) {
-      let dayChanged = false
       if (filtered) {
         // Jump to one iteration before next day
         this.second +=
@@ -388,7 +380,7 @@ export namespace dateutil {
         const { div: minuteDiv, mod: secondMod } = divmod(this.second, 60)
         if (minuteDiv) {
           this.second = secondMod
-          dayChanged = this.addMinutes(minuteDiv, false, byhour, byminute)
+          this.addMinutes(minuteDiv, false, byhour, byminute)
         }
 
         if (
@@ -399,8 +391,6 @@ export namespace dateutil {
           break
         }
       }
-
-      return dayChanged
     }
 
     public fixDay () {

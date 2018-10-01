@@ -17,6 +17,10 @@ export enum Frequency {
   SECONDLY = 6
 }
 
+export function freqIsDailyOrGreater (freq: Frequency): freq is Frequency.YEARLY | Frequency.MONTHLY | Frequency.WEEKLY | Frequency.DAILY {
+  return freq < Frequency.HOURLY
+}
+
 export interface Options {
   freq: Frequency
   dtstart: Date | null

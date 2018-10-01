@@ -159,14 +159,14 @@ export default class RRule implements QueryMethods {
   all (iterator?: (d: Date, len: number) => boolean): Date[] {
     if (iterator) {
       return this._iter(new CallbackIterResult('all', {}, iterator)) as Date[]
-    } else {
-      let result = this._cacheGet('all') as Date[] | false
-      if (result === false) {
-        result = this._iter(new IterResult('all', {})) as Date[]
-        this._cacheAdd('all', result)
-      }
-      return result
     }
+
+    let result = this._cacheGet('all') as Date[] | false
+    if (result === false) {
+      result = this._iter(new IterResult('all', {})) as Date[]
+      this._cacheAdd('all', result)
+    }
+    return result
   }
 
   /**

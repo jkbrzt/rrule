@@ -41,7 +41,6 @@ export function parseOptions (options: Partial<Options>) {
 
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
-  const millisecondModulo = opts.dtstart.getTime() % 1000
   if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday
   } else if (isNumber(opts.wkst)) {
@@ -194,6 +193,11 @@ export function parseOptions (options: Partial<Options>) {
     opts.bysecond = [opts.bysecond]
   }
 
+  return { parsedOptions: opts as ParsedOptions }
+}
+
+export function buildTimeset (opts: ParsedOptions) {
+  const millisecondModulo = opts.dtstart.getTime() % 1000
   let timeset: dateutil.Time[] | null
   if (opts.freq >= RRule.HOURLY) {
     timeset = null
@@ -217,5 +221,5 @@ export function parseOptions (options: Partial<Options>) {
     dateutil.sort(timeset)
   }
 
-  return { parsedOptions: opts as ParsedOptions, timeset }
+  return timeset
 }

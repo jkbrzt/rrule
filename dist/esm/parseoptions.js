@@ -35,7 +35,6 @@ export function parseOptions(options) {
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
-    var millisecondModulo = opts.dtstart.getTime() % 1000;
     if (!isPresent(opts.wkst)) {
         opts.wkst = RRule.MO.weekday;
     }
@@ -180,6 +179,10 @@ export function parseOptions(options) {
     else if (isNumber(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
     }
+    return { parsedOptions: opts };
+}
+export function buildTimeset(opts) {
+    var millisecondModulo = opts.dtstart.getTime() % 1000;
     var timeset;
     if (opts.freq >= RRule.HOURLY) {
         timeset = null;
@@ -201,6 +204,6 @@ export function parseOptions(options) {
         }
         dateutil.sort(timeset);
     }
-    return { parsedOptions: opts, timeset: timeset };
+    return timeset;
 }
 //# sourceMappingURL=parseoptions.js.map

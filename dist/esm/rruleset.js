@@ -181,7 +181,7 @@ var RRuleSet = /** @class */ (function (_super) {
                 break;
         }
         this._rrule.forEach(function (rrule) {
-            rrule._iter(iterResult);
+            rrule._iter(iterResult, rrule.options);
         });
         var res = iterResult._result;
         dateutil.sort(res);

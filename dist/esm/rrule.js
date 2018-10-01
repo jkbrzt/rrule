@@ -4,7 +4,7 @@ import { pymod, notEmpty, includes, isPresent } from './helpers';
 import IterResult from './iterresult';
 import CallbackIterResult from './callbackiterresult';
 import { Frequency } from './types';
-import { parseOptions, initializeOptions } from './parseoptions';
+import { parseOptions, initializeOptions, buildTimeset } from './parseoptions';
 import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache } from './cache';
@@ -66,9 +66,8 @@ var RRule = /** @class */ (function () {
         this._cache = noCache ? null : new Cache();
         // used by toString()
         this.origOptions = initializeOptions(options);
-        var _a = parseOptions(options), parsedOptions = _a.parsedOptions, timeset = _a.timeset;
+        var parsedOptions = parseOptions(options).parsedOptions;
         this.options = parsedOptions;
-        this.timeset = timeset;
     }
     RRule.parseText = function (text, language) {
         return getnlp().parseText(text, language);
@@ -97,12 +96,12 @@ var RRule = /** @class */ (function () {
      */
     RRule.prototype.all = function (iterator) {
         if (iterator) {
-            return this._iter(new CallbackIterResult('all', {}, iterator));
+            return this._iter(new CallbackIterResult('all', {}, iterator), this.options);
         }
         else {
             var result = this._cacheGet('all');
             if (result === false) {
-                result = this._iter(new IterResult('all', {}));
+                result = this._iter(new IterResult('all', {}), this.options);
                 this._cacheAdd('all', result);
             }
             return result;
@@ -125,11 +124,11 @@ var RRule = /** @class */ (function () {
             inc: inc
         };
         if (iterator) {
-            return this._iter(new CallbackIterResult('between', args, iterator));
+            return this._iter(new CallbackIterResult('between', args, iterator), this.options);
         }
         var result = this._cacheGet('between', args);
         if (result === false) {
-            result = this._iter(new IterResult('between', args));
+            result = this._iter(new IterResult('between', args), this.options);
             this._cacheAdd('between', result, args);
         }
         return result;
@@ -147,7 +146,7 @@ var RRule = /** @class */ (function () {
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('before', args);
         if (result === false) {
-            result = this._iter(new IterResult('before', args));
+            result = this._iter(new IterResult('before', args), this.options);
             this._cacheAdd('before', result, args);
         }
         return result;
@@ -165,7 +164,7 @@ var RRule = /** @class */ (function () {
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('after', args);
         if (result === false) {
-            result = this._iter(new IterResult('after', args));
+            result = this._iter(new IterResult('after', args), this.options);
             this._cacheAdd('after', result, args);
         }
         return result;
@@ -202,16 +201,15 @@ var RRule = /** @class */ (function () {
     RRule.prototype.clone = function () {
         return new RRule(this.origOptions);
     };
-    RRule.prototype._iter = function (iterResult) {
+    RRule.prototype._iter = function (iterResult, options) {
         /* Since JavaScript doesn't have the python's yield operator (<1.7),
             we use the IterResult object that tells us when to stop iterating.
     
         */
         var _a, _b;
-        var dtstart = this.options.dtstart;
-        var date = new dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
         // Some local variables to speed things up a bit
-        var _c = this.options, freq = _c.freq, interval = _c.interval, wkst = _c.wkst, until = _c.until, bymonth = _c.bymonth, byweekno = _c.byweekno, byyearday = _c.byyearday, byweekday = _c.byweekday, byeaster = _c.byeaster, bymonthday = _c.bymonthday, bynmonthday = _c.bynmonthday, bysetpos = _c.bysetpos, byhour = _c.byhour, byminute = _c.byminute, bysecond = _c.bysecond;
+        var dtstart = options.dtstart, freq = options.freq, interval = options.interval, wkst = options.wkst, until = options.until, bymonth = options.bymonth, byweekno = options.byweekno, byyearday = options.byyearday, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, bysetpos = options.bysetpos, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+        var date = new dateutil.DateTime(dtstart.getUTCFullYear(), dtstart.getUTCMonth() + 1, dtstart.getUTCDate(), dtstart.getUTCHours(), dtstart.getUTCMinutes(), dtstart.getUTCSeconds(), dtstart.valueOf() % 1000);
         var ii = new Iterinfo(this);
         ii.rebuild(date.year, date.month);
         var getdayset = (_a = {},
@@ -226,7 +224,7 @@ var RRule = /** @class */ (function () {
         var timeset;
         var gettimeset;
         if (freq < RRule.HOURLY) {
-            timeset = this.timeset;
+            timeset = buildTimeset(options);
         }
         else {
             gettimeset = (_b = {},
@@ -250,11 +248,11 @@ var RRule = /** @class */ (function () {
             }
         }
         var currentDay;
-        var count = this.options.count;
+        var count = options.count;
         var pos;
         while (true) {
             // Get dayset with the right frequency
-            var _d = getdayset.call(ii, date.year, date.month, date.day), dayset = _d[0], start = _d[1], end = _d[2];
+            var _c = getdayset.call(ii, date.year, date.month, date.day), dayset = _c[0], start = _c[1], end = _c[2];
             // Do the "hard" work ;-)
             var filtered = false;
             for (var dayCounter = start; dayCounter < end; dayCounter++) {
@@ -305,17 +303,17 @@ var RRule = /** @class */ (function () {
                 for (var j = 0; j < poslist.length; j++) {
                     var res = poslist[j];
                     if (until && res > until) {
-                        return this.emitResult(iterResult);
+                        return emitResult(iterResult);
                     }
                     if (res >= dtstart) {
-                        var rezonedDate = this.rezoneIfNeeded(res);
+                        var rezonedDate = rezoneIfNeeded(res, options);
                         if (!iterResult.accept(rezonedDate)) {
-                            return this.emitResult(iterResult);
+                            return emitResult(iterResult);
                         }
                         if (count) {
                             --count;
                             if (!count) {
-                                return this.emitResult(iterResult);
+                                return emitResult(iterResult);
                             }
                         }
                     }
@@ -332,17 +330,17 @@ var RRule = /** @class */ (function () {
                         var time = timeset[k];
                         var res = dateutil.combine(date_2, time);
                         if (until && res > until) {
-                            return this.emitResult(iterResult);
+                            return emitResult(iterResult);
                         }
                         if (res >= dtstart) {
-                            var rezonedDate = this.rezoneIfNeeded(res);
+                            var rezonedDate = rezoneIfNeeded(res, options);
                             if (!iterResult.accept(rezonedDate)) {
-                                return this.emitResult(iterResult);
+                                return emitResult(iterResult);
                             }
                             if (count) {
                                 --count;
                                 if (!count) {
-                                    return this.emitResult(iterResult);
+                                    return emitResult(iterResult);
                                 }
                             }
                         }
@@ -382,17 +380,10 @@ var RRule = /** @class */ (function () {
                 timeset = gettimeset.call(ii, date.hour, date.minute, date.second);
             }
             if (date.year > dateutil.MAXYEAR) {
-                return this.emitResult(iterResult);
+                return emitResult(iterResult);
             }
             ii.rebuild(date.year, date.month);
         }
-    };
-    RRule.prototype.emitResult = function (iterResult) {
-        this._len = iterResult.total;
-        return iterResult.getValue();
-    };
-    RRule.prototype.rezoneIfNeeded = function (date) {
-        return new DateWithZone(date, this.options.tzid).rezonedDate();
     };
     // RRule class 'constants'
     RRule.FREQUENCIES = [
@@ -439,5 +430,11 @@ function isFiltered(bymonth, ii, currentDay, byweekno, byweekday, byeaster, bymo
                 (currentDay >= ii.yearlen &&
                     !includes(byyearday, currentDay + 1 - ii.yearlen) &&
                     !includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen)))));
+}
+function rezoneIfNeeded(date, options) {
+    return new DateWithZone(date, options.tzid).rezonedDate();
+}
+function emitResult(iterResult) {
+    return iterResult.getValue();
 }
 //# sourceMappingURL=rrule.js.map

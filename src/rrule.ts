@@ -8,7 +8,7 @@ import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
 import { ParsedOptions, Options, Frequency, QueryMethods } from './types'
-import { parseOptions, initializeOptions } from './parseoptions'
+import { parseOptions, initializeOptions, buildTimeset } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
@@ -77,7 +77,6 @@ export default class RRule implements QueryMethods {
   public _cache: Cache | null
   public origOptions: Partial<Options>
   public options: ParsedOptions
-  public timeset: dateutil.Time[] | null
   public _len: number
 
   // RRule class 'constants'
@@ -115,9 +114,8 @@ export default class RRule implements QueryMethods {
 
     // used by toString()
     this.origOptions = initializeOptions(options)
-    const { parsedOptions, timeset } = parseOptions(options)
+    const { parsedOptions } = parseOptions(options)
     this.options = parsedOptions
-    this.timeset = timeset
   }
 
   static parseText (text: string, language: Language) {
@@ -158,11 +156,11 @@ export default class RRule implements QueryMethods {
    */
   all (iterator?: (d: Date, len: number) => boolean): Date[] {
     if (iterator) {
-      return this._iter(new CallbackIterResult('all', {}, iterator)) as Date[]
+      return this._iter(new CallbackIterResult('all', {}, iterator), this.options) as Date[]
     } else {
       let result = this._cacheGet('all') as Date[] | false
       if (result === false) {
-        result = this._iter(new IterResult('all', {})) as Date[]
+        result = this._iter(new IterResult('all', {}), this.options) as Date[]
         this._cacheAdd('all', result)
       }
       return result
@@ -191,13 +189,14 @@ export default class RRule implements QueryMethods {
 
     if (iterator) {
       return this._iter(
-        new CallbackIterResult('between', args, iterator)
+        new CallbackIterResult('between', args, iterator),
+        this.options
       ) as Date[]
     }
 
     let result = this._cacheGet('between', args)
     if (result === false) {
-      result = this._iter(new IterResult('between', args))!
+      result = this._iter(new IterResult('between', args), this.options)!
       this._cacheAdd('between', result, args)
     }
     return result as Date[]
@@ -214,7 +213,7 @@ export default class RRule implements QueryMethods {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
-      result = this._iter(new IterResult('before', args))!
+      result = this._iter(new IterResult('before', args), this.options)!
       this._cacheAdd('before', result, args)
     }
     return result as Date
@@ -231,7 +230,7 @@ export default class RRule implements QueryMethods {
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {
-      result = this._iter(new IterResult('after', args))!
+      result = this._iter(new IterResult('after', args), this.options)!
       this._cacheAdd('after', result, args)
     }
     return result as Date
@@ -274,26 +273,15 @@ export default class RRule implements QueryMethods {
     return new RRule(this.origOptions)
   }
 
-  _iter (iterResult: IterResult): Date | Date[] | null {
+  _iter (iterResult: IterResult, options: ParsedOptions): Date | Date[] | null {
     /* Since JavaScript doesn't have the python's yield operator (<1.7),
         we use the IterResult object that tells us when to stop iterating.
 
     */
 
-    const dtstart = this.options.dtstart
-
-    let date = new dateutil.DateTime(
-      dtstart.getUTCFullYear(),
-      dtstart.getUTCMonth() + 1,
-      dtstart.getUTCDate(),
-      dtstart.getUTCHours(),
-      dtstart.getUTCMinutes(),
-      dtstart.getUTCSeconds(),
-      dtstart.valueOf() % 1000
-    )
-
     // Some local variables to speed things up a bit
     const {
+      dtstart,
       freq,
       interval,
       wkst,
@@ -309,7 +297,17 @@ export default class RRule implements QueryMethods {
       byhour,
       byminute,
       bysecond
-    } = this.options
+    } = options
+
+    let date = new dateutil.DateTime(
+      dtstart.getUTCFullYear(),
+      dtstart.getUTCMonth() + 1,
+      dtstart.getUTCDate(),
+      dtstart.getUTCHours(),
+      dtstart.getUTCMinutes(),
+      dtstart.getUTCSeconds(),
+      dtstart.valueOf() % 1000
+    )
 
     const ii = new Iterinfo(this)
     ii.rebuild(date.year, date.month)
@@ -327,7 +325,7 @@ export default class RRule implements QueryMethods {
     let timeset: dateutil.Time[] | null
     let gettimeset: () => typeof timeset
     if (freq < RRule.HOURLY) {
-      timeset = this.timeset
+      timeset = buildTimeset(options)
     } else {
       gettimeset = {
         [RRule.HOURLY]: ii.htimeset,
@@ -361,7 +359,7 @@ export default class RRule implements QueryMethods {
     }
 
     let currentDay: number
-    let count = this.options.count
+    let count = options.count
     let pos: number
 
     while (true) {
@@ -436,19 +434,19 @@ export default class RRule implements QueryMethods {
         for (let j = 0; j < poslist.length; j++) {
           const res = poslist[j]
           if (until && res > until) {
-            return this.emitResult(iterResult)
+            return emitResult(iterResult)
           }
 
           if (res >= dtstart) {
-            const rezonedDate = this.rezoneIfNeeded(res)
+            const rezonedDate = rezoneIfNeeded(res, options)
             if (!iterResult.accept(rezonedDate)) {
-              return this.emitResult(iterResult)
+              return emitResult(iterResult)
             }
 
             if (count) {
               --count
               if (!count) {
-                return this.emitResult(iterResult)
+                return emitResult(iterResult)
               }
             }
           }
@@ -465,19 +463,19 @@ export default class RRule implements QueryMethods {
             const time = timeset![k]
             const res = dateutil.combine(date, time)
             if (until && res > until) {
-              return this.emitResult(iterResult)
+              return emitResult(iterResult)
             }
 
             if (res >= dtstart) {
-              const rezonedDate = this.rezoneIfNeeded(res)
+              const rezonedDate = rezoneIfNeeded(res, options)
               if (!iterResult.accept(rezonedDate)) {
-                return this.emitResult(iterResult)
+                return emitResult(iterResult)
               }
 
               if (count) {
                 --count
                 if (!count) {
-                  return this.emitResult(iterResult)
+                  return emitResult(iterResult)
                 }
               }
             }
@@ -516,20 +514,11 @@ export default class RRule implements QueryMethods {
       }
 
       if (date.year > dateutil.MAXYEAR) {
-        return this.emitResult(iterResult)
+        return emitResult(iterResult)
       }
 
       ii.rebuild(date.year, date.month)
     }
-  }
-
-  private emitResult (iterResult: IterResult) {
-    this._len = iterResult.total
-    return iterResult.getValue() as Date[]
-  }
-
-  private rezoneIfNeeded (date: Date) {
-    return new DateWithZone(date, this.options.tzid).rezonedDate()
   }
 }
 
@@ -561,4 +550,12 @@ function isFiltered (
           !includes(byyearday, currentDay + 1 - ii.yearlen) &&
           !includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
   )
+}
+
+function rezoneIfNeeded (date: Date, options: ParsedOptions) {
+  return new DateWithZone(date, options.tzid).rezonedDate()
+}
+
+function emitResult (iterResult: IterResult) {
+  return iterResult.getValue() as Date[]
 }

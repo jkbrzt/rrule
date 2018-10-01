@@ -1,4 +1,3 @@
-import dateutil from './dateutil';
 import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
 import { GetText } from './nlp/totext';
@@ -29,7 +28,6 @@ export default class RRule implements QueryMethods {
     _cache: Cache | null;
     origOptions: Partial<Options>;
     options: ParsedOptions;
-    timeset: dateutil.Time[] | null;
     _len: number;
     static readonly FREQUENCIES: (keyof typeof Frequency)[];
     static readonly YEARLY: Frequency;
@@ -105,7 +103,5 @@ export default class RRule implements QueryMethods {
      *          as this one (cache is not cloned)
      */
     clone(): RRule;
-    _iter(iterResult: IterResult): Date | Date[] | null;
-    private emitResult;
-    private rezoneIfNeeded;
+    _iter(iterResult: IterResult, options: ParsedOptions): Date | Date[] | null;
 }

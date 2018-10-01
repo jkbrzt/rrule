@@ -202,7 +202,7 @@ export default class RRuleSet extends RRule {
     }
 
     this._rrule.forEach(function (rrule) {
-      rrule._iter(iterResult)
+      rrule._iter(iterResult, rrule.options)
     })
 
     const res = iterResult._result

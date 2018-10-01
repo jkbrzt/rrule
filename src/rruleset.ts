@@ -60,7 +60,7 @@ export default class RRuleSet extends RRule {
    *
    * @param {RRule}
    */
-  rrule (rrule: RRule | string) {
+  rrule (rrule: RRule) {
     _addRule(rrule, this._rrule)
   }
 
@@ -145,7 +145,7 @@ export default class RRuleSet extends RRule {
   }
 }
 
-function _addRule (rrule: RRule | string, collection: RRule[]) {
+function _addRule (rrule: RRule, collection: RRule[]) {
   if (!(rrule instanceof RRule)) {
     throw new TypeError(String(rrule) + ' is not RRule instance')
   }

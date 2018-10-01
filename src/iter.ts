@@ -7,17 +7,12 @@ import { buildTimeset } from './parseoptions'
 import { notEmpty, includes, pymod, isPresent } from './helpers'
 import { DateWithZone } from './datewithzone'
 
-export function iter (iterResult: IterResult, options: ParsedOptions): Date | Date[] | null {
+export function iter (iterResult: IterResult, options: ParsedOptions) {
   const {
     dtstart,
     freq,
-    interval,
-    wkst,
     until,
-    bysetpos,
-    byhour,
-    byminute,
-    bysecond
+    bysetpos
   } = options
 
   let counterDate = dateutil.DateTime.fromDate(dtstart)
@@ -27,9 +22,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
 
   let timeset = makeTimeset(ii, counterDate, options)
 
-  let currentDay: number
   let count = options.count
-  let pos: number
 
   while (true) {
     let [dayset, start, end] = ii.getdayset(freq)(
@@ -40,44 +33,9 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
 
     let filtered = removeFilteredDays(dayset, start, end, ii, options)
 
-    if (notEmpty(bysetpos) && notEmpty(timeset)) {
-      let daypos: number
-      let timepos: number
-      const poslist: Date[] = []
+    if (notEmpty(bysetpos)) {
+      const poslist = buildPoslist(bysetpos, timeset!, start, end, ii, dayset)
 
-      for (let j = 0; j < bysetpos.length; j++) {
-        pos = bysetpos[j]
-
-        if (pos < 0) {
-          daypos = Math.floor(pos / timeset.length)
-          timepos = pymod(pos, timeset.length)
-        } else {
-          daypos = Math.floor((pos - 1) / timeset.length)
-          timepos = pymod(pos - 1, timeset.length)
-        }
-
-        const tmp = []
-        for (let k = start; k < end; k++) {
-          const val = dayset[k]
-          if (!isPresent(val)) continue
-          tmp.push(val)
-        }
-        let i: number
-        if (daypos < 0) {
-          i = tmp.slice(daypos)[0]
-        } else {
-          i = tmp[daypos]
-        }
-
-        const time = timeset[timepos]
-        const date = dateutil.fromOrdinal(ii.yearordinal + i)
-        const res = dateutil.combine(date, time)
-        // XXX: can this ever be in the array?
-        // - compare the actual date instead?
-        if (!includes(poslist, res)) poslist.push(res)
-      }
-
-      dateutil.sort(poslist)
       for (let j = 0; j < poslist.length; j++) {
         const res = poslist[j]
         if (until && res > until) {
@@ -100,7 +58,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
       }
     } else {
       for (let j = start; j < end; j++) {
-        currentDay = dayset[j] as number
+        const currentDay = dayset[j]
         if (!isPresent(currentDay)) {
           continue
         }
@@ -134,7 +92,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions): Date | Da
     addToCounter(options, ii, filtered, counterDate)
 
     if (!freqIsDailyOrGreater(freq)) {
-      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second)
+      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, 0)
     }
 
     if (counterDate.year > dateutil.MAXYEAR) {
@@ -259,4 +217,46 @@ function addToCounter (options: ParsedOptions, ii: Iterinfo, filtered: boolean, 
     case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute)
     case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)
   }
+}
+
+function buildPoslist (bysetpos: number[], timeset: dateutil.Time[], start: number, end: number, ii: Iterinfo, dayset: (number | null)[]) {
+  const poslist: Date[] = []
+
+  for (let j = 0; j < bysetpos.length; j++) {
+    let daypos: number
+    let timepos: number
+    const pos = bysetpos[j]
+
+    if (pos < 0) {
+      daypos = Math.floor(pos / timeset.length)
+      timepos = pymod(pos, timeset.length)
+    } else {
+      daypos = Math.floor((pos - 1) / timeset.length)
+      timepos = pymod(pos - 1, timeset.length)
+    }
+
+    const tmp = []
+    for (let k = start; k < end; k++) {
+      const val = dayset[k]
+      if (!isPresent(val)) continue
+      tmp.push(val)
+    }
+    let i: number
+    if (daypos < 0) {
+      i = tmp.slice(daypos)[0]
+    } else {
+      i = tmp[daypos]
+    }
+
+    const time = timeset[timepos]
+    const date = dateutil.fromOrdinal(ii.yearordinal + i)
+    const res = dateutil.combine(date, time)
+    // XXX: can this ever be in the array?
+    // - compare the actual date instead?
+    if (!includes(poslist, res)) poslist.push(res)
+  }
+
+  dateutil.sort(poslist)
+
+  return poslist
 }

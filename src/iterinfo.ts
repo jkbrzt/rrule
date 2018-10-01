@@ -128,7 +128,6 @@ export default class Iterinfo {
     const numweeks = Math.floor(div + mod / 4)
 
     for (let j = 0; j < options.byweekno.length; j++) {
-      let i: number
       let n = options.byweekno[j]
       if (n < 0) {
         n += numweeks + 1
@@ -136,6 +135,8 @@ export default class Iterinfo {
       if (!(n > 0 && n <= numweeks)) {
         continue
       }
+
+      let i: number
       if (n > 1) {
         i = no1wkst + (n - 1) * 7
         if (no1wkst !== firstwkst) {
@@ -214,13 +215,13 @@ export default class Iterinfo {
 
     let ranges: number[][] = []
     if (options.freq === RRule.YEARLY) {
-      if (notEmpty(options.bymonth)) {
+      if (empty(options.bymonth)) {
+        ranges = [[0, this.yearlen]]
+      } else {
         for (let j = 0; j < options.bymonth.length; j++) {
           month = options.bymonth[j]
           ranges.push(this.mrange!.slice(month - 1, month + 1))
         }
-      } else {
-        ranges = [[0, this.yearlen]]
       }
     } else if (options.freq === RRule.MONTHLY) {
       ranges = [this.mrange!.slice(month - 1, month + 1)]
@@ -261,14 +262,14 @@ export default class Iterinfo {
   mdayset (_: any, month: number, __: any) {
     const start = this.mrange![month - 1]
     const end = this.mrange![month]
-    const set = repeat(null, this.yearlen) as (number | null)[]
+    const set = repeat<number | null>(null, this.yearlen)
     for (let i = start; i < end; i++) set[i] = i
     return [set, start, end]
   }
 
   wdayset (year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
-    const set = repeat(null, this.yearlen + 7) as (number | null)[]
+    const set = repeat<number | null>(null, this.yearlen + 7)
     let i =
       dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
       this.yearordinal
@@ -290,27 +291,20 @@ export default class Iterinfo {
     return [set, i, i + 1]
   }
 
-  htimeset (hour: number, minute: number, second: number, millisecond: number) {
-    const set = []
-    const options = this.options
-    for (let i = 0; i < options.byminute.length; i++) {
-      minute = options.byminute[i]
-      for (let j = 0; j < options.bysecond.length; j++) {
-        second = options.bysecond[j]
-        set.push(new dateutil.Time(hour, minute, second, millisecond))
-      }
-    }
+  htimeset (hour: number, _: number, second: number, millisecond: number) {
+    let set: dateutil.Time[] = []
+    this.options.byminute.forEach(minute => {
+      set = set.concat(this.mtimeset(hour, minute, second, millisecond))
+    })
     dateutil.sort(set)
     return set
   }
 
-  mtimeset (hour: number, minute: number, second: number, millisecond: number) {
-    const set = []
-    const options = this.options
-    for (let j = 0; j < options.bysecond.length; j++) {
-      second = options.bysecond[j]
-      set.push(new dateutil.Time(hour, minute, second, millisecond))
-    }
+  mtimeset (hour: number, minute: number, _: number, millisecond: number) {
+    const set = this.options.bysecond.map(second =>
+      new dateutil.Time(hour, minute, second, millisecond)
+    )
+
     dateutil.sort(set)
     return set
   }

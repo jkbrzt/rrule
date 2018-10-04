@@ -440,10 +440,10 @@ rule.all(function (date, i){return i < 2})
   '2012-05-01T10:30:00.000Z' ]
 ```
 
-##### `RRule.prototype.between(after, before, inc=false [, iterator])`
+##### `RRule.prototype.between(before, after, inc=false [, iterator])`
 
-Returns all the occurrences of the rrule between `after` and `before`.
-The inc keyword defines what happens if `after` and/or `before` are
+Returns all the occurrences of the rrule between `before` and `after`.
+The inc keyword defines what happens if `before` and/or `after` are
 themselves occurrences. With `inc == true`, they will be included in the
 list, if they are found in the recurrence set.
 

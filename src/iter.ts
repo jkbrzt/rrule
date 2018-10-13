@@ -87,7 +87,9 @@ export function iter (iterResult: IterResult, options: ParsedOptions) {
         }
       }
     }
-
+    if (options.interval === 0) {
+      return emitResult(iterResult)
+    }
     // Handle frequency and interval
     addToCounter(options, ii, filtered, counterDate)
 

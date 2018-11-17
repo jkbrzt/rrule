@@ -71,11 +71,9 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
  * @constructor
  */
 export default class RRule implements QueryMethods {
-  public _string: any
   public _cache: Cache | null
   public origOptions: Partial<Options>
   public options: ParsedOptions
-  public _len: number
 
   // RRule class 'constants'
 
@@ -107,7 +105,6 @@ export default class RRule implements QueryMethods {
 
   constructor (options: Partial<Options> = {}, noCache: boolean = false) {
     // RFC string
-    this._string = null
     this._cache = noCache ? null : new Cache()
 
     // used by toString()

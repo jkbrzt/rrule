@@ -159,6 +159,54 @@ rrulestr('DTSTART:20120201T023000Z\nRRULE:FREQ=MONTHLY;COUNT=5\nRDATE:20120701T0
 
 ```
 
+### Important: Use UTC dates
+
+Dates in JavaScript are tricky. `RRule` tries to support as much flexibility as possible without adding any large required 3rd party dependencies, but that means we also have some special rules.
+
+By default, `RRule` deals in ["floating" times or UTC timezones](https://tools.ietf.org/html/rfc5545#section-3.2.19). If you want results in a specific timezone, `RRule` also provides [timezone support](#timezone-support). Either way, JavaScript's built-in "timezone" offset tends to just get in the way, so this library simply doesn't use it at all. All times are returned with zero offset, as though it didn't exist in JavaScript.
+
+**The bottom line is the returned "UTC" dates are always meant to be interpreted as dates in your local timezone. This may mean you have to do additional conversion to get the "correct" local time with offset applied.**
+
+For this reason, it is highly recommended to use timestamps in UTC eg. `new Date(Date.UTC(...))`. Returned dates will likewise be in UTC (except on Chrome, which always returns dates with a timezone offset).
+
+For example:
+
+```ts
+// local machine zone is America/Los_Angeles
+const rule = RRule.fromString(
+  "DTSTART;TZID=America/Denver:20181101T190000;\n"
+  + "RRULE:FREQ=WEEKLY;BYDAY=MO,WE,TH;INTERVAL=1;COUNT=3"
+)
+rule.all()
+
+[ 2018-11-01T18:00:00.000Z,
+  2018-11-05T18:00:00.000Z,
+  2018-11-07T18:00:00.000Z ]
+// Even though the given offset is `Z` (UTC), these are local times, not UTC times.
+// Each of these this is the correct local Pacific time of each recurrence in
+// America/Los_Angeles when it is 19:00 in America/Denver, including the DST shift.
+
+// You can get the local components by using the getUTC* methods eg:
+date.getUTCDate() // --> 1
+date.getUTCHours() // --> 18
+```
+
+If you want to get the same times in true UTC, you may do so eg. using Luxon:
+
+```ts
+rule.all().map(date =>
+DateTime.fromJSDate(date)
+  .toUTC()
+  .setZone('local', { keepLocalTime: true })
+  .toJSDate()
+)
+
+[ 2018-11-02T01:00:00.000Z,
+  2018-11-06T02:00:00.000Z,
+  2018-11-08T02:00:00.000Z ]
+// These times are in true UTC; you can see the hours shift
+```
+
 For more examples see
 [python-dateutil](http://labix.org/python-dateutil/) documentation.
 
@@ -166,8 +214,6 @@ For more examples see
 
 ### Timezone Support
 
-By default, `RRule` only correctly supports
-["floating" times or UTC timezones](https://tools.ietf.org/html/rfc5545#section-3.2.19).
 Optionally, it also supports use of the `TZID` parameter in the
 [RFC](https://tools.ietf.org/html/rfc5545#section-3.2.19)
 when the [Luxon](https://github.com/moment/luxon) library is provided. The 

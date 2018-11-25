@@ -64,7 +64,5 @@ export function iterSet (iterResult: IterResult, _rrule: RRule[], _exrule: RRule
       return (res.length && res[res.length - 1]) || null
     case 'after':
       return (res.length && res[0]) || null
-    default:
-      return null
   }
 }

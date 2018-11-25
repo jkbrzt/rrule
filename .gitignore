@@ -5,3 +5,4 @@ bower_components/
 *.log
 coverage
 .nyc_output
+dist/

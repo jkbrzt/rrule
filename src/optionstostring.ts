@@ -48,11 +48,13 @@ export function optionsToString (options: Partial<Options>) {
         outValue = toArray<Weekday | number[] | number>(value).map(wday => {
           if (wday instanceof Weekday) {
             return wday
-          } else if (isArray(wday)) {
-            return new Weekday(wday[0], wday[1])
-          } else {
-            return new Weekday(wday)
           }
+
+          if (isArray(wday)) {
+            return new Weekday(wday[0], wday[1])
+          }
+
+          return new Weekday(wday)
         }).toString()
 
         break

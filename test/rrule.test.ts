@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
+import { optionsToString } from '../src/optionstostring';
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -61,10 +62,28 @@ describe('RRule', function () {
     })
   })
 
+  it('parseText()', function () {
+    texts.forEach(function (item) {
+      const text = item[0]
+      const str = item[1]
+      expect(optionsToString(RRule.parseText(text))).equals(str, text + ' => ' + str)
+    })
+  })
+
   it('rrulestr https://github.com/jkbrzt/rrule/pull/164', function () {
     const s1 = 'RRULE:FREQ=WEEKLY;WKST=WE'
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
+  })
+  
+  it('rrulestr itteration not infinite when interval 0', function () {
+    ['FREQ=YEARLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
+    'FREQ=MONTHLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
+    'FREQ=DAILY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
+    'FREQ=HOURLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
+    'FREQ=MINUTELY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
+    'FREQ=SECONDLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO']
+    .map((s) => expect(rrulestr(s).count()).to.equal(0))
   })
 
   it('does not mutate the passed-in options object', function () {

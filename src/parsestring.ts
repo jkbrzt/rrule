@@ -105,14 +105,14 @@ function parseRrule (line: string) {
 function parseNumber (value: string) {
   if (value.indexOf(',') !== -1) {
     const values = value.split(',')
-    return values.map(val => {
-      if (/^[+-]?\d+$/.test(val.toString())) {
-        return Number(val)
-      } else {
-        return val
-      }
-    })
-  } else if (/^[+-]?\d+$/.test(value)) {
+    return values.map(parseIndividualNumber)
+  }
+
+  return parseIndividualNumber(value)
+}
+
+function parseIndividualNumber (value: string) {
+  if (/^[+-]?\d+$/.test(value)) {
     return Number(value)
   }
 
@@ -126,13 +126,13 @@ function parseWeekday (value: string) {
     if (day.length === 2) {
       // MO, TU, ...
       return Days[day as keyof typeof Days] // wday instanceof Weekday
-    } else {
-      // -1MO, +3FR, 1SO, ...
-      const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
-      const n = Number(parts[1])
-      const wdaypart = parts[2] as keyof typeof Days
-      const wday = Days[wdaypart].weekday
-      return new Weekday(wday, n)
     }
+
+    // -1MO, +3FR, 1SO, ...
+    const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
+    const n = Number(parts[1])
+    const wdaypart = parts[2] as keyof typeof Days
+    const wday = Days[wdaypart].weekday
+    return new Weekday(wday, n)
   })
 }

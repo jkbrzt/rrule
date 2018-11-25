@@ -1,5 +1,5 @@
 import IterResult from './iterresult'
-import { ParsedOptions, Frequency } from './types'
+import { ParsedOptions, Frequency, freqIsDailyOrGreater } from './types'
 import dateutil from './dateutil'
 import Iterinfo from './iterinfo'
 import RRule from './rrule'
@@ -87,16 +87,18 @@ export function iter (iterResult: IterResult, options: ParsedOptions) {
         }
       }
     }
-
+    if (options.interval === 0) {
+      return emitResult(iterResult)
+    }
     // Handle frequency and interval
     addToCounter(options, ii, filtered, counterDate)
 
-    if (!freqIsDailyOrGreater(freq)) {
-      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, 0)
-    }
-
     if (counterDate.year > dateutil.MAXYEAR) {
       return emitResult(iterResult)
+    }
+
+    if (!freqIsDailyOrGreater(freq)) {
+      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, 0)
     }
 
     ii.rebuild(counterDate.year, counterDate.month)
@@ -162,10 +164,6 @@ function removeFilteredDays (dayset: (number | null)[], start: number, end: numb
   return filtered
 }
 
-function freqIsDailyOrGreater (freq: Frequency): freq is Frequency.YEARLY | Frequency.MONTHLY | Frequency.WEEKLY | Frequency.DAILY {
-  return freq < Frequency.HOURLY
-}
-
 function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: ParsedOptions): dateutil.Time[] | null {
   const {
     freq,
@@ -176,7 +174,9 @@ function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: Par
 
   if (freqIsDailyOrGreater(freq)) {
     return buildTimeset(options)
-  } else if (
+  }
+
+  if (
     (freq >= RRule.HOURLY &&
       notEmpty(byhour) &&
       !includes(byhour, counterDate.hour)) ||
@@ -188,14 +188,14 @@ function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: Par
       !includes(bysecond, counterDate.second))
   ) {
     return []
-  } else {
-    return ii.gettimeset(freq)(
-      counterDate.hour,
-      counterDate.minute,
-      counterDate.second,
-      counterDate.millisecond
-    )
   }
+
+  return ii.gettimeset(freq)(
+    counterDate.hour,
+    counterDate.minute,
+    counterDate.second,
+    counterDate.millisecond
+  )
 }
 
 function addToCounter (options: ParsedOptions, ii: Iterinfo, filtered: boolean, counterDate: dateutil.DateTime) {

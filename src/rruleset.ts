@@ -60,13 +60,8 @@ export default class RRuleSet extends RRule {
    *
    * @param {RRule}
    */
-  rrule (rrule: RRule | string) {
-    if (!(rrule instanceof RRule)) {
-      throw new TypeError(String(rrule) + ' is not RRule instance')
-    }
-    if (!includes(this._rrule.map(String), String(rrule))) {
-      this._rrule.push(rrule)
-    }
+  rrule (rrule: RRule) {
+    _addRule(rrule, this._rrule)
   }
 
   /**
@@ -75,12 +70,7 @@ export default class RRuleSet extends RRule {
    * @param {RRule}
    */
   exrule (rrule: RRule) {
-    if (!(rrule instanceof RRule)) {
-      throw new TypeError(String(rrule) + ' is not RRule instance')
-    }
-    if (!includes(this._exrule.map(String), String(rrule))) {
-      this._exrule.push(rrule)
-    }
+    _addRule(rrule, this._exrule)
   }
 
   /**
@@ -89,13 +79,7 @@ export default class RRuleSet extends RRule {
    * @param {Date}
    */
   rdate (date: Date) {
-    if (!(date instanceof Date)) {
-      throw new TypeError(String(date) + ' is not Date instance')
-    }
-    if (!includes(this._rdate.map(Number), Number(date))) {
-      this._rdate.push(date)
-      dateutil.sort(this._rdate)
-    }
+    _addDate(date, this._rdate)
   }
 
   /**
@@ -104,25 +88,7 @@ export default class RRuleSet extends RRule {
    * @param {Date}
    */
   exdate (date: Date) {
-    if (!(date instanceof Date)) {
-      throw new TypeError(String(date) + ' is not Date instance')
-    }
-    if (!includes(this._exdate.map(Number), Number(date))) {
-      this._exdate.push(date)
-      dateutil.sort(this._exdate)
-    }
-  }
-
-  private rdatesToString (param: string, rdates: Date[]) {
-    const tzid = this.tzid()
-    const isUTC = !tzid || tzid.toUpperCase() === 'UTC'
-    const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
-
-    const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
-      .join(',')
-
-    return `${header}${dateString}`
+    _addDate(date, this._exdate)
   }
 
   valueOf () {
@@ -130,12 +96,6 @@ export default class RRuleSet extends RRule {
     this._rrule.forEach(function (rrule) {
       result = result.concat(rrule.toString().split('\n'))
     })
-
-    if (this._rdate.length) {
-      result.push(
-        this.rdatesToString('RDATE', this._rdate)
-      )
-    }
 
     this._exrule.forEach(function (exrule) {
       result = result.concat(
@@ -145,9 +105,15 @@ export default class RRuleSet extends RRule {
       )
     })
 
+    if (this._rdate.length) {
+      result.push(
+        rdatesToString('RDATE', this._rdate, this.tzid())
+      )
+    }
+
     if (this._exdate.length) {
       result.push(
-        this.rdatesToString('EXDATE', this._exdate)
+        rdatesToString('EXDATE', this._exdate, this.tzid())
       )
     }
 
@@ -177,4 +143,35 @@ export default class RRuleSet extends RRule {
 
     return rrs
   }
+}
+
+function _addRule (rrule: RRule, collection: RRule[]) {
+  if (!(rrule instanceof RRule)) {
+    throw new TypeError(String(rrule) + ' is not RRule instance')
+  }
+
+  if (!includes(collection.map(String), String(rrule))) {
+    collection.push(rrule)
+  }
+}
+
+function _addDate (date: Date, collection: Date[]) {
+  if (!(date instanceof Date)) {
+    throw new TypeError(String(date) + ' is not Date instance')
+  }
+  if (!includes(collection.map(Number), Number(date))) {
+    collection.push(date)
+    dateutil.sort(collection)
+  }
+}
+
+function rdatesToString (param: string, rdates: Date[], tzid: string | undefined) {
+  const isUTC = !tzid || tzid.toUpperCase() === 'UTC'
+  const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
+
+  const dateString = rdates
+      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
+      .join(',')
+
+  return `${header}${dateString}`
 }

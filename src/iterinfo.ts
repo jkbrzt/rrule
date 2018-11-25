@@ -67,7 +67,12 @@ export default class Iterinfo {
       notEmpty(options.bynweekday!) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
-      this.rebuildMonth(year, month)
+      const { lastyear, lastmonth, nwdaymask } = rebuildMonth(
+        year, month, this.yearlen, this.mrange as number[], this.wdaymask as number[], options
+      )
+      this.lastyear = lastyear
+      this.lastmonth = lastmonth
+      this.nwdaymask = nwdaymask
     }
 
     if (isPresent(options.byeaster)) {
@@ -207,54 +212,6 @@ export default class Iterinfo {
     }
   }
 
-  private rebuildMonth (year: number, month: number) {
-    const options = this.options
-
-    this.lastyear = year
-    this.lastmonth = month
-
-    let ranges: number[][] = []
-    if (options.freq === RRule.YEARLY) {
-      if (empty(options.bymonth)) {
-        ranges = [[0, this.yearlen]]
-      } else {
-        for (let j = 0; j < options.bymonth.length; j++) {
-          month = options.bymonth[j]
-          ranges.push(this.mrange!.slice(month - 1, month + 1))
-        }
-      }
-    } else if (options.freq === RRule.MONTHLY) {
-      ranges = [this.mrange!.slice(month - 1, month + 1)]
-    }
-
-    if (empty(ranges)) {
-      return
-    }
-
-    // Weekly frequency won't get here, so we may not
-    // care about cross-year weekly periods.
-    this.nwdaymask = repeat(0, this.yearlen) as number[]
-
-    for (let j = 0; j < ranges.length; j++) {
-      const rang = ranges[j]
-      const first = rang[0]
-      const last = rang[1] - 1
-
-      for (let k = 0; k < options.bynweekday!.length; k++) {
-        let i
-        const [ wday, n ] = options.bynweekday![k]
-        if (n < 0) {
-          i = last + (n + 1) * 7
-          i -= pymod(this.wdaymask![i] - wday, 7)
-        } else {
-          i = first + (n - 1) * 7
-          i += pymod(7 - this.wdaymask![i] + wday, 7)
-        }
-        if (first <= i && i <= last) this.nwdaymask[i] = 1
-      }
-    }
-  }
-
   ydayset () {
     return [range(this.yearlen), 0, this.yearlen]
   }
@@ -351,4 +308,68 @@ function easter (y: number, offset: number = 0) {
   const yearStart = Date.UTC(y, 0, 1)
 
   return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))]
+}
+
+function rebuildMonth (
+  year: number,
+  month: number,
+  yearlen: number,
+  mrange: number[],
+  wdaymask: number[],
+  options: ParsedOptions
+) {
+  interface Result {
+    lastyear: number
+    lastmonth: number
+    nwdaymask: number[]
+  }
+
+  const result: Result = {
+    lastyear: year,
+    lastmonth: month,
+    nwdaymask: []
+  }
+
+  let ranges: number[][] = []
+  if (options.freq === RRule.YEARLY) {
+    if (empty(options.bymonth)) {
+      ranges = [[0, yearlen]]
+    } else {
+      for (let j = 0; j < options.bymonth.length; j++) {
+        month = options.bymonth[j]
+        ranges.push(mrange.slice(month - 1, month + 1))
+      }
+    }
+  } else if (options.freq === RRule.MONTHLY) {
+    ranges = [mrange.slice(month - 1, month + 1)]
+  }
+
+  if (empty(ranges)) {
+    return result
+  }
+
+  // Weekly frequency won't get here, so we may not
+  // care about cross-year weekly periods.
+  result.nwdaymask = repeat(0, yearlen) as number[]
+
+  for (let j = 0; j < ranges.length; j++) {
+    const rang = ranges[j]
+    const first = rang[0]
+    const last = rang[1] - 1
+
+    for (let k = 0; k < options.bynweekday!.length; k++) {
+      let i
+      const [ wday, n ] = options.bynweekday![k]
+      if (n < 0) {
+        i = last + (n + 1) * 7
+        i -= pymod(wdaymask[i] - wday, 7)
+      } else {
+        i = first + (n - 1) * 7
+        i += pymod(7 - wdaymask[i] + wday, 7)
+      }
+      if (first <= i && i <= last) result.nwdaymask[i] = 1
+    }
+  }
+
+  return result
 }

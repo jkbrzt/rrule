@@ -25,6 +25,20 @@ import { ParsedOptions, Frequency } from './types'
 export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
 
+interface YearInfo {
+  yearlen: 365 | 366
+  nextyearlen: 365 | 366
+  yearordinal: number
+  yearweekday: number
+  mmask: number[]
+  mrange: number[]
+  mdaymask: number[]
+  nmdaymask: number[]
+  wdaymask: number[]
+  wnomask: number[] | null
+  nwdaymask: number[] | null
+}
+
 // =============================================================================
 // Iterinfo
 // =============================================================================
@@ -32,47 +46,29 @@ export type GetDayset = () => DaySet
 export default class Iterinfo {
   public lastyear: number
   public lastmonth: number
-  public yearlen: 365 | 366 = 365
-  public nextyearlen: 365 | 366 = 365
-  public yearordinal: number
-  public yearweekday: number
-  public mmask: number[] | null
-  public mrange: number[] | null
-  public mdaymask: number[] | null
-  public nmdaymask: number[] | null
-  public wdaymask: number[] | null
-  public wnomask: number[] | null
-  public nwdaymask: number[] | null
+  public yearinfo: YearInfo
   public eastermask: number[] | null
 
-  constructor (private options: ParsedOptions) {
-    this.mmask = null
-    this.mrange = null
-    this.mdaymask = null
-    this.nmdaymask = null
-    this.wdaymask = null
-    this.wnomask = null
-    this.nwdaymask = null
-    this.eastermask = null
-  }
+  constructor (private options: ParsedOptions) {}
 
   rebuild (year: number, month: number) {
     const options = this.options
 
     if (year !== this.lastyear) {
-      this.rebuildYear(year)
+      this.yearinfo = rebuildYear(year, options)
     }
 
     if (
       notEmpty(options.bynweekday!) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
+      const { yearlen, mrange, wdaymask } = this.yearinfo
       const { lastyear, lastmonth, nwdaymask } = rebuildMonth(
-        year, month, this.yearlen, this.mrange as number[], this.wdaymask as number[], options
+        year, month, yearlen, mrange, wdaymask, options
       )
       this.lastyear = lastyear
       this.lastmonth = lastmonth
-      this.nwdaymask = nwdaymask
+      this.yearinfo.nwdaymask = nwdaymask
     }
 
     if (isPresent(options.byeaster)) {
@@ -80,136 +76,44 @@ export default class Iterinfo {
     }
   }
 
-  private rebuildYear (year: number) {
-    const options = this.options
+  get yearlen () {
+    return this.yearinfo.yearlen
+  }
 
-    this.yearlen = dateutil.isLeapYear(year) ? 366 : 365
-    this.nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365
-    const firstyday = new Date(Date.UTC(year, 0, 1))
+  get yearordinal () {
+    return this.yearinfo.yearordinal
+  }
 
-    this.yearordinal = dateutil.toOrdinal(firstyday)
-    this.yearweekday = dateutil.getWeekday(firstyday)
+  get mrange () {
+    return this.yearinfo.mrange
+  }
 
-    const wday = dateutil.getWeekday(firstyday)
+  get wdaymask () {
+    return this.yearinfo.wdaymask
+  }
 
-    if (this.yearlen === 365) {
-      this.mmask = M365MASK as number[]
-      this.mdaymask = MDAY365MASK
-      this.nmdaymask = NMDAY365MASK
-      this.wdaymask = WDAYMASK.slice(wday)
-      this.mrange = M365RANGE
-    } else {
-      this.mmask = M366MASK as number[]
-      this.mdaymask = MDAY366MASK
-      this.nmdaymask = NMDAY366MASK
-      this.wdaymask = WDAYMASK.slice(wday)
-      this.mrange = M366RANGE
-    }
+  get mmask () {
+    return this.yearinfo.mmask
+  }
 
-    if (empty(options.byweekno)) {
-      this.wnomask = null
-      return
-    }
+  get wnomask () {
+    return this.yearinfo.wnomask
+  }
 
-    this.wnomask = repeat(0, this.yearlen + 7) as number[]
-    let firstwkst: number
-    let wyearlen: number
-    let no1wkst = firstwkst = pymod(7 - this.yearweekday + options.wkst, 7)
+  get nwdaymask () {
+    return this.yearinfo.nwdaymask
+  }
 
-    if (no1wkst >= 4) {
-      no1wkst = 0
-      // Number of days in the year, plus the days we got
-      // from last year.
-      wyearlen =
-            this.yearlen + pymod(this.yearweekday - options.wkst, 7)
-    } else {
-      // Number of days in the year, minus the days we
-      // left in last year.
-      wyearlen = this.yearlen - no1wkst
-    }
+  get nextyearlen () {
+    return this.yearinfo.nextyearlen
+  }
 
-    const div = Math.floor(wyearlen / 7)
-    const mod = pymod(wyearlen, 7)
-    const numweeks = Math.floor(div + mod / 4)
+  get mdaymask () {
+    return this.yearinfo.mdaymask
+  }
 
-    for (let j = 0; j < options.byweekno.length; j++) {
-      let n = options.byweekno[j]
-      if (n < 0) {
-        n += numweeks + 1
-      }
-      if (!(n > 0 && n <= numweeks)) {
-        continue
-      }
-
-      let i: number
-      if (n > 1) {
-        i = no1wkst + (n - 1) * 7
-        if (no1wkst !== firstwkst) {
-          i -= 7 - firstwkst
-        }
-      } else {
-        i = no1wkst
-      }
-
-      for (let k = 0; k < 7; k++) {
-        this.wnomask[i] = 1
-        i++
-        if (this.wdaymask[i] === options.wkst) break
-      }
-    }
-
-    if (includes(options.byweekno, 1)) {
-      // Check week number 1 of next year as well
-      // orig-TODO : Check -numweeks for next year.
-      let i = no1wkst + numweeks * 7
-      if (no1wkst !== firstwkst) i -= 7 - firstwkst
-      if (i < this.yearlen) {
-        // If week starts in next year, we
-        // don't care about it.
-        for (let j = 0; j < 7; j++) {
-          this.wnomask[i] = 1
-          i += 1
-          if (this.wdaymask[i] === options.wkst) break
-        }
-      }
-    }
-
-    if (no1wkst) {
-      // Check last week number of last year as
-      // well. If no1wkst is 0, either the year
-      // started on week start, or week number 1
-      // got days from last year, so there are no
-      // days from last year's last week number in
-      // this year.
-      let lnumweeks: number
-      if (!includes(options.byweekno, -1)) {
-        const lyearweekday = dateutil.getWeekday(
-          new Date(Date.UTC(year - 1, 0, 1))
-        )
-
-        let lno1wkst = pymod(
-          7 - lyearweekday.valueOf() + options.wkst,
-          7
-        )
-
-        const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
-        let weekst: number
-        if (lno1wkst >= 4) {
-          lno1wkst = 0
-          weekst = lyearlen + pymod(lyearweekday - options.wkst, 7)
-        } else {
-          weekst = this.yearlen - no1wkst
-        }
-
-        lnumweeks = Math.floor(52 + pymod(weekst, 7) / 4)
-      } else {
-        lnumweeks = -1
-      }
-
-      if (includes(options.byweekno, lnumweeks)) {
-        for (let i = 0; i < no1wkst; i++) this.wnomask[i] = 1
-      }
-    }
+  get nmdaymask () {
+    return this.yearinfo.nmdaymask
   }
 
   ydayset () {
@@ -217,8 +121,8 @@ export default class Iterinfo {
   }
 
   mdayset (_: any, month: number, __: any) {
-    const start = this.mrange![month - 1]
-    const end = this.mrange![month]
+    const start = this.mrange[month - 1]
+    const end = this.mrange[month]
     const set = repeat<number | null>(null, this.yearlen)
     for (let i = start; i < end; i++) set[i] = i
     return [set, start, end]
@@ -234,7 +138,7 @@ export default class Iterinfo {
     for (let j = 0; j < 7; j++) {
       set[i] = i
       ++i
-      if (this.wdaymask![i] === this.options.wkst) break
+      if (this.wdaymask[i] === this.options.wkst) break
     }
     return [set, start, i]
   }
@@ -372,4 +276,153 @@ function rebuildMonth (
   }
 
   return result
+}
+
+function rebuildYear (year: number, options: ParsedOptions) {
+  const firstyday = new Date(Date.UTC(year, 0, 1))
+
+  const yearlen = dateutil.isLeapYear(year) ? 366 : 365
+  const nextyearlen = dateutil.isLeapYear(year + 1) ? 366 : 365
+  const yearordinal = dateutil.toOrdinal(firstyday)
+  const yearweekday = dateutil.getWeekday(firstyday)
+
+  const result: YearInfo = {
+    yearlen,
+    nextyearlen,
+    yearordinal,
+    yearweekday,
+    ...baseYearMasks(year),
+    wnomask: null,
+    nwdaymask: null
+  }
+
+  if (empty(options.byweekno)) {
+    return result
+  }
+
+  result.wnomask = repeat(0, yearlen + 7) as number[]
+  let firstwkst: number
+  let wyearlen: number
+  let no1wkst = firstwkst = pymod(7 - yearweekday + options.wkst, 7)
+
+  if (no1wkst >= 4) {
+    no1wkst = 0
+    // Number of days in the year, plus the days we got
+    // from last year.
+    wyearlen =
+          result.yearlen + pymod(yearweekday - options.wkst, 7)
+  } else {
+    // Number of days in the year, minus the days we
+    // left in last year.
+    wyearlen = yearlen - no1wkst
+  }
+
+  const div = Math.floor(wyearlen / 7)
+  const mod = pymod(wyearlen, 7)
+  const numweeks = Math.floor(div + mod / 4)
+
+  for (let j = 0; j < options.byweekno.length; j++) {
+    let n = options.byweekno[j]
+    if (n < 0) {
+      n += numweeks + 1
+    }
+    if (!(n > 0 && n <= numweeks)) {
+      continue
+    }
+
+    let i: number
+    if (n > 1) {
+      i = no1wkst + (n - 1) * 7
+      if (no1wkst !== firstwkst) {
+        i -= 7 - firstwkst
+      }
+    } else {
+      i = no1wkst
+    }
+
+    for (let k = 0; k < 7; k++) {
+      result.wnomask[i] = 1
+      i++
+      if (result.wdaymask[i] === options.wkst) break
+    }
+  }
+
+  if (includes(options.byweekno, 1)) {
+    // Check week number 1 of next year as well
+    // orig-TODO : Check -numweeks for next year.
+    let i = no1wkst + numweeks * 7
+    if (no1wkst !== firstwkst) i -= 7 - firstwkst
+    if (i < yearlen) {
+      // If week starts in next year, we
+      // don't care about it.
+      for (let j = 0; j < 7; j++) {
+        result.wnomask[i] = 1
+        i += 1
+        if (result.wdaymask[i] === options.wkst) break
+      }
+    }
+  }
+
+  if (no1wkst) {
+    // Check last week number of last year as
+    // well. If no1wkst is 0, either the year
+    // started on week start, or week number 1
+    // got days from last year, so there are no
+    // days from last year's last week number in
+    // this year.
+    let lnumweeks: number
+    if (!includes(options.byweekno, -1)) {
+      const lyearweekday = dateutil.getWeekday(
+        new Date(Date.UTC(year - 1, 0, 1))
+      )
+
+      let lno1wkst = pymod(
+        7 - lyearweekday.valueOf() + options.wkst,
+        7
+      )
+
+      const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
+      let weekst: number
+      if (lno1wkst >= 4) {
+        lno1wkst = 0
+        weekst = lyearlen + pymod(lyearweekday - options.wkst, 7)
+      } else {
+        weekst = yearlen - no1wkst
+      }
+
+      lnumweeks = Math.floor(52 + pymod(weekst, 7) / 4)
+    } else {
+      lnumweeks = -1
+    }
+
+    if (includes(options.byweekno, lnumweeks)) {
+      for (let i = 0; i < no1wkst; i++) result.wnomask[i] = 1
+    }
+  }
+
+  return result
+}
+
+function baseYearMasks (year: number) {
+  const yearlen = dateutil.isLeapYear(year) ? 366 : 365
+  const firstyday = new Date(Date.UTC(year, 0, 1))
+  const wday = dateutil.getWeekday(firstyday)
+
+  if (yearlen === 365) {
+    return {
+      mmask: M365MASK as number[],
+      mdaymask: MDAY365MASK,
+      nmdaymask: NMDAY365MASK,
+      wdaymask: WDAYMASK.slice(wday),
+      mrange: M365RANGE
+    }
+  }
+
+  return {
+    mmask: M366MASK as number[],
+    mdaymask: MDAY366MASK,
+    nmdaymask: NMDAY366MASK,
+    wdaymask: WDAYMASK.slice(wday),
+    mrange: M366RANGE
+  }
 }

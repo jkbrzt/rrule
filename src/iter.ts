@@ -121,14 +121,14 @@ function isFiltered (
   } = options
 
   return (
-    (notEmpty(bymonth) && !includes(bymonth, ii.mmask![currentDay])) ||
+    (notEmpty(bymonth) && !includes(bymonth, ii.mmask[currentDay])) ||
     (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
-    (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask![currentDay])) ||
+    (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask[currentDay])) ||
     (notEmpty(ii.nwdaymask!) && !ii.nwdaymask![currentDay]) ||
     (byeaster !== null && !includes(ii.eastermask!, currentDay)) ||
     ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
-      !includes(bymonthday, ii.mdaymask![currentDay]) &&
-      !includes(bynmonthday, ii.nmdaymask![currentDay])) ||
+      !includes(bymonthday, ii.mdaymask[currentDay]) &&
+      !includes(bynmonthday, ii.nmdaymask[currentDay])) ||
     (notEmpty(byyearday) &&
       ((currentDay < ii.yearlen &&
         !includes(byyearday, currentDay + 1) &&

@@ -33,11 +33,10 @@ $ yarn add rrule
 
 Alternatively, download manually:
 
- * [rrule.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.min.js) (bundled, minified)
- * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule.js) (bundled, not minified)
- * [rrule-tz.min.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule-tz.min.js) (with timezone support, bundled, minified)
- * [rrule-tz.js](https://raw.github.com/jakubroztocil/rrule/master/dist/es5/rrule-tz.js) (with timezone support, bundled, not minified)
- * [rrule.js](https://raw.github.com/jakubroztocil/rrule/master/dist/esm/rrule.js) (ES module source with optional TypeScript types)
+ * [rrule.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
+ * [rrule.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
+ * [rrule-tz.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule-tz.min.js) (with timezone support, bundled, minified)
+ * [rrule-tz.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule-tz.js) (with timezone support, bundled, not minified)
 
 ```html
 <script src="rrule/dist/es5/rrule.min.js"></script>
@@ -45,18 +44,20 @@ Alternatively, download manually:
 
 #### Server Side
 
+Includes optional TypeScript types
+
 ```bash
 $ yarn add rrule
-```
-
-```es6
-import { RRule, RRuleSet, rrulestr } from 'rrule'
+# or
+$ npm install rrule
 ```
 
 #### Usage
 
 **RRule:**
-```js
+```es6
+import { RRule, RRuleSet, rrulestr } from 'rrule'
+
 // Create a rule:
 const rule = new RRule({
   freq: RRule.WEEKLY,

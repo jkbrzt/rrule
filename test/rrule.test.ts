@@ -3804,4 +3804,20 @@ describe('RRule', function () {
     expect(() => rule.between(invalidDate, validDate)).to.throw('Invalid date passed in to RRule.between')
     expect(() => rule.between(validDate, invalidDate)).to.throw('Invalid date passed in to RRule.between')
   })
+
+  it('#300', () => {
+    const rule = RRule.fromString(
+      "DTSTART;TZID=America/Denver:20181101T190000;\n"
+      + "RRULE:FREQ=WEEKLY;BYDAY=MO,WE,TH;INTERVAL=1;COUNT=3"
+    )
+
+    console.log(process.env.TZ)
+    const all = rule.all()
+    console.log(all)
+    expect(all).to.deep.equal([
+      new Date(2018, 10, 1, 18, 0, 0, 0),
+      new Date(2018, 10, 5, 18, 0, 0, 0),
+      new Date(2018, 10, 7, 18, 0, 0, 0)
+    ])
+  })
 })

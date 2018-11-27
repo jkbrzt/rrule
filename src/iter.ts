@@ -144,7 +144,27 @@ function rezoneIfNeeded (date: Date, options: ParsedOptions) {
 }
 
 function emitResult (iterResult: IterResult) {
-  return iterResult.getValue() as Date[]
+  const result = iterResult.getValue()
+  if (result instanceof Array) {
+    return result.map(relocalize)
+  }
+
+  if (result instanceof Date) {
+    return relocalize(result)
+  }
+
+  return result
+}
+
+function relocalize (d: Date) {
+  return new Date(
+    d.getUTCFullYear(),
+    d.getUTCMonth(),
+    d.getUTCDate(),
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCMilliseconds()
+  )
 }
 
 function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {

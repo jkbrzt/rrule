@@ -129,7 +129,7 @@ export default class RRule implements QueryMethods {
 
   static optionsToString = optionsToString
 
-  protected _iter (iterResult: IterResult): Date | Date[] | null {
+  protected _iter (iterResult: IterResult) {
     return iter(iterResult, this.options)
   }
 

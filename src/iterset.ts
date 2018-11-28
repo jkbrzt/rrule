@@ -1,7 +1,7 @@
 import IterResult from './iterresult'
 import RRule from './rrule'
 import { DateWithZone } from './datewithzone'
-import { iter } from './iter'
+import { iter } from './iter/index'
 import dateutil from './dateutil'
 
 export function iterSet (iterResult: IterResult, _rrule: RRule[], _exrule: RRule[], _rdate: Date[], _exdate: Date[], tzid: string | undefined) {

@@ -3,6 +3,7 @@ import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import { Weekday } from './weekday'
+import { Time } from './datetime'
 
 export function initializeOptions (options: Partial<Options>) {
   const invalid: string[] = []
@@ -202,11 +203,11 @@ export function buildTimeset (opts: ParsedOptions) {
     return []
   }
 
-  const timeset: dateutil.Time[] = []
+  const timeset: Time[] = []
   opts.byhour.forEach(hour => {
     opts.byminute.forEach(minute => {
       opts.bysecond.forEach(second => {
-        timeset.push(new dateutil.Time(hour, minute, second, millisecondModulo))
+        timeset.push(new Time(hour, minute, second, millisecondModulo))
       })
     })
   })

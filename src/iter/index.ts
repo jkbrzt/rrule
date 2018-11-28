@@ -1,12 +1,13 @@
-import IterResult from './iterresult'
-import { ParsedOptions, freqIsDailyOrGreater } from './types'
-import dateutil from './dateutil'
-import Iterinfo from './iterinfo/index'
-import RRule from './rrule'
-import { buildTimeset } from './parseoptions'
-import { notEmpty, includes, pymod, isPresent } from './helpers'
-import { DateWithZone } from './datewithzone'
-import { Time, DateTime as DTime } from './datetime'
+import IterResult from '../iterresult'
+import { ParsedOptions, Frequency, freqIsDailyOrGreater } from '../types'
+import dateutil from '../dateutil'
+import Iterinfo from '../iterinfo/index'
+import RRule from '../rrule'
+import { buildTimeset } from '../parseoptions'
+import { notEmpty, includes, isPresent } from '../helpers'
+import { DateWithZone } from '../datewithzone'
+import { buildPoslist } from './poslist'
+import { Time, DateTime } from '../datetime'
 
 export function iter (iterResult: IterResult, options: ParsedOptions) {
   const {
@@ -16,7 +17,7 @@ export function iter (iterResult: IterResult, options: ParsedOptions) {
     bysetpos
   } = options
 
-  let counterDate = DTime.fromDate(dtstart)
+  let counterDate = DateTime.fromDate(dtstart)
 
   const ii = new Iterinfo(options)
   ii.rebuild(counterDate.year, counterDate.month)
@@ -166,7 +167,7 @@ function removeFilteredDays (dayset: (number | null)[], start: number, end: numb
   return filtered
 }
 
-function makeTimeset (ii: Iterinfo, counterDate: DTime, options: ParsedOptions): Time[] | null {
+function makeTimeset (ii: Iterinfo, counterDate: DateTime, options: ParsedOptions): Time[] | null {
   const {
     freq,
     byhour,
@@ -198,46 +199,4 @@ function makeTimeset (ii: Iterinfo, counterDate: DTime, options: ParsedOptions):
     counterDate.second,
     counterDate.millisecond
   )
-}
-
-function buildPoslist (bysetpos: number[], timeset: Time[], start: number, end: number, ii: Iterinfo, dayset: (number | null)[]) {
-  const poslist: Date[] = []
-
-  for (let j = 0; j < bysetpos.length; j++) {
-    let daypos: number
-    let timepos: number
-    const pos = bysetpos[j]
-
-    if (pos < 0) {
-      daypos = Math.floor(pos / timeset.length)
-      timepos = pymod(pos, timeset.length)
-    } else {
-      daypos = Math.floor((pos - 1) / timeset.length)
-      timepos = pymod(pos - 1, timeset.length)
-    }
-
-    const tmp = []
-    for (let k = start; k < end; k++) {
-      const val = dayset[k]
-      if (!isPresent(val)) continue
-      tmp.push(val)
-    }
-    let i: number
-    if (daypos < 0) {
-      i = tmp.slice(daypos)[0]
-    } else {
-      i = tmp[daypos]
-    }
-
-    const time = timeset[timepos]
-    const date = dateutil.fromOrdinal(ii.yearordinal + i)
-    const res = dateutil.combine(date, time)
-    // XXX: can this ever be in the array?
-    // - compare the actual date instead?
-    if (!includes(poslist, res)) poslist.push(res)
-  }
-
-  dateutil.sort(poslist)
-
-  return poslist
 }

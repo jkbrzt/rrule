@@ -9,6 +9,7 @@ import { ParsedOptions, Frequency } from '../types'
 import { YearInfo, rebuildYear } from './yearinfo'
 import { rebuildMonth, MonthInfo } from './monthinfo'
 import { easter } from './easter'
+import { Time } from '../datetime'
 
 export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
@@ -131,7 +132,7 @@ export default class Iterinfo {
   }
 
   htimeset (hour: number, _: number, second: number, millisecond: number) {
-    let set: dateutil.Time[] = []
+    let set: Time[] = []
     this.options.byminute.forEach(minute => {
       set = set.concat(this.mtimeset(hour, minute, second, millisecond))
     })
@@ -141,7 +142,7 @@ export default class Iterinfo {
 
   mtimeset (hour: number, minute: number, _: number, millisecond: number) {
     const set = this.options.bysecond.map(second =>
-      new dateutil.Time(hour, minute, second, millisecond)
+      new Time(hour, minute, second, millisecond)
     )
 
     dateutil.sort(set)
@@ -149,7 +150,7 @@ export default class Iterinfo {
   }
 
   stimeset (hour: number, minute: number, second: number, millisecond: number) {
-    return [new dateutil.Time(hour, minute, second, millisecond)]
+    return [new Time(hour, minute, second, millisecond)]
   }
 
   getdayset (freq: Frequency): (y: number, m: number, d: number) => DaySet {
@@ -162,7 +163,7 @@ export default class Iterinfo {
     }
   }
 
-  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): (h: number, m: number, s: number, ms: number) => dateutil.Time[] {
+  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): (h: number, m: number, s: number, ms: number) => Time[] {
     switch (freq) {
       case Frequency.HOURLY: return this.htimeset.bind(this)
       case Frequency.MINUTELY: return this.mtimeset.bind(this)

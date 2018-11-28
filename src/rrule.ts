@@ -11,7 +11,7 @@ import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
-import { iter } from './iter'
+import { iter } from './iter/index'
 
 interface GetNlp {
   _nlp: Nlp

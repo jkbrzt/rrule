@@ -1,6 +1,5 @@
 import { ParsedOptions, Frequency } from './types'
 import { pymod, divmod, empty, includes } from './helpers'
-import Iterinfo from './iterinfo/index'
 import { dateutil } from './dateutil'
 
 export class Time {

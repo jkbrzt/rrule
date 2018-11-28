@@ -1,5 +1,5 @@
 import IterResult from '../iterresult'
-import { ParsedOptions, Frequency, freqIsDailyOrGreater } from '../types'
+import { ParsedOptions, freqIsDailyOrGreater } from '../types'
 import dateutil from '../dateutil'
 import Iterinfo from '../iterinfo/index'
 import RRule from '../rrule'

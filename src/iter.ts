@@ -1,7 +1,7 @@
 import IterResult from './iterresult'
 import { ParsedOptions, Frequency, freqIsDailyOrGreater } from './types'
 import dateutil from './dateutil'
-import Iterinfo from './iterinfo'
+import Iterinfo from './iterinfo/index'
 import RRule from './rrule'
 import { buildTimeset } from './parseoptions'
 import { notEmpty, includes, pymod, isPresent } from './helpers'

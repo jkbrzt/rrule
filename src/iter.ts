@@ -124,7 +124,7 @@ function isFiltered (
     (notEmpty(bymonth) && !includes(bymonth, ii.mmask[currentDay])) ||
     (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
     (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask[currentDay])) ||
-    (notEmpty(ii.nwdaymask!) && !ii.nwdaymask![currentDay]) ||
+    (notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
     (byeaster !== null && !includes(ii.eastermask!, currentDay)) ||
     ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
       !includes(bymonthday, ii.mdaymask[currentDay]) &&

@@ -7,7 +7,7 @@ import {
 } from '../helpers'
 import { ParsedOptions, Frequency } from '../types'
 import { YearInfo, rebuildYear } from './yearinfo'
-import { rebuildMonth } from './monthinfo'
+import { rebuildMonth, MonthInfo } from './monthinfo'
 import { easter } from './easter'
 
 export type DaySet = [(number | null)[], number, number]
@@ -18,9 +18,8 @@ export type GetDayset = () => DaySet
 // =============================================================================
 
 export default class Iterinfo {
-  public lastyear: number
-  public lastmonth: number
   public yearinfo: YearInfo
+  public monthinfo: MonthInfo
   public eastermask: number[] | null
 
   constructor (private options: ParsedOptions) {}
@@ -37,17 +36,22 @@ export default class Iterinfo {
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       const { yearlen, mrange, wdaymask } = this.yearinfo
-      const { lastyear, lastmonth, nwdaymask } = rebuildMonth(
+      this.monthinfo = rebuildMonth(
         year, month, yearlen, mrange, wdaymask, options
       )
-      this.lastyear = lastyear
-      this.lastmonth = lastmonth
-      this.yearinfo.nwdaymask = nwdaymask
     }
 
     if (isPresent(options.byeaster)) {
       this.eastermask = easter(year, options.byeaster)
     }
+  }
+
+  get lastyear () {
+    return this.monthinfo ? this.monthinfo.lastyear : null
+  }
+
+  get lastmonth () {
+    return this.monthinfo ? this.monthinfo.lastmonth : null
   }
 
   get yearlen () {
@@ -75,7 +79,7 @@ export default class Iterinfo {
   }
 
   get nwdaymask () {
-    return this.yearinfo.nwdaymask
+    return this.monthinfo ? this.monthinfo.nwdaymask : []
   }
 
   get nextyearlen () {

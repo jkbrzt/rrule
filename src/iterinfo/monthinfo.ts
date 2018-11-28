@@ -2,7 +2,7 @@ import { ParsedOptions } from '../types'
 import RRule from '../rrule'
 import { empty, repeat, pymod } from '../helpers'
 
-interface MonthInfo {
+export interface MonthInfo {
   lastyear: number
   lastmonth: number
   nwdaymask: number[]

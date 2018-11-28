@@ -14,7 +14,6 @@ export interface YearInfo {
   nmdaymask: number[]
   wdaymask: number[]
   wnomask: number[] | null
-  nwdaymask: number[] | null
 }
 
 export function rebuildYear (year: number, options: ParsedOptions) {
@@ -31,8 +30,7 @@ export function rebuildYear (year: number, options: ParsedOptions) {
     yearordinal,
     yearweekday,
     ...baseYearMasks(year),
-    wnomask: null,
-    nwdaymask: null
+    wnomask: null
   }
 
   if (empty(options.byweekno)) {

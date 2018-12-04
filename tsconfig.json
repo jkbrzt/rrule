@@ -9,7 +9,6 @@
     "target": "es5",
     "jsx": "react",
     "strictNullChecks": true,
-    "baseUrl": ".",
     "rootDirs": ["./src/", "./test/"]
   },
   "include": ["./src/**/*"],

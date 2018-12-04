@@ -3,8 +3,16 @@ import RRule from './rrule'
 import { DateWithZone } from './datewithzone'
 import { iter } from './iter/index'
 import dateutil from './dateutil'
+import { QueryMethodTypes, IterResultType } from './types'
 
-export function iterSet (iterResult: IterResult, _rrule: RRule[], _exrule: RRule[], _rdate: Date[], _exdate: Date[], tzid: string | undefined) {
+export function iterSet <M extends QueryMethodTypes> (
+  iterResult: IterResult<M>,
+  _rrule: RRule[],
+  _exrule: RRule[],
+  _rdate: Date[],
+  _exdate: Date[],
+  tzid: string | undefined
+) {
   const _exdateHash: { [k: number]: boolean } = {}
   const _accept = iterResult.accept
 
@@ -59,10 +67,11 @@ export function iterSet (iterResult: IterResult, _rrule: RRule[], _exrule: RRule
   switch (iterResult.method) {
     case 'all':
     case 'between':
-      return res
+      return res as IterResultType<M>
     case 'before':
-      return (res.length && res[res.length - 1]) || null
+      return ((res.length && res[res.length - 1]) || null) as IterResultType<M>
     case 'after':
-      return (res.length && res[0]) || null
+    default:
+      return ((res.length && res[0]) || null) as IterResultType<M>
   }
 }

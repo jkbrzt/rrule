@@ -1,5 +1,5 @@
 import IterResult from '../iterresult'
-import { ParsedOptions, freqIsDailyOrGreater } from '../types'
+import { ParsedOptions, freqIsDailyOrGreater, QueryMethodTypes } from '../types'
 import dateutil from '../dateutil'
 import Iterinfo from '../iterinfo/index'
 import RRule from '../rrule'
@@ -9,7 +9,7 @@ import { DateWithZone } from '../datewithzone'
 import { buildPoslist } from './poslist'
 import { Time, DateTime } from '../datetime'
 
-export function iter (iterResult: IterResult, options: ParsedOptions) {
+export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, options: ParsedOptions) {
   const {
     dtstart,
     freq,
@@ -146,8 +146,8 @@ function rezoneIfNeeded (date: Date, options: ParsedOptions) {
   return new DateWithZone(date, options.tzid).rezonedDate()
 }
 
-function emitResult (iterResult: IterResult) {
-  return iterResult.getValue() as Date[]
+function emitResult <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  return iterResult.getValue()
 }
 
 function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {

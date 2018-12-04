@@ -6,7 +6,7 @@ type Iterator = (d: Date, len: number) => boolean
  * IterResult subclass that calls a callback function on each add,
  * and stops iterating when the callback returns false.
  */
-export default class CallbackIterResult extends IterResult {
+export default class CallbackIterResult extends IterResult<'all' | 'between'> {
   private iterator: Iterator
 
   constructor (

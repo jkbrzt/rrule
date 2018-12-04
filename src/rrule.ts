@@ -5,13 +5,13 @@ import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods } from './types'
+import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
-import { iter } from './iter'
+import { iter } from './iter/index'
 
 interface GetNlp {
   _nlp: Nlp
@@ -129,7 +129,7 @@ export default class RRule implements QueryMethods {
 
   static optionsToString = optionsToString
 
-  protected _iter (iterResult: IterResult): Date | Date[] | null {
+  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
     return iter(iterResult, this.options)
   }
 
@@ -155,12 +155,12 @@ export default class RRule implements QueryMethods {
    */
   all (iterator?: (d: Date, len: number) => boolean): Date[] {
     if (iterator) {
-      return this._iter(new CallbackIterResult('all', {}, iterator)) as Date[]
+      return this._iter(new CallbackIterResult('all', {}, iterator))
     }
 
     let result = this._cacheGet('all') as Date[] | false
     if (result === false) {
-      result = this._iter(new IterResult('all', {})) as Date[]
+      result = this._iter(new IterResult('all', {}))
       this._cacheAdd('all', result)
     }
     return result
@@ -189,7 +189,7 @@ export default class RRule implements QueryMethods {
     if (iterator) {
       return this._iter(
         new CallbackIterResult('between', args, iterator)
-      ) as Date[]
+      )
     }
 
     let result = this._cacheGet('between', args)

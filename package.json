@@ -1,6 +1,6 @@
 {
   "name": "@bonobolabs/rrule",
-  "version": "2.5.6",
+  "version": "2.5.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "SEE LICENSE IN LICENSE",

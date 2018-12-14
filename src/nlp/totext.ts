@@ -148,7 +148,7 @@ export default class ToText {
       return gettext('RRule error: Unable to fully convert this rrule to text')
     }
 
-    this.text = [gettext('every')]
+    this.text = [gettext('Repeats every')]
     // @ts-ignore
     this[RRule.FREQUENCIES[this.options.freq]]()
 
@@ -164,9 +164,12 @@ export default class ToText {
         .add(
           this.plural(this.options.count) ? gettext('times') : gettext('time')
         )
+    } else {
+      this.text.push(',')
+      this.add(gettext('forever'))
     }
 
-    if (!this.isFullyConvertible()) this.add(gettext('(~ approximate)'))
+    // if (!this.isFullyConvertible()) this.add(gettext('(~ approximate)'))
 
     return this.text.join('')
   }

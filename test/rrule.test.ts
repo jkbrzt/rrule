@@ -22,8 +22,8 @@ describe('RRule', function () {
 
   this.ctx.ALSO_TEST_SUBSECOND_PRECISION = true
 
-  const texts = [
-    ['Every day', 'RRULE:FREQ=DAILY'],
+  const fromTexts = [
+    ['every day', 'RRULE:FREQ=DAILY'],
     ['Every day at 10, 12 and 17', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
     ['Every week', 'RRULE:FREQ=WEEKLY'],
     ['Every hour', 'RRULE:FREQ=HOURLY'],
@@ -46,27 +46,50 @@ describe('RRule', function () {
   ]
 
   it('fromText()', function () {
-    texts.forEach(function (item) {
+    fromTexts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
       expect(RRule.fromText(text).toString()).equals(str, text + ' => ' + str)
     })
   })
 
+  it('parseText()', function () {
+    fromTexts.forEach(function (item) {
+      const text = item[0]
+      const str = item[1]
+      expect(optionsToString(RRule.parseText(text))).equals(str, text + ' => ' + str)
+    })
+  })
+
+  const toTexts = [
+    ['Repeats every day, forever', 'RRULE:FREQ=DAILY'],
+    ['Repeats every day at 10, 12 and 17, forever', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
+    ['Repeats every week, forever', 'RRULE:FREQ=WEEKLY'],
+    ['Repeats every hour, forever', 'RRULE:FREQ=HOURLY'],
+    ['Repeats every 4 hours, forever', 'RRULE:INTERVAL=4;FREQ=HOURLY'],
+    ['Repeats every week on Tuesday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=TU'],
+    ['Repeats every week on Monday, Wednesday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE'],
+    ['Repeats every weekday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
+    ['Repeats every 2 weeks, forever', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
+    ['Repeats every month, forever', 'RRULE:FREQ=MONTHLY'],
+    ['Repeats every 6 months, forever', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
+    ['Repeats every year, forever', 'RRULE:FREQ=YEARLY'],
+    ['Repeats every month on the 4th, forever', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
+    ['Repeats every month on the 4th last, forever', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4'],
+    ['Repeats every month on the 3rd Tuesday, forever', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],
+    ['Repeats every month on the 3rd last Tuesday, forever', 'RRULE:FREQ=MONTHLY;BYDAY=-3TU'],
+    ['Repeats every month on the last Monday, forever', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
+    ['Repeats every month on the 2nd last Friday, forever', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
+    // ['Every week until January 1, 2007, forever', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
+    ['Repeats every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20']
+  ]
+
   it('toText()', function () {
-    texts.forEach(function (item) {
+    toTexts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
       expect(RRule.fromString(str).toText().toLowerCase()).equals(text.toLowerCase(),
         str + ' => ' + text)
-    })
-  })
-
-  it('parseText()', function () {
-    texts.forEach(function (item) {
-      const text = item[0]
-      const str = item[1]
-      expect(optionsToString(RRule.parseText(text))).equals(str, text + ' => ' + str)
     })
   })
 
@@ -75,7 +98,7 @@ describe('RRule', function () {
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
-  
+
   it('rrulestr itteration not infinite when interval 0', function () {
     ['FREQ=YEARLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=MONTHLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
@@ -3703,14 +3726,14 @@ describe('RRule', function () {
       byweekday: 0
     })
 
-    expect(rrule.toText()).to.equal('every week on Monday')
+    expect(rrule.toText()).to.equal('Repeats every week on Monday, forever')
     expect(rrule.toString()).to.equal('RRULE:FREQ=WEEKLY;BYDAY=MO')
   })
 
   it('sorts monthdays correctly (#101)', () => {
     const options = { "freq": 2, "bymonthday": [3, 10, 17, 24] }
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every week on the 3rd, 10th, 17th and 24th')
+    expect(rule.toText()).to.equal('Repeats every week on the 3rd, 10th, 17th and 24th, forever')
   })
 
   it('shows correct text for every day', () => {
@@ -3718,7 +3741,7 @@ describe('RRule', function () {
       RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU
     ]}
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every day')
+    expect(rule.toText()).to.equal('Repeats every day, forever')
   })
 
   describe('time zones', () => {
@@ -3740,7 +3763,7 @@ describe('RRule', function () {
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          expected
         )
 
       resetMockDate()
@@ -3760,7 +3783,7 @@ describe('RRule', function () {
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          expected
         )
 
       resetMockDate()
@@ -3780,7 +3803,7 @@ describe('RRule', function () {
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          expected
         )
 
       resetMockDate()

@@ -43,6 +43,7 @@ const ENGLISH: Language = {
     'for': /^for/i,
     'time(s)': /^times?/i,
     'until': /^(un)?til/i,
+    'forever': /^forever/i,
     'monday': /^mo(n(day)?)?/i,
     'tuesday': /^tu(e(s(day)?)?)?/i,
     'wednesday': /^we(d(n(esday)?)?)?/i,
@@ -62,7 +63,8 @@ const ENGLISH: Language = {
     'october': /^oct(ober)?/i,
     'november': /^nov(ember)?/i,
     'december': /^dec(ember)?/i,
-    'comma': /^(,\s*|(and|or)\s*)+/i
+    'comma': /^(,\s*|(and|or)\s*)+/i,
+    'Repeats': /^Repeats/i,
   }
 }
 

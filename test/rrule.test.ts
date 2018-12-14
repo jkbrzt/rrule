@@ -70,6 +70,7 @@ describe('RRule', function () {
     ['Repeats every week on Tuesday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=TU'],
     ['Repeats every week on Monday, Wednesday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE'],
     ['Repeats every weekday, forever', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
+    ['Repeats every weekend, forever', 'RRULE:FREQ=WEEKLY;BYDAY=SA,SU'],
     ['Repeats every 2 weeks, forever', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
     ['Repeats every month, forever', 'RRULE:FREQ=MONTHLY'],
     ['Repeats every 6 months, forever', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
@@ -3746,6 +3747,14 @@ describe('RRule', function () {
     ]}
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('Repeats every day, forever')
+  })
+
+  it('shows correct text for weekends', () => {
+    const options = { "freq": RRule.WEEKLY, byweekday: [
+      RRule.SA, RRule.SU
+    ]}
+    const rule = new RRule(options)
+    expect(rule.toText()).to.equal('Repeats every weekend, forever')
   })
 
   describe('time zones', () => {

@@ -27,6 +27,7 @@ const ENGLISH: Language = {
     'every': /^every/i,
     'day(s)': /^days?/i,
     'weekday(s)': /^weekdays?/i,
+    'weekend(s)': /^weekend?/i,
     'week(s)': /^weeks?/i,
     'hour(s)': /^hours?/i,
     'minute(s)': /^minutes?/i,

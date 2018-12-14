@@ -44,6 +44,7 @@ export default class ToText {
     allWeeks: ByWeekday[] | null
     someWeeks: ByWeekday[] | null
     isWeekdays: boolean
+    isWeekends: boolean
     isEveryDay: boolean
   } | null
 
@@ -88,6 +89,14 @@ export default class ToText {
           days.indexOf('FR') !== -1 &&
           days.indexOf('SA') === -1 &&
           days.indexOf('SU') === -1,
+        isWeekends:
+          days.indexOf('MO') === -1 &&
+          days.indexOf('TU') === -1 &&
+          days.indexOf('WE') === -1 &&
+          days.indexOf('TH') === -1 &&
+          days.indexOf('FR') === -1 &&
+          days.indexOf('SA') !== -1 &&
+          days.indexOf('SU') !== -1,
         isEveryDay:
           days.indexOf('MO') !== -1 &&
           days.indexOf('TU') !== -1 &&
@@ -207,6 +216,12 @@ export default class ToText {
           ? gettext('weekdays')
           : gettext('weekday')
       )
+    } else if (this.byweekday && this.byweekday.isWeekends) {
+      this.add(
+        this.plural(this.options.interval!)
+          ? gettext('weekends')
+          : gettext('weekend')
+      )
     } else {
       this.add(
         this.plural(this.options.interval!) ? gettext('days') : gettext('day')
@@ -246,6 +261,16 @@ export default class ToText {
         )
       } else {
         this.add(gettext('on')).add(gettext('weekdays'))
+      }
+    } else if (this.byweekday && this.byweekday.isWeekends) {
+      if (this.options.interval === 1) {
+        this.add(
+          this.plural(this.options.interval)
+            ? gettext('weekends')
+            : gettext('weekend')
+        )
+      } else {
+        this.add(gettext('on')).add(gettext('weekends'))
       }
     } else if (this.byweekday && this.byweekday.isEveryDay) {
       this.add(

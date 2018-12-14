@@ -64,7 +64,7 @@ const ENGLISH: Language = {
     'november': /^nov(ember)?/i,
     'december': /^dec(ember)?/i,
     'comma': /^(,\s*|(and|or)\s*)+/i,
-    'Repeats': /^Repeats/i,
+    'Repeats': /^Repeats/i
   }
 }
 

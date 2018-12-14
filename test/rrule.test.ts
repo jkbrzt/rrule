@@ -141,6 +141,10 @@ describe('RRule', function () {
     ]
   )
 
+  it('fromString handles trailing semi', function () {
+    expect(() => RRule.fromString('FREQ=MONTHLY;')).to.not.throw()
+  })
+
   // =============================================================================
     // The original `dateutil.rrule` test suite converted from Py to JS.
     // =============================================================================

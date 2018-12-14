@@ -94,6 +94,9 @@ function parseRrule (line: string) {
       case 'BYEASTER':
         options.byeaster = Number(value)
         break
+      case '':
+        // Ignore blank strings
+        break
       default:
         throw new Error("Unknown RRULE property '" + key + "'")
     }

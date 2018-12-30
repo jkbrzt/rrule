@@ -5,7 +5,7 @@ import {
   Weekday
 } from '../src/index'
 
-const days = [
+const getDay = (i: number) => [
   RRule.MO,
   RRule.TU,
   RRule.WE,
@@ -13,17 +13,19 @@ const days = [
   RRule.FR,
   RRule.SA,
   RRule.SU
-]
+][i]
 
-const getDay = (i: number) => days[i]
+const makeArray = (s: string | string[]) =>
+  Array.isArray(s) ? s : [s]
 
 const getFormValues = function ($form: JQuery<HTMLElement>) {
   const paramObj: { [K in keyof Partial<Options>]: string | string[] } = {}
   $form.serializeArray().forEach(kv => {
     const k = kv.name as keyof Options
-    if (paramObj.hasOwnProperty(kv.name)) {
-      paramObj[k] = paramObj[k] as string[] || [];
-      (paramObj[k] as string[]).push(kv.value)
+    if (paramObj.hasOwnProperty(k)) {
+      const v = makeArray(paramObj[k]!)
+      v.push(kv.value)
+      paramObj[k] = v
     } else {
       paramObj[k] = kv.value
     }
@@ -60,7 +62,7 @@ const getOptionsCode = function (options: Partial<Options>) {
         d.getUTCSeconds()
       ].join(', ') + '))'
     } else if (k === 'byweekday') {
-      if (v instanceof Array) {
+      if (Array.isArray(v)) {
         v = (v as Weekday[]).map(function (wday) {
           console.log('wday', wday)
           let s = days[wday.weekday]
@@ -81,7 +83,7 @@ const getOptionsCode = function (options: Partial<Options>) {
       v = days[w.weekday]
     }
 
-    if (v instanceof Array) {
+    if (Array.isArray(v)) {
       v = `[${v.join(', ')}]`
     }
 
@@ -89,7 +91,7 @@ const getOptionsCode = function (options: Partial<Options>) {
     return `${k}: ${v}`
   })
 
-  return `{\n  ${items.join(',\n  ')}\n}`
+  return `{\n  ${items.filter(v => !!v).join(',\n  ')}\n}`
 }
 
 const makeRows = function (dates: Date[]) {
@@ -148,8 +150,6 @@ $(function () {
   let makeRule: () => RRule
 
   $('input, select').on('keyup change', function () {
-    let options: Options
-    let rule: RRule
     const $in = $(this)
     const $section = $in.parents('section:first')
     const inputMethod = $section.attr('id')!.split('-')[0]
@@ -177,19 +177,19 @@ $(function () {
             const date = new Date(Date.parse(value + 'Z'))
             options[key] = date
           } else if (key === 'byweekday') {
-            if (value instanceof Array) {
-              options[key] = (value).map(i => getDay(parseInt(i, 10)))
+            if (Array.isArray(value)) {
+              options[key] = value.map(i => getDay(parseInt(i, 10)))
             } else {
               options[key] = getDay(parseInt(value, 10))
             }
+          } else if (/^by/.test(key)) {
+            if (!Array.isArray(value)) {
+              value = value.split(/[,\s]+/)
+            }
+            value = value.filter(v => v)
+            options[key] = value.map(n => parseInt(n, 10))
           } else if (key === 'tzid') {
             options[key] = value as string
-          } else if (/^by/.test(key)) {
-            if (!(value instanceof Array)) {
-              value = (value).split(/[,\s]+/)
-            }
-            value = (value).filter((v) => v)
-            options[key] = value.map(n => parseInt(n, 10))
           } else {
             options[key] = parseInt(value as string, 10)
           }
@@ -198,11 +198,14 @@ $(function () {
             options[key] = getDay(parseInt(value as string, 10))
           }
 
-          if ((key === 'interval') && ((parseInt(value as string, 10) === 1) || !value)) {
-            continue
-          }
+          if (key === 'interval') {
+            const i = parseInt(value as string, 10)
+            if (i === 1 || !value) {
+              continue
+            }
 
-          options[key] = value as string
+            options[key] = i
+          }
         }
 
         makeRule = () => new RRule(options)
@@ -217,6 +220,7 @@ $(function () {
     $('#options-output').html('')
     $('#dates').html('')
 
+    let rule: RRule
     try {
       rule = makeRule()
     } catch (e) {

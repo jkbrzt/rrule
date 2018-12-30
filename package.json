@@ -11,10 +11,10 @@
     "icalendar",
     "rfc"
   ],
-  "author": "Jakub Roztocil and Lars Schöning",
-  "main": "dist/es5/rrule.js",
-  "module": "dist/esm/index.js",
-  "typings": "dist/esm/index.d.ts",
+  "author": "Jakub Roztocil, Lars Schöning, and David Golightly",
+  "main": "dist/es5/src/rrule.js",
+  "module": "dist/esm/src/index.js",
+  "typings": "dist/esm/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"

@@ -52,8 +52,6 @@
     "@types/mockdate": "^2.0.0",
     "@types/node": "^10.5.4",
     "chai": "^4.1.2",
-    "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.3.1",
     "copy-webpack-plugin": "^4.5.2",
     "coverage": "^0.0.0",
     "html-webpack-plugin": "^3.2.0",

@@ -60,7 +60,7 @@
     "mocha": "^5.2.0",
     "mockdate": "^2.0.2",
     "nyc": "^12.0.2",
-    "source-map-loader": "^0.2.3",
+    "source-map-loader": "^0.2.4",
     "source-map-support": "^0.5.8",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",

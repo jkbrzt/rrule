@@ -9,9 +9,9 @@ const paths = {
     styles: path.resolve(__dirname, "demo/demo.css"),
     template: path.resolve(__dirname, "demo/index.html")
   },
-  demoDist: path.resolve(__dirname, "dist"),
-  es5: path.resolve(__dirname, "dist", "es5"),
-  esm: path.resolve(__dirname, "dist", "esm")
+  demoDist: path.resolve(__dirname, "dist", "esm", "demo"),
+  es5: path.resolve(__dirname, "dist", "es5", "src"),
+  esm: path.resolve(__dirname, "dist", "esm", "src")
 };
 
 const commonConfig = {
@@ -31,6 +31,7 @@ const commonConfig = {
     minimize: true,
     minimizer: [
       new UglifyJsPlugin({
+        exclude: /\.ts$/,
         include: /\.min\.js$/
       })
     ]
@@ -56,20 +57,23 @@ const rruleWithLuxonConfig = Object.assign({
 
 const demoConfig = {
   entry: {
-    demo: "./demo/demo.coffee"
+    demo: path.join(paths.demoDist, "demo.js"),
   },
   module: {
     rules: [
       {
         exclude: /node_modules/,
-        loader: "coffee-loader",
-        test: /\.coffee$/
+        loader: "ts-loader",
+        test: /\.ts$/
       }
     ]
   },
   output: {
     filename: "demo.js",
     path: paths.demoDist
+  },
+  resolve: {
+    extensions: [".js", ".ts"]
   },
   plugins: [
     new webpack.ProvidePlugin({

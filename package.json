@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "build": "yarn lint && tsc && webpack && tsc dist/esm/*.d.ts",
+    "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
     "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
     "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
@@ -46,6 +46,7 @@
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/chai": "^4.1.4",
+    "@types/jquery": "^3.3.29",
     "@types/luxon": "^1.2.2",
     "@types/mocha": "^5.2.5",
     "@types/mockdate": "^2.0.0",

@@ -9,8 +9,9 @@
     "target": "es5",
     "jsx": "react",
     "strictNullChecks": true,
-    "rootDirs": ["./src/", "./test/"]
+    "rootDirs": ["./src/", "./test/", "./demo/"],
+    "sourceRoot": "./dist/esm"
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./demo/**/*"],
   "exclude": ["node_modules", "./test/**/*"]
 }

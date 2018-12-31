@@ -12,8 +12,8 @@ const paths = {
   },
   source: path.resolve(__dirname, 'src'),
   demoDist: path.resolve(__dirname, "dist", "esm", "demo"),
-  es5: path.resolve(__dirname, "dist", "es5", "src"),
-  esm: path.resolve(__dirname, "dist", "esm", "src")
+  es5: path.resolve(__dirname, "dist", "es5"),
+  esm: path.resolve(__dirname, "dist", "esm")
 };
 
 const commonConfig = {

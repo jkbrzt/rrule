@@ -97,8 +97,8 @@ const getOptionsCode = function (options: Partial<Options>) {
 const makeRows = function (dates: Date[]) {
   let prevParts: string[] = []
   let prevStates: boolean[] = []
-  let index = 1
-  const rows = dates.map(date => {
+
+  const rows = dates.map((date, index) => {
     let states: boolean[] = []
     let parts = date.toUTCString().split(' ')
 
@@ -115,7 +115,7 @@ const makeRows = function (dates: Date[]) {
     prevParts = parts
     prevStates = states
 
-    return `<tr><td>${ index++ }</td>${ cells.join('\n') }</tr>`
+    return `<tr><td>${ index + 1 }</td>${ cells.join('\n') }</tr>`
   })
 
   return rows.join('\n\n')

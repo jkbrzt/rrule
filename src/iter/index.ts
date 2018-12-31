@@ -13,9 +13,15 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
   const {
     dtstart,
     freq,
+    interval,
     until,
     bysetpos
   } = options
+
+  let count = options.count
+  if (count === 0 || interval === 0) {
+    return emitResult(iterResult)
+  }
 
   let counterDate = DateTime.fromDate(dtstart)
 
@@ -23,8 +29,6 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
   ii.rebuild(counterDate.year, counterDate.month)
 
   let timeset = makeTimeset(ii, counterDate, options)
-
-  let count = options.count
 
   while (true) {
     let [dayset, start, end] = ii.getdayset(freq)(

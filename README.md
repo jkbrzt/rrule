@@ -781,6 +781,7 @@ $ yarn build
 * [Jakub Roztocil](http://roztocil.co/)
     ([@jakubroztocil](http://twitter.com/jakubroztocil))
 * Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
+* David Golightly ([@davigoli](http://twitter.com/davigoli))
 
 Python `dateutil` is written by [Gustavo
 Niemeyer](http://niemeyer.net/).

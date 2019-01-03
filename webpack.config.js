@@ -6,31 +6,43 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const paths = {
   demo: {
-    styles: path.resolve(__dirname, "demo/demo.css"),
-    template: path.resolve(__dirname, "demo/index.html")
+    source: path.resolve(__dirname, 'demo'),
+    styles: path.resolve(__dirname, "demo", "demo.css"),
+    template: path.resolve(__dirname, "demo", "index.html")
   },
-  demoDist: path.resolve(__dirname, "dist"),
+  source: path.resolve(__dirname, 'src'),
+  demoDist: path.resolve(__dirname, "dist", "esm", "demo"),
   es5: path.resolve(__dirname, "dist", "es5"),
   esm: path.resolve(__dirname, "dist", "esm")
 };
 
 const commonConfig = {
   output: {
-    filename: "[name].js",
+    filename: '[name].js',
     path: paths.es5,
-    library: "rrule",
-    libraryTarget: "umd",
+    library: 'rrule',
+    libraryTarget: 'umd',
     globalObject: "typeof self !== 'undefined' ? self : this"
   },
-  devtool: "source-map",
-  mode: "production",
+  devtool: 'source-map',
+  mode: 'production',
   resolve: {
-    extensions: [".js"]
+    extensions: ['.js', '.ts']
+  },
+  module: {
+    rules: [
+      {
+        exclude: /node_modules/,
+        loader: "ts-loader",
+        test: /\.ts$/
+      }
+    ]
   },
   optimization: {
     minimize: true,
     minimizer: [
       new UglifyJsPlugin({
+        exclude: /\.ts$/,
         include: /\.min\.js$/
       })
     ]
@@ -39,8 +51,8 @@ const commonConfig = {
 
 const rruleConfig = Object.assign({
   entry: {
-    rrule: path.join(paths.esm, "index.js"),
-    'rrule.min': path.join(paths.esm, "index.js")
+    rrule: path.join(paths.source, "index.ts"),
+    'rrule.min': path.join(paths.source, "index.ts")
   },
   externals: {
     luxon: 'luxon'
@@ -49,27 +61,35 @@ const rruleConfig = Object.assign({
 
 const rruleWithLuxonConfig = Object.assign({
   entry: {
-    'rrule-tz': path.join(paths.esm, "index.js"),
-    'rrule-tz.min': path.join(paths.esm, "index.js")
+    'rrule-tz': path.join(paths.source, "index.ts"),
+    'rrule-tz.min': path.join(paths.source, "index.ts")
   },
 }, commonConfig);
 
 const demoConfig = {
   entry: {
-    demo: "./demo/demo.coffee"
+    demo: path.join(paths.demo.source, "demo.ts"),
   },
   module: {
     rules: [
       {
+        test: /\.js$/,
+        use: ["source-map-loader"],
+        enforce: "pre"
+      },
+      {
         exclude: /node_modules/,
-        loader: "coffee-loader",
-        test: /\.coffee$/
+        loader: "ts-loader",
+        test: /\.ts$/
       }
     ]
   },
   output: {
     filename: "demo.js",
     path: paths.demoDist
+  },
+  resolve: {
+    extensions: [".js", ".ts"]
   },
   plugins: [
     new webpack.ProvidePlugin({

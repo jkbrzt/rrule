@@ -11,10 +11,10 @@
     "icalendar",
     "rfc"
   ],
-  "author": "Jakub Roztocil and Lars Schöning",
+  "author": "Jakub Roztocil, Lars Schöning, and David Golightly",
   "main": "dist/es5/rrule.js",
-  "module": "dist/esm/index.js",
-  "typings": "dist/esm/index.d.ts",
+  "module": "dist/esm/src/index.js",
+  "typings": "dist/esm/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"
@@ -25,7 +25,7 @@
     }
   },
   "scripts": {
-    "build": "yarn lint && tsc && webpack && tsc dist/esm/*.d.ts",
+    "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
     "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
     "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
@@ -46,13 +46,12 @@
   "devDependencies": {
     "@types/assert": "^0.0.31",
     "@types/chai": "^4.1.4",
+    "@types/jquery": "^3.3.29",
     "@types/luxon": "^1.2.2",
     "@types/mocha": "^5.2.5",
     "@types/mockdate": "^2.0.0",
     "@types/node": "^10.5.4",
     "chai": "^4.1.2",
-    "coffee-loader": "^0.9.0",
-    "coffeescript": "^2.3.1",
     "copy-webpack-plugin": "^4.5.2",
     "coverage": "^0.0.0",
     "html-webpack-plugin": "^3.2.0",
@@ -61,7 +60,7 @@
     "mocha": "^5.2.0",
     "mockdate": "^2.0.2",
     "nyc": "^12.0.2",
-    "source-map-loader": "^0.2.3",
+    "source-map-loader": "^0.2.4",
     "source-map-support": "^0.5.8",
     "ts-loader": "^4.4.2",
     "ts-node": "^7.0.0",

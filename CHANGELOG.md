@@ -1,5 +1,8 @@
 ### Changelog
 
+- 2.6.0 (2019-01-03)
+  - Bugfixes:
+    - Fix sourcemap structure (#303)
 - 2.5.6 (2018-09-30)
   - Bugfixes:
     - Validate date inputs (#281)

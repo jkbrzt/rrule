@@ -225,7 +225,7 @@ var notEmpty = function (obj) {
 var includes = function (arr, val) {
     return notEmpty(arr) && arr.indexOf(val) !== -1;
 };
-//# sourceMappingURL=helpers.js.map
+
 
 /***/ }),
 /* 1 */
@@ -234,23 +234,10 @@ var includes = function (arr, val) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// EXTERNAL MODULE: ./dist/esm/helpers.js
+// EXTERNAL MODULE: ./src/helpers.ts
 var helpers = __webpack_require__(0);
 
-// CONCATENATED MODULE: ./dist/esm/dateutil.js
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+// CONCATENATED MODULE: ./src/dateutil.ts
 
 /**
  * General date-related utilities.
@@ -394,171 +381,10 @@ var dateutil_dateutil;
             throw new Error("Invalid UNTIL value: " + until);
         return new Date(Date.UTC(parseInt(bits[1], 10), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10), parseInt(bits[5], 10) || 0, parseInt(bits[6], 10) || 0, parseInt(bits[7], 10) || 0));
     };
-    var Time = /** @class */ (function () {
-        function Time(hour, minute, second, millisecond) {
-            this.hour = hour;
-            this.minute = minute;
-            this.second = second;
-            this.millisecond = millisecond || 0;
-        }
-        Time.prototype.getHours = function () {
-            return this.hour;
-        };
-        Time.prototype.getMinutes = function () {
-            return this.minute;
-        };
-        Time.prototype.getSeconds = function () {
-            return this.second;
-        };
-        Time.prototype.getMilliseconds = function () {
-            return this.millisecond;
-        };
-        Time.prototype.getTime = function () {
-            return ((this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
-                this.millisecond);
-        };
-        return Time;
-    }());
-    dateutil.Time = Time;
-    var DateTime = /** @class */ (function (_super) {
-        __extends(DateTime, _super);
-        function DateTime(year, month, day, hour, minute, second, millisecond) {
-            var _this = _super.call(this, hour, minute, second, millisecond) || this;
-            _this.year = year;
-            _this.month = month;
-            _this.day = day;
-            return _this;
-        }
-        DateTime.fromDate = function (date) {
-            return new this(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.valueOf() % 1000);
-        };
-        DateTime.prototype.getWeekday = function () {
-            return dateutil.getWeekday(new Date(this.getTime()));
-        };
-        DateTime.prototype.getTime = function () {
-            return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond)).getTime();
-        };
-        DateTime.prototype.getDay = function () {
-            return this.day;
-        };
-        DateTime.prototype.getMonth = function () {
-            return this.month;
-        };
-        DateTime.prototype.getYear = function () {
-            return this.year;
-        };
-        DateTime.prototype.addYears = function (years) {
-            this.year += years;
-        };
-        DateTime.prototype.addMonths = function (months) {
-            this.month += months;
-            if (this.month > 12) {
-                var yearDiv = Math.floor(this.month / 12);
-                var monthMod = Object(helpers["i" /* pymod */])(this.month, 12);
-                this.month = monthMod;
-                this.year += yearDiv;
-                if (this.month === 0) {
-                    this.month = 12;
-                    --this.year;
-                }
-            }
-        };
-        DateTime.prototype.addWeekly = function (days, wkst) {
-            if (wkst > this.getWeekday()) {
-                this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7;
-            }
-            else {
-                this.day += -(this.getWeekday() - wkst) + days * 7;
-            }
-            this.fixDay();
-        };
-        DateTime.prototype.addDaily = function (days) {
-            this.day += days;
-            this.fixDay();
-        };
-        DateTime.prototype.addHours = function (hours, filtered, byhour) {
-            if (filtered) {
-                // Jump to one iteration before next day
-                this.hour += Math.floor((23 - this.hour) / hours) * hours;
-            }
-            while (true) {
-                this.hour += hours;
-                var _a = Object(helpers["a" /* divmod */])(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
-                if (dayDiv) {
-                    this.hour = hourMod;
-                    this.addDaily(dayDiv);
-                }
-                if (Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour))
-                    break;
-            }
-        };
-        DateTime.prototype.addMinutes = function (minutes, filtered, byhour, byminute) {
-            if (filtered) {
-                // Jump to one iteration before next day
-                this.minute +=
-                    Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes;
-            }
-            while (true) {
-                this.minute += minutes;
-                var _a = Object(helpers["a" /* divmod */])(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
-                if (hourDiv) {
-                    this.minute = minuteMod;
-                    this.addHours(hourDiv, false, byhour);
-                }
-                if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
-                    (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute))) {
-                    break;
-                }
-            }
-        };
-        DateTime.prototype.addSeconds = function (seconds, filtered, byhour, byminute, bysecond) {
-            if (filtered) {
-                // Jump to one iteration before next day
-                this.second +=
-                    Math.floor((86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds) * seconds;
-            }
-            while (true) {
-                this.second += seconds;
-                var _a = Object(helpers["a" /* divmod */])(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
-                if (minuteDiv) {
-                    this.second = secondMod;
-                    this.addMinutes(minuteDiv, false, byhour, byminute);
-                }
-                if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
-                    (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute)) &&
-                    (Object(helpers["b" /* empty */])(bysecond) || Object(helpers["c" /* includes */])(bysecond, this.second))) {
-                    break;
-                }
-            }
-        };
-        DateTime.prototype.fixDay = function () {
-            if (this.day <= 28) {
-                return;
-            }
-            var daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
-            if (this.day <= daysinmonth) {
-                return;
-            }
-            while (this.day > daysinmonth) {
-                this.day -= daysinmonth;
-                ++this.month;
-                if (this.month === 13) {
-                    this.month = 1;
-                    ++this.year;
-                    if (this.year > dateutil.MAXYEAR) {
-                        return;
-                    }
-                }
-                daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1];
-            }
-        };
-        return DateTime;
-    }(Time));
-    dateutil.DateTime = DateTime;
 })(dateutil_dateutil || (dateutil_dateutil = {}));
-/* harmony default export */ var esm_dateutil = (dateutil_dateutil);
-//# sourceMappingURL=dateutil.js.map
-// CONCATENATED MODULE: ./dist/esm/iterresult.js
+/* harmony default export */ var src_dateutil = (dateutil_dateutil);
+
+// CONCATENATED MODULE: ./src/iterresult.ts
 /**
  * This class helps us to emulate python's generators, sorta.
  */
@@ -635,7 +461,8 @@ var IterResult = /** @class */ (function () {
                 return res;
             case 'before':
             case 'after':
-                return res.length ? res[res.length - 1] : null;
+            default:
+                return (res.length ? res[res.length - 1] : null);
         }
     };
     IterResult.prototype.clone = function () {
@@ -644,9 +471,9 @@ var IterResult = /** @class */ (function () {
     return IterResult;
 }());
 /* harmony default export */ var iterresult = (IterResult);
-//# sourceMappingURL=iterresult.js.map
-// CONCATENATED MODULE: ./dist/esm/callbackiterresult.js
-var callbackiterresult_extends = (undefined && undefined.__extends) || (function () {
+
+// CONCATENATED MODULE: ./src/callbackiterresult.ts
+var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -665,7 +492,7 @@ var callbackiterresult_extends = (undefined && undefined.__extends) || (function
  * and stops iterating when the callback returns false.
  */
 var CallbackIterResult = /** @class */ (function (_super) {
-    callbackiterresult_extends(CallbackIterResult, _super);
+    __extends(CallbackIterResult, _super);
     function CallbackIterResult(method, args, iterator) {
         var _this = _super.call(this, method, args) || this;
         _this.iterator = iterator;
@@ -681,8 +508,8 @@ var CallbackIterResult = /** @class */ (function (_super) {
     return CallbackIterResult;
 }(iterresult));
 /* harmony default export */ var callbackiterresult = (CallbackIterResult);
-//# sourceMappingURL=callbackiterresult.js.map
-// CONCATENATED MODULE: ./dist/esm/types.js
+
+// CONCATENATED MODULE: ./src/types.ts
 var Frequency;
 (function (Frequency) {
     Frequency[Frequency["YEARLY"] = 0] = "YEARLY";
@@ -696,8 +523,8 @@ var Frequency;
 function freqIsDailyOrGreater(freq) {
     return freq < Frequency.HOURLY;
 }
-//# sourceMappingURL=types.js.map
-// CONCATENATED MODULE: ./dist/esm/weekday.js
+
+// CONCATENATED MODULE: ./src/weekday.ts
 // =============================================================================
 // Weekday
 // =============================================================================
@@ -731,8 +558,200 @@ var Weekday = /** @class */ (function () {
     return Weekday;
 }());
 
-//# sourceMappingURL=weekday.js.map
-// CONCATENATED MODULE: ./dist/esm/parseoptions.js
+
+// CONCATENATED MODULE: ./src/datetime.ts
+var datetime_extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+
+var Time = /** @class */ (function () {
+    function Time(hour, minute, second, millisecond) {
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
+        this.millisecond = millisecond || 0;
+    }
+    Time.prototype.getHours = function () {
+        return this.hour;
+    };
+    Time.prototype.getMinutes = function () {
+        return this.minute;
+    };
+    Time.prototype.getSeconds = function () {
+        return this.second;
+    };
+    Time.prototype.getMilliseconds = function () {
+        return this.millisecond;
+    };
+    Time.prototype.getTime = function () {
+        return ((this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
+            this.millisecond);
+    };
+    return Time;
+}());
+
+var datetime_DateTime = /** @class */ (function (_super) {
+    datetime_extends(DateTime, _super);
+    function DateTime(year, month, day, hour, minute, second, millisecond) {
+        var _this = _super.call(this, hour, minute, second, millisecond) || this;
+        _this.year = year;
+        _this.month = month;
+        _this.day = day;
+        return _this;
+    }
+    DateTime.fromDate = function (date) {
+        return new this(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.valueOf() % 1000);
+    };
+    DateTime.prototype.getWeekday = function () {
+        return dateutil_dateutil.getWeekday(new Date(this.getTime()));
+    };
+    DateTime.prototype.getTime = function () {
+        return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond)).getTime();
+    };
+    DateTime.prototype.getDay = function () {
+        return this.day;
+    };
+    DateTime.prototype.getMonth = function () {
+        return this.month;
+    };
+    DateTime.prototype.getYear = function () {
+        return this.year;
+    };
+    DateTime.prototype.addYears = function (years) {
+        this.year += years;
+    };
+    DateTime.prototype.addMonths = function (months) {
+        this.month += months;
+        if (this.month > 12) {
+            var yearDiv = Math.floor(this.month / 12);
+            var monthMod = Object(helpers["i" /* pymod */])(this.month, 12);
+            this.month = monthMod;
+            this.year += yearDiv;
+            if (this.month === 0) {
+                this.month = 12;
+                --this.year;
+            }
+        }
+    };
+    DateTime.prototype.addWeekly = function (days, wkst) {
+        if (wkst > this.getWeekday()) {
+            this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7;
+        }
+        else {
+            this.day += -(this.getWeekday() - wkst) + days * 7;
+        }
+        this.fixDay();
+    };
+    DateTime.prototype.addDaily = function (days) {
+        this.day += days;
+        this.fixDay();
+    };
+    DateTime.prototype.addHours = function (hours, filtered, byhour) {
+        if (filtered) {
+            // Jump to one iteration before next day
+            this.hour += Math.floor((23 - this.hour) / hours) * hours;
+        }
+        while (true) {
+            this.hour += hours;
+            var _a = Object(helpers["a" /* divmod */])(this.hour, 24), dayDiv = _a.div, hourMod = _a.mod;
+            if (dayDiv) {
+                this.hour = hourMod;
+                this.addDaily(dayDiv);
+            }
+            if (Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour))
+                break;
+        }
+    };
+    DateTime.prototype.addMinutes = function (minutes, filtered, byhour, byminute) {
+        if (filtered) {
+            // Jump to one iteration before next day
+            this.minute +=
+                Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes;
+        }
+        while (true) {
+            this.minute += minutes;
+            var _a = Object(helpers["a" /* divmod */])(this.minute, 60), hourDiv = _a.div, minuteMod = _a.mod;
+            if (hourDiv) {
+                this.minute = minuteMod;
+                this.addHours(hourDiv, false, byhour);
+            }
+            if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
+                (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute))) {
+                break;
+            }
+        }
+    };
+    DateTime.prototype.addSeconds = function (seconds, filtered, byhour, byminute, bysecond) {
+        if (filtered) {
+            // Jump to one iteration before next day
+            this.second +=
+                Math.floor((86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds) * seconds;
+        }
+        while (true) {
+            this.second += seconds;
+            var _a = Object(helpers["a" /* divmod */])(this.second, 60), minuteDiv = _a.div, secondMod = _a.mod;
+            if (minuteDiv) {
+                this.second = secondMod;
+                this.addMinutes(minuteDiv, false, byhour, byminute);
+            }
+            if ((Object(helpers["b" /* empty */])(byhour) || Object(helpers["c" /* includes */])(byhour, this.hour)) &&
+                (Object(helpers["b" /* empty */])(byminute) || Object(helpers["c" /* includes */])(byminute, this.minute)) &&
+                (Object(helpers["b" /* empty */])(bysecond) || Object(helpers["c" /* includes */])(bysecond, this.second))) {
+                break;
+            }
+        }
+    };
+    DateTime.prototype.fixDay = function () {
+        if (this.day <= 28) {
+            return;
+        }
+        var daysinmonth = dateutil_dateutil.monthRange(this.year, this.month - 1)[1];
+        if (this.day <= daysinmonth) {
+            return;
+        }
+        while (this.day > daysinmonth) {
+            this.day -= daysinmonth;
+            ++this.month;
+            if (this.month === 13) {
+                this.month = 1;
+                ++this.year;
+                if (this.year > dateutil_dateutil.MAXYEAR) {
+                    return;
+                }
+            }
+            daysinmonth = dateutil_dateutil.monthRange(this.year, this.month - 1)[1];
+        }
+    };
+    DateTime.prototype.add = function (options, filtered) {
+        var freq = options.freq, interval = options.interval, wkst = options.wkst, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
+        switch (freq) {
+            case Frequency.YEARLY: return this.addYears(interval);
+            case Frequency.MONTHLY: return this.addMonths(interval);
+            case Frequency.WEEKLY: return this.addWeekly(interval, wkst);
+            case Frequency.DAILY: return this.addDaily(interval);
+            case Frequency.HOURLY: return this.addHours(interval, filtered, byhour);
+            case Frequency.MINUTELY: return this.addMinutes(interval, filtered, byhour, byminute);
+            case Frequency.SECONDLY: return this.addSeconds(interval, filtered, byhour, byminute, bysecond);
+        }
+    };
+    return DateTime;
+}(Time));
+
+
+// CONCATENATED MODULE: ./src/parseoptions.ts
+
 
 
 
@@ -748,7 +767,7 @@ function initializeOptions(options) {
         initializedOptions[key] = value;
         if (!Object(helpers["c" /* includes */])(rrule_defaultKeys, key))
             invalid.push(key);
-        if (esm_dateutil.isDate(value) && !esm_dateutil.isValidDate(value))
+        if (src_dateutil.isDate(value) && !src_dateutil.isValidDate(value))
             invalid.push(key);
     });
     if (invalid.length) {
@@ -765,14 +784,14 @@ function parseOptions(options) {
             opts[key] = DEFAULT_OPTIONS[key];
     });
     if (Object(helpers["f" /* isPresent */])(opts.byeaster))
-        opts.freq = esm_rrule.YEARLY;
-    if (!(Object(helpers["f" /* isPresent */])(opts.freq) && esm_rrule.FREQUENCIES[opts.freq])) {
+        opts.freq = src_rrule.YEARLY;
+    if (!(Object(helpers["f" /* isPresent */])(opts.freq) && src_rrule.FREQUENCIES[opts.freq])) {
         throw new Error("Invalid frequency: " + opts.freq + " " + options.freq);
     }
     if (!opts.dtstart)
         opts.dtstart = new Date(new Date().setMilliseconds(0));
     if (!Object(helpers["f" /* isPresent */])(opts.wkst)) {
-        opts.wkst = esm_rrule.MO.weekday;
+        opts.wkst = src_rrule.MO.weekday;
     }
     else if (Object(helpers["e" /* isNumber */])(opts.wkst)) {
         // cool, just keep it like that
@@ -798,16 +817,16 @@ function parseOptions(options) {
         Object(helpers["f" /* isPresent */])(opts.byweekday) ||
         Object(helpers["f" /* isPresent */])(opts.byeaster))) {
         switch (opts.freq) {
-            case esm_rrule.YEARLY:
+            case src_rrule.YEARLY:
                 if (!opts.bymonth)
                     opts.bymonth = opts.dtstart.getUTCMonth() + 1;
                 opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
-            case esm_rrule.MONTHLY:
+            case src_rrule.MONTHLY:
                 opts.bymonthday = opts.dtstart.getUTCDate();
                 break;
-            case esm_rrule.WEEKLY:
-                opts.byweekday = [esm_dateutil.getWeekday(opts.dtstart)];
+            case src_rrule.WEEKLY:
+                opts.byweekday = [src_dateutil.getWeekday(opts.dtstart)];
                 break;
         }
     }
@@ -862,7 +881,7 @@ function parseOptions(options) {
         opts.bynweekday = null;
     }
     else if (opts.byweekday instanceof Weekday) {
-        if (!opts.byweekday.n || opts.freq > esm_rrule.MONTHLY) {
+        if (!opts.byweekday.n || opts.freq > src_rrule.MONTHLY) {
             opts.byweekday = [opts.byweekday.weekday];
             opts.bynweekday = null;
         }
@@ -881,7 +900,7 @@ function parseOptions(options) {
                 continue;
             }
             var wd = wday;
-            if (!wd.n || opts.freq > esm_rrule.MONTHLY) {
+            if (!wd.n || opts.freq > src_rrule.MONTHLY) {
                 byweekday.push(wd.weekday);
             }
             else {
@@ -894,7 +913,7 @@ function parseOptions(options) {
     // byhour
     if (!Object(helpers["f" /* isPresent */])(opts.byhour)) {
         opts.byhour =
-            opts.freq < esm_rrule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
+            opts.freq < src_rrule.HOURLY ? [opts.dtstart.getUTCHours()] : null;
     }
     else if (Object(helpers["e" /* isNumber */])(opts.byhour)) {
         opts.byhour = [opts.byhour];
@@ -902,7 +921,7 @@ function parseOptions(options) {
     // byminute
     if (!Object(helpers["f" /* isPresent */])(opts.byminute)) {
         opts.byminute =
-            opts.freq < esm_rrule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
+            opts.freq < src_rrule.MINUTELY ? [opts.dtstart.getUTCMinutes()] : null;
     }
     else if (Object(helpers["e" /* isNumber */])(opts.byminute)) {
         opts.byminute = [opts.byminute];
@@ -910,7 +929,7 @@ function parseOptions(options) {
     // bysecond
     if (!Object(helpers["f" /* isPresent */])(opts.bysecond)) {
         opts.bysecond =
-            opts.freq < esm_rrule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
+            opts.freq < src_rrule.SECONDLY ? [opts.dtstart.getUTCSeconds()] : null;
     }
     else if (Object(helpers["e" /* isNumber */])(opts.bysecond)) {
         opts.bysecond = [opts.bysecond];
@@ -926,14 +945,14 @@ function buildTimeset(opts) {
     opts.byhour.forEach(function (hour) {
         opts.byminute.forEach(function (minute) {
             opts.bysecond.forEach(function (second) {
-                timeset.push(new esm_dateutil.Time(hour, minute, second, millisecondModulo));
+                timeset.push(new Time(hour, minute, second, millisecondModulo));
             });
         });
     });
     return timeset;
 }
-//# sourceMappingURL=parseoptions.js.map
-// CONCATENATED MODULE: ./dist/esm/parsestring.js
+
+// CONCATENATED MODULE: ./src/parsestring.ts
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -963,7 +982,7 @@ function parseDtstart(line) {
     if (tzid) {
         options.tzid = tzid;
     }
-    options.dtstart = esm_dateutil.untilStringToDate(dtstart);
+    options.dtstart = src_dateutil.untilStringToDate(dtstart);
     return options;
 }
 function parseLine(rfcString) {
@@ -1025,7 +1044,7 @@ function parseRrule(line) {
                 options.dtstart = dtstart.dtstart;
                 break;
             case 'UNTIL':
-                options.until = esm_dateutil.untilStringToDate(value);
+                options.until = src_dateutil.untilStringToDate(value);
                 break;
             case 'BYEASTER':
                 options.byeaster = Number(value);
@@ -1064,11 +1083,11 @@ function parseWeekday(value) {
         return new Weekday(wday, n);
     });
 }
-//# sourceMappingURL=parsestring.js.map
+
 // EXTERNAL MODULE: ./node_modules/luxon/build/cjs-browser/luxon.js
 var luxon = __webpack_require__(2);
 
-// CONCATENATED MODULE: ./dist/esm/datewithzone.js
+// CONCATENATED MODULE: ./src/datewithzone.ts
 
 
 var datewithzone_DateWithZone = /** @class */ (function () {
@@ -1084,7 +1103,7 @@ var datewithzone_DateWithZone = /** @class */ (function () {
         configurable: true
     });
     DateWithZone.prototype.toString = function () {
-        var datestr = esm_dateutil.timeToUntilString(this.date.getTime(), this.isUTC);
+        var datestr = src_dateutil.timeToUntilString(this.date.getTime(), this.isUTC);
         if (!this.isUTC) {
             return ";TZID=" + this.tzid + ":" + datestr;
         }
@@ -1113,8 +1132,8 @@ var datewithzone_DateWithZone = /** @class */ (function () {
     return DateWithZone;
 }());
 
-//# sourceMappingURL=datewithzone.js.map
-// CONCATENATED MODULE: ./dist/esm/optionstostring.js
+
+// CONCATENATED MODULE: ./src/optionstostring.ts
 
 
 
@@ -1137,7 +1156,7 @@ function optionsToString(options) {
             continue;
         switch (key) {
             case 'FREQ':
-                outValue = esm_rrule.FREQUENCIES[options.freq];
+                outValue = src_rrule.FREQUENCIES[options.freq];
                 break;
             case 'WKST':
                 if (Object(helpers["e" /* isNumber */])(value)) {
@@ -1174,7 +1193,7 @@ function optionsToString(options) {
                 dtstart = buildDtstart(value, options.tzid);
                 break;
             case 'UNTIL':
-                outValue = esm_dateutil.timeToUntilString(value, !options.tzid);
+                outValue = src_dateutil.timeToUntilString(value, !options.tzid);
                 break;
             default:
                 if (Object(helpers["d" /* isArray */])(value)) {
@@ -1208,8 +1227,8 @@ function buildDtstart(dtstart, tzid) {
     }
     return 'DTSTART' + new datewithzone_DateWithZone(new Date(dtstart), tzid).toString();
 }
-//# sourceMappingURL=optionstostring.js.map
-// CONCATENATED MODULE: ./dist/esm/cache.js
+
+// CONCATENATED MODULE: ./src/cache.ts
 
 
 
@@ -1229,8 +1248,8 @@ var cache_Cache = /** @class */ (function () {
         if (value) {
             value =
                 value instanceof Date
-                    ? esm_dateutil.clone(value)
-                    : esm_dateutil.cloneDates(value);
+                    ? src_dateutil.clone(value)
+                    : src_dateutil.cloneDates(value);
         }
         if (what === 'all') {
             this.all = value;
@@ -1286,16 +1305,16 @@ var cache_Cache = /** @class */ (function () {
             this._cacheAdd(what, cached, args);
         }
         return Object(helpers["d" /* isArray */])(cached)
-            ? esm_dateutil.cloneDates(cached)
+            ? src_dateutil.cloneDates(cached)
             : cached instanceof Date
-                ? esm_dateutil.clone(cached)
+                ? src_dateutil.clone(cached)
                 : cached;
     };
     return Cache;
 }());
 
-//# sourceMappingURL=cache.js.map
-// CONCATENATED MODULE: ./dist/esm/masks.js
+
+// CONCATENATED MODULE: ./src/masks.ts
 
 // =============================================================================
 // Date masks
@@ -1324,276 +1343,203 @@ var WDAYMASK = (function () {
     return wdaymask;
 })();
 
-//# sourceMappingURL=masks.js.map
-// CONCATENATED MODULE: ./dist/esm/iterinfo.js
 
-
-
-
-
-// =============================================================================
-// Iterinfo
-// =============================================================================
-var iterinfo_Iterinfo = /** @class */ (function () {
-    function Iterinfo(options) {
-        this.options = options;
-        this.yearlen = 365;
-        this.nextyearlen = 365;
-        this.mmask = null;
-        this.mrange = null;
-        this.mdaymask = null;
-        this.nmdaymask = null;
-        this.wdaymask = null;
-        this.wnomask = null;
-        this.nwdaymask = null;
-        this.eastermask = null;
-    }
-    Iterinfo.prototype.rebuild = function (year, month) {
-        var options = this.options;
-        if (year !== this.lastyear) {
-            this.rebuildYear(year);
+// CONCATENATED MODULE: ./src/iterinfo/yearinfo.ts
+var yearinfo_assign = (undefined && undefined.__assign) || function () {
+    yearinfo_assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
         }
-        if (Object(helpers["g" /* notEmpty */])(options.bynweekday) &&
-            (month !== this.lastmonth || year !== this.lastyear)) {
-            this.rebuildMonth(year, month);
-        }
-        if (Object(helpers["f" /* isPresent */])(options.byeaster)) {
-            this.eastermask = easter(year, options.byeaster);
-        }
+        return t;
     };
-    Iterinfo.prototype.rebuildYear = function (year) {
-        var options = this.options;
-        this.yearlen = esm_dateutil.isLeapYear(year) ? 366 : 365;
-        this.nextyearlen = esm_dateutil.isLeapYear(year + 1) ? 366 : 365;
-        var firstyday = new Date(Date.UTC(year, 0, 1));
-        this.yearordinal = esm_dateutil.toOrdinal(firstyday);
-        this.yearweekday = esm_dateutil.getWeekday(firstyday);
-        var wday = esm_dateutil.getWeekday(firstyday);
-        if (this.yearlen === 365) {
-            this.mmask = M365MASK;
-            this.mdaymask = MDAY365MASK;
-            this.nmdaymask = NMDAY365MASK;
-            this.wdaymask = WDAYMASK.slice(wday);
-            this.mrange = M365RANGE;
+    return yearinfo_assign.apply(this, arguments);
+};
+
+
+
+function rebuildYear(year, options) {
+    var firstyday = new Date(Date.UTC(year, 0, 1));
+    var yearlen = src_dateutil.isLeapYear(year) ? 366 : 365;
+    var nextyearlen = src_dateutil.isLeapYear(year + 1) ? 366 : 365;
+    var yearordinal = src_dateutil.toOrdinal(firstyday);
+    var yearweekday = src_dateutil.getWeekday(firstyday);
+    var result = yearinfo_assign({ yearlen: yearlen,
+        nextyearlen: nextyearlen,
+        yearordinal: yearordinal,
+        yearweekday: yearweekday }, baseYearMasks(year), { wnomask: null });
+    if (Object(helpers["b" /* empty */])(options.byweekno)) {
+        return result;
+    }
+    result.wnomask = Object(helpers["k" /* repeat */])(0, yearlen + 7);
+    var firstwkst;
+    var wyearlen;
+    var no1wkst = firstwkst = Object(helpers["i" /* pymod */])(7 - yearweekday + options.wkst, 7);
+    if (no1wkst >= 4) {
+        no1wkst = 0;
+        // Number of days in the year, plus the days we got
+        // from last year.
+        wyearlen =
+            result.yearlen + Object(helpers["i" /* pymod */])(yearweekday - options.wkst, 7);
+    }
+    else {
+        // Number of days in the year, minus the days we
+        // left in last year.
+        wyearlen = yearlen - no1wkst;
+    }
+    var div = Math.floor(wyearlen / 7);
+    var mod = Object(helpers["i" /* pymod */])(wyearlen, 7);
+    var numweeks = Math.floor(div + mod / 4);
+    for (var j = 0; j < options.byweekno.length; j++) {
+        var n = options.byweekno[j];
+        if (n < 0) {
+            n += numweeks + 1;
+        }
+        if (!(n > 0 && n <= numweeks)) {
+            continue;
+        }
+        var i = void 0;
+        if (n > 1) {
+            i = no1wkst + (n - 1) * 7;
+            if (no1wkst !== firstwkst) {
+                i -= 7 - firstwkst;
+            }
         }
         else {
-            this.mmask = M366MASK;
-            this.mdaymask = MDAY366MASK;
-            this.nmdaymask = NMDAY366MASK;
-            this.wdaymask = WDAYMASK.slice(wday);
-            this.mrange = M366RANGE;
+            i = no1wkst;
         }
-        if (Object(helpers["b" /* empty */])(options.byweekno)) {
-            this.wnomask = null;
-            return;
+        for (var k = 0; k < 7; k++) {
+            result.wnomask[i] = 1;
+            i++;
+            if (result.wdaymask[i] === options.wkst)
+                break;
         }
-        this.wnomask = Object(helpers["k" /* repeat */])(0, this.yearlen + 7);
-        var firstwkst;
-        var wyearlen;
-        var no1wkst = firstwkst = Object(helpers["i" /* pymod */])(7 - this.yearweekday + options.wkst, 7);
-        if (no1wkst >= 4) {
-            no1wkst = 0;
-            // Number of days in the year, plus the days we got
-            // from last year.
-            wyearlen =
-                this.yearlen + Object(helpers["i" /* pymod */])(this.yearweekday - options.wkst, 7);
-        }
-        else {
-            // Number of days in the year, minus the days we
-            // left in last year.
-            wyearlen = this.yearlen - no1wkst;
-        }
-        var div = Math.floor(wyearlen / 7);
-        var mod = Object(helpers["i" /* pymod */])(wyearlen, 7);
-        var numweeks = Math.floor(div + mod / 4);
-        for (var j = 0; j < options.byweekno.length; j++) {
-            var n = options.byweekno[j];
-            if (n < 0) {
-                n += numweeks + 1;
-            }
-            if (!(n > 0 && n <= numweeks)) {
-                continue;
-            }
-            var i = void 0;
-            if (n > 1) {
-                i = no1wkst + (n - 1) * 7;
-                if (no1wkst !== firstwkst) {
-                    i -= 7 - firstwkst;
-                }
-            }
-            else {
-                i = no1wkst;
-            }
-            for (var k = 0; k < 7; k++) {
-                this.wnomask[i] = 1;
-                i++;
-                if (this.wdaymask[i] === options.wkst)
+    }
+    if (Object(helpers["c" /* includes */])(options.byweekno, 1)) {
+        // Check week number 1 of next year as well
+        // orig-TODO : Check -numweeks for next year.
+        var i = no1wkst + numweeks * 7;
+        if (no1wkst !== firstwkst)
+            i -= 7 - firstwkst;
+        if (i < yearlen) {
+            // If week starts in next year, we
+            // don't care about it.
+            for (var j = 0; j < 7; j++) {
+                result.wnomask[i] = 1;
+                i += 1;
+                if (result.wdaymask[i] === options.wkst)
                     break;
             }
         }
-        if (Object(helpers["c" /* includes */])(options.byweekno, 1)) {
-            // Check week number 1 of next year as well
-            // orig-TODO : Check -numweeks for next year.
-            var i = no1wkst + numweeks * 7;
-            if (no1wkst !== firstwkst)
-                i -= 7 - firstwkst;
-            if (i < this.yearlen) {
-                // If week starts in next year, we
-                // don't care about it.
-                for (var j = 0; j < 7; j++) {
-                    this.wnomask[i] = 1;
-                    i += 1;
-                    if (this.wdaymask[i] === options.wkst)
-                        break;
-                }
-            }
-        }
-        if (no1wkst) {
-            // Check last week number of last year as
-            // well. If no1wkst is 0, either the year
-            // started on week start, or week number 1
-            // got days from last year, so there are no
-            // days from last year's last week number in
-            // this year.
-            var lnumweeks = void 0;
-            if (!Object(helpers["c" /* includes */])(options.byweekno, -1)) {
-                var lyearweekday = esm_dateutil.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
-                var lno1wkst = Object(helpers["i" /* pymod */])(7 - lyearweekday.valueOf() + options.wkst, 7);
-                var lyearlen = esm_dateutil.isLeapYear(year - 1) ? 366 : 365;
-                var weekst = void 0;
-                if (lno1wkst >= 4) {
-                    lno1wkst = 0;
-                    weekst = lyearlen + Object(helpers["i" /* pymod */])(lyearweekday - options.wkst, 7);
-                }
-                else {
-                    weekst = this.yearlen - no1wkst;
-                }
-                lnumweeks = Math.floor(52 + Object(helpers["i" /* pymod */])(weekst, 7) / 4);
+    }
+    if (no1wkst) {
+        // Check last week number of last year as
+        // well. If no1wkst is 0, either the year
+        // started on week start, or week number 1
+        // got days from last year, so there are no
+        // days from last year's last week number in
+        // this year.
+        var lnumweeks = void 0;
+        if (!Object(helpers["c" /* includes */])(options.byweekno, -1)) {
+            var lyearweekday = src_dateutil.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
+            var lno1wkst = Object(helpers["i" /* pymod */])(7 - lyearweekday.valueOf() + options.wkst, 7);
+            var lyearlen = src_dateutil.isLeapYear(year - 1) ? 366 : 365;
+            var weekst = void 0;
+            if (lno1wkst >= 4) {
+                lno1wkst = 0;
+                weekst = lyearlen + Object(helpers["i" /* pymod */])(lyearweekday - options.wkst, 7);
             }
             else {
-                lnumweeks = -1;
+                weekst = yearlen - no1wkst;
             }
-            if (Object(helpers["c" /* includes */])(options.byweekno, lnumweeks)) {
-                for (var i = 0; i < no1wkst; i++)
-                    this.wnomask[i] = 1;
+            lnumweeks = Math.floor(52 + Object(helpers["i" /* pymod */])(weekst, 7) / 4);
+        }
+        else {
+            lnumweeks = -1;
+        }
+        if (Object(helpers["c" /* includes */])(options.byweekno, lnumweeks)) {
+            for (var i = 0; i < no1wkst; i++)
+                result.wnomask[i] = 1;
+        }
+    }
+    return result;
+}
+function baseYearMasks(year) {
+    var yearlen = src_dateutil.isLeapYear(year) ? 366 : 365;
+    var firstyday = new Date(Date.UTC(year, 0, 1));
+    var wday = src_dateutil.getWeekday(firstyday);
+    if (yearlen === 365) {
+        return {
+            mmask: M365MASK,
+            mdaymask: MDAY365MASK,
+            nmdaymask: NMDAY365MASK,
+            wdaymask: WDAYMASK.slice(wday),
+            mrange: M365RANGE
+        };
+    }
+    return {
+        mmask: M366MASK,
+        mdaymask: MDAY366MASK,
+        nmdaymask: NMDAY366MASK,
+        wdaymask: WDAYMASK.slice(wday),
+        mrange: M366RANGE
+    };
+}
+
+// CONCATENATED MODULE: ./src/iterinfo/monthinfo.ts
+
+
+function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
+    var result = {
+        lastyear: year,
+        lastmonth: month,
+        nwdaymask: []
+    };
+    var ranges = [];
+    if (options.freq === src_rrule.YEARLY) {
+        if (Object(helpers["b" /* empty */])(options.bymonth)) {
+            ranges = [[0, yearlen]];
+        }
+        else {
+            for (var j = 0; j < options.bymonth.length; j++) {
+                month = options.bymonth[j];
+                ranges.push(mrange.slice(month - 1, month + 1));
             }
         }
-    };
-    Iterinfo.prototype.rebuildMonth = function (year, month) {
-        var options = this.options;
-        this.lastyear = year;
-        this.lastmonth = month;
-        var ranges = [];
-        if (options.freq === esm_rrule.YEARLY) {
-            if (Object(helpers["b" /* empty */])(options.bymonth)) {
-                ranges = [[0, this.yearlen]];
+    }
+    else if (options.freq === src_rrule.MONTHLY) {
+        ranges = [mrange.slice(month - 1, month + 1)];
+    }
+    if (Object(helpers["b" /* empty */])(ranges)) {
+        return result;
+    }
+    // Weekly frequency won't get here, so we may not
+    // care about cross-year weekly periods.
+    result.nwdaymask = Object(helpers["k" /* repeat */])(0, yearlen);
+    for (var j = 0; j < ranges.length; j++) {
+        var rang = ranges[j];
+        var first = rang[0];
+        var last = rang[1] - 1;
+        for (var k = 0; k < options.bynweekday.length; k++) {
+            var i = void 0;
+            var _a = options.bynweekday[k], wday = _a[0], n = _a[1];
+            if (n < 0) {
+                i = last + (n + 1) * 7;
+                i -= Object(helpers["i" /* pymod */])(wdaymask[i] - wday, 7);
             }
             else {
-                for (var j = 0; j < options.bymonth.length; j++) {
-                    month = options.bymonth[j];
-                    ranges.push(this.mrange.slice(month - 1, month + 1));
-                }
+                i = first + (n - 1) * 7;
+                i += Object(helpers["i" /* pymod */])(7 - wdaymask[i] + wday, 7);
             }
+            if (first <= i && i <= last)
+                result.nwdaymask[i] = 1;
         }
-        else if (options.freq === esm_rrule.MONTHLY) {
-            ranges = [this.mrange.slice(month - 1, month + 1)];
-        }
-        if (Object(helpers["b" /* empty */])(ranges)) {
-            return;
-        }
-        // Weekly frequency won't get here, so we may not
-        // care about cross-year weekly periods.
-        this.nwdaymask = Object(helpers["k" /* repeat */])(0, this.yearlen);
-        for (var j = 0; j < ranges.length; j++) {
-            var rang = ranges[j];
-            var first = rang[0];
-            var last = rang[1] - 1;
-            for (var k = 0; k < options.bynweekday.length; k++) {
-                var i = void 0;
-                var _a = options.bynweekday[k], wday = _a[0], n = _a[1];
-                if (n < 0) {
-                    i = last + (n + 1) * 7;
-                    i -= Object(helpers["i" /* pymod */])(this.wdaymask[i] - wday, 7);
-                }
-                else {
-                    i = first + (n - 1) * 7;
-                    i += Object(helpers["i" /* pymod */])(7 - this.wdaymask[i] + wday, 7);
-                }
-                if (first <= i && i <= last)
-                    this.nwdaymask[i] = 1;
-            }
-        }
-    };
-    Iterinfo.prototype.ydayset = function () {
-        return [Object(helpers["j" /* range */])(this.yearlen), 0, this.yearlen];
-    };
-    Iterinfo.prototype.mdayset = function (_, month, __) {
-        var start = this.mrange[month - 1];
-        var end = this.mrange[month];
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
-        for (var i = start; i < end; i++)
-            set[i] = i;
-        return [set, start, end];
-    };
-    Iterinfo.prototype.wdayset = function (year, month, day) {
-        // We need to handle cross-year weeks here.
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen + 7);
-        var i = esm_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-            this.yearordinal;
-        var start = i;
-        for (var j = 0; j < 7; j++) {
-            set[i] = i;
-            ++i;
-            if (this.wdaymask[i] === this.options.wkst)
-                break;
-        }
-        return [set, start, i];
-    };
-    Iterinfo.prototype.ddayset = function (year, month, day) {
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
-        var i = esm_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-            this.yearordinal;
-        set[i] = i;
-        return [set, i, i + 1];
-    };
-    Iterinfo.prototype.htimeset = function (hour, _, second, millisecond) {
-        var _this = this;
-        var set = [];
-        this.options.byminute.forEach(function (minute) {
-            set = set.concat(_this.mtimeset(hour, minute, second, millisecond));
-        });
-        esm_dateutil.sort(set);
-        return set;
-    };
-    Iterinfo.prototype.mtimeset = function (hour, minute, _, millisecond) {
-        var set = this.options.bysecond.map(function (second) {
-            return new esm_dateutil.Time(hour, minute, second, millisecond);
-        });
-        esm_dateutil.sort(set);
-        return set;
-    };
-    Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
-        return [new esm_dateutil.Time(hour, minute, second, millisecond)];
-    };
-    Iterinfo.prototype.getdayset = function (freq) {
-        switch (freq) {
-            case Frequency.YEARLY: return this.ydayset.bind(this);
-            case Frequency.MONTHLY: return this.mdayset.bind(this);
-            case Frequency.WEEKLY: return this.wdayset.bind(this);
-            case Frequency.DAILY: return this.ddayset.bind(this);
-            default: return this.ddayset.bind(this);
-        }
-    };
-    Iterinfo.prototype.gettimeset = function (freq) {
-        switch (freq) {
-            case Frequency.HOURLY: return this.htimeset.bind(this);
-            case Frequency.MINUTELY: return this.mtimeset.bind(this);
-            case Frequency.SECONDLY: return this.stimeset.bind(this);
-        }
-    };
-    return Iterinfo;
-}());
-/* harmony default export */ var iterinfo = (iterinfo_Iterinfo);
+    }
+    return result;
+}
+
+// CONCATENATED MODULE: ./src/iterinfo/easter.ts
 function easter(y, offset) {
     if (offset === void 0) { offset = 0; }
     var a = y % 19;
@@ -1614,8 +1560,237 @@ function easter(y, offset) {
     var yearStart = Date.UTC(y, 0, 1);
     return [Math.ceil((date - yearStart) / (1000 * 60 * 60 * 24))];
 }
-//# sourceMappingURL=iterinfo.js.map
-// CONCATENATED MODULE: ./dist/esm/iter.js
+
+// CONCATENATED MODULE: ./src/iterinfo/index.ts
+
+
+
+
+
+
+
+// =============================================================================
+// Iterinfo
+// =============================================================================
+var iterinfo_Iterinfo = /** @class */ (function () {
+    function Iterinfo(options) {
+        this.options = options;
+    }
+    Iterinfo.prototype.rebuild = function (year, month) {
+        var options = this.options;
+        if (year !== this.lastyear) {
+            this.yearinfo = rebuildYear(year, options);
+        }
+        if (Object(helpers["g" /* notEmpty */])(options.bynweekday) &&
+            (month !== this.lastmonth || year !== this.lastyear)) {
+            var _a = this.yearinfo, yearlen = _a.yearlen, mrange = _a.mrange, wdaymask = _a.wdaymask;
+            this.monthinfo = rebuildMonth(year, month, yearlen, mrange, wdaymask, options);
+        }
+        if (Object(helpers["f" /* isPresent */])(options.byeaster)) {
+            this.eastermask = easter(year, options.byeaster);
+        }
+    };
+    Object.defineProperty(Iterinfo.prototype, "lastyear", {
+        get: function () {
+            return this.monthinfo ? this.monthinfo.lastyear : null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "lastmonth", {
+        get: function () {
+            return this.monthinfo ? this.monthinfo.lastmonth : null;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "yearlen", {
+        get: function () {
+            return this.yearinfo.yearlen;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "yearordinal", {
+        get: function () {
+            return this.yearinfo.yearordinal;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "mrange", {
+        get: function () {
+            return this.yearinfo.mrange;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "wdaymask", {
+        get: function () {
+            return this.yearinfo.wdaymask;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "mmask", {
+        get: function () {
+            return this.yearinfo.mmask;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "wnomask", {
+        get: function () {
+            return this.yearinfo.wnomask;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "nwdaymask", {
+        get: function () {
+            return this.monthinfo ? this.monthinfo.nwdaymask : [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "nextyearlen", {
+        get: function () {
+            return this.yearinfo.nextyearlen;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "mdaymask", {
+        get: function () {
+            return this.yearinfo.mdaymask;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Iterinfo.prototype, "nmdaymask", {
+        get: function () {
+            return this.yearinfo.nmdaymask;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Iterinfo.prototype.ydayset = function () {
+        return [Object(helpers["j" /* range */])(this.yearlen), 0, this.yearlen];
+    };
+    Iterinfo.prototype.mdayset = function (_, month, __) {
+        var start = this.mrange[month - 1];
+        var end = this.mrange[month];
+        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        for (var i = start; i < end; i++)
+            set[i] = i;
+        return [set, start, end];
+    };
+    Iterinfo.prototype.wdayset = function (year, month, day) {
+        // We need to handle cross-year weeks here.
+        var set = Object(helpers["k" /* repeat */])(null, this.yearlen + 7);
+        var i = src_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+            this.yearordinal;
+        var start = i;
+        for (var j = 0; j < 7; j++) {
+            set[i] = i;
+            ++i;
+            if (this.wdaymask[i] === this.options.wkst)
+                break;
+        }
+        return [set, start, i];
+    };
+    Iterinfo.prototype.ddayset = function (year, month, day) {
+        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        var i = src_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
+            this.yearordinal;
+        set[i] = i;
+        return [set, i, i + 1];
+    };
+    Iterinfo.prototype.htimeset = function (hour, _, second, millisecond) {
+        var _this = this;
+        var set = [];
+        this.options.byminute.forEach(function (minute) {
+            set = set.concat(_this.mtimeset(hour, minute, second, millisecond));
+        });
+        src_dateutil.sort(set);
+        return set;
+    };
+    Iterinfo.prototype.mtimeset = function (hour, minute, _, millisecond) {
+        var set = this.options.bysecond.map(function (second) {
+            return new Time(hour, minute, second, millisecond);
+        });
+        src_dateutil.sort(set);
+        return set;
+    };
+    Iterinfo.prototype.stimeset = function (hour, minute, second, millisecond) {
+        return [new Time(hour, minute, second, millisecond)];
+    };
+    Iterinfo.prototype.getdayset = function (freq) {
+        switch (freq) {
+            case Frequency.YEARLY: return this.ydayset.bind(this);
+            case Frequency.MONTHLY: return this.mdayset.bind(this);
+            case Frequency.WEEKLY: return this.wdayset.bind(this);
+            case Frequency.DAILY: return this.ddayset.bind(this);
+            default: return this.ddayset.bind(this);
+        }
+    };
+    Iterinfo.prototype.gettimeset = function (freq) {
+        switch (freq) {
+            case Frequency.HOURLY: return this.htimeset.bind(this);
+            case Frequency.MINUTELY: return this.mtimeset.bind(this);
+            case Frequency.SECONDLY: return this.stimeset.bind(this);
+        }
+    };
+    return Iterinfo;
+}());
+/* harmony default export */ var iterinfo = (iterinfo_Iterinfo);
+
+// CONCATENATED MODULE: ./src/iter/poslist.ts
+
+
+function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
+    var poslist = [];
+    for (var j = 0; j < bysetpos.length; j++) {
+        var daypos = void 0;
+        var timepos = void 0;
+        var pos = bysetpos[j];
+        if (pos < 0) {
+            daypos = Math.floor(pos / timeset.length);
+            timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
+        }
+        else {
+            daypos = Math.floor((pos - 1) / timeset.length);
+            timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
+        }
+        var tmp = [];
+        for (var k = start; k < end; k++) {
+            var val = dayset[k];
+            if (!Object(helpers["f" /* isPresent */])(val))
+                continue;
+            tmp.push(val);
+        }
+        var i = void 0;
+        if (daypos < 0) {
+            i = tmp.slice(daypos)[0];
+        }
+        else {
+            i = tmp[daypos];
+        }
+        var time = timeset[timepos];
+        var date = src_dateutil.fromOrdinal(ii.yearordinal + i);
+        var res = src_dateutil.combine(date, time);
+        // XXX: can this ever be in the array?
+        // - compare the actual date instead?
+        if (!Object(helpers["c" /* includes */])(poslist, res))
+            poslist.push(res);
+    }
+    src_dateutil.sort(poslist);
+    return poslist;
+}
+
+// CONCATENATED MODULE: ./src/iter/index.ts
+
+
 
 
 
@@ -1624,12 +1799,15 @@ function easter(y, offset) {
 
 
 function iter(iterResult, options) {
-    var dtstart = options.dtstart, freq = options.freq, until = options.until, bysetpos = options.bysetpos;
-    var counterDate = esm_dateutil.DateTime.fromDate(dtstart);
+    var dtstart = options.dtstart, freq = options.freq, interval = options.interval, until = options.until, bysetpos = options.bysetpos;
+    var count = options.count;
+    if (count === 0 || interval === 0) {
+        return emitResult(iterResult);
+    }
+    var counterDate = datetime_DateTime.fromDate(dtstart);
     var ii = new iterinfo(options);
     ii.rebuild(counterDate.year, counterDate.month);
     var timeset = makeTimeset(ii, counterDate, options);
-    var count = options.count;
     while (true) {
         var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
@@ -1660,10 +1838,10 @@ function iter(iterResult, options) {
                 if (!Object(helpers["f" /* isPresent */])(currentDay)) {
                     continue;
                 }
-                var date = esm_dateutil.fromOrdinal(ii.yearordinal + currentDay);
+                var date = src_dateutil.fromOrdinal(ii.yearordinal + currentDay);
                 for (var k = 0; k < timeset.length; k++) {
                     var time = timeset[k];
-                    var res = esm_dateutil.combine(date, time);
+                    var res = src_dateutil.combine(date, time);
                     if (until && res > until) {
                         return emitResult(iterResult);
                     }
@@ -1686,8 +1864,8 @@ function iter(iterResult, options) {
             return emitResult(iterResult);
         }
         // Handle frequency and interval
-        addToCounter(options, ii, filtered, counterDate);
-        if (counterDate.year > esm_dateutil.MAXYEAR) {
+        counterDate.add(options, filtered);
+        if (counterDate.year > src_dateutil.MAXYEAR) {
             return emitResult(iterResult);
         }
         if (!freqIsDailyOrGreater(freq)) {
@@ -1735,72 +1913,21 @@ function makeTimeset(ii, counterDate, options) {
     if (freqIsDailyOrGreater(freq)) {
         return buildTimeset(options);
     }
-    if ((freq >= esm_rrule.HOURLY &&
+    if ((freq >= src_rrule.HOURLY &&
         Object(helpers["g" /* notEmpty */])(byhour) &&
         !Object(helpers["c" /* includes */])(byhour, counterDate.hour)) ||
-        (freq >= esm_rrule.MINUTELY &&
+        (freq >= src_rrule.MINUTELY &&
             Object(helpers["g" /* notEmpty */])(byminute) &&
             !Object(helpers["c" /* includes */])(byminute, counterDate.minute)) ||
-        (freq >= esm_rrule.SECONDLY &&
+        (freq >= src_rrule.SECONDLY &&
             Object(helpers["g" /* notEmpty */])(bysecond) &&
             !Object(helpers["c" /* includes */])(bysecond, counterDate.second))) {
         return [];
     }
     return ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, counterDate.millisecond);
 }
-function addToCounter(options, ii, filtered, counterDate) {
-    var freq = options.freq, interval = options.interval, wkst = options.wkst, byhour = options.byhour, byminute = options.byminute, bysecond = options.bysecond;
-    switch (freq) {
-        case Frequency.YEARLY: return counterDate.addYears(interval);
-        case Frequency.MONTHLY: return counterDate.addMonths(interval);
-        case Frequency.WEEKLY: return counterDate.addWeekly(interval, wkst);
-        case Frequency.DAILY: return counterDate.addDaily(interval);
-        case Frequency.HOURLY: return counterDate.addHours(interval, filtered, byhour);
-        case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute);
-        case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond);
-    }
-}
-function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
-    var poslist = [];
-    for (var j = 0; j < bysetpos.length; j++) {
-        var daypos = void 0;
-        var timepos = void 0;
-        var pos = bysetpos[j];
-        if (pos < 0) {
-            daypos = Math.floor(pos / timeset.length);
-            timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
-        }
-        else {
-            daypos = Math.floor((pos - 1) / timeset.length);
-            timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
-        }
-        var tmp = [];
-        for (var k = start; k < end; k++) {
-            var val = dayset[k];
-            if (!Object(helpers["f" /* isPresent */])(val))
-                continue;
-            tmp.push(val);
-        }
-        var i = void 0;
-        if (daypos < 0) {
-            i = tmp.slice(daypos)[0];
-        }
-        else {
-            i = tmp[daypos];
-        }
-        var time = timeset[timepos];
-        var date = esm_dateutil.fromOrdinal(ii.yearordinal + i);
-        var res = esm_dateutil.combine(date, time);
-        // XXX: can this ever be in the array?
-        // - compare the actual date instead?
-        if (!Object(helpers["c" /* includes */])(poslist, res))
-            poslist.push(res);
-    }
-    esm_dateutil.sort(poslist);
-    return poslist;
-}
-//# sourceMappingURL=iter.js.map
-// CONCATENATED MODULE: ./dist/esm/rrule.js
+
+// CONCATENATED MODULE: ./src/rrule.ts
 
 
 
@@ -1917,7 +2044,7 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.between = function (after, before, inc, iterator) {
         if (inc === void 0) { inc = false; }
-        if (!esm_dateutil.isValidDate(after) || !esm_dateutil.isValidDate(before))
+        if (!src_dateutil.isValidDate(after) || !src_dateutil.isValidDate(before))
             throw new Error('Invalid date passed in to RRule.between');
         var args = {
             before: before,
@@ -1942,7 +2069,7 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.before = function (dt, inc) {
         if (inc === void 0) { inc = false; }
-        if (!esm_dateutil.isValidDate(dt))
+        if (!src_dateutil.isValidDate(dt))
             throw new Error('Invalid date passed in to RRule.before');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('before', args);
@@ -1960,7 +2087,7 @@ var rrule_RRule = /** @class */ (function () {
      */
     RRule.prototype.after = function (dt, inc) {
         if (inc === void 0) { inc = false; }
-        if (!esm_dateutil.isValidDate(dt))
+        if (!src_dateutil.isValidDate(dt))
             throw new Error('Invalid date passed in to RRule.after');
         var args = { dt: dt, inc: inc };
         var result = this._cacheGet('after', args);
@@ -2030,9 +2157,9 @@ var rrule_RRule = /** @class */ (function () {
     RRule.optionsToString = optionsToString;
     return RRule;
 }());
-/* harmony default export */ var esm_rrule = (rrule_RRule);
-//# sourceMappingURL=rrule.js.map
-// CONCATENATED MODULE: ./dist/esm/iterset.js
+/* harmony default export */ var src_rrule = (rrule_RRule);
+
+// CONCATENATED MODULE: ./src/iterset.ts
 
 
 
@@ -2081,19 +2208,20 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
         iter(iterResult, rrule.options);
     });
     var res = iterResult._result;
-    esm_dateutil.sort(res);
+    src_dateutil.sort(res);
     switch (iterResult.method) {
         case 'all':
         case 'between':
             return res;
         case 'before':
-            return (res.length && res[res.length - 1]) || null;
+            return ((res.length && res[res.length - 1]) || null);
         case 'after':
-            return (res.length && res[0]) || null;
+        default:
+            return ((res.length && res[0]) || null);
     }
 }
-//# sourceMappingURL=iterset.js.map
-// CONCATENATED MODULE: ./dist/esm/rruleset.js
+
+// CONCATENATED MODULE: ./src/rruleset.ts
 var rruleset_extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -2217,10 +2345,10 @@ var rruleset_RRuleSet = /** @class */ (function (_super) {
         return rrs;
     };
     return RRuleSet;
-}(esm_rrule));
+}(src_rrule));
 /* harmony default export */ var rruleset = (rruleset_RRuleSet);
 function _addRule(rrule, collection) {
-    if (!(rrule instanceof esm_rrule)) {
+    if (!(rrule instanceof src_rrule)) {
         throw new TypeError(String(rrule) + ' is not RRule instance');
     }
     if (!Object(helpers["c" /* includes */])(collection.map(String), String(rrule))) {
@@ -2233,19 +2361,19 @@ function _addDate(date, collection) {
     }
     if (!Object(helpers["c" /* includes */])(collection.map(Number), Number(date))) {
         collection.push(date);
-        esm_dateutil.sort(collection);
+        src_dateutil.sort(collection);
     }
 }
 function rdatesToString(param, rdates, tzid) {
     var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
     var header = isUTC ? param + ":" : param + ";TZID=" + tzid + ":";
     var dateString = rdates
-        .map(function (rdate) { return esm_dateutil.timeToUntilString(rdate.valueOf(), isUTC); })
+        .map(function (rdate) { return src_dateutil.timeToUntilString(rdate.valueOf(), isUTC); })
         .join(',');
     return "" + header + dateString;
 }
-//# sourceMappingURL=rruleset.js.map
-// CONCATENATED MODULE: ./dist/esm/rrulestr.js
+
+// CONCATENATED MODULE: ./src/rrulestr.ts
 var rrulestr_assign = (undefined && undefined.__assign) || function () {
     rrulestr_assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -2338,13 +2466,13 @@ function buildRule(s, options) {
         var rset_1 = new rruleset(noCache);
         rset_1.tzid(tzid || undefined);
         rrulevals.forEach(function (val) {
-            rset_1.rrule(new esm_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
+            rset_1.rrule(new src_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         rdatevals.forEach(function (date) {
             rset_1.rdate(date);
         });
         exrulevals.forEach(function (val) {
-            rset_1.exrule(new esm_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
+            rset_1.exrule(new src_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
         });
         exdatevals.forEach(function (date) {
             rset_1.exdate(date);
@@ -2354,7 +2482,7 @@ function buildRule(s, options) {
         return rset_1;
     }
     var val = rrulevals[0];
-    return new esm_rrule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
+    return new src_rrule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
 }
 function rrulestr(s, options) {
     if (options === void 0) { options = {}; }
@@ -2446,13 +2574,13 @@ function parseRDate(rdateval, parms) {
     validateDateParm(parms);
     return rdateval
         .split(',')
-        .map(function (datestr) { return esm_dateutil.untilStringToDate(datestr); });
+        .map(function (datestr) { return src_dateutil.untilStringToDate(datestr); });
 }
-//# sourceMappingURL=rrulestr.js.map
-// CONCATENATED MODULE: ./dist/esm/index.js
+
+// CONCATENATED MODULE: ./src/index.ts
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return esm_rrule; });
+/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return src_rrule; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
 /* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "rrulestr", function() { return rrulestr; });
 /*!
@@ -2479,8 +2607,8 @@ function parseRDate(rdateval, parms) {
 // Export
 // =============================================================================
 
-/* harmony default export */ var esm = __webpack_exports__["default"] = (esm_rrule);
-//# sourceMappingURL=index.js.map
+/* harmony default export */ var src = __webpack_exports__["default"] = (src_rrule);
+
 
 /***/ }),
 /* 2 */
@@ -10339,7 +10467,7 @@ if (typeof Object.create === 'function') {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 
-// CONCATENATED MODULE: ./dist/esm/nlp/i18n.js
+// CONCATENATED MODULE: ./src/nlp/i18n.ts
 // =============================================================================
 // i18n
 // =============================================================================
@@ -10399,14 +10527,14 @@ var ENGLISH = {
     }
 };
 /* harmony default export */ var i18n = (ENGLISH);
-//# sourceMappingURL=i18n.js.map
-// EXTERNAL MODULE: ./dist/esm/index.js + 17 modules
-var esm = __webpack_require__(1);
 
-// EXTERNAL MODULE: ./dist/esm/helpers.js
+// EXTERNAL MODULE: ./src/index.ts + 22 modules
+var src = __webpack_require__(1);
+
+// EXTERNAL MODULE: ./src/helpers.ts
 var helpers = __webpack_require__(0);
 
-// CONCATENATED MODULE: ./dist/esm/nlp/totext.js
+// CONCATENATED MODULE: ./src/nlp/totext.ts
 
 
 
@@ -10524,7 +10652,7 @@ var totext_ToText = /** @class */ (function () {
         }
         this.text = [gettext('every')];
         // @ts-ignore
-        this[esm["default"].FREQUENCIES[this.options.freq]]();
+        this[src["default"].FREQUENCIES[this.options.freq]]();
         if (this.options.until) {
             this.add(gettext('until'));
             var until = this.options.until;
@@ -10792,8 +10920,8 @@ var totext_ToText = /** @class */ (function () {
     return ToText;
 }());
 /* harmony default export */ var totext = (totext_ToText);
-//# sourceMappingURL=totext.js.map
-// CONCATENATED MODULE: ./dist/esm/nlp/parsetext.js
+
+// CONCATENATED MODULE: ./src/nlp/parsetext.ts
 
 
 // =============================================================================
@@ -10891,7 +11019,7 @@ function parseText(text, language) {
             throw new Error('Unexpected end');
         switch (ttr.symbol) {
             case 'day(s)':
-                options.freq = esm["default"].DAILY;
+                options.freq = src["default"].DAILY;
                 if (ttr.nextSymbol()) {
                     AT();
                     F();
@@ -10900,47 +11028,47 @@ function parseText(text, language) {
             // FIXME Note: every 2 weekdays != every two weeks on weekdays.
             // DAILY on weekdays is not a valid rule
             case 'weekday(s)':
-                options.freq = esm["default"].WEEKLY;
+                options.freq = src["default"].WEEKLY;
                 options.byweekday = [
-                    esm["default"].MO,
-                    esm["default"].TU,
-                    esm["default"].WE,
-                    esm["default"].TH,
-                    esm["default"].FR
+                    src["default"].MO,
+                    src["default"].TU,
+                    src["default"].WE,
+                    src["default"].TH,
+                    src["default"].FR
                 ];
                 ttr.nextSymbol();
                 F();
                 break;
             case 'week(s)':
-                options.freq = esm["default"].WEEKLY;
+                options.freq = src["default"].WEEKLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'hour(s)':
-                options.freq = esm["default"].HOURLY;
+                options.freq = src["default"].HOURLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'minute(s)':
-                options.freq = esm["default"].MINUTELY;
+                options.freq = src["default"].MINUTELY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'month(s)':
-                options.freq = esm["default"].MONTHLY;
+                options.freq = src["default"].MONTHLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
                 }
                 break;
             case 'year(s)':
-                options.freq = esm["default"].YEARLY;
+                options.freq = src["default"].YEARLY;
                 if (ttr.nextSymbol()) {
                     ON();
                     F();
@@ -10953,9 +11081,9 @@ function parseText(text, language) {
             case 'friday':
             case 'saturday':
             case 'sunday':
-                options.freq = esm["default"].WEEKLY;
+                options.freq = src["default"].WEEKLY;
                 var key = ttr.symbol.substr(0, 2).toUpperCase();
-                options.byweekday = [esm["default"][key]];
+                options.byweekday = [src["default"][key]];
                 if (!ttr.nextSymbol())
                     return;
                 // TODO check for duplicates
@@ -10967,7 +11095,7 @@ function parseText(text, language) {
                         throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday');
                     }
                     // @ts-ignore
-                    options.byweekday.push(esm["default"][wkd]);
+                    options.byweekday.push(src["default"][wkd]);
                     ttr.nextSymbol();
                 }
                 MDAYs();
@@ -10985,7 +11113,7 @@ function parseText(text, language) {
             case 'october':
             case 'november':
             case 'december':
-                options.freq = esm["default"].YEARLY;
+                options.freq = src["default"].YEARLY;
                 options.bymonth = [decodeM()];
                 if (!ttr.nextSymbol())
                     return;
@@ -11024,7 +11152,7 @@ function parseText(text, language) {
                     if (!options.byweekday)
                         options.byweekday = [];
                     // @ts-ignore
-                    options.byweekday.push(esm["default"][wkd].nth(nth));
+                    options.byweekday.push(src["default"][wkd].nth(nth));
                 }
                 else {
                     if (!options.bymonthday)
@@ -11040,17 +11168,17 @@ function parseText(text, language) {
                 if (!options.byweekday)
                     options.byweekday = [];
                 // @ts-ignore
-                options.byweekday.push(esm["default"][wkd]);
+                options.byweekday.push(src["default"][wkd]);
             }
             else if (ttr.symbol === 'weekday(s)') {
                 ttr.nextSymbol();
                 if (!options.byweekday) {
                     options.byweekday = [
-                        esm["default"].MO,
-                        esm["default"].TU,
-                        esm["default"].WE,
-                        esm["default"].TH,
-                        esm["default"].FR
+                        src["default"].MO,
+                        src["default"].TU,
+                        src["default"].WE,
+                        src["default"].TH,
+                        src["default"].FR
                     ];
                 }
             }
@@ -11199,8 +11327,8 @@ function parseText(text, language) {
         }
     }
 }
-//# sourceMappingURL=parsetext.js.map
-// CONCATENATED MODULE: ./dist/esm/nlp/index.js
+
+// CONCATENATED MODULE: ./src/nlp/index.ts
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fromText", function() { return fromText; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFullyConvertible", function() { return isFullyConvertible; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toText", function() { return toText; });
@@ -11300,7 +11428,7 @@ function parseText(text, language) {
  */
 var fromText = function (text, language) {
     if (language === void 0) { language = i18n; }
-    return new esm["default"](parseText(text, language) || undefined);
+    return new src["default"](parseText(text, language) || undefined);
 };
 var common = [
     'count',
@@ -11311,12 +11439,12 @@ var common = [
     'bymonth'
 ];
 totext.IMPLEMENTED = [];
-totext.IMPLEMENTED[esm["default"].HOURLY] = common;
-totext.IMPLEMENTED[esm["default"].MINUTELY] = common;
-totext.IMPLEMENTED[esm["default"].DAILY] = ['byhour'].concat(common);
-totext.IMPLEMENTED[esm["default"].WEEKLY] = common;
-totext.IMPLEMENTED[esm["default"].MONTHLY] = common;
-totext.IMPLEMENTED[esm["default"].YEARLY] = ['byweekno', 'byyearday'].concat(common);
+totext.IMPLEMENTED[src["default"].HOURLY] = common;
+totext.IMPLEMENTED[src["default"].MINUTELY] = common;
+totext.IMPLEMENTED[src["default"].DAILY] = ['byhour'].concat(common);
+totext.IMPLEMENTED[src["default"].WEEKLY] = common;
+totext.IMPLEMENTED[src["default"].MONTHLY] = common;
+totext.IMPLEMENTED[src["default"].YEARLY] = ['byweekno', 'byyearday'].concat(common);
 // =============================================================================
 // Export
 // =============================================================================
@@ -11325,7 +11453,7 @@ var toText = function (rrule, gettext, language) {
 };
 var isFullyConvertible = totext.isFullyConvertible;
 
-//# sourceMappingURL=index.js.map
+
 
 /***/ })
 /******/ ]);

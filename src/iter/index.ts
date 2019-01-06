@@ -1,28 +1,34 @@
-import IterResult from './iterresult'
-import { ParsedOptions, Frequency, freqIsDailyOrGreater } from './types'
-import dateutil from './dateutil'
-import Iterinfo from './iterinfo'
-import RRule from './rrule'
-import { buildTimeset } from './parseoptions'
-import { notEmpty, includes, pymod, isPresent } from './helpers'
-import { DateWithZone } from './datewithzone'
+import IterResult from '../iterresult'
+import { ParsedOptions, freqIsDailyOrGreater, QueryMethodTypes } from '../types'
+import dateutil from '../dateutil'
+import Iterinfo from '../iterinfo/index'
+import RRule from '../rrule'
+import { buildTimeset } from '../parseoptions'
+import { notEmpty, includes, isPresent } from '../helpers'
+import { DateWithZone } from '../datewithzone'
+import { buildPoslist } from './poslist'
+import { Time, DateTime } from '../datetime'
 
-export function iter (iterResult: IterResult, options: ParsedOptions) {
+export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, options: ParsedOptions) {
   const {
     dtstart,
     freq,
+    interval,
     until,
     bysetpos
   } = options
 
-  let counterDate = dateutil.DateTime.fromDate(dtstart)
+  let count = options.count
+  if (count === 0 || interval === 0) {
+    return emitResult(iterResult)
+  }
+
+  let counterDate = DateTime.fromDate(dtstart)
 
   const ii = new Iterinfo(options)
   ii.rebuild(counterDate.year, counterDate.month)
 
   let timeset = makeTimeset(ii, counterDate, options)
-
-  let count = options.count
 
   while (true) {
     let [dayset, start, end] = ii.getdayset(freq)(
@@ -90,8 +96,9 @@ export function iter (iterResult: IterResult, options: ParsedOptions) {
     if (options.interval === 0) {
       return emitResult(iterResult)
     }
+
     // Handle frequency and interval
-    addToCounter(options, ii, filtered, counterDate)
+    counterDate.add(options, filtered)
 
     if (counterDate.year > dateutil.MAXYEAR) {
       return emitResult(iterResult)
@@ -121,14 +128,14 @@ function isFiltered (
   } = options
 
   return (
-    (notEmpty(bymonth) && !includes(bymonth, ii.mmask![currentDay])) ||
+    (notEmpty(bymonth) && !includes(bymonth, ii.mmask[currentDay])) ||
     (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
-    (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask![currentDay])) ||
-    (notEmpty(ii.nwdaymask!) && !ii.nwdaymask![currentDay]) ||
+    (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask[currentDay])) ||
+    (notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
     (byeaster !== null && !includes(ii.eastermask!, currentDay)) ||
     ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
-      !includes(bymonthday, ii.mdaymask![currentDay]) &&
-      !includes(bynmonthday, ii.nmdaymask![currentDay])) ||
+      !includes(bymonthday, ii.mdaymask[currentDay]) &&
+      !includes(bynmonthday, ii.nmdaymask[currentDay])) ||
     (notEmpty(byyearday) &&
       ((currentDay < ii.yearlen &&
         !includes(byyearday, currentDay + 1) &&
@@ -143,8 +150,8 @@ function rezoneIfNeeded (date: Date, options: ParsedOptions) {
   return new DateWithZone(date, options.tzid).rezonedDate()
 }
 
-function emitResult (iterResult: IterResult) {
-  return iterResult.getValue() as Date[]
+function emitResult <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  return iterResult.getValue()
 }
 
 function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {
@@ -164,7 +171,7 @@ function removeFilteredDays (dayset: (number | null)[], start: number, end: numb
   return filtered
 }
 
-function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: ParsedOptions): dateutil.Time[] | null {
+function makeTimeset (ii: Iterinfo, counterDate: DateTime, options: ParsedOptions): Time[] | null {
   const {
     freq,
     byhour,
@@ -196,67 +203,4 @@ function makeTimeset (ii: Iterinfo, counterDate: dateutil.DateTime, options: Par
     counterDate.second,
     counterDate.millisecond
   )
-}
-
-function addToCounter (options: ParsedOptions, ii: Iterinfo, filtered: boolean, counterDate: dateutil.DateTime) {
-  const {
-    freq,
-    interval,
-    wkst,
-    byhour,
-    byminute,
-    bysecond
-  } = options
-
-  switch (freq) {
-    case Frequency.YEARLY: return counterDate.addYears(interval)
-    case Frequency.MONTHLY: return counterDate.addMonths(interval)
-    case Frequency.WEEKLY: return counterDate.addWeekly(interval, wkst)
-    case Frequency.DAILY: return counterDate.addDaily(interval)
-    case Frequency.HOURLY: return counterDate.addHours(interval, filtered, byhour)
-    case Frequency.MINUTELY: return counterDate.addMinutes(interval, filtered, byhour, byminute)
-    case Frequency.SECONDLY: return counterDate.addSeconds(interval, filtered, byhour, byminute, bysecond)
-  }
-}
-
-function buildPoslist (bysetpos: number[], timeset: dateutil.Time[], start: number, end: number, ii: Iterinfo, dayset: (number | null)[]) {
-  const poslist: Date[] = []
-
-  for (let j = 0; j < bysetpos.length; j++) {
-    let daypos: number
-    let timepos: number
-    const pos = bysetpos[j]
-
-    if (pos < 0) {
-      daypos = Math.floor(pos / timeset.length)
-      timepos = pymod(pos, timeset.length)
-    } else {
-      daypos = Math.floor((pos - 1) / timeset.length)
-      timepos = pymod(pos - 1, timeset.length)
-    }
-
-    const tmp = []
-    for (let k = start; k < end; k++) {
-      const val = dayset[k]
-      if (!isPresent(val)) continue
-      tmp.push(val)
-    }
-    let i: number
-    if (daypos < 0) {
-      i = tmp.slice(daypos)[0]
-    } else {
-      i = tmp[daypos]
-    }
-
-    const time = timeset[timepos]
-    const date = dateutil.fromOrdinal(ii.yearordinal + i)
-    const res = dateutil.combine(date, time)
-    // XXX: can this ever be in the array?
-    // - compare the actual date instead?
-    if (!includes(poslist, res)) poslist.push(res)
-  }
-
-  dateutil.sort(poslist)
-
-  return poslist
 }

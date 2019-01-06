@@ -1,4 +1,4 @@
-import { QueryMethods } from './types'
+import { QueryMethodTypes, IterResultType } from './types'
 
 // =============================================================================
 // Results
@@ -15,15 +15,15 @@ export interface IterArgs {
 /**
  * This class helps us to emulate python's generators, sorta.
  */
-export default class IterResult {
-  public readonly method: keyof QueryMethods
+export default class IterResult<M extends QueryMethodTypes> {
+  public readonly method: M
   public readonly args: Partial<IterArgs>
   public readonly minDate: Date | null = null
   public readonly maxDate: Date | null = null
   public _result: Date[] = []
   public total = 0
 
-  constructor (method: keyof QueryMethods, args: Partial<IterArgs>) {
+  constructor (method: M, args: Partial<IterArgs>) {
     this.method = method
     this.args = args
 
@@ -81,15 +81,16 @@ export default class IterResult {
    * and 'between' an array.
    * @return {Date,Array?}
    */
-  getValue () {
+  getValue (): IterResultType<M> {
     const res = this._result
     switch (this.method) {
       case 'all':
       case 'between':
-        return res
+        return res as IterResultType<M>
       case 'before':
       case 'after':
-        return res.length ? res[res.length - 1] : null
+      default:
+        return (res.length ? res[res.length - 1] : null) as IterResultType<M>
     }
   }
 

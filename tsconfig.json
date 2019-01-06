@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist/esm",
     "declaration": true,
+    "declarationMap": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "es2015",
@@ -9,9 +10,8 @@
     "target": "es5",
     "jsx": "react",
     "strictNullChecks": true,
-    "baseUrl": ".",
-    "rootDirs": ["./src/", "./test/"]
+    "rootDirs": ["./src/", "./test/", "./demo/"]
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./demo/**/*"],
   "exclude": ["node_modules", "./test/**/*"]
 }

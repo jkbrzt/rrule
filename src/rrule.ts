@@ -4,7 +4,7 @@ import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
-import { GetText } from './nlp/totext'
+import { DateFormatter, GetText } from './nlp/totext'
 import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
@@ -255,8 +255,8 @@ export default class RRule implements QueryMethods {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext?: GetText, language?: Language) {
-    return getnlp().toText(this, gettext, language)
+  toText (gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
+    return getnlp().toText(this, gettext, language, dateFormatter)
   }
 
   isFullyConvertibleToText () {

@@ -23,6 +23,10 @@ export type GetText = (id: string | number | Weekday) => string
 
 const defaultGetText: GetText = id => id.toString()
 
+export type DateFormatter = (year: number, month: string, day: number) => string
+
+const defaultDateFormatter: DateFormatter = (year: number, month: string, day: number) => `${month} ${day}, ${year}`
+
 /**
  *
  * @param {RRule} rrule
@@ -36,6 +40,7 @@ export default class ToText {
   private rrule: RRule
   private text: string[]
   private gettext: GetText
+  private dateFormatter: DateFormatter
   private language: Language
   private options: Partial<Options>
   private origOptions: Partial<Options>
@@ -47,11 +52,11 @@ export default class ToText {
     isEveryDay: boolean
   } | null
 
-  constructor (rrule: RRule, gettext: GetText = defaultGetText, language: Language = ENGLISH) {
+  constructor (rrule: RRule, gettext: GetText = defaultGetText, language: Language = ENGLISH, dateFormatter: DateFormatter = defaultDateFormatter) {
     this.text = []
     this.language = language || ENGLISH
     this.gettext = gettext
-
+    this.dateFormatter = dateFormatter
     this.rrule = rrule
     this.options = rrule.options
     this.origOptions = rrule.origOptions
@@ -155,9 +160,7 @@ export default class ToText {
     if (this.options.until) {
       this.add(gettext('until'))
       const until = this.options.until
-      this.add(this.language.monthNames[until.getUTCMonth()])
-        .add(until.getUTCDate() + ',')
-        .add(until.getUTCFullYear().toString())
+      this.add(this.dateFormatter(until.getUTCFullYear(), this.language.monthNames[until.getUTCMonth()], until.getUTCDate()))
     } else if (this.options.count) {
       this.add(gettext('for'))
         .add(this.options.count.toString())

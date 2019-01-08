@@ -1,22 +1,17 @@
 import IterResult, { IterArgs } from './iterresult'
-
-type Iterator = (d: Date, len: number) => boolean
+import { QueryIterator } from './types'
 
 /**
  * IterResult subclass that calls a callback function on each add,
  * and stops iterating when the callback returns false.
  */
 export default class CallbackIterResult extends IterResult<'all' | 'between'> {
-  private iterator: Iterator
-
   constructor (
     method: 'all' | 'between',
     args: Partial<IterArgs>,
-    iterator: Iterator
+    private iterator: QueryIterator
   ) {
     super(method, args)
-
-    this.iterator = iterator
   }
 
   add (date: Date) {

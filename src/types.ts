@@ -10,6 +10,10 @@ export interface QueryMethods {
 export type QueryMethodTypes = keyof QueryMethods
 export type IterResultType<M extends QueryMethodTypes> = M extends 'all' | 'between' ? Date[] : (Date | null)
 
+export interface QueryIterator {
+  (d: Date, len: number): boolean
+}
+
 export enum Frequency {
   YEARLY = 0,
   MONTHLY = 1,

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import RRule from '../src';
+import RRule from '../src/rrule';
 import { optionsToString } from '../src/optionstostring';
 
 const texts = [

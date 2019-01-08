@@ -5,7 +5,7 @@ import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
+import { ParsedOptions, Options, Frequency, QueryIterator, QueryMethods, QueryMethodTypes } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
@@ -153,7 +153,7 @@ export default class RRule implements QueryMethods {
    *                   to stop the iteration.
    * @return Array containing all recurrences.
    */
-  all (iterator?: (d: Date, len: number) => boolean): Date[] {
+  all (iterator?: QueryIterator): Date[] {
     if (iterator) {
       return this._iter(new CallbackIterResult('all', {}, iterator))
     }

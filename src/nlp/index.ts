@@ -1,6 +1,6 @@
 import ToText, { GetText } from './totext'
 import parseText from './parsetext'
-import RRule from '../index'
+import RRule from '../rrule'
 import ENGLISH, { Language } from './i18n'
 
 /*!

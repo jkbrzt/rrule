@@ -50,7 +50,7 @@
     "@types/luxon": "^1.2.2",
     "@types/mocha": "^5.2.5",
     "@types/mockdate": "^2.0.0",
-    "@types/node": "^10.5.4",
+    "@types/node": "^10.12.18",
     "chai": "^4.1.2",
     "copy-webpack-plugin": "^4.5.2",
     "coverage": "^0.0.0",
@@ -82,5 +82,8 @@
   "optionalDependencies": {
     "luxon": "^1.3.3"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "dependencies": {
+    "tslib": "^1.9.0"
+  }
 }

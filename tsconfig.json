@@ -6,10 +6,12 @@
     "noImplicitAny": true,
     "sourceMap": true,
     "module": "es2015",
+    "moduleResolution": "node",
     "noEmitOnError": true,
     "target": "es5",
     "jsx": "react",
     "strictNullChecks": true,
+    "importHelpers": true,
     "rootDirs": ["./src/", "./test/", "./demo/"]
   },
   "include": ["./src/**/*", "./demo/**/*"],

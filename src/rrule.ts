@@ -5,7 +5,7 @@ import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { DateFormatter, GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
+import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
@@ -129,7 +129,7 @@ export default class RRule implements QueryMethods {
 
   static optionsToString = optionsToString
 
-  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
     return iter(iterResult, this.options)
   }
 

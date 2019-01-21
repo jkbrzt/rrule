@@ -3,7 +3,7 @@ import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
-import { QueryMethodTypes } from './types'
+import { QueryMethodTypes, IterResultType } from './types'
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
@@ -45,7 +45,7 @@ export default class RRuleSet extends RRule {
     return undefined
   }
 
-  _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
     return iterSet(
       iterResult,
       this._rrule,

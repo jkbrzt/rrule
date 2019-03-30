@@ -254,6 +254,18 @@ describe('rrulestr', function () {
     ]
   )
 
+  testRecurring('testStrNWeekDayLarge',
+    rrulestr(
+      'DTSTART:19970902T090000Z\n' +
+      'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=13TU,-13TH\n'
+    ),
+    [
+      datetimeUTC(1997, 10, 2, 9, 0),
+      datetimeUTC(1998, 3, 31, 9, 0),
+      datetimeUTC(1998, 10, 8, 9, 0)
+    ]
+  )
+
   it('parses without TZID', () => {
     const rrule = rrulestr(
       'DTSTART:19970902T090000\nRRULE:FREQ=WEEKLY'

@@ -17,6 +17,8 @@ const texts = [
   ['Every month', 'RRULE:FREQ=MONTHLY'],
   ['Every 6 months', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
   ['Every year', 'RRULE:FREQ=YEARLY'],
+  ['Every year on the 1st Friday', 'RRULE:FREQ=YEARLY;BYDAY=+1FR'],
+  ['Every year on the 13th Friday', 'RRULE:FREQ=YEARLY;BYDAY=+13FR'],
   ['Every month on the 4th', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
   ['Every month on the 4th last', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4'],
   ['Every month on the 3rd Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],

@@ -4,12 +4,15 @@ import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
 import { QueryMethodTypes, IterResultType } from './types'
+import { optionsToString } from './optionstostring'
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]
   public readonly _exdate: Date[]
+
+  private _dtstart?: Date | null | undefined
   private _tzid?: string
 
   /**
@@ -25,6 +28,10 @@ export default class RRuleSet extends RRule {
     this._rdate = []
     this._exrule = []
     this._exdate = []
+  }
+
+  dtstart (dtstart?: Date | null | undefined) {
+    this._dtstart = dtstart
   }
 
   tzid (tzid?: string) {
@@ -94,6 +101,11 @@ export default class RRuleSet extends RRule {
 
   valueOf () {
     let result: string[] = []
+
+    if (!this._rrule.length && this._dtstart) {
+      result = result.concat(optionsToString({ dtstart: this._dtstart }))
+    }
+
     this._rrule.forEach(function (rrule) {
       result = result.concat(rrule.toString().split('\n'))
     })

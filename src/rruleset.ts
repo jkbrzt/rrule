@@ -92,6 +92,42 @@ export default class RRuleSet extends RRule {
     _addDate(date, this._exdate)
   }
 
+  /**
+   * Get list of rrules in this RRuleSet
+   *
+   * @return List of rrules
+   */
+  rrules () {
+    return this._rrule
+  }
+
+  /**
+   * Get list of exrules in this RRuleSet
+   *
+   * @return List of exrules
+   */
+  exrules () {
+    return this._exrule
+  }
+
+  /**
+   * Get list of rdates in this RRuleSet
+   *
+   * @return List of rdates
+   */
+  rdates () {
+    return this._rdate
+  }
+
+  /**
+   * Get list of exdates in this RRuleSet
+   *
+   * @return List of exdates
+   */
+  exdates () {
+    return this._exdate
+  }
+
   valueOf () {
     let result: string[] = []
     this._rrule.forEach(function (rrule) {

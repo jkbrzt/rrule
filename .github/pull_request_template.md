@@ -8,4 +8,3 @@ To submit a pull request, please verify that you have done the following:
 - [ ] Linked to an existing bug or issue describing the bug or feature you're
       addressing
 - [ ] Written one or more tests showing that your change works as advertised
-- [ ] Run `yarn build` to rebuild the `dist/` files

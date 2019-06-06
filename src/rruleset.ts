@@ -93,7 +93,7 @@ export default class RRuleSet extends RRule {
   }
 
   /**
-   * Get list of rrules in this RRuleSet
+   * Get list of included rrules in this recurrence set.
    *
    * @return List of rrules
    */
@@ -102,7 +102,7 @@ export default class RRuleSet extends RRule {
   }
 
   /**
-   * Get list of exrules in this RRuleSet
+   * Get list of excluded rrules in this recurrence set.
    *
    * @return List of exrules
    */
@@ -111,7 +111,7 @@ export default class RRuleSet extends RRule {
   }
 
   /**
-   * Get list of rdates in this RRuleSet
+   * Get list of included datetimes in this recurrence set.
    *
    * @return List of rdates
    */
@@ -120,7 +120,7 @@ export default class RRuleSet extends RRule {
   }
 
   /**
-   * Get list of exdates in this RRuleSet
+   * Get list of included datetimes in this recurrence set.
    *
    * @return List of exdates
    */

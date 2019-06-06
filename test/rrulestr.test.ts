@@ -26,6 +26,17 @@ describe('rrulestr', function () {
     )).to.be.instanceof(RRule)
   })
 
+  it('parses an rrule without frequency', () => {
+    const rRuleString = 'DTSTART:19970902T090000Z';
+    const parsedRRuleSet = rrulestr(
+      rRuleString, { forceset: true }
+    ) as RRuleSet;
+    expect(parsedRRuleSet.toString()).to.be.equal(rRuleString);
+
+    const parsedRRule = rrulestr(rRuleString) as RRule;
+    expect(parsedRRule.toString()).to.be.equal(rRuleString);
+  })
+
   it('parses an rruleset when forceset=true', () => {
     expect(rrulestr(
       'DTSTART:19970902T090000Z\n' +

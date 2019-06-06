@@ -4,12 +4,34 @@ import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
 import { QueryMethodTypes, IterResultType } from './types'
+import { optionsToString } from './optionstostring'
+
+function createGetterSetter <T> (fieldName: string) {
+  return (field?: T) => {
+    if (field !== undefined) {
+      this[`_${fieldName}`] = field
+    }
+
+    if (this[`_${fieldName}`] !== undefined) {
+      return this[`_${fieldName}`]
+    }
+
+    for (let i = 0; i < this._rrule.length; i++) {
+      const field: T = this._rrule[i].origOptions[fieldName]
+      if (field) {
+        return field
+      }
+    }
+  }
+}
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]
   public readonly _exdate: Date[]
+
+  private _dtstart?: Date | null | undefined
   private _tzid?: string
 
   /**
@@ -27,23 +49,8 @@ export default class RRuleSet extends RRule {
     this._exdate = []
   }
 
-  tzid (tzid?: string) {
-    if (tzid !== undefined) {
-      this._tzid = tzid
-    }
-
-    if (this._tzid !== undefined) {
-      return this._tzid
-    }
-
-    for (let i = 0; i < this._rrule.length; i++) {
-      const tzid = this._rrule[i].origOptions.tzid
-      if (tzid) {
-        return tzid
-      }
-    }
-    return undefined
-  }
+  dtstart = createGetterSetter.apply(this, ['dtstart'])
+  tzid = createGetterSetter.apply(this, ['tzid'])
 
   _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
     return iterSet(
@@ -94,6 +101,11 @@ export default class RRuleSet extends RRule {
 
   valueOf () {
     let result: string[] = []
+
+    if (!this._rrule.length && this._dtstart) {
+      result = result.concat(optionsToString({ dtstart: this._dtstart }))
+    }
+
     this._rrule.forEach(function (rrule) {
       result = result.concat(rrule.toString().split('\n'))
     })

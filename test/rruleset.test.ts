@@ -741,6 +741,7 @@ describe('RRuleSet', function () {
 
       expect(set.rrules().map(e => e.toString())).eql([rrule.toString()]);
     });
+    
     it('exrules()', () => {
       let set = new RRuleSet();
       let rrule = new RRule({
@@ -753,6 +754,7 @@ describe('RRuleSet', function () {
 
       expect(set.exrules().map(e => e.toString())).eql([rrule.toString()]);
     });
+
     it('rdates()', () => {
       let set = new RRuleSet();
       let dt = parse('19610201T090000');
@@ -760,6 +762,7 @@ describe('RRuleSet', function () {
       
       expect(set.rdates()).eql([dt]);
     });
+
     it('exdates()', () => {
       let set = new RRuleSet();
       let dt = parse('19610201T090000');

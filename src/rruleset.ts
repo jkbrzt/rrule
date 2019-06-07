@@ -4,6 +4,7 @@ import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
 import { QueryMethodTypes, IterResultType } from './types'
+import { rrulestr } from './rrulestr';
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
@@ -98,7 +99,7 @@ export default class RRuleSet extends RRule {
    * @return List of rrules
    */
   rrules () {
-    return this._rrule
+    return this._rrule.map(e => rrulestr(e.toString()))
   }
 
   /**
@@ -107,7 +108,7 @@ export default class RRuleSet extends RRule {
    * @return List of exrules
    */
   exrules () {
-    return this._exrule
+    return this._exrule.map(e => rrulestr(e.toString()))
   }
 
   /**
@@ -116,7 +117,7 @@ export default class RRuleSet extends RRule {
    * @return List of rdates
    */
   rdates () {
-    return this._rdate
+    return this._rdate.map(e => new Date(e.getTime()))
   }
 
   /**
@@ -125,7 +126,7 @@ export default class RRuleSet extends RRule {
    * @return List of exdates
    */
   exdates () {
-    return this._exdate
+    return this._exdate.map(e => new Date(e.getTime()))
   }
 
   valueOf () {

@@ -4,7 +4,7 @@ import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
 import { QueryMethodTypes, IterResultType } from './types'
-import { rrulestr } from './rrulestr';
+import { rrulestr } from './rrulestr'
 
 export default class RRuleSet extends RRule {
   public readonly _rrule: RRule[]

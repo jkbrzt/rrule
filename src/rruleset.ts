@@ -4,6 +4,7 @@ import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
 import { QueryMethodTypes, IterResultType } from './types'
+import { rrulestr } from './rrulestr'
 import { optionsToString } from './optionstostring'
 
 function createGetterSetter <T> (fieldName: string) {
@@ -97,6 +98,42 @@ export default class RRuleSet extends RRule {
    */
   exdate (date: Date) {
     _addDate(date, this._exdate)
+  }
+
+  /**
+   * Get list of included rrules in this recurrence set.
+   *
+   * @return List of rrules
+   */
+  rrules () {
+    return this._rrule.map(e => rrulestr(e.toString()))
+  }
+
+  /**
+   * Get list of excluded rrules in this recurrence set.
+   *
+   * @return List of exrules
+   */
+  exrules () {
+    return this._exrule.map(e => rrulestr(e.toString()))
+  }
+
+  /**
+   * Get list of included datetimes in this recurrence set.
+   *
+   * @return List of rdates
+   */
+  rdates () {
+    return this._rdate.map(e => new Date(e.getTime()))
+  }
+
+  /**
+   * Get list of included datetimes in this recurrence set.
+   *
+   * @return List of exdates
+   */
+  exdates () {
+    return this._exdate.map(e => new Date(e.getTime()))
   }
 
   valueOf () {

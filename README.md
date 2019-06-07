@@ -680,6 +680,22 @@ Same as `RRule.prototype.before`.
 
 Same as `RRule.prototype.after`.
 
+##### `RRuleSet.prototype.rrules()`
+
+Get list of included rrules in this recurrence set.
+
+##### `RRuleSet.prototype.exrules()`
+
+Get list of excluded rrules in this recurrence set.
+
+##### `RRuleSet.prototype.rdates()`
+
+Get list of included datetimes in this recurrence set.
+
+##### `RRuleSet.prototype.exdates()`
+
+Get list of excluded datetimes in this recurrence set.
+
 * * * * *
 
 #### `rrulestr` Function

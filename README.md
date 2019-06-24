@@ -819,3 +819,9 @@ more details.
 
 [gitter-url]: https://gitter.im/rrule-js/Lobby
 [gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+
+
+#### Related projects
+
+* https://rrules.com/ — RESTful API to get back occurrences of RRULEs that conform to RFC 5545.
+

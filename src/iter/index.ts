@@ -24,6 +24,7 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
   }
 
   let counterDate = DateTime.fromDate(dtstart)
+  const endYear = until ? DateTime.fromDate(until).year : dateutil.MAXYEAR
 
   const ii = new Iterinfo(options)
   ii.rebuild(counterDate.year, counterDate.month)
@@ -100,8 +101,11 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
     // Handle frequency and interval
     counterDate.add(options, filtered)
 
-    if (counterDate.year > dateutil.MAXYEAR) {
-      return emitResult(iterResult)
+    if (counterDate) {
+
+      if (counterDate.year > endYear) {
+        return emitResult(iterResult)
+      }
     }
 
     if (!freqIsDailyOrGreater(freq)) {

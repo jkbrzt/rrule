@@ -1,6 +1,5 @@
 import IterResult from './iterresult'
 import RRule from './rrule'
-import { DateWithZone } from './datewithzone'
 import { iter } from './iter/index'
 import dateutil from './dateutil'
 import { QueryMethodTypes, IterResultType } from './types'
@@ -25,8 +24,7 @@ export function iterSet <M extends QueryMethodTypes> (
   }
 
   _exdate.forEach(function (date) {
-    const zonedDate = new DateWithZone(date, tzid).rezonedDate()
-    _exdateHash[Number(zonedDate)] = true
+    _exdateHash[Number(date)] = true
   })
 
   iterResult.accept = function (date) {
@@ -54,8 +52,7 @@ export function iterSet <M extends QueryMethodTypes> (
   }
 
   for (let i = 0; i < _rdate.length; i++) {
-    const zonedDate = new DateWithZone(_rdate[i], tzid).rezonedDate()
-    if (!iterResult.accept(new Date(zonedDate.getTime()))) break
+    if (!iterResult.accept(new Date(_rdate[i].getTime()))) break
   }
 
   _rrule.forEach(function (rrule) {

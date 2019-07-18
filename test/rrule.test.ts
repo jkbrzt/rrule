@@ -1,4 +1,4 @@
-import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
+import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
@@ -3664,11 +3664,10 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          startDate.toJSDate()
         )
 
       resetMockDate()
@@ -3684,11 +3683,10 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          startDate.toJSDate()
         )
 
       resetMockDate()
@@ -3704,11 +3702,10 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.after(new Date(0))
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          startDate.toJSDate()
         )
 
       resetMockDate()

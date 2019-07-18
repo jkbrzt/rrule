@@ -5,7 +5,6 @@ import Iterinfo from '../iterinfo/index'
 import RRule from '../rrule'
 import { buildTimeset } from '../parseoptions'
 import { notEmpty, includes, isPresent } from '../helpers'
-import { DateWithZone } from '../datewithzone'
 import { buildPoslist } from './poslist'
 import { Time, DateTime } from '../datetime'
 
@@ -49,8 +48,7 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
         }
 
         if (res >= dtstart) {
-          const rezonedDate = rezoneIfNeeded(res, options)
-          if (!iterResult.accept(rezonedDate)) {
+          if (!iterResult.accept(res)) {
             return emitResult(iterResult)
           }
 
@@ -78,8 +76,7 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
           }
 
           if (res >= dtstart) {
-            const rezonedDate = rezoneIfNeeded(res, options)
-            if (!iterResult.accept(rezonedDate)) {
+            if (!iterResult.accept(res)) {
               return emitResult(iterResult)
             }
 
@@ -144,10 +141,6 @@ function isFiltered (
           !includes(byyearday, currentDay + 1 - ii.yearlen) &&
           !includes(byyearday, -ii.nextyearlen + currentDay - ii.yearlen))))
   )
-}
-
-function rezoneIfNeeded (date: Date, options: ParsedOptions) {
-  return new DateWithZone(date, options.tzid).rezonedDate()
 }
 
 function emitResult <M extends QueryMethodTypes> (iterResult: IterResult<M>) {

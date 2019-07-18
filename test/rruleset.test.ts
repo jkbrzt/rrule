@@ -1,4 +1,4 @@
-import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
+import { parse, datetime, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { DateTime } from 'luxon'
 import { expect } from 'chai'
@@ -533,10 +533,10 @@ describe('RRuleSet', function () {
       )     
 
       expect(set.all()).to.deep.equal([
-        expectedDate(DateTime.fromISO('20000101T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20020101T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20030101T090000'), currentLocalDate, targetZone),
+        DateTime.fromISO('20000101T090000').toJSDate(),
+        DateTime.fromISO('20020101T090000').toJSDate(),
+        DateTime.fromISO('20020301T090000').toJSDate(),
+        DateTime.fromISO('20030101T090000').toJSDate(),
       ])
 
       resetMockDate()
@@ -568,7 +568,7 @@ describe('RRuleSet', function () {
       )
 
       expect(set.all()).to.deep.equal([
-        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone)
+        DateTime.fromISO('20020301T090000').toJSDate()
       ])
 
       resetMockDate()

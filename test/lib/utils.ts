@@ -194,16 +194,3 @@ testRecurring.only = function (...args) {
 testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
-
-export function expectedDate(startDate: DateTime, currentLocalDate: DateTime, targetZone: string): Date {
-  const targetOffset = startDate.setZone(targetZone).offset
-  const { zoneName: systemZone } = currentLocalDate
-  const {
-    offset: systemOffset,
-  } = startDate.setZone(systemZone)
-
-  const netOffset = targetOffset - systemOffset
-  const hours = -((netOffset / 60) % 24)
-  const minutes = -(netOffset % 60)
-  return startDate.plus({ hours, minutes }).toJSDate()
-}

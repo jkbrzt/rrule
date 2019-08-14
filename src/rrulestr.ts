@@ -3,10 +3,11 @@ import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import { includes, split } from './helpers'
 import { Options } from './types'
-import { parseString, parseDtstart } from './parsestring'
+import { parseString, parseDateTime } from './parsestring'
 
 export interface RRuleStrOptions {
   dtstart: Date | null
+  dtend: Date | null
   cache: boolean
   unfold: boolean
   forceset: boolean
@@ -20,6 +21,7 @@ export interface RRuleStrOptions {
  */
 const DEFAULT_OPTIONS: RRuleStrOptions = {
   dtstart: null,
+  dtend: null,
   cache: false,
   unfold: false,
   forceset: false,
@@ -33,7 +35,8 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   let exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let { dtstart, tzid } = parseDtstart(s)
+  let { dtstart, tzid } = parseDateTime(s)
+  let dtend
 
   const lines = splitIntoLines(s, options.unfold)
 
@@ -73,6 +76,13 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
       case 'DTSTART':
         break
 
+      case 'DTEND':
+        let parsed = parseDateTime(s, true /* end */)
+        if (parsed) {
+          dtend = parsed.dtend
+        }
+        break
+
       default:
         throw new Error('unsupported property: ' + name)
     }
@@ -80,6 +90,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
 
   return {
     dtstart,
+    dtend,
     tzid,
     rrulevals,
     rdatevals,

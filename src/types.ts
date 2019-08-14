@@ -27,6 +27,7 @@ export function freqIsDailyOrGreater (freq: Frequency): freq is Frequency.YEARLY
 export interface Options {
   freq: Frequency
   dtstart: Date | null
+  dtend: Date | null
   interval: number
   wkst: Weekday | number | null
   count: number | null
@@ -48,6 +49,7 @@ export interface Options {
 
 export interface ParsedOptions extends Options {
   dtstart: Date
+  dtend: Date
   wkst: number
   bysetpos: number[]
   bymonth: number[]

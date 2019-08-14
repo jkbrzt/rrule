@@ -8,6 +8,7 @@ import { DateWithZone } from './datewithzone'
 export function optionsToString (options: Partial<Options>) {
   let rrule: string[][] = []
   let dtstart: string = ''
+  let dtend: string = ''
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
   const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
@@ -56,10 +57,14 @@ export function optionsToString (options: Partial<Options>) {
 
           return new Weekday(wday)
         }).toString()
-
         break
+
       case 'DTSTART':
-        dtstart = buildDtstart(value, options.tzid)
+        dtstart = buildDateTime(value, options.tzid)
+        break
+
+      case 'DTEND':
+        dtend = buildDateTime(value, options.tzid, true /* end */)
         break
 
       case 'UNTIL':
@@ -89,13 +94,13 @@ export function optionsToString (options: Partial<Options>) {
     ruleString = `RRULE:${rules}`
   }
 
-  return [ dtstart, ruleString ].filter(x => !!x).join('\n')
+  return [ dtstart, dtend, ruleString ].filter(x => !!x).join('\n')
 }
 
-function buildDtstart (dtstart?: number, tzid?: string | null) {
-  if (!dtstart) {
+function buildDateTime (dt?: number, tzid?: string | null, end: boolean = false) {
+  if (!dt) {
     return ''
   }
 
-  return 'DTSTART' + new DateWithZone(new Date(dtstart), tzid).toString()
+  return 'DT' + (end ? 'END' : 'START') + new DateWithZone(new Date(dt), tzid).toString()
 }

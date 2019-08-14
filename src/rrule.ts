@@ -43,6 +43,7 @@ export const Days = {
 export const DEFAULT_OPTIONS: Options = {
   freq: Frequency.YEARLY,
   dtstart: null,
+  dtend: null,
   interval: 1,
   wkst: Days.MO,
   count: null,
@@ -240,6 +241,31 @@ export default class RRule implements QueryMethods {
    */
   count (): number {
     return this.all().length
+  }
+
+  /**
+   * Returns the duration of recurrence instances in this set, in milliseconds.
+   */
+  duration (): number {
+    if (this.options.dtstart && this.options.dtend) {
+      return this.options.dtend.valueOf() - this.options.dtstart.valueOf()
+    }
+    return NaN
+  }
+
+  /**
+   * Returns true iff the given date-time is included within the duration
+   * of any instance of this rule.
+   */
+  includes (dt: Date): boolean {
+    const prev = this.before(dt)
+    if (!prev) {
+      return false
+    }
+    if (this.options.until && dt.valueOf() > this.options.until.valueOf()) {
+      return false
+    }
+    return dt.valueOf() >= prev.valueOf() && dt.valueOf() < (prev.valueOf() + this.duration())
   }
 
   /**

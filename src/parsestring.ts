@@ -5,24 +5,30 @@ import { Days } from './rrule'
 
 export function parseString (rfcString: string): Partial<Options> {
   const options = rfcString.split('\n').map(parseLine).filter(x => x !== null)
-  return { ...options[0], ...options[1] }
+  return options.reduce((acc, cur) => Object.assign(acc, cur))
 }
 
-export function parseDtstart (line: string) {
+export function parseDateTime (line: string, end: boolean = false) {
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
+  const dtWithZone = end
+    ? /DTEND(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
+    : /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
 
-  if (!dtstartWithZone) {
+  if (!dtWithZone) {
     return options
   }
 
-  const [ _, tzid, dtstart ] = dtstartWithZone
+  const [ _, tzid, dt ] = dtWithZone
 
   if (tzid) {
     options.tzid = tzid
   }
-  options.dtstart = dateutil.untilStringToDate(dtstart)
+  if (end) {
+    options.dtend = dateutil.untilStringToDate(dt)
+  } else {
+    options.dtstart = dateutil.untilStringToDate(dt)
+  }
   return options
 }
 
@@ -41,7 +47,9 @@ function parseLine (rfcString: string) {
     case 'EXRULE':
       return parseRrule(rfcString)
     case 'DTSTART':
-      return parseDtstart(rfcString)
+      return parseDateTime(rfcString)
+    case 'DTEND':
+      return parseDateTime(rfcString, true /* end */)
     default:
       throw new Error(`Unsupported RFC prop ${key} in ${rfcString}`)
   }
@@ -49,7 +57,7 @@ function parseLine (rfcString: string) {
 
 function parseRrule (line: string) {
   const strippedLine = line.replace(/^RRULE:/i, '')
-  const options = parseDtstart(strippedLine)
+  const options = parseDateTime(strippedLine)
 
   const attrs = line.replace(/^(?:RRULE|EXRULE):/i, '').split(';')
 
@@ -84,7 +92,7 @@ function parseRrule (line: string) {
       case 'DTSTART':
       case 'TZID':
         // for backwards compatibility
-        const dtstart = parseDtstart(line)
+        const dtstart = parseDateTime(line)
         options.tzid = dtstart.tzid
         options.dtstart = dtstart.dtstart
         break

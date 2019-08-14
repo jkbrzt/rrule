@@ -27,8 +27,8 @@ describe('RRule', function () {
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
-  
-  it('rrulestr itteration not infinite when interval 0', function () {
+
+  it('rrulestr iteration not infinite when interval 0', function () {
     ['FREQ=YEARLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=MONTHLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=DAILY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
@@ -36,6 +36,80 @@ describe('RRule', function () {
     'FREQ=MINUTELY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=SECONDLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO']
     .map((s) => expect(rrulestr(s).count()).to.equal(0))
+  })
+
+  it('duration', function () {
+    const rule = new RRule({
+      freq: RRule.WEEKLY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z')
+    })
+    expect(rule.duration()).equals(8 * 60 * 60 * 1e3)
+  })
+
+  it('duration with timezone', function () {
+    const rule = new RRule({
+      freq: RRule.WEEKLY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T00:00:00-0800')
+    })
+    expect(rule.duration()).equals(8 * 60 * 60 * 1e3)
+  })
+
+  it('includes', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z')
+    })
+    expect(rule.includes(new Date('2010-01-02T01:00:00Z'))).equals(true)
+  })
+
+  it('includes recurrence', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z')
+    })
+    expect(rule.includes(new Date('2010-01-03T01:00:00Z'))).equals(true)
+  })
+
+  it('does not include', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z')
+    })
+    expect(rule.includes(new Date('2010-01-02T09:00:00Z'))).equals(false)
+  })
+
+  it('does not include after end', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z'),
+      until: new Date('2010-01-03T00:00:00Z')
+    })
+    expect(rule.includes(new Date('2010-01-03T01:00:00Z'))).equals(false)
+  })
+
+  it('does not include after end with timezone', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z'),
+      until: new Date('2010-01-03T08:00:00+0800')
+    })
+    expect(rule.includes(new Date('2010-01-03T01:00:00Z'))).equals(false)
+  })
+
+  it('does not include before start', function () {
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: new Date('2010-01-02T00:00:00Z'),
+      dtend: new Date('2010-01-02T08:00:00Z')
+    })
+    expect(rule.includes(new Date('2010-01-01T01:00:00Z'))).equals(false)
   })
 
   it('does not mutate the passed-in options object', function () {

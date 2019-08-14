@@ -51,6 +51,7 @@ export default class RRuleSet extends RRule {
   }
 
   dtstart = createGetterSetter.apply(this, ['dtstart'])
+  dtend = createGetterSetter.apply(this, ['dtend'])
   tzid = createGetterSetter.apply(this, ['tzid'])
 
   _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {

@@ -2,6 +2,7 @@ import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
+import { DateWithZone } from '../src/datewithzone'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 import { optionsToString } from '../src/optionstostring';
 
@@ -72,6 +73,21 @@ describe('RRule', function () {
       dtend: new Date('2010-01-02T08:00:00Z')
     })
     expect(rule.includes(new Date('2010-01-03T01:00:00Z'))).equals(true)
+  })
+
+  it('includes recurrence with DST', function () {
+    // This recurrence spans the DST transition in America/Los_Angeles, and is
+    // only 2 hours in duration on the first day (3 hours on subsequent days).
+    const rule = rrulestr([
+      'DTSTART;TZID=America/Los_Angeles:20190310T010000',
+      'DTEND;TZID=America/Los_Angeles:20190310T040000',
+      'RRULE:FREQ=DAILY'
+    ].join('\n'))
+    // Test dates are assumed to be in America/Los_Angeles, as all other input
+    // to rrule they are represented as zoneless UTC.
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 3, 30, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 11, 3, 30, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 11, 3, 30, 0)))).equals(true)
   })
 
   it('does not include', function () {

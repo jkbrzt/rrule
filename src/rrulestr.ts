@@ -106,6 +106,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals,
     exdatevals,
     dtstart,
+    dtend,
     tzid
   } = parseInput(s, options)
 
@@ -131,7 +132,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(
-          groomRruleOptions(val, dtstart, tzid),
+          groomRruleOptions(val, dtstart, dtend, tzid),
           noCache
         )
       )
@@ -144,7 +145,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         new RRule(
-          groomRruleOptions(val, dtstart, tzid),
+          groomRruleOptions(val, dtstart, dtend, tzid),
           noCache
         )
       )
@@ -162,6 +163,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
   return new RRule(groomRruleOptions(
     val,
     val.dtstart || options.dtstart || dtstart,
+    val.dtend || options.dtend || dtend,
     val.tzid || options.tzid || tzid
   ), noCache)
 }
@@ -173,10 +175,11 @@ export function rrulestr (
   return buildRule(s, initializeOptions(options))
 }
 
-function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, tzid?: string | null) {
+function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, dtend?: Date | null, tzid?: string | null) {
   return {
     ...val,
     dtstart,
+    dtend,
     tzid
   }
 }

@@ -5,7 +5,7 @@ import { Days } from './rrule'
 
 export function parseString (rfcString: string): Partial<Options> {
   const options = rfcString.split('\n').map(parseLine).filter(x => x !== null)
-  return options.reduce((acc, cur) => Object.assign(acc, cur))
+  return options.reduce((acc, cur) => Object.assign(acc, cur), {}) || {}
 }
 
 export function parseDateTime (line: string, end: boolean = false) {

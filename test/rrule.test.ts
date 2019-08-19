@@ -75,19 +75,62 @@ describe('RRule', function () {
     expect(rule.includes(new Date('2010-01-03T01:00:00Z'))).equals(true)
   })
 
-  it('includes recurrence with DST', function () {
+  it('includes recurrence for rule created during DST start', function () {
     // This recurrence spans the DST transition in America/Los_Angeles, and is
-    // only 2 hours in duration on the first day (3 hours on subsequent days).
+    // 2.5 hours in duration on the first day (3.5 hours on subsequent days).
     const rule = rrulestr([
-      'DTSTART;TZID=America/Los_Angeles:20190310T010000',
+      'DTSTART;TZID=America/Los_Angeles:20190310T003000',
       'DTEND;TZID=America/Los_Angeles:20190310T040000',
       'RRULE:FREQ=DAILY'
     ].join('\n'))
-    // Test dates are assumed to be in America/Los_Angeles, as all other input
-    // to rrule they are represented as zoneless UTC.
-    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 3, 30, 0)))).equals(true)
-    expect(rule.includes(new Date(Date.UTC(2019, 2, 11, 3, 30, 0)))).equals(true)
-    expect(rule.includes(new Date(Date.UTC(2019, 10, 11, 3, 30, 0)))).equals(true)
+    // Test dates are assumed to be in America/Los_Angeles, as all inputs to rrule
+    // are represented as zoneless UTC.
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 4, 20, 0)))).equals(false)
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 11, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 11, 4, 20, 0)))).equals(false)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 9, 3, 20, 0)))).equals(true)
+  })
+
+  it('includes recurrence for rule created during DST end', function () {
+    // This recurrence spans the DST transition in America/Los_Angeles, and is
+    // 4.5 hours in duration on the first day (3.5 hours on subsequent days).
+    const rule = rrulestr([
+      'DTSTART;TZID=America/Los_Angeles:20191103T003000',
+      'DTEND;TZID=America/Los_Angeles:20191103T040000',
+      'RRULE:FREQ=DAILY'
+    ].join('\n'))
+    // Test dates are assumed to be in America/Los_Angeles, as all inputs to rrule
+    // are represented as zoneless UTC.
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 3, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 3, 4, 20, 0)))).equals(false)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 4, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 4, 4, 20, 0)))).equals(false)
+    expect(rule.includes(new Date(Date.UTC(2020, 2, 11, 3, 20, 0)))).equals(true)
+  })
+
+  it('includes recurrence spanning DST start', function () {
+    const rule = rrulestr([
+      'DTSTART;TZID=America/Los_Angeles:20190210T003000',
+      'DTEND;TZID=America/Los_Angeles:20190210T040000',
+      'RRULE:FREQ=DAILY'
+    ].join('\n'))
+    // Test dates are assumed to be in America/Los_Angeles, as all inputs to rrule
+    // are represented as zoneless UTC.
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 2, 10, 4, 20, 0)))).equals(false)
+  })
+
+  it('includes recurrence spanning DST end', function () {
+    const rule = rrulestr([
+      'DTSTART;TZID=America/Los_Angeles:20191003T003000',
+      'DTEND;TZID=America/Los_Angeles:20191003T040000',
+      'RRULE:FREQ=DAILY'
+    ].join('\n'))
+    // Test dates are assumed to be in America/Los_Angeles, as all inputs to rrule
+    // are represented as zoneless UTC.
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 3, 3, 20, 0)))).equals(true)
+    expect(rule.includes(new Date(Date.UTC(2019, 10, 3, 4, 20, 0)))).equals(false)
   })
 
   it('does not include', function () {

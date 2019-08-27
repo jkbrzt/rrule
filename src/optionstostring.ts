@@ -1,4 +1,4 @@
-import { Options } from './types'
+import { Options, DateTimeProperty, DateTimeValue } from './types'
 import RRule, { DEFAULT_OPTIONS } from './rrule'
 import { includes, isPresent, isArray, isNumber, toArray } from './helpers'
 import { Weekday } from './weekday'
@@ -60,15 +60,35 @@ export function optionsToString (options: Partial<Options>) {
         break
 
       case 'DTSTART':
-        dtstart = buildDateTime(value, options.tzid)
+        dtstart = formatDateTime(value, options, DateTimeProperty.START)
         break
 
       case 'DTEND':
-        dtend = buildDateTime(value, options.tzid, true /* end */)
+        dtend = formatDateTime(value, options, DateTimeProperty.END)
+        break
+
+      case 'DTVALUE':
+      case 'DTFLOATING':
         break
 
       case 'UNTIL':
-        outValue = dateutil.timeToUntilString(value, !options.tzid)
+        /**
+         * From [RFC 5545](https://tools.ietf.org/html/rfc5545):
+         *
+         * 3.3.10. Recurrence Rule
+         *
+         * The value of the UNTIL rule part MUST have the same value type as the
+         * "DTSTART" property. Furthermore, if the "DTSTART" property is specified as
+         * a date with local time, then the UNTIL rule part MUST also be specified as
+         * a date with local time. If the "DTSTART" property is specified as a date
+         * with UTC time or a date with local time and time zone reference, then the
+         * UNTIL rule part MUST be specified as a date with UTC time.
+         */
+        if (options.dtvalue === DateTimeValue.DATE) {
+          outValue = dateutil.toRfc5545Date(value)
+        } else {
+          outValue = dateutil.toRfc5545DateTime(value, !options.dtfloating)
+        }
         break
 
       default:
@@ -97,10 +117,16 @@ export function optionsToString (options: Partial<Options>) {
   return [ dtstart, dtend, ruleString ].filter(x => !!x).join('\n')
 }
 
-function buildDateTime (dt?: number, tzid?: string | null, end: boolean = false) {
+function formatDateTime (dt?: number, options: Partial<Options> = {}, prop = DateTimeProperty.START) {
   if (!dt) {
     return ''
   }
-
-  return 'DT' + (end ? 'END' : 'START') + new DateWithZone(new Date(dt), tzid).toString()
+  let prefix = prop.toString()
+  if (options.dtvalue) {
+    prefix += ';VALUE=' + options.dtvalue.toString()
+  }
+  if (options.dtfloating) {
+    return prefix + ':' + dateutil.toRfc5545DateTime(dt, false)
+  }
+  return prefix + new DateWithZone(new Date(dt), options.tzid).toString()
 }

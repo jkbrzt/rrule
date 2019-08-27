@@ -161,7 +161,7 @@ export namespace dateutil {
     })
   }
 
-  export const timeToUntilString = function (time: number, utc = true) {
+  export const toRfc5545DateTime = function (time: number, utc = true) {
     const date = new Date(time)
     return [
       padStart(date.getUTCFullYear().toString(), 4, '0'),
@@ -175,11 +175,20 @@ export namespace dateutil {
     ].join('')
   }
 
-  export const untilStringToDate = function (until: string) {
-    const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
-    const bits = re.exec(until)
+  export const toRfc5545Date = function (time: number) {
+    const date = new Date(time)
+    return [
+      padStart(date.getUTCFullYear().toString(), 4, '0'),
+      padStart(date.getUTCMonth() + 1, 2, '0'),
+      padStart(date.getUTCDate(), 2, '0')
+    ].join('')
+  }
 
-    if (!bits) throw new Error(`Invalid UNTIL value: ${until}`)
+  export const fromRfc5545DateTime = function (dt: string) {
+    const re = /^(\d{4})(\d{2})(\d{2})(T(\d{2})(\d{2})(\d{2})Z?)?$/
+    const bits = re.exec(dt)
+
+    if (!bits) throw new Error(`Invalid date-time value: ${dt}`)
 
     return new Date(
       Date.UTC(
@@ -189,6 +198,21 @@ export namespace dateutil {
         parseInt(bits[5], 10) || 0,
         parseInt(bits[6], 10) || 0,
         parseInt(bits[7], 10) || 0
+      )
+    )
+  }
+
+  export const fromRfc5545Date = function (dt: string) {
+    const re = /^(\d{4})(\d{2})(\d{2})$/
+    const bits = re.exec(dt)
+
+    if (!bits) throw new Error(`Invalid date value: ${dt}`)
+
+    return new Date(
+      Date.UTC(
+        parseInt(bits[1], 10),
+        parseInt(bits[2], 10) - 1,
+        parseInt(bits[3], 10)
       )
     )
   }

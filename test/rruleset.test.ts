@@ -649,6 +649,21 @@ describe('RRuleSet', function () {
 
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
         'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ].join('\n'))
+    })
+
+    it('handles rule with floating time', () => {
+      const legacy = [
+        'RRULE:DTSTART=20171201T080000;FREQ=WEEKLY',
+      ]
+      const original = [
+        'DTSTART:20171201T080000',
+        'RRULE:FREQ=WEEKLY',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000',
         'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
       ].join('\n'))
     })

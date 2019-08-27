@@ -3,7 +3,7 @@ import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
-import { QueryMethodTypes, IterResultType } from './types'
+import { DateTimeProperty, QueryMethodTypes, IterResultType } from './types'
 import { rrulestr } from './rrulestr'
 import { optionsToString } from './optionstostring'
 
@@ -33,6 +33,7 @@ export default class RRuleSet extends RRule {
   public readonly _exdate: Date[]
 
   private _dtstart?: Date | null | undefined
+  private _dtend?: Date | null | undefined
   private _tzid?: string
 
   /**
@@ -143,6 +144,9 @@ export default class RRuleSet extends RRule {
     if (!this._rrule.length && this._dtstart) {
       result = result.concat(optionsToString({ dtstart: this._dtstart }))
     }
+    if (!this._rrule.length && this._dtend) {
+      result = result.concat(optionsToString({ dtend: this._dtend }))
+    }
 
     this._rrule.forEach(function (rrule) {
       result = result.concat(rrule.toString().split('\n'))
@@ -221,7 +225,7 @@ function rdatesToString (param: string, rdates: Date[], tzid: string | undefined
   const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
 
   const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
+      .map(rdate => dateutil.toRfc5545DateTime(rdate.valueOf(), isUTC))
       .join(',')
 
   return `${header}${dateString}`

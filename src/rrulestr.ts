@@ -2,12 +2,14 @@ import RRule from './rrule'
 import RRuleSet from './rruleset'
 import dateutil from './dateutil'
 import { includes, split } from './helpers'
-import { Options } from './types'
+import { Options, DateTimeProperty, DateTimeValue } from './types'
 import { parseString, parseDateTime } from './parsestring'
 
 export interface RRuleStrOptions {
   dtstart: Date | null
   dtend: Date | null
+  dtvalue: DateTimeValue | null
+  dtfloating: boolean | null
   cache: boolean
   unfold: boolean
   forceset: boolean
@@ -22,6 +24,8 @@ export interface RRuleStrOptions {
 const DEFAULT_OPTIONS: RRuleStrOptions = {
   dtstart: null,
   dtend: null,
+  dtvalue: null,
+  dtfloating: false,
   cache: false,
   unfold: false,
   forceset: false,
@@ -35,8 +39,8 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   let exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let { dtstart, tzid } = parseDateTime(s)
-  let dtend
+  let { dtstart, dtfloating, dtvalue, tzid } = parseDateTime(s)
+  let dtend: Date | null = null
 
   const lines = splitIntoLines(s, options.unfold)
 
@@ -77,8 +81,24 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'DTEND':
-        let parsed = parseDateTime(s, true /* end */)
-        if (parsed) {
+        let parsed: Partial<Options> = parseDateTime(s, DateTimeProperty.END)
+        if (parsed.dtend) {
+          if (dtend) {
+            throw new Error('Invalid rule: DTEND must occur only once')
+          }
+          if (dtstart && dtstart.valueOf() >= parsed.dtend.valueOf()) {
+            throw new Error('Invalid rule: DTEND must be later than DTSTART')
+          }
+          if (dtstart && dtvalue !== parsed.dtvalue) {
+            // Different value types.
+            throw new Error('Invalid rule: DTSTART and DTEND must have the same value type')
+          } else if (dtstart && tzid !== parsed.tzid) {
+            // Different timezones.
+            throw new Error('Invalid rule: DTSTART and DTEND must have the same timezone')
+          } else if (dtstart && dtfloating !== parsed.dtfloating) {
+            // Different floating types.
+            throw new Error('Invalid rule: DTSTART and DTEND must both be floating')
+          }
           dtend = parsed.dtend
         }
         break
@@ -91,6 +111,8 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   return {
     dtstart,
     dtend,
+    dtvalue,
+    dtfloating,
     tzid,
     rrulevals,
     rdatevals,
@@ -107,6 +129,8 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exdatevals,
     dtstart,
     dtend,
+    dtvalue,
+    dtfloating,
     tzid
   } = parseInput(s, options)
 
@@ -127,12 +151,13 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     const rset = new RRuleSet(noCache)
 
     rset.dtstart(dtstart)
+    rset.dtend(dtend)
     rset.tzid(tzid || undefined)
 
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(
-          groomRruleOptions(val, dtstart, dtend, tzid),
+          groomRruleOptions(val, dtstart, dtend, dtvalue, dtfloating, tzid),
           noCache
         )
       )
@@ -145,7 +170,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         new RRule(
-          groomRruleOptions(val, dtstart, dtend, tzid),
+          groomRruleOptions(val, dtstart, dtend, dtvalue, dtfloating, tzid),
           noCache
         )
       )
@@ -164,6 +189,8 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     val,
     val.dtstart || options.dtstart || dtstart,
     val.dtend || options.dtend || dtend,
+    val.dtvalue || options.dtvalue || dtvalue,
+    val.dtfloating || options.dtfloating || dtfloating,
     val.tzid || options.tzid || tzid
   ), noCache)
 }
@@ -175,11 +202,13 @@ export function rrulestr (
   return buildRule(s, initializeOptions(options))
 }
 
-function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, dtend?: Date | null, tzid?: string | null) {
+function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, dtend?: Date | null, dtvalue?: DateTimeValue | null, dtfloating?: boolean | null, tzid?: string | null) {
   return {
     ...val,
     dtstart,
     dtend,
+    dtvalue,
+    dtfloating,
     tzid
   }
 }
@@ -270,5 +299,5 @@ function parseRDate (rdateval: string, parms: string[]) {
 
   return rdateval
     .split(',')
-    .map(datestr => dateutil.untilStringToDate(datestr))
+    .map(datestr => dateutil.fromRfc5545DateTime(datestr))
 }

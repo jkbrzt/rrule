@@ -5,7 +5,7 @@ import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
 import { DateFormatter, GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
+import { ParsedOptions, Options, DateTimeValue, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
@@ -44,6 +44,8 @@ export const DEFAULT_OPTIONS: Options = {
   freq: Frequency.YEARLY,
   dtstart: null,
   dtend: null,
+  dtvalue: DateTimeValue.DATE_TIME,
+  dtfloating: false,
   interval: 1,
   wkst: Days.MO,
   count: null,
@@ -265,7 +267,7 @@ export default class RRule implements QueryMethods {
     if (this.options.until && dt.valueOf() > this.options.until.valueOf()) {
       return false
     }
-    return dt.valueOf() >= prev.valueOf() && dt.valueOf() < (prev.valueOf() + this.duration())
+    return dt.valueOf() >= prev.valueOf() && dt.valueOf() < (prev.valueOf() + (this.duration() || 0))
   }
 
   /**

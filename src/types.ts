@@ -10,6 +10,16 @@ export interface QueryMethods {
 export type QueryMethodTypes = keyof QueryMethods
 export type IterResultType<M extends QueryMethodTypes> = M extends 'all' | 'between' ? Date[] : (Date | null)
 
+export enum DateTimeProperty {
+  START = 'DTSTART',
+  END = 'DTEND'
+}
+
+export enum DateTimeValue {
+  DATE = 'DATE',
+  DATE_TIME = 'DATE-TIME'
+}
+
 export enum Frequency {
   YEARLY = 0,
   MONTHLY = 1,
@@ -28,6 +38,8 @@ export interface Options {
   freq: Frequency
   dtstart: Date | null
   dtend: Date | null
+  dtvalue: DateTimeValue | null
+  dtfloating: boolean | null
   interval: number
   wkst: Weekday | number | null
   count: number | null

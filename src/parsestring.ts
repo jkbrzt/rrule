@@ -1,34 +1,96 @@
-import { Options, Frequency } from './types'
+import { Options, Frequency, DateTimeProperty, DateTimeValue } from './types'
 import { Weekday } from './weekday'
 import dateutil from './dateutil'
 import { Days } from './rrule'
 
 export function parseString (rfcString: string): Partial<Options> {
   const options = rfcString.split('\n').map(parseLine).filter(x => x !== null)
-  return options.reduce((acc, cur) => Object.assign(acc, cur), {}) || {}
+  /**
+   * From [RFC 5545](https://tools.ietf.org/html/rfc5545):
+   *
+   * 3.8.2.2. Date-Time End ("DTEND")
+   *
+   * The value type of this property MUST be the same as the "DTSTART" property, and its
+   * value MUST be later in time than the value of the "DTSTART" property. Furthermore,
+   * this property MUST be specified as a date with local time if and only if the
+   * "DTSTART" property is also specified as a date with local time.
+   */
+  return options.reduce((acc: Partial<Options>, cur: Partial<Options>) => {
+    let existing
+    if (cur.dtstart) {
+      if (acc.dtstart) {
+        throw new Error('Invalid rule: DTSTART must occur only once')
+      }
+      if (acc.dtend && acc.dtend.valueOf() <= cur.dtstart.valueOf()) {
+        throw new Error('Invalid rule: DTEND must be later than DTSTART')
+      }
+      existing = acc.dtend
+    }
+    if (cur.dtend) {
+      if (acc.dtend) {
+        throw new Error('Invalid rule: DTEND must occur only once')
+      }
+      if (acc.dtstart && acc.dtstart.valueOf() >= cur.dtend.valueOf()) {
+        throw new Error('Invalid rule: DTEND must be later than DTSTART')
+      }
+      existing = acc.dtstart
+    }
+    if (existing && acc.dtvalue !== cur.dtvalue) {
+      // Different value types.
+      throw new Error('Invalid rule: DTSTART and DTEND must have the same value type')
+    } else if (existing && acc.tzid !== cur.tzid) {
+      // Different timezones.
+      throw new Error('Invalid rule: DTSTART and DTEND must have the same timezone')
+    } else if (existing && acc.dtfloating !== cur.dtfloating) {
+      // Different floating types.
+      throw new Error('Invalid rule: DTSTART and DTEND must both be floating')
+    }
+    return Object.assign(acc, cur)
+  }, {}) || {}
 }
 
-export function parseDateTime (line: string, end: boolean = false) {
+export function parseDateTime (line: string, prop = DateTimeProperty.START): Partial<Options> {
   const options: Partial<Options> = {}
 
-  const dtWithZone = end
-    ? /DTEND(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
-    : /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
+  const dtWithZone = new RegExp(
+    `${prop}(?:;TZID=([^:=]+?))?(?:;VALUE=(DATE|DATE-TIME))?(?::|=)([^;\\s]+)`, 'i'
+  ).exec(line)
 
   if (!dtWithZone) {
     return options
   }
 
-  const [ _, tzid, dt ] = dtWithZone
+  const [ _, tzid, dtvalue, dt ] = dtWithZone
 
   if (tzid) {
+    if (dt.endsWith('Z')) {
+      throw new Error(`Invalid UTC date-time with timezone: ${line}`)
+    }
     options.tzid = tzid
   }
-  if (end) {
-    options.dtend = dateutil.untilStringToDate(dt)
-  } else {
-    options.dtstart = dateutil.untilStringToDate(dt)
+
+  if (dtvalue === DateTimeValue.DATE) {
+    if (prop === DateTimeProperty.START) {
+      options.dtstart = dateutil.fromRfc5545Date(dt)
+    } else {
+      options.dtend = dateutil.fromRfc5545Date(dt)
+    }
+    options.dtvalue = DateTimeValue.DATE
+    options.dtfloating = true
+  } else { // Default value type is DATE-TIME
+    if (prop === DateTimeProperty.START) {
+      options.dtstart = dateutil.fromRfc5545DateTime(dt)
+    } else {
+      options.dtend = dateutil.fromRfc5545DateTime(dt)
+    }
+    if (dtvalue) {
+      options.dtvalue = DateTimeValue.DATE_TIME
+    }
+    if (!tzid && !dt.endsWith('Z')) {
+      options.dtfloating = true
+    }
   }
+
   return options
 }
 
@@ -47,9 +109,9 @@ function parseLine (rfcString: string) {
     case 'EXRULE':
       return parseRrule(rfcString)
     case 'DTSTART':
-      return parseDateTime(rfcString)
+      return parseDateTime(rfcString, DateTimeProperty.START)
     case 'DTEND':
-      return parseDateTime(rfcString, true /* end */)
+      return parseDateTime(rfcString, DateTimeProperty.END)
     default:
       throw new Error(`Unsupported RFC prop ${key} in ${rfcString}`)
   }
@@ -95,9 +157,15 @@ function parseRrule (line: string) {
         const dtstart = parseDateTime(line)
         options.tzid = dtstart.tzid
         options.dtstart = dtstart.dtstart
+        if (dtstart.dtvalue) {
+          options.dtvalue = dtstart.dtvalue
+        }
+        if (dtstart.dtfloating) {
+          options.dtfloating = dtstart.dtfloating
+        }
         break
       case 'UNTIL':
-        options.until = dateutil.untilStringToDate(value)
+        options.until = dateutil.fromRfc5545DateTime(value)
         break
       case 'BYEASTER':
         options.byeaster = Number(value)

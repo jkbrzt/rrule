@@ -50,6 +50,16 @@ describe('parseString', () => {
           dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
           freq: RRule.WEEKLY
         }
+      ],
+      [
+        'RRULE:FREQ=WEEKLY\n' +
+        'DTEND:19970903T090000Z\n' +
+        'DTSTART:19970902T090000Z\n',
+        {
+          dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+          dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
+          freq: RRule.WEEKLY
+        }
       ]
     ]
 

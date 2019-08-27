@@ -15,7 +15,7 @@ export class DateWithZone {
   }
 
   public toString () {
-    const datestr = dateutil.timeToUntilString(this.date.getTime(), this.isUTC)
+    const datestr = dateutil.toRfc5545DateTime(this.date.getTime(), this.isUTC)
     if (!this.isUTC) {
       return `;TZID=${this.tzid}:${datestr}`
     }

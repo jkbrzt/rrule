@@ -126,7 +126,11 @@ function formatDateTime (dt?: number, options: Partial<Options> = {}, prop = Dat
     prefix += ';VALUE=' + options.dtvalue.toString()
   }
   if (options.dtfloating) {
-    return prefix + ':' + dateutil.toRfc5545DateTime(dt, false)
+    if (options.dtvalue === DateTimeValue.DATE) {
+      return prefix + ':' + dateutil.toRfc5545Date(dt)
+    } else {
+      return prefix + ':' + dateutil.toRfc5545DateTime(dt, false)
+    }
   }
   return prefix + new DateWithZone(new Date(dt), options.tzid).toString()
 }

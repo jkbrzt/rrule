@@ -64,9 +64,11 @@ export function parseDateTime (line: string, prop = DateTimeProperty.START): Par
 
   if (tzid) {
     if (dt.endsWith('Z')) {
-      throw new Error(`Invalid UTC date-time with timezone: ${line}`)
+      throw new Error(`Invalid UTC date-time value with timezone: ${line}`)
     }
     options.tzid = tzid
+  } else if (dt.endsWith('Z')) {
+    options.tzid = 'UTC'
   }
 
   if (dtvalue === DateTimeValue.DATE) {
@@ -77,6 +79,9 @@ export function parseDateTime (line: string, prop = DateTimeProperty.START): Par
     }
     options.dtvalue = DateTimeValue.DATE
     options.dtfloating = true
+    if (options.tzid) {
+      throw new Error(`Invalid date value with timezone: ${line}`)
+    }
   } else { // Default value type is DATE-TIME
     if (prop === DateTimeProperty.START) {
       options.dtstart = dateutil.fromRfc5545DateTime(dt)

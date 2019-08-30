@@ -37,6 +37,7 @@ describe('parseString', () => {
         'RRULE:FREQ=YEARLY;COUNT=3\n',
         {
           dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+          tzid: 'UTC',
           freq: RRule.YEARLY,
           count: 3
         }
@@ -48,6 +49,7 @@ describe('parseString', () => {
         {
           dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
           dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
+          tzid: 'UTC',
           freq: RRule.WEEKLY
         }
       ],
@@ -58,6 +60,7 @@ describe('parseString', () => {
         {
           dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
           dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
+          tzid: 'UTC',
           freq: RRule.WEEKLY
         }
       ]

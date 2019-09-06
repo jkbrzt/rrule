@@ -257,31 +257,6 @@ export default class RRule implements QueryMethods {
   }
 
   /**
-   * Returns the duration of recurrence instances in this set, in milliseconds.
-   */
-  duration (): number {
-    if (this.options.dtstart && this.options.dtend) {
-      return this.options.dtend.valueOf() - this.options.dtstart.valueOf()
-    }
-    return NaN
-  }
-
-  /**
-   * Returns true iff the given date-time is included within the duration
-   * of any instance of this rule.
-   */
-  includes (dt: Date, inc = false): boolean {
-    const prev = this.before(dt, inc)
-    if (!prev) {
-      return false
-    }
-    if (this.options.until && dt.valueOf() > this.options.until.valueOf()) {
-      return false
-    }
-    return dt.valueOf() >= prev.valueOf() && dt.valueOf() < (prev.valueOf() + (this.duration() || 0))
-  }
-
-  /**
    * Converts the rrule into its string representation
    * @see <http://www.ietf.org/rfc/rfc2445.txt>
    * @return String

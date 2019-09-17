@@ -366,7 +366,8 @@ describe('RRuleSet', function () {
       set.rrule(new RRule({
         freq: RRule.YEARLY,
         count: 2,
-        dtstart: parse('19600101T090000')
+        dtstart: parse('19600101T090000'),
+        tzid: 'UTC'
       }))
 
       expect(set.valueOf()).to.deep.equal([
@@ -381,7 +382,8 @@ describe('RRuleSet', function () {
       set.rrule(new RRule({
         freq: RRule.YEARLY,
         count: 2,
-        dtstart: parse('19600101T090000')
+        dtstart: parse('19600101T090000'),
+        tzid: 'UTC'
       }))
 
       set.rrule(new RRule({

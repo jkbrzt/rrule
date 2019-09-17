@@ -142,10 +142,10 @@ export default class RRuleSet extends RRule {
     let result: string[] = []
 
     if (!this._rrule.length && this._dtstart) {
-      result = result.concat(optionsToString({ dtstart: this._dtstart }))
+      result = result.concat(optionsToString({ dtstart: this._dtstart, tzid: this._tzid }))
     }
     if (!this._rrule.length && this._dtend) {
-      result = result.concat(optionsToString({ dtend: this._dtend }))
+      result = result.concat(optionsToString({ dtend: this._dtend, tzid: this._tzid }))
     }
 
     this._rrule.forEach(function (rrule) {

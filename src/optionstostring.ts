@@ -68,7 +68,6 @@ export function optionsToString (options: Partial<Options>) {
         break
 
       case 'DTVALUE':
-      case 'DTFLOATING':
         break
 
       case 'UNTIL':
@@ -87,7 +86,7 @@ export function optionsToString (options: Partial<Options>) {
         if (options.dtvalue === DateTimeValue.DATE) {
           outValue = dateutil.toRfc5545Date(value)
         } else {
-          outValue = dateutil.toRfc5545DateTime(value, !options.dtfloating)
+          outValue = dateutil.toRfc5545DateTime(value, !!options.tzid)
         }
         break
 
@@ -125,7 +124,7 @@ function formatDateTime (dt?: number, options: Partial<Options> = {}, prop = Dat
   if (options.dtvalue) {
     prefix += ';VALUE=' + options.dtvalue.toString()
   }
-  if (options.dtfloating) {
+  if (!options.tzid) {
     if (options.dtvalue === DateTimeValue.DATE) {
       return prefix + ':' + dateutil.toRfc5545Date(dt)
     } else {

@@ -41,9 +41,6 @@ export function parseString (rfcString: string): Partial<Options> {
     } else if (existing && acc.tzid !== cur.tzid) {
       // Different timezones.
       throw new Error('Invalid rule: DTSTART and DTEND must have the same timezone')
-    } else if (existing && acc.dtfloating !== cur.dtfloating) {
-      // Different floating types.
-      throw new Error('Invalid rule: DTSTART and DTEND must both be floating')
     }
     return Object.assign(acc, cur)
   }, {}) || {}
@@ -78,7 +75,6 @@ export function parseDateTime (line: string, prop = DateTimeProperty.START): Par
       options.dtend = dateutil.fromRfc5545Date(dt)
     }
     options.dtvalue = DateTimeValue.DATE
-    options.dtfloating = true
     if (options.tzid) {
       throw new Error(`Invalid date value with timezone: ${line}`)
     }
@@ -90,9 +86,6 @@ export function parseDateTime (line: string, prop = DateTimeProperty.START): Par
     }
     if (dtvalue) {
       options.dtvalue = DateTimeValue.DATE_TIME
-    }
-    if (!tzid && !dt.endsWith('Z')) {
-      options.dtfloating = true
     }
   }
 
@@ -159,14 +152,11 @@ function parseRrule (line: string) {
       case 'DTSTART':
       case 'TZID':
         // for backwards compatibility
-        const dtstart = parseDateTime(line)
-        options.tzid = dtstart.tzid
-        options.dtstart = dtstart.dtstart
-        if (dtstart.dtvalue) {
-          options.dtvalue = dtstart.dtvalue
-        }
-        if (dtstart.dtfloating) {
-          options.dtfloating = dtstart.dtfloating
+        const parsed = parseDateTime(line)
+        options.tzid = parsed.tzid
+        options.dtstart = parsed.dtstart
+        if (parsed.dtvalue) {
+          options.dtvalue = parsed.dtvalue
         }
         break
       case 'UNTIL':

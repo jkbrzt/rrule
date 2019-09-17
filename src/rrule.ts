@@ -45,7 +45,6 @@ export const DEFAULT_OPTIONS: Options = {
   dtstart: null,
   dtend: null,
   dtvalue: DateTimeValue.DATE_TIME,
-  dtfloating: false,
   interval: 1,
   wkst: Days.MO,
   count: null,

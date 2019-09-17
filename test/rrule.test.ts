@@ -3505,6 +3505,7 @@ describe('RRule', function () {
     [6, RRule.SU].forEach(function (wkst) {
       const rr = new RRule({
         dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
+        tzid: 'UTC',
         until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),
         freq: RRule.MONTHLY,
         interval: 1,
@@ -3643,7 +3644,7 @@ describe('RRule', function () {
     const ruleString = rrule.toString()
     const rrule2 = RRule.fromString(ruleString)
 
-    expect(ruleString).to.equal('DTSTART:09900101T000000Z\nRRULE:COUNT=1')
+    expect(ruleString).to.equal('DTSTART:09900101T000000\nRRULE:COUNT=1')
     expect(rrule2.count()).to.equal(1)
     expect(rrule2.all()).to.deep.equal([
       new Date(Date.UTC(990, 0, 1, 0, 0, 0))

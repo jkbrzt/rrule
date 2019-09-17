@@ -39,7 +39,6 @@ export interface Options {
   dtstart: Date | null
   dtend: Date | null
   dtvalue: DateTimeValue | null
-  dtfloating: boolean | null
   interval: number
   wkst: Weekday | number | null
   count: number | null

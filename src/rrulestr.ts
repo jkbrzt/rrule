@@ -9,7 +9,6 @@ export interface RRuleStrOptions {
   dtstart: Date | null
   dtend: Date | null
   dtvalue: DateTimeValue | null
-  dtfloating: boolean | null
   cache: boolean
   unfold: boolean
   forceset: boolean
@@ -25,7 +24,6 @@ const DEFAULT_OPTIONS: RRuleStrOptions = {
   dtstart: null,
   dtend: null,
   dtvalue: null,
-  dtfloating: false,
   cache: false,
   unfold: false,
   forceset: false,
@@ -39,7 +37,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
   let exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let { dtstart, dtfloating, dtvalue, tzid } = parseDateTime(s)
+  let { dtstart, dtvalue, tzid } = parseDateTime(s)
   let dtend: Date | null = null
 
   const lines = splitIntoLines(s, options.unfold)
@@ -95,9 +93,6 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
           } else if (dtstart && tzid !== parsed.tzid) {
             // Different timezones.
             throw new Error('Invalid rule: DTSTART and DTEND must have the same timezone')
-          } else if (dtstart && dtfloating !== parsed.dtfloating) {
-            // Different floating types.
-            throw new Error('Invalid rule: DTSTART and DTEND must both be floating')
           }
           dtend = parsed.dtend
         }
@@ -112,7 +107,6 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
     dtstart,
     dtend,
     dtvalue,
-    dtfloating,
     tzid,
     rrulevals,
     rdatevals,
@@ -130,7 +124,6 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     dtstart,
     dtend,
     dtvalue,
-    dtfloating,
     tzid
   } = parseInput(s, options)
 
@@ -157,7 +150,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(
-          groomRruleOptions(val, dtstart, dtend, dtvalue, dtfloating, tzid),
+          groomRruleOptions(val, dtstart, dtend, dtvalue, tzid),
           noCache
         )
       )
@@ -170,7 +163,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         new RRule(
-          groomRruleOptions(val, dtstart, dtend, dtvalue, dtfloating, tzid),
+          groomRruleOptions(val, dtstart, dtend, dtvalue, tzid),
           noCache
         )
       )
@@ -190,7 +183,6 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     val.dtstart || options.dtstart || dtstart,
     val.dtend || options.dtend || dtend,
     val.dtvalue || options.dtvalue || dtvalue,
-    val.dtfloating || options.dtfloating || dtfloating,
     val.tzid || options.tzid || tzid
   ), noCache)
 }
@@ -202,13 +194,12 @@ export function rrulestr (
   return buildRule(s, initializeOptions(options))
 }
 
-function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, dtend?: Date | null, dtvalue?: DateTimeValue | null, dtfloating?: boolean | null, tzid?: string | null) {
+function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, dtend?: Date | null, dtvalue?: DateTimeValue | null, tzid?: string | null) {
   return {
     ...val,
     dtstart,
     dtend,
     dtvalue,
-    dtfloating,
     tzid
   }
 }

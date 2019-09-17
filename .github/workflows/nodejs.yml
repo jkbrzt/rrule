@@ -18,5 +18,4 @@ jobs:
       - run: TZ=America/Los_Angeles yarn test
       - run: TZ=Africa/Nairobi yarn test
       - run: TZ=Asia/Tokyo yarn test-ci
-      - run: nyc report --reporter=json && codecov -f coverage/*.json
-      
+      - run: nyc report --reporter=json && codecov -t ${{ secrets.CODECOV_REPO_TOKEN }} -f coverage/*.json

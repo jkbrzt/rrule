@@ -1,9 +1,11 @@
 import * as $ from 'jquery'
-import {
-  RRule,
-  Options,
-  Weekday
-} from '../src/index'
+
+import { RRule, Weekday, Options } from '../src/index'
+
+// Make library accessible to browser debuggers so users can try things out themselves
+// tslint:disable-next-line:no-duplicate-imports
+import * as rruleExports from '../src/index'
+$.extend(window, rruleExports)
 
 const getDay = (i: number) => [
   RRule.MO,

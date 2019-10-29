@@ -1,8 +1,8 @@
 import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
-import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
+import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
-import { Weekday } from './weekday'
+import { ALL_WEEKDAYS, Weekday } from './weekday'
 import { Time } from './datetime'
 
 export function initializeOptions (options: Partial<Options>) {
@@ -139,6 +139,9 @@ export function parseOptions (options: Partial<Options>) {
   } else if (isNumber(opts.byweekday)) {
     opts.byweekday = [opts.byweekday]
     opts.bynweekday = null
+  } else if (isWeekdayStr(opts.byweekday)) {
+    opts.byweekday = [Weekday.fromStr(opts.byweekday).weekday]
+    opts.bynweekday = null
   } else if (opts.byweekday instanceof Weekday) {
     if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
       opts.byweekday = [opts.byweekday.weekday]
@@ -148,7 +151,7 @@ export function parseOptions (options: Partial<Options>) {
       opts.byweekday = null
     }
   } else {
-    const byweekday = []
+    const byweekday: number[] = []
     const bynweekday = []
 
     for (let i = 0; i < opts.byweekday.length; i++) {
@@ -157,13 +160,15 @@ export function parseOptions (options: Partial<Options>) {
       if (isNumber(wday)) {
         byweekday.push(wday)
         continue
+      } else if (isWeekdayStr(wday)) {
+        byweekday.push(Weekday.fromStr(wday).weekday)
+        continue
       }
 
-      const wd = wday as Weekday
-      if (!wd.n || opts.freq > RRule.MONTHLY) {
-        byweekday.push(wd.weekday)
+      if (!wday.n || opts.freq > RRule.MONTHLY) {
+        byweekday.push(wday.weekday)
       } else {
-        bynweekday.push([wd.weekday, wd.n])
+        bynweekday.push([wday.weekday, wday.n])
       }
     }
     opts.byweekday = notEmpty(byweekday) ? byweekday : null

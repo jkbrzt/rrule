@@ -2,12 +2,18 @@
 // Helper functions
 // =============================================================================
 
+import { ALL_WEEKDAYS, WeekdayStr } from './weekday'
+
 export const isPresent = function<T>(value?: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 
 export const isNumber = function (value?: any): value is number {
   return typeof value === 'number'
+}
+
+export const isWeekdayStr = function (value?: any): value is WeekdayStr {
+  return ALL_WEEKDAYS.indexOf(value) >= 0
 }
 
 export const isArray = Array.isArray

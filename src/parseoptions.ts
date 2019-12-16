@@ -42,14 +42,6 @@ export function parseOptions (options: Partial<Options>) {
 
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
-  if (
-    isPresent(opts.interval) &&
-    !isNumber(opts.interval) ||
-    isNaN(opts.interval as number)
-  ) {
-    throw new Error('interval must be a number')
-  }
-
   if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday
   } else if (isNumber(opts.wkst)) {

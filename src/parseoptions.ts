@@ -2,37 +2,28 @@ import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
 import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
-import { ALL_WEEKDAYS, Weekday } from './weekday'
+import { Weekday } from './weekday'
 import { Time } from './datetime'
 
 export function initializeOptions (options: Partial<Options>) {
   const invalid: string[] = []
   const keys = Object.keys(options) as (keyof Options)[]
-  const initializedOptions: Partial<Options> = {}
 
   // Shallow copy for options and origOptions and check for invalid
-  keys.forEach(key => {
-    const value = options[key]
-    initializedOptions[key] = value
+  for (const key of keys) {
     if (!includes(defaultKeys, key)) invalid.push(key)
-    if (dateutil.isDate(value) && !dateutil.isValidDate(value)) invalid.push(key)
-  })
+    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key])) invalid.push(key)
+  }
 
   if (invalid.length) {
     throw new Error('Invalid options: ' + invalid.join(', '))
   }
 
-  return initializedOptions
+  return { ...options }
 }
 
 export function parseOptions (options: Partial<Options>) {
-  const opts = initializeOptions(options)
-  const keys = Object.keys(options) as (keyof Options)[]
-
-  // Merge in default options
-  defaultKeys.forEach(key => {
-    if (!includes(keys, key) || !isPresent(opts[key])) opts[key] = DEFAULT_OPTIONS[key]
-  })
+  const opts = { ...DEFAULT_OPTIONS, ...initializeOptions(options) }
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
 

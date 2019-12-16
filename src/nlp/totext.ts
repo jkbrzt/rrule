@@ -357,7 +357,7 @@ export default class ToText {
     const gettext = this.gettext
     if (this.byweekday!.allWeeks && !this.byweekday!.isWeekdays) {
       this.add(gettext('on')).add(
-        this.list(this.byweekday!.allWeeks!, this.weekdaytext)
+        this.list(this.byweekday!.allWeeks, this.weekdaytext)
       )
     }
 
@@ -365,7 +365,7 @@ export default class ToText {
       if (this.byweekday!.allWeeks) this.add(gettext('and'))
 
       this.add(gettext('on the')).add(
-        this.list(this.byweekday!.someWeeks!, this.weekdaytext, gettext('and'))
+        this.list(this.byweekday!.someWeeks, this.weekdaytext, gettext('and'))
       )
     }
   }

@@ -3732,4 +3732,11 @@ describe('RRule', function () {
     expect(() => rule.between(invalidDate, validDate)).to.throw('Invalid date passed in to RRule.between')
     expect(() => rule.between(validDate, invalidDate)).to.throw('Invalid date passed in to RRule.between')
   })
+
+  it('throws an error when interval is NaN', () => {
+    expect(() => new RRule({ interval: undefined })).to.not.throw()
+    expect(() => new RRule({ interval: null })).to.not.throw()
+    expect(() => new RRule({ interval: 1 })).to.not.throw()
+    expect(() => new RRule({ interval: NaN })).to.throw('interval must be a number')
+  })
 })

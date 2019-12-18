@@ -246,7 +246,7 @@ new RRule({
   until: new Date(2018, 2, 31)
 }).all()
 
-[ '2018-02-01T18:30:00.000Z' ]
+[ '2018-02-01T18:30:00.000Z', '2018-03-01T18:30:00.000Z' ]
 
 // RIGHT: Will produce dates with recurrences at the correct time
 new RRule({
@@ -255,7 +255,7 @@ new RRule({
   until: new Date(Date.UTC(2018, 2, 31))
 }).all()
 
-[ '2018-02-01T10:30:00.000Z' ]
+[ '2018-02-01T10:30:00.000Z', '2018-03-01T10:30:00.000Z' ]
 ```
 
 ### API

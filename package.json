@@ -3,7 +3,7 @@
   "version": "2.6.4",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "BSD-3-Clause",
   "keywords": [
     "dates",
     "recurrences",

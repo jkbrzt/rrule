@@ -1,17 +1,17 @@
-import ToText, { DateFormatter, GetText } from './totext'
-import parseText from './parsetext'
-import RRule from '../index'
-import ENGLISH, { Language } from './i18n'
+import ToText, { DateFormatter, GetText } from "./totext";
+import parseText from "./parsetext";
+import RRule from "../index";
+import ENGLISH, { Language } from "./i18n";
 
 /*!
-* rrule.js - Library for working with recurrence rules for calendar dates.
-* https://github.com/jakubroztocil/rrule
-*
-* Copyright 2010, Jakub Roztocil and Lars Schoning
-* Licenced under the BSD licence.
-* https://github.com/jakubroztocil/rrule/blob/master/LICENCE
-*
-*/
+ * rrule.js - Library for working with recurrence rules for calendar dates.
+ * https://github.com/jakubroztocil/rrule
+ *
+ * Copyright 2010, Jakub Roztocil and Lars Schoning
+ * Licenced under the BSD licence.
+ * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+ *
+ */
 
 /**
  *
@@ -94,42 +94,47 @@ import ENGLISH, { Language } from './i18n'
  * @param {String} text
  * @return {Object, Boolean} the rule, or null.
  */
-const fromText = function (text: string, language: Language = ENGLISH) {
-  return new RRule(parseText(text, language) || undefined)
-}
+const fromText = function(text: string, language: Language = ENGLISH) {
+  return new RRule(parseText(text, language) || undefined);
+};
 
 const common = [
-  'count',
-  'until',
-  'interval',
-  'byweekday',
-  'bymonthday',
-  'bymonth'
-]
+  "count",
+  "until",
+  "interval",
+  "byweekday",
+  "bymonthday",
+  "bymonth"
+];
 
-ToText.IMPLEMENTED = []
-ToText.IMPLEMENTED[RRule.HOURLY] = common
-ToText.IMPLEMENTED[RRule.MINUTELY] = common
-ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common)
-ToText.IMPLEMENTED[RRule.WEEKLY] = common
-ToText.IMPLEMENTED[RRule.MONTHLY] = common
-ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
+ToText.IMPLEMENTED = [];
+ToText.IMPLEMENTED[RRule.HOURLY] = common;
+ToText.IMPLEMENTED[RRule.MINUTELY] = common;
+ToText.IMPLEMENTED[RRule.DAILY] = ["byhour", "byminute"].concat(common);
+ToText.IMPLEMENTED[RRule.WEEKLY] = common;
+ToText.IMPLEMENTED[RRule.MONTHLY] = common;
+ToText.IMPLEMENTED[RRule.YEARLY] = ["byweekno", "byyearday"].concat(common);
 
 // =============================================================================
 // Export
 // =============================================================================
 
-const toText = function (rrule: RRule, gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
-  return new ToText(rrule, gettext, language, dateFormatter).toString()
-}
+const toText = function(
+  rrule: RRule,
+  gettext?: GetText,
+  language?: Language,
+  dateFormatter?: DateFormatter
+) {
+  return new ToText(rrule, gettext, language, dateFormatter).toString();
+};
 
-const { isFullyConvertible } = ToText
+const { isFullyConvertible } = ToText;
 
 export interface Nlp {
-  fromText: typeof fromText
-  parseText: typeof parseText
-  isFullyConvertible: typeof isFullyConvertible
-  toText: typeof toText
+  fromText: typeof fromText;
+  parseText: typeof parseText;
+  isFullyConvertible: typeof isFullyConvertible;
+  toText: typeof toText;
 }
 
-export { fromText, parseText, isFullyConvertible, toText }
+export { fromText, parseText, isFullyConvertible, toText };

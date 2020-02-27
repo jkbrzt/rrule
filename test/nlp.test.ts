@@ -17,6 +17,7 @@ const texts = [
   ["Every weekday", "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"],
   ["Every 2 weeks", "RRULE:INTERVAL=2;FREQ=WEEKLY"],
   ["Every month", "RRULE:FREQ=MONTHLY"],
+  ["Every month at 10:30", "RRULE:FREQ=MONTHLY;BYHOUR=10;BYMINUTE=30"],
   ["Every 6 months", "RRULE:INTERVAL=6;FREQ=MONTHLY"],
   ["Every year", "RRULE:FREQ=YEARLY"],
   ["Every year on the 1st Friday", "RRULE:FREQ=YEARLY;BYDAY=+1FR"],

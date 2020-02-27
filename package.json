@@ -1,6 +1,6 @@
 {
-  "name": "rrule",
-  "version": "2.6.4",
+  "name": "@pulsarplatform/rrule",
+  "version": "1.0.2",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "BSD-3-Clause",

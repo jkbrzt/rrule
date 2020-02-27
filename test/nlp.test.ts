@@ -7,15 +7,36 @@ import { DateFormatter } from "../src/nlp/totext";
 const texts = [
   ["Every day", "RRULE:FREQ=DAILY"],
   ["Every day at 10, 12 and 17", "RRULE:FREQ=DAILY;BYHOUR=10,12,17"],
-  ["Every day at 10:30", "RRULE:FREQ=DAILY;BYHOUR=10;BYMINUTE=30"],
+  ["Every day at 10:05", "RRULE:FREQ=DAILY;BYHOUR=10;BYMINUTE=5"],
+  ["Every day at 10:27", "RRULE:FREQ=DAILY;BYHOUR=10;BYMINUTE=27"],
   ["Every week", "RRULE:FREQ=WEEKLY"],
   ["Every week at 10:30", "RRULE:FREQ=WEEKLY;BYHOUR=10;BYMINUTE=30"],
   ["Every hour", "RRULE:FREQ=HOURLY"],
   ["Every 4 hours", "RRULE:INTERVAL=4;FREQ=HOURLY"],
   ["Every week on Tuesday", "RRULE:FREQ=WEEKLY;BYDAY=TU"],
+  [
+    "Every week on Tuesday at 10:42",
+    "RRULE:FREQ=WEEKLY;BYDAY=TU;BYHOUR=10;BYMINUTE=42"
+  ],
+  [
+    "Every week on Tuesday at 10:07",
+    "RRULE:FREQ=WEEKLY;BYDAY=TU;BYHOUR=10;BYMINUTE=7"
+  ],
   ["Every week on Monday, Wednesday", "RRULE:FREQ=WEEKLY;BYDAY=MO,WE"],
+  [
+    "Every week on Monday, Wednesday at 10:07",
+    "RRULE:FREQ=WEEKLY;BYDAY=MO,WE;BYHOUR=10;BYMINUTE=7"
+  ],
   ["Every weekday", "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"],
+  [
+    "Every weekday at 10:07",
+    "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=10;BYMINUTE=7"
+  ],
   ["Every 2 weeks", "RRULE:INTERVAL=2;FREQ=WEEKLY"],
+  [
+    "Every 2 weeks at 10:07",
+    "RRULE:INTERVAL=2;FREQ=WEEKLY;BYHOUR=10;BYMINUTE=7"
+  ],
   ["Every month", "RRULE:FREQ=MONTHLY"],
   ["Every month at 10:30", "RRULE:FREQ=MONTHLY;BYHOUR=10;BYMINUTE=30"],
   ["Every 6 months", "RRULE:INTERVAL=6;FREQ=MONTHLY"],

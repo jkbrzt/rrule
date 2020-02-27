@@ -9,6 +9,7 @@ const texts = [
   ["Every day at 10, 12 and 17", "RRULE:FREQ=DAILY;BYHOUR=10,12,17"],
   ["Every day at 10:30", "RRULE:FREQ=DAILY;BYHOUR=10;BYMINUTE=30"],
   ["Every week", "RRULE:FREQ=WEEKLY"],
+  ["Every week at 10:30", "RRULE:FREQ=WEEKLY;BYHOUR=10;BYMINUTE=30"],
   ["Every hour", "RRULE:FREQ=HOURLY"],
   ["Every 4 hours", "RRULE:INTERVAL=4;FREQ=HOURLY"],
   ["Every week on Tuesday", "RRULE:FREQ=WEEKLY;BYDAY=TU"],

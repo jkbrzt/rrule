@@ -28,7 +28,10 @@
     "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
     "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
-    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
+    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts",
+    "no-can-do": "echo \"Cannot bump version automatically on branch master. Please run 'npm version [major|minor|patch]' manually.\"",
+    "build-version": "if [ $(git symbolic-ref --short HEAD) = master ]; then npm run --silent no-can-do; else npx version-from-git; fi",
+    "publish-version": "npm publish --tag $(if [ $(git symbolic-ref --short HEAD) = master ]; then echo latest; else echo $(git symbolic-ref --short HEAD); fi)"
   },
   "nyc": {
     "extension": [

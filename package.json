@@ -2,7 +2,6 @@
   "name": "@pulsarplatform/rrule",
   "version": "1.0.2-add-npmrc.23207be",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
-  "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "BSD-3-Clause",
   "keywords": [
     "dates",
@@ -17,7 +16,7 @@
   "typings": "dist/esm/src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git://github.com/jakubroztocil/rrule.git"
+    "url": "git://github.com/pulsarplatform/rrule.git"
   },
   "husky": {
     "hooks": {

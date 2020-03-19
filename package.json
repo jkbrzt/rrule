@@ -21,12 +21,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn lint"
+      "pre-commit": "npm run lint"
     }
   },
   "scripts": {
-    "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
-    "lint": "yarn tslint --project . --fix --config tslint.json",
+    "build": "npm run lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
+    "lint": "tslint --project . --fix --config tslint.json",
     "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
     "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts",
     "no-can-do": "echo \"Cannot bump version automatically on branch master. Please run 'npm version [major|minor|patch]' manually.\"",

@@ -1,6 +1,6 @@
 {
   "name": "@pulsarplatform/rrule",
-  "version": "1.0.2-add-npmrc.23207be",
+  "version": "1.0.3",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "license": "BSD-3-Clause",
   "keywords": [

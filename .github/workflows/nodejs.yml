@@ -12,10 +12,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install -g codecov nyc
-      - run: yarn install
-      - run: yarn build
-      - run: TZ=America/Vancouver yarn test
-      - run: TZ=America/Los_Angeles yarn test
-      - run: TZ=Africa/Nairobi yarn test
-      - run: TZ=Asia/Tokyo yarn test-ci
+      - run: npm install
+      - run: npm run-script build
+      - run: TZ=America/Vancouver npm test
+      - run: TZ=America/Los_Angeles npm test
+      - run: TZ=Africa/Nairobi npm test
+      - run: TZ=Asia/Tokyo npm run-script test-ci
       - run: nyc report --reporter=json && codecov -t ${{ secrets.CODECOV_REPO_TOKEN }} -f coverage/*.json

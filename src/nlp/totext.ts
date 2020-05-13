@@ -223,6 +223,8 @@ export default class ToText {
       this._bymonthday()
     } else if (this.byweekday) {
       this._byweekday()
+    } else if (this.origOptions.byhour && this.origOptions.byminute) {
+      this._byhourandminute()
     } else if (this.origOptions.byhour) {
       this._byhour()
     }
@@ -378,6 +380,36 @@ export default class ToText {
     )
   }
 
+  private _byhourandminute () {
+    const gettext = this.gettext
+    const { byhour, byminute } = this.origOptions
+
+    let byhourArray: number[] = []
+    let byminuteArray: number[] = []
+
+    if (Array.isArray(byhour)) {
+      byhourArray = byhour
+    } else if (byhour !== null && byhour !== undefined) {
+      byhourArray = [byhour]
+    }
+
+    if (Array.isArray(byminute)) {
+      byminuteArray = byminute
+    } else if (byminute !== null && byminute !== undefined) {
+      byminuteArray = [byminute]
+    }
+
+    if (byhourArray.length > 0 && byminuteArray.length > 0) {
+      const listOfTimes = byhourArray.reduce<string[]>((acc, hour) => {
+        return acc.concat(byminuteArray.map((minute) => `${hour}:${String(minute).padStart(2, '0')}`))
+      }, [])
+
+      this.add(gettext('at')).add(
+        this.list(listOfTimes, undefined, gettext('and'))
+      )
+    }
+  }
+
   private _bymonth () {
     this.add(
       this.list(this.options.bymonth!, this.monthtext, this.gettext('and'))
@@ -436,7 +468,7 @@ export default class ToText {
     return this
   }
 
-  list (arr: ByWeekday | ByWeekday[], callback?: GetText, finalDelim?: string, delim: string = ',') {
+  list (arr: ByWeekday | Array<ByWeekday | string>, callback?: GetText, finalDelim?: string, delim: string = ',') {
     if (!isArray(arr)) {
       arr = [arr]
     }
@@ -466,7 +498,7 @@ export default class ToText {
         return o.toString()
       }
     const self = this
-    const realCallback = function (arg: ByWeekday) {
+    const realCallback = function (arg: ByWeekday | string) {
       return callback && callback.call(self, arg)
     }
 

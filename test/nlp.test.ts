@@ -26,7 +26,11 @@ const texts = [
   ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
   ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
   // ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
-  ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20']
+  ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
+  ['Every day at 9:10', 'RRULE:FREQ=DAILY;BYHOUR=9;BYMINUTE=10'],
+  ['Every day at 9', 'RRULE:FREQ=DAILY;BYHOUR=9'],
+  ['Every day at 23:10', 'RRULE:FREQ=DAILY;BYHOUR=23;BYMINUTE=10'],
+  ['Every day at 23:00, 23:30, 9:00 and 9:30', 'RRULE:FREQ=DAILY;BYHOUR=23,9;BYMINUTE=0,30'],
 ]
 
 describe('NLP', () => {

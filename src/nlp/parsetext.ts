@@ -321,17 +321,41 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     if (!at) return
 
     do {
-      let n = ttr.acceptNumber()
+      let n = ttr.accept('hourMinuteTime') as RegExpExecArray
       if (!n) {
-        throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour')
-      }
-      options.byhour = [parseInt(n[0], 10)]
-      while (ttr.accept('comma')) {
-        n = ttr.acceptNumber()
+        let n = ttr.acceptNumber()
         if (!n) {
-          throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour')
+          throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour or hour:minute')
         }
-        options.byhour.push(parseInt(n[0], 10))
+        options.byhour = [(parseInt(n[0], 10))]
+      } else {
+        const [fullString, byhour, byminute] = n
+        options.byhour = [parseInt(byhour, 10)]
+        options.byminute = [parseInt(byminute, 10)]
+      }
+
+      while (ttr.accept('comma')) {
+        let n = ttr.accept('hourMinuteTime') as RegExpExecArray
+        if (!n) {
+          let n = ttr.acceptNumber()
+          if (!n) {
+            throw new Error('Unexpected symbol ' + ttr.symbol + ', expected hour or hour:minute')
+          }
+
+          options.byhour.push(parseInt(n[0], 10))
+        } else {
+          const [fullString, byhour, byminute] = n
+          const byhourNumber = parseInt(byhour, 10)
+          const byminuteNumber = parseInt(byminute, 10)
+
+          if (!options.byhour.includes(byhourNumber)) options.byhour.push(byhourNumber)
+
+          if (Array.isArray(options.byminute) && !options.byminute.includes(byminuteNumber)) {
+            if (!options.byminute.includes(byminuteNumber)) options.byminute.push(byminuteNumber)
+          } else {
+            options.byminute = [byminuteNumber]
+          }
+        }
       }
     } while (ttr.accept('comma') || ttr.accept('at'))
   }

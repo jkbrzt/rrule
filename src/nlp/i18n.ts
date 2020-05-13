@@ -23,6 +23,7 @@ const ENGLISH: Language = {
   tokens: {
     'SKIP': /^[ \r\n\t]+|^\.$/,
     'number': /^[1-9][0-9]*/,
+    'hourMinuteTime': /^(2[0-3]|[01]?\d)(?::([0-5]\d))?/,
     'numberAsText': /^(one|two|three)/i,
     'every': /^every/i,
     'day(s)': /^days?/i,

@@ -113,7 +113,7 @@ rruleSet.rdate(new Date(Date.UTC(2012, 6, 1, 10, 30)))
 rruleSet.rdate(new Date(Date.UTC(2012, 6, 2, 10, 30)))
 
 // Add a exclusion rrule to rruleSet
-rruleSet.exrule(new r.RRule({
+rruleSet.exrule(new RRule({
   freq: RRule.MONTHLY,
   count: 2,
   dtstart: new Date(Date.UTC(2012, 2, 1, 10, 30))

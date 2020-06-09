@@ -67,7 +67,7 @@ export namespace dateutil {
   /**
    * @return {Number} the date's timezone offset in ms
    */
-  export const tzOffset = function (date: Date) {
+  export const tzOffset = function (date: Date): number {
     return date.getTimezoneOffset() * 60 * 1000
   }
 
@@ -109,7 +109,7 @@ export namespace dateutil {
   /**
    * @return {Number} python-like weekday
    */
-  export const getWeekday = function (date: Date) {
+  export const getWeekday = function (date: Date): number {
     return PY_WEEKDAYS[date.getUTCDay()]
   }
 

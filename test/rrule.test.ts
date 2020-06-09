@@ -1,9 +1,8 @@
-import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
+import { parse, datetime, testRecurring } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
-import { optionsToString } from '../src/optionstostring';
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -27,7 +26,7 @@ describe('RRule', function () {
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
-  
+
   it('rrulestr itteration not infinite when interval 0', function () {
     ['FREQ=YEARLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=MONTHLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
@@ -3664,12 +3663,9 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
+      const expected = new Date('2013-08-06T18:00:00.000Z') // regardless in which timezone the local time is, the result in UTC must be the same!
 
-      expect(recurrence)
-        .to.deep.equal(
-          expected 
-        )
+      expect(recurrence).to.deep.equal(expected)
 
       resetMockDate()
     })
@@ -3684,12 +3680,9 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.all()[0]
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
+      const expected = new Date('2013-08-06T18:00:00.000Z') // regardless in which timezone the local time is, the result in UTC must be the same!
 
-      expect(recurrence)
-        .to.deep.equal(
-          expected 
-        )
+      expect(recurrence).to.deep.equal(expected)
 
       resetMockDate()
     })
@@ -3704,11 +3697,11 @@ describe('RRule', function () {
         tzid: targetZone
       })
       const recurrence = rule.after(new Date(0))
-      const expected = expectedDate(startDate, currentLocalDate, targetZone)
+      const expected = new Date('2013-08-06T18:00:00.000Z') // regardless in which timezone the local time is, the result in UTC must be the same!
 
       expect(recurrence)
         .to.deep.equal(
-          expected 
+          expected
         )
 
       resetMockDate()

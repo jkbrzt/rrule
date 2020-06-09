@@ -33,8 +33,17 @@ export class DateWithZone {
     }
 
     try {
-      const datetime = DateTime
-        .fromJSDate(this.date)
+      const { date } = this
+      const local = new Date(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+        date.getUTCSeconds(),
+        date.valueOf() % 1000
+      )
+      const datetime = DateTime.fromJSDate(local)
 
       const rezoned = datetime.setZone(this.tzid!, { keepLocalTime: true })
 

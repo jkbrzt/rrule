@@ -28,7 +28,11 @@
     "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
     "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
-    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
+    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts",
+    "test:tz": "npm run test:tz1 && npm run test:tz2 && npm run test:tz3",
+    "test:tz1": "TZ=Asia/Tokyo npm t",
+    "test:tz2": "TZ=Europe/Madrid npm t",
+    "test:tz3": "TZ=America/Chicago npm t"
   },
   "nyc": {
     "extension": [

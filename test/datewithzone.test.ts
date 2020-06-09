@@ -37,8 +37,9 @@ describe('rezonedDate', () => {
     const currentLocalDate = DateTime.local(2000, 2, 6, 1, 0, 0)
     setMockDate(currentLocalDate.toJSDate())
 
-    const d = DateTime.fromISO('20101005T110000').toJSDate()
+    const d = DateTime.fromISO('20101005T110000Z').toJSDate()
     const dt = new DateWithZone(d, targetZone)
+
     expect(dt.rezonedDate()).to.deep.equal(
       expectedDate(DateTime.fromISO('20101005T110000'), currentLocalDate, targetZone)
     )

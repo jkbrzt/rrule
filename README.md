@@ -217,7 +217,7 @@ For more examples see
 
 Optionally, it also supports use of the `TZID` parameter in the
 [RFC](https://tools.ietf.org/html/rfc5545#section-3.2.19)
-when the [Luxon](https://github.com/moment/luxon) library is provided. The 
+when the [Luxon](https://github.com/moment/luxon) library is provided. The
 [specification](https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone)
 and [support matrix](https://moment.github.io/luxon/docs/manual/matrix.html) for Luxon apply.
 
@@ -230,9 +230,9 @@ new RRule({
   tzid: 'Asia/Tokyo'
 }).all()
 
-// assuming the system timezone is set to America/Los_Angeles, you get:
-[ '2018-01-31T17:30:00.000Z' ]
-// which is the time in Los Angeles when it's 2018-02-01T10:30:00 in Tokyo.
+// regardless of the system timezone, you get:
+[ '2018-02-01T01:30:00.000Z' ]
+// which is the time in UTC when it's 2018-02-01T10:30:00 in Tokyo.
 ```
 
 Whether or not you use the `TZID` param, make sure to only use JS `Date` objects that are
@@ -243,19 +243,22 @@ represented in UTC to avoid unexpected timezone offsets being applied, for examp
 new RRule({
   freq: RRule.MONTHLY,
   dtstart: new Date(2018, 1, 1, 10, 30),
-  until: new Date(2018, 2, 31)
+  until: new Date(2018, 2, 31),
+  tzid: 'Asia/Tokyo'
 }).all()
 
-[ '2018-02-01T18:30:00.000Z', '2018-03-01T18:30:00.000Z' ]
+// assuming your local timezone is Asia/Tokyo
+[ '2018-01-31T16:30:00.000Z', '2018-02-28T16:30:00.000Z' ]
 
 // RIGHT: Will produce dates with recurrences at the correct time
 new RRule({
   freq: RRule.MONTHLY,
   dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
-  until: new Date(Date.UTC(2018, 2, 31))
+  until: new Date(Date.UTC(2018, 2, 31)),
+  tzid: 'Asia/Tokyo'
 }).all()
 
-[ '2018-02-01T10:30:00.000Z', '2018-03-01T10:30:00.000Z' ]
+[ '2018-02-01T01:30:00.000Z', '2018-03-01T01:30:00.000Z' ]
 ```
 
 ### API
@@ -824,4 +827,3 @@ more details.
 #### Related projects
 
 * https://rrules.com/ — RESTful API to get back occurrences of RRULEs that conform to RFC 5545.
-

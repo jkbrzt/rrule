@@ -207,7 +207,17 @@ DateTime.fromJSDate(date)
   2018-11-08T02:00:00.000Z ]
 // These times are in true UTC; you can see the hours shift
 ```
+It is also possible with moment-timezone js.
+```js
+//Note: do this very carefully
+rule.all().map(date => 
+  moment(date)
+    .utc()
+    .tz(moment.tz.guess(), true)
+    .toDate()
+)
 
+```
 For more examples see
 [python-dateutil](http://labix.org/python-dateutil/) documentation.
 

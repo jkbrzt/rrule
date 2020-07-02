@@ -63,7 +63,7 @@ class Parser {
         this.value = null
         return
       }
-    // @ts-ignore
+      // @ts-ignore
     } while (bestSymbol === 'SKIP')
 
     // @ts-ignore
@@ -119,6 +119,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
         options.freq = RRule.DAILY
         if (ttr.nextSymbol()) {
           AT()
+          COLON()
           F()
         }
         break
@@ -127,14 +128,10 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       // DAILY on weekdays is not a valid rule
       case 'weekday(s)':
         options.freq = RRule.WEEKLY
-        options.byweekday = [
-          RRule.MO,
-          RRule.TU,
-          RRule.WE,
-          RRule.TH,
-          RRule.FR
-        ]
+        options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR]
         ttr.nextSymbol()
+        AT()
+        COLON()
         F()
         break
 
@@ -142,6 +139,8 @@ export default function parseText (text: string, language: Language = ENGLISH) {
         options.freq = RRule.WEEKLY
         if (ttr.nextSymbol()) {
           ON()
+          AT()
+          COLON()
           F()
         }
         break
@@ -166,6 +165,8 @@ export default function parseText (text: string, language: Language = ENGLISH) {
         options.freq = RRule.MONTHLY
         if (ttr.nextSymbol()) {
           ON()
+          AT()
+          COLON()
           F()
         }
         break
@@ -186,7 +187,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       case 'saturday':
       case 'sunday':
         options.freq = RRule.WEEKLY
-        const key: WeekdayStr = ttr.symbol.substr(0, 2).toUpperCase() as WeekdayStr
+        const key: WeekdayStr = ttr.symbol
+          .substr(0, 2)
+          .toUpperCase() as WeekdayStr
         options.byweekday = [RRule[key]]
 
         if (!ttr.nextSymbol()) return
@@ -197,7 +200,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
 
           let wkd = decodeWKD() as keyof typeof RRule
           if (!wkd) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + ', expected weekday'
+            )
           }
 
           // @ts-ignore
@@ -231,7 +236,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
 
           let m = decodeM()
           if (!m) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + ', expected month')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + ', expected month'
+            )
           }
 
           options.bymonth.push(m)
@@ -294,13 +301,17 @@ export default function parseText (text: string, language: Language = ENGLISH) {
         ttr.nextSymbol()
         let n = ttr.acceptNumber()
         if (!n) {
-          throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number')
+          throw new Error(
+            'Unexpected symbol ' + ttr.symbol + ', expected week number'
+          )
         }
         options.byweekno = [parseInt(n[0], 10)]
         while (ttr.accept('comma')) {
           n = ttr.acceptNumber()
           if (!n) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + '; expected monthday'
+            )
           }
           options.byweekno.push(parseInt(n[0], 10))
         }
@@ -329,11 +340,28 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       while (ttr.accept('comma')) {
         n = ttr.acceptNumber()
         if (!n) {
-          throw new Error('Unexpected symbol ' + ttr.symbol + '; expected hour')
+          throw new Error(
+            'Unexpected symbol ' + ttr.symbol + '; expected hour'
+          )
         }
         options.byhour.push(parseInt(n[0], 10))
       }
     } while (ttr.accept('comma') || ttr.accept('at'))
+  }
+
+  function COLON () {
+    const colon = ttr.accept('colon')
+    if (!colon) return
+
+    do {
+      let m = parseInt(ttr.acceptNumber()[0], 10)
+      if (!m) {
+        throw new Error(
+          'Unexpected symbol ' + ttr.symbol + ', expected minutes'
+        )
+      }
+      options.byminute = m
+    } while (ttr.accept('colon'))
   }
 
   function decodeM () {
@@ -421,7 +449,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     while (ttr.accept('comma')) {
       nth = decodeNTH()
       if (!nth) {
-        throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
+        throw new Error(
+          'Unexpected symbol ' + ttr.symbol + '; expected monthday'
+        )
       }
 
       options.bymonthday.push(nth)

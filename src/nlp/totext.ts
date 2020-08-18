@@ -192,7 +192,7 @@ export default class ToText {
     this.add(
       this.plural(this.options.interval!)
         ? gettext('minutes')
-        : gettext('minutes')
+        : gettext('minute')
     )
   }
 

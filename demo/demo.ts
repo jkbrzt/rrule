@@ -1,10 +1,24 @@
 import * as $ from 'jquery'
-import { RRule, Options, Weekday } from '../src/index'
 
-const getDay = (i: number) =>
-  [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU][i]
+import { RRule, Weekday, Options } from '../src/index'
 
-const makeArray = (s: string | string[]) => (Array.isArray(s) ? s : [s])
+// Make library accessible to browser debuggers so users can try things out themselves
+// tslint:disable-next-line:no-duplicate-imports
+import * as rruleExports from '../src/index'
+$.extend(window, rruleExports)
+
+const getDay = (i: number) => [
+  RRule.MO,
+  RRule.TU,
+  RRule.WE,
+  RRule.TH,
+  RRule.FR,
+  RRule.SA,
+  RRule.SU
+][i]
+
+const makeArray = (s: string | string[]) =>
+  Array.isArray(s) ? s : [s]
 
 const getFormValues = function ($form: JQuery<HTMLElement>) {
   const paramObj: { [K in keyof Partial<Options>]: string | string[] } = {}

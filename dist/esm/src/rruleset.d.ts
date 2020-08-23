@@ -1,11 +1,12 @@
 import RRule from './rrule';
 import IterResult from './iterresult';
-import { QueryMethodTypes } from './types';
+import { QueryMethodTypes, IterResultType } from './types';
 export default class RRuleSet extends RRule {
     readonly _rrule: RRule[];
     readonly _rdate: Date[];
     readonly _exrule: RRule[];
     readonly _exdate: Date[];
+    private _dtstart?;
     private _tzid?;
     /**
      *
@@ -14,8 +15,9 @@ export default class RRuleSet extends RRule {
      * @constructor
      */
     constructor(noCache?: boolean);
-    tzid(tzid?: string): string | undefined;
-    _iter<M extends QueryMethodTypes>(iterResult: IterResult<M>): import("./types").IterResultType<M>;
+    dtstart: any;
+    tzid: any;
+    _iter<M extends QueryMethodTypes>(iterResult: IterResult<M>): IterResultType<M>;
     /**
      * Adds an RRule to the set
      *
@@ -40,6 +42,30 @@ export default class RRuleSet extends RRule {
      * @param {Date}
      */
     exdate(date: Date): void;
+    /**
+     * Get list of included rrules in this recurrence set.
+     *
+     * @return List of rrules
+     */
+    rrules(): (RRule | RRuleSet)[];
+    /**
+     * Get list of excluded rrules in this recurrence set.
+     *
+     * @return List of exrules
+     */
+    exrules(): (RRule | RRuleSet)[];
+    /**
+     * Get list of included datetimes in this recurrence set.
+     *
+     * @return List of rdates
+     */
+    rdates(): Date[];
+    /**
+     * Get list of included datetimes in this recurrence set.
+     *
+     * @return List of exdates
+     */
+    exdates(): Date[];
     valueOf(): string[];
     /**
      * to generate recurrence field such as:

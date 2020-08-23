@@ -186,8 +186,8 @@ var RRule = /** @class */ (function () {
      * Will convert all rules described in nlp:ToText
      * to text.
      */
-    RRule.prototype.toText = function (gettext, language) {
-        return getnlp().toText(this, gettext, language);
+    RRule.prototype.toText = function (gettext, language, dateFormatter) {
+        return getnlp().toText(this, gettext, language, dateFormatter);
     };
     RRule.prototype.isFullyConvertibleToText = function () {
         return getnlp().isFullyConvertible(this);

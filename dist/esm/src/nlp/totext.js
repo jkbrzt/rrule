@@ -11,6 +11,7 @@ var contains = function (arr, val) {
     return arr.indexOf(val) !== -1;
 };
 var defaultGetText = function (id) { return id.toString(); };
+var defaultDateFormatter = function (year, month, day) { return month + " " + day + ", " + year; };
 /**
  *
  * @param {RRule} rrule
@@ -20,12 +21,14 @@ var defaultGetText = function (id) { return id.toString(); };
  * @constructor
  */
 var ToText = /** @class */ (function () {
-    function ToText(rrule, gettext, language) {
+    function ToText(rrule, gettext, language, dateFormatter) {
         if (gettext === void 0) { gettext = defaultGetText; }
         if (language === void 0) { language = ENGLISH; }
+        if (dateFormatter === void 0) { dateFormatter = defaultDateFormatter; }
         this.text = [];
         this.language = language || ENGLISH;
         this.gettext = gettext;
+        this.dateFormatter = dateFormatter;
         this.rrule = rrule;
         this.options = rrule.options;
         this.origOptions = rrule.origOptions;
@@ -119,9 +122,7 @@ var ToText = /** @class */ (function () {
         if (this.options.until) {
             this.add(gettext('until'));
             var until = this.options.until;
-            this.add(this.language.monthNames[until.getUTCMonth()])
-                .add(until.getUTCDate() + ',')
-                .add(until.getUTCFullYear().toString());
+            this.add(this.dateFormatter(until.getUTCFullYear(), this.language.monthNames[until.getUTCMonth()], until.getUTCDate()));
         }
         else if (this.options.count) {
             this.add(gettext('for'))
@@ -144,7 +145,7 @@ var ToText = /** @class */ (function () {
             this.add(this.options.interval.toString());
         this.add(this.plural(this.options.interval)
             ? gettext('minutes')
-            : gettext('minutes'));
+            : gettext('minute'));
     };
     ToText.prototype.DAILY = function () {
         var gettext = this.gettext;

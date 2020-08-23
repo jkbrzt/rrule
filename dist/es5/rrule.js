@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("luxon"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["luxon"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["rrule"] = factory(require("luxon"));
+		exports["rrule"] = factory();
 	else
-		root["rrule"] = factory(root["luxon"]);
-})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE__2__) {
+		root["rrule"] = factory();
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -101,26 +101,32 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return isPresent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isNumber; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return isWeekdayStr; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return range; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return range; });
 /* unused harmony export clone */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return repeat; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return toArray; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return padStart; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return split; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return pymod; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return repeat; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return toArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return padStart; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return split; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return pymod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return divmod; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return empty; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return notEmpty; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return notEmpty; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return includes; });
+/* harmony import */ var _weekday__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
 // =============================================================================
 // Helper functions
 // =============================================================================
+
 var isPresent = function (value) {
     return value !== null && value !== undefined;
 };
 var isNumber = function (value) {
     return typeof value === 'number';
+};
+var isWeekdayStr = function (value) {
+    return _weekday__WEBPACK_IMPORTED_MODULE_0__[/* ALL_WEEKDAYS */ "a"].indexOf(value) >= 0;
 };
 var isArray = Array.isArray;
 /**
@@ -364,13 +370,13 @@ var dateutil_dateutil;
         if (utc === void 0) { utc = true; }
         var date = new Date(time);
         return [
-            Object(helpers["h" /* padStart */])(date.getUTCFullYear().toString(), 4, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCMonth() + 1, 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCDate(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCFullYear().toString(), 4, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCMonth() + 1, 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCDate(), 2, '0'),
             'T',
-            Object(helpers["h" /* padStart */])(date.getUTCHours(), 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCMinutes(), 2, '0'),
-            Object(helpers["h" /* padStart */])(date.getUTCSeconds(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCHours(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCMinutes(), 2, '0'),
+            Object(helpers["i" /* padStart */])(date.getUTCSeconds(), 2, '0'),
             utc ? 'Z' : ''
         ].join('');
     };
@@ -472,26 +478,212 @@ var IterResult = /** @class */ (function () {
 }());
 /* harmony default export */ var iterresult = (IterResult);
 
-// CONCATENATED MODULE: ./src/callbackiterresult.ts
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
+// CONCATENATED MODULE: ./node_modules/tslib/tslib.es6.js
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
     }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    return __assign.apply(this, arguments);
+}
+
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __metadata(metadataKey, metadataValue) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function __exportStar(m, exports) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+
+function __values(o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
     };
-})();
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
+function __spread() {
+    for (var ar = [], i = 0; i < arguments.length; i++)
+        ar = ar.concat(__read(arguments[i]));
+    return ar;
+}
+
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
+
+function __await(v) {
+    return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+    var i, p;
+    return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; } : f; }
+}
+
+function __asyncValues(o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+}
+
+function __makeTemplateObject(cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+
+function __importStar(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result.default = mod;
+    return result;
+}
+
+function __importDefault(mod) {
+    return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+// CONCATENATED MODULE: ./src/callbackiterresult.ts
+
 
 /**
  * IterResult subclass that calls a callback function on each add,
  * and stops iterating when the callback returns false.
  */
-var CallbackIterResult = /** @class */ (function (_super) {
+var callbackiterresult_CallbackIterResult = /** @class */ (function (_super) {
     __extends(CallbackIterResult, _super);
     function CallbackIterResult(method, args, iterator) {
         var _this = _super.call(this, method, args) || this;
@@ -507,7 +699,7 @@ var CallbackIterResult = /** @class */ (function (_super) {
     };
     return CallbackIterResult;
 }(iterresult));
-/* harmony default export */ var callbackiterresult = (CallbackIterResult);
+/* harmony default export */ var callbackiterresult = (callbackiterresult_CallbackIterResult);
 
 // CONCATENATED MODULE: ./src/types.ts
 var Frequency;
@@ -524,55 +716,11 @@ function freqIsDailyOrGreater(freq) {
     return freq < Frequency.HOURLY;
 }
 
-// CONCATENATED MODULE: ./src/weekday.ts
-// =============================================================================
-// Weekday
-// =============================================================================
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
-var Weekday = /** @class */ (function () {
-    function Weekday(weekday, n) {
-        if (n === 0)
-            throw new Error("Can't create weekday with n == 0");
-        this.weekday = weekday;
-        this.n = n;
-    }
-    // __call__ - Cannot call the object directly, do it through
-    // e.g. RRule.TH.nth(-1) instead,
-    Weekday.prototype.nth = function (n) {
-        return this.n === n ? this : new Weekday(this.weekday, n);
-    };
-    // __eq__
-    Weekday.prototype.equals = function (other) {
-        return this.weekday === other.weekday && this.n === other.n;
-    };
-    // __repr__
-    Weekday.prototype.toString = function () {
-        var s = WDAYS[this.weekday];
-        if (this.n)
-            s = (this.n > 0 ? '+' : '') + String(this.n) + s;
-        return s;
-    };
-    Weekday.prototype.getJsWeekday = function () {
-        return this.weekday === 6 ? 0 : this.weekday + 1;
-    };
-    return Weekday;
-}());
-
+// EXTERNAL MODULE: ./src/weekday.ts
+var weekday = __webpack_require__(2);
 
 // CONCATENATED MODULE: ./src/datetime.ts
-var datetime_extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
+
 
 
 
@@ -603,7 +751,7 @@ var Time = /** @class */ (function () {
 }());
 
 var datetime_DateTime = /** @class */ (function (_super) {
-    datetime_extends(DateTime, _super);
+    __extends(DateTime, _super);
     function DateTime(year, month, day, hour, minute, second, millisecond) {
         var _this = _super.call(this, hour, minute, second, millisecond) || this;
         _this.year = year;
@@ -636,7 +784,7 @@ var datetime_DateTime = /** @class */ (function (_super) {
         this.month += months;
         if (this.month > 12) {
             var yearDiv = Math.floor(this.month / 12);
-            var monthMod = Object(helpers["i" /* pymod */])(this.month, 12);
+            var monthMod = Object(helpers["j" /* pymod */])(this.month, 12);
             this.month = monthMod;
             this.year += yearDiv;
             if (this.month === 0) {
@@ -757,32 +905,25 @@ var datetime_DateTime = /** @class */ (function (_super) {
 
 
 
+
 function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
-    var initializedOptions = {};
     // Shallow copy for options and origOptions and check for invalid
-    keys.forEach(function (key) {
-        var value = options[key];
-        initializedOptions[key] = value;
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
         if (!Object(helpers["c" /* includes */])(rrule_defaultKeys, key))
             invalid.push(key);
-        if (src_dateutil.isDate(value) && !src_dateutil.isValidDate(value))
+        if (src_dateutil.isDate(options[key]) && !src_dateutil.isValidDate(options[key]))
             invalid.push(key);
-    });
+    }
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    return initializedOptions;
+    return __assign({}, options);
 }
 function parseOptions(options) {
-    var opts = initializeOptions(options);
-    var keys = Object.keys(options);
-    // Merge in default options
-    rrule_defaultKeys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(keys, key) || !Object(helpers["f" /* isPresent */])(opts[key]))
-            opts[key] = DEFAULT_OPTIONS[key];
-    });
+    var opts = __assign(__assign({}, DEFAULT_OPTIONS), initializeOptions(options));
     if (Object(helpers["f" /* isPresent */])(opts.byeaster))
         opts.freq = src_rrule.YEARLY;
     if (!(Object(helpers["f" /* isPresent */])(opts.freq) && src_rrule.FREQUENCIES[opts.freq])) {
@@ -810,10 +951,10 @@ function parseOptions(options) {
         }
     }
     if (!(Boolean(opts.byweekno) ||
-        Object(helpers["g" /* notEmpty */])(opts.byweekno) ||
-        Object(helpers["g" /* notEmpty */])(opts.byyearday) ||
+        Object(helpers["h" /* notEmpty */])(opts.byweekno) ||
+        Object(helpers["h" /* notEmpty */])(opts.byyearday) ||
         Boolean(opts.bymonthday) ||
-        Object(helpers["g" /* notEmpty */])(opts.bymonthday) ||
+        Object(helpers["h" /* notEmpty */])(opts.bymonthday) ||
         Object(helpers["f" /* isPresent */])(opts.byweekday) ||
         Object(helpers["f" /* isPresent */])(opts.byeaster))) {
         switch (opts.freq) {
@@ -880,7 +1021,11 @@ function parseOptions(options) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
-    else if (opts.byweekday instanceof Weekday) {
+    else if (Object(helpers["g" /* isWeekdayStr */])(opts.byweekday)) {
+        opts.byweekday = [weekday["b" /* Weekday */].fromStr(opts.byweekday).weekday];
+        opts.bynweekday = null;
+    }
+    else if (opts.byweekday instanceof weekday["b" /* Weekday */]) {
         if (!opts.byweekday.n || opts.freq > src_rrule.MONTHLY) {
             opts.byweekday = [opts.byweekday.weekday];
             opts.bynweekday = null;
@@ -899,16 +1044,19 @@ function parseOptions(options) {
                 byweekday.push(wday);
                 continue;
             }
-            var wd = wday;
-            if (!wd.n || opts.freq > src_rrule.MONTHLY) {
-                byweekday.push(wd.weekday);
+            else if (Object(helpers["g" /* isWeekdayStr */])(wday)) {
+                byweekday.push(weekday["b" /* Weekday */].fromStr(wday).weekday);
+                continue;
+            }
+            if (!wday.n || opts.freq > src_rrule.MONTHLY) {
+                byweekday.push(wday.weekday);
             }
             else {
-                bynweekday.push([wd.weekday, wd.n]);
+                bynweekday.push([wday.weekday, wday.n]);
             }
         }
-        opts.byweekday = Object(helpers["g" /* notEmpty */])(byweekday) ? byweekday : null;
-        opts.bynweekday = Object(helpers["g" /* notEmpty */])(bynweekday) ? bynweekday : null;
+        opts.byweekday = Object(helpers["h" /* notEmpty */])(byweekday) ? byweekday : null;
+        opts.bynweekday = Object(helpers["h" /* notEmpty */])(bynweekday) ? bynweekday : null;
     }
     // byhour
     if (!Object(helpers["f" /* isPresent */])(opts.byhour)) {
@@ -953,24 +1101,14 @@ function buildTimeset(opts) {
 }
 
 // CONCATENATED MODULE: ./src/parsestring.ts
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
+
 
 
 
 
 function parseString(rfcString) {
     var options = rfcString.split('\n').map(parseLine).filter(function (x) { return x !== null; });
-    return __assign({}, options[0], options[1]);
+    return __assign(__assign({}, options[0]), options[1]);
 }
 function parseDtstart(line) {
     var options = {};
@@ -1075,17 +1213,21 @@ function parseWeekday(value) {
             // MO, TU, ...
             return Days[day]; // wday instanceof Weekday
         }
-        // -1MO, +3FR, 1SO, ...
-        var parts = day.match(/^([+-]?\d)([A-Z]{2})$/);
+        // -1MO, +3FR, 1SO, 13TU ...
+        var parts = day.match(/^([+-]?\d{1,2})([A-Z]{2})$/);
         var n = Number(parts[1]);
         var wdaypart = parts[2];
         var wday = Days[wdaypart].weekday;
-        return new Weekday(wday, n);
+        return new weekday["b" /* Weekday */](wday, n);
     });
 }
 
-// EXTERNAL MODULE: external "luxon"
-var external_luxon_ = __webpack_require__(2);
+// CONCATENATED MODULE: ./src/fake-luxon.ts
+var fake_luxon_DateTime = {
+    fromJSDate: function () {
+        throw new TypeError();
+    }
+};
 
 // CONCATENATED MODULE: ./src/datewithzone.ts
 
@@ -1117,7 +1259,7 @@ var datewithzone_DateWithZone = /** @class */ (function () {
             return this.date;
         }
         try {
-            var datetime = external_luxon_["DateTime"]
+            var datetime = fake_luxon_DateTime
                 .fromJSDate(this.date);
             var rezoned = datetime.setZone(this.tzid, { keepLocalTime: true });
             return rezoned.toJSDate();
@@ -1160,7 +1302,7 @@ function optionsToString(options) {
                 break;
             case 'WKST':
                 if (Object(helpers["e" /* isNumber */])(value)) {
-                    outValue = new Weekday(value).toString();
+                    outValue = new weekday["b" /* Weekday */](value).toString();
                 }
                 else {
                     outValue = value.toString();
@@ -1179,14 +1321,14 @@ function optionsToString(options) {
       
                 */
                 key = 'BYDAY';
-                outValue = Object(helpers["m" /* toArray */])(value).map(function (wday) {
-                    if (wday instanceof Weekday) {
+                outValue = Object(helpers["n" /* toArray */])(value).map(function (wday) {
+                    if (wday instanceof weekday["b" /* Weekday */]) {
                         return wday;
                     }
                     if (Object(helpers["d" /* isArray */])(wday)) {
-                        return new Weekday(wday[0], wday[1]);
+                        return new weekday["b" /* Weekday */](wday[0], wday[1]);
                     }
-                    return new Weekday(wday);
+                    return new weekday["b" /* Weekday */](wday);
                 }).toString();
                 break;
             case 'DTSTART':
@@ -1316,46 +1458,37 @@ var cache_Cache = /** @class */ (function () {
 
 // CONCATENATED MODULE: ./src/masks.ts
 
+
 // =============================================================================
 // Date masks
 // =============================================================================
 // Every mask is 7 days longer to handle cross-year weekly periods.
-var M365MASK = Object(helpers["k" /* repeat */])(1, 31).concat(Object(helpers["k" /* repeat */])(2, 28), Object(helpers["k" /* repeat */])(3, 31), Object(helpers["k" /* repeat */])(4, 30), Object(helpers["k" /* repeat */])(5, 31), Object(helpers["k" /* repeat */])(6, 30), Object(helpers["k" /* repeat */])(7, 31), Object(helpers["k" /* repeat */])(8, 31), Object(helpers["k" /* repeat */])(9, 30), Object(helpers["k" /* repeat */])(10, 31), Object(helpers["k" /* repeat */])(11, 30), Object(helpers["k" /* repeat */])(12, 31), Object(helpers["k" /* repeat */])(1, 7));
-var M366MASK = Object(helpers["k" /* repeat */])(1, 31).concat(Object(helpers["k" /* repeat */])(2, 29), Object(helpers["k" /* repeat */])(3, 31), Object(helpers["k" /* repeat */])(4, 30), Object(helpers["k" /* repeat */])(5, 31), Object(helpers["k" /* repeat */])(6, 30), Object(helpers["k" /* repeat */])(7, 31), Object(helpers["k" /* repeat */])(8, 31), Object(helpers["k" /* repeat */])(9, 30), Object(helpers["k" /* repeat */])(10, 31), Object(helpers["k" /* repeat */])(11, 30), Object(helpers["k" /* repeat */])(12, 31), Object(helpers["k" /* repeat */])(1, 7));
-var M28 = Object(helpers["j" /* range */])(1, 29);
-var M29 = Object(helpers["j" /* range */])(1, 30);
-var M30 = Object(helpers["j" /* range */])(1, 31);
-var M31 = Object(helpers["j" /* range */])(1, 32);
-var MDAY366MASK = M31.concat(M29, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
-var MDAY365MASK = M31.concat(M28, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
-var NM28 = Object(helpers["j" /* range */])(-28, 0);
-var NM29 = Object(helpers["j" /* range */])(-29, 0);
-var NM30 = Object(helpers["j" /* range */])(-30, 0);
-var NM31 = Object(helpers["j" /* range */])(-31, 0);
-var NMDAY366MASK = NM31.concat(NM29, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
-var NMDAY365MASK = NM31.concat(NM28, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
+var M365MASK = __spreadArrays(Object(helpers["l" /* repeat */])(1, 31), Object(helpers["l" /* repeat */])(2, 28), Object(helpers["l" /* repeat */])(3, 31), Object(helpers["l" /* repeat */])(4, 30), Object(helpers["l" /* repeat */])(5, 31), Object(helpers["l" /* repeat */])(6, 30), Object(helpers["l" /* repeat */])(7, 31), Object(helpers["l" /* repeat */])(8, 31), Object(helpers["l" /* repeat */])(9, 30), Object(helpers["l" /* repeat */])(10, 31), Object(helpers["l" /* repeat */])(11, 30), Object(helpers["l" /* repeat */])(12, 31), Object(helpers["l" /* repeat */])(1, 7));
+var M366MASK = __spreadArrays(Object(helpers["l" /* repeat */])(1, 31), Object(helpers["l" /* repeat */])(2, 29), Object(helpers["l" /* repeat */])(3, 31), Object(helpers["l" /* repeat */])(4, 30), Object(helpers["l" /* repeat */])(5, 31), Object(helpers["l" /* repeat */])(6, 30), Object(helpers["l" /* repeat */])(7, 31), Object(helpers["l" /* repeat */])(8, 31), Object(helpers["l" /* repeat */])(9, 30), Object(helpers["l" /* repeat */])(10, 31), Object(helpers["l" /* repeat */])(11, 30), Object(helpers["l" /* repeat */])(12, 31), Object(helpers["l" /* repeat */])(1, 7));
+var M28 = Object(helpers["k" /* range */])(1, 29);
+var M29 = Object(helpers["k" /* range */])(1, 30);
+var M30 = Object(helpers["k" /* range */])(1, 31);
+var M31 = Object(helpers["k" /* range */])(1, 32);
+var MDAY366MASK = __spreadArrays(M31, M29, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
+var MDAY365MASK = __spreadArrays(M31, M28, M31, M30, M31, M30, M31, M31, M30, M31, M30, M31, M31.slice(0, 7));
+var NM28 = Object(helpers["k" /* range */])(-28, 0);
+var NM29 = Object(helpers["k" /* range */])(-29, 0);
+var NM30 = Object(helpers["k" /* range */])(-30, 0);
+var NM31 = Object(helpers["k" /* range */])(-31, 0);
+var NMDAY366MASK = __spreadArrays(NM31, NM29, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
+var NMDAY365MASK = __spreadArrays(NM31, NM28, NM31, NM30, NM31, NM30, NM31, NM31, NM30, NM31, NM30, NM31, NM31.slice(0, 7));
 var M366RANGE = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366];
 var M365RANGE = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
 var WDAYMASK = (function () {
     var wdaymask = [];
     for (var i = 0; i < 55; i++)
-        wdaymask = wdaymask.concat(Object(helpers["j" /* range */])(7));
+        wdaymask = wdaymask.concat(Object(helpers["k" /* range */])(7));
     return wdaymask;
 })();
 
 
 // CONCATENATED MODULE: ./src/iterinfo/yearinfo.ts
-var yearinfo_assign = (undefined && undefined.__assign) || function () {
-    yearinfo_assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return yearinfo_assign.apply(this, arguments);
-};
+
 
 
 
@@ -1365,23 +1498,23 @@ function rebuildYear(year, options) {
     var nextyearlen = src_dateutil.isLeapYear(year + 1) ? 366 : 365;
     var yearordinal = src_dateutil.toOrdinal(firstyday);
     var yearweekday = src_dateutil.getWeekday(firstyday);
-    var result = yearinfo_assign({ yearlen: yearlen,
+    var result = __assign(__assign({ yearlen: yearlen,
         nextyearlen: nextyearlen,
         yearordinal: yearordinal,
-        yearweekday: yearweekday }, baseYearMasks(year), { wnomask: null });
+        yearweekday: yearweekday }, baseYearMasks(year)), { wnomask: null });
     if (Object(helpers["b" /* empty */])(options.byweekno)) {
         return result;
     }
-    result.wnomask = Object(helpers["k" /* repeat */])(0, yearlen + 7);
+    result.wnomask = Object(helpers["l" /* repeat */])(0, yearlen + 7);
     var firstwkst;
     var wyearlen;
-    var no1wkst = firstwkst = Object(helpers["i" /* pymod */])(7 - yearweekday + options.wkst, 7);
+    var no1wkst = firstwkst = Object(helpers["j" /* pymod */])(7 - yearweekday + options.wkst, 7);
     if (no1wkst >= 4) {
         no1wkst = 0;
         // Number of days in the year, plus the days we got
         // from last year.
         wyearlen =
-            result.yearlen + Object(helpers["i" /* pymod */])(yearweekday - options.wkst, 7);
+            result.yearlen + Object(helpers["j" /* pymod */])(yearweekday - options.wkst, 7);
     }
     else {
         // Number of days in the year, minus the days we
@@ -1389,7 +1522,7 @@ function rebuildYear(year, options) {
         wyearlen = yearlen - no1wkst;
     }
     var div = Math.floor(wyearlen / 7);
-    var mod = Object(helpers["i" /* pymod */])(wyearlen, 7);
+    var mod = Object(helpers["j" /* pymod */])(wyearlen, 7);
     var numweeks = Math.floor(div + mod / 4);
     for (var j = 0; j < options.byweekno.length; j++) {
         var n = options.byweekno[j];
@@ -1443,17 +1576,17 @@ function rebuildYear(year, options) {
         var lnumweeks = void 0;
         if (!Object(helpers["c" /* includes */])(options.byweekno, -1)) {
             var lyearweekday = src_dateutil.getWeekday(new Date(Date.UTC(year - 1, 0, 1)));
-            var lno1wkst = Object(helpers["i" /* pymod */])(7 - lyearweekday.valueOf() + options.wkst, 7);
+            var lno1wkst = Object(helpers["j" /* pymod */])(7 - lyearweekday.valueOf() + options.wkst, 7);
             var lyearlen = src_dateutil.isLeapYear(year - 1) ? 366 : 365;
             var weekst = void 0;
             if (lno1wkst >= 4) {
                 lno1wkst = 0;
-                weekst = lyearlen + Object(helpers["i" /* pymod */])(lyearweekday - options.wkst, 7);
+                weekst = lyearlen + Object(helpers["j" /* pymod */])(lyearweekday - options.wkst, 7);
             }
             else {
                 weekst = yearlen - no1wkst;
             }
-            lnumweeks = Math.floor(52 + Object(helpers["i" /* pymod */])(weekst, 7) / 4);
+            lnumweeks = Math.floor(52 + Object(helpers["j" /* pymod */])(weekst, 7) / 4);
         }
         else {
             lnumweeks = -1;
@@ -1516,7 +1649,7 @@ function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
     }
     // Weekly frequency won't get here, so we may not
     // care about cross-year weekly periods.
-    result.nwdaymask = Object(helpers["k" /* repeat */])(0, yearlen);
+    result.nwdaymask = Object(helpers["l" /* repeat */])(0, yearlen);
     for (var j = 0; j < ranges.length; j++) {
         var rang = ranges[j];
         var first = rang[0];
@@ -1526,11 +1659,11 @@ function rebuildMonth(year, month, yearlen, mrange, wdaymask, options) {
             var _a = options.bynweekday[k], wday = _a[0], n = _a[1];
             if (n < 0) {
                 i = last + (n + 1) * 7;
-                i -= Object(helpers["i" /* pymod */])(wdaymask[i] - wday, 7);
+                i -= Object(helpers["j" /* pymod */])(wdaymask[i] - wday, 7);
             }
             else {
                 i = first + (n - 1) * 7;
-                i += Object(helpers["i" /* pymod */])(7 - wdaymask[i] + wday, 7);
+                i += Object(helpers["j" /* pymod */])(7 - wdaymask[i] + wday, 7);
             }
             if (first <= i && i <= last)
                 result.nwdaymask[i] = 1;
@@ -1581,7 +1714,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         if (year !== this.lastyear) {
             this.yearinfo = rebuildYear(year, options);
         }
-        if (Object(helpers["g" /* notEmpty */])(options.bynweekday) &&
+        if (Object(helpers["h" /* notEmpty */])(options.bynweekday) &&
             (month !== this.lastmonth || year !== this.lastyear)) {
             var _a = this.yearinfo, yearlen = _a.yearlen, mrange = _a.mrange, wdaymask = _a.wdaymask;
             this.monthinfo = rebuildMonth(year, month, yearlen, mrange, wdaymask, options);
@@ -1675,19 +1808,19 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         configurable: true
     });
     Iterinfo.prototype.ydayset = function () {
-        return [Object(helpers["j" /* range */])(this.yearlen), 0, this.yearlen];
+        return [Object(helpers["k" /* range */])(this.yearlen), 0, this.yearlen];
     };
     Iterinfo.prototype.mdayset = function (_, month, __) {
         var start = this.mrange[month - 1];
         var end = this.mrange[month];
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen);
         for (var i = start; i < end; i++)
             set[i] = i;
         return [set, start, end];
     };
     Iterinfo.prototype.wdayset = function (year, month, day) {
         // We need to handle cross-year weeks here.
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen + 7);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen + 7);
         var i = src_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
             this.yearordinal;
         var start = i;
@@ -1700,7 +1833,7 @@ var iterinfo_Iterinfo = /** @class */ (function () {
         return [set, start, i];
     };
     Iterinfo.prototype.ddayset = function (year, month, day) {
-        var set = Object(helpers["k" /* repeat */])(null, this.yearlen);
+        var set = Object(helpers["l" /* repeat */])(null, this.yearlen);
         var i = src_dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
             this.yearordinal;
         set[i] = i;
@@ -1756,11 +1889,11 @@ function buildPoslist(bysetpos, timeset, start, end, ii, dayset) {
         var pos = bysetpos[j];
         if (pos < 0) {
             daypos = Math.floor(pos / timeset.length);
-            timepos = Object(helpers["i" /* pymod */])(pos, timeset.length);
+            timepos = Object(helpers["j" /* pymod */])(pos, timeset.length);
         }
         else {
             daypos = Math.floor((pos - 1) / timeset.length);
-            timepos = Object(helpers["i" /* pymod */])(pos - 1, timeset.length);
+            timepos = Object(helpers["j" /* pymod */])(pos - 1, timeset.length);
         }
         var tmp = [];
         for (var k = start; k < end; k++) {
@@ -1811,7 +1944,7 @@ function iter(iterResult, options) {
     while (true) {
         var _a = ii.getdayset(freq)(counterDate.year, counterDate.month, counterDate.day), dayset = _a[0], start = _a[1], end = _a[2];
         var filtered = removeFilteredDays(dayset, start, end, ii, options);
-        if (Object(helpers["g" /* notEmpty */])(bysetpos)) {
+        if (Object(helpers["h" /* notEmpty */])(bysetpos)) {
             var poslist = buildPoslist(bysetpos, timeset, start, end, ii, dayset);
             for (var j = 0; j < poslist.length; j++) {
                 var res = poslist[j];
@@ -1876,15 +2009,15 @@ function iter(iterResult, options) {
 }
 function isFiltered(ii, currentDay, options) {
     var bymonth = options.bymonth, byweekno = options.byweekno, byweekday = options.byweekday, byeaster = options.byeaster, bymonthday = options.bymonthday, bynmonthday = options.bynmonthday, byyearday = options.byyearday;
-    return ((Object(helpers["g" /* notEmpty */])(bymonth) && !Object(helpers["c" /* includes */])(bymonth, ii.mmask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(byweekno) && !ii.wnomask[currentDay]) ||
-        (Object(helpers["g" /* notEmpty */])(byweekday) && !Object(helpers["c" /* includes */])(byweekday, ii.wdaymask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
+    return ((Object(helpers["h" /* notEmpty */])(bymonth) && !Object(helpers["c" /* includes */])(bymonth, ii.mmask[currentDay])) ||
+        (Object(helpers["h" /* notEmpty */])(byweekno) && !ii.wnomask[currentDay]) ||
+        (Object(helpers["h" /* notEmpty */])(byweekday) && !Object(helpers["c" /* includes */])(byweekday, ii.wdaymask[currentDay])) ||
+        (Object(helpers["h" /* notEmpty */])(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
         (byeaster !== null && !Object(helpers["c" /* includes */])(ii.eastermask, currentDay)) ||
-        ((Object(helpers["g" /* notEmpty */])(bymonthday) || Object(helpers["g" /* notEmpty */])(bynmonthday)) &&
+        ((Object(helpers["h" /* notEmpty */])(bymonthday) || Object(helpers["h" /* notEmpty */])(bynmonthday)) &&
             !Object(helpers["c" /* includes */])(bymonthday, ii.mdaymask[currentDay]) &&
             !Object(helpers["c" /* includes */])(bynmonthday, ii.nmdaymask[currentDay])) ||
-        (Object(helpers["g" /* notEmpty */])(byyearday) &&
+        (Object(helpers["h" /* notEmpty */])(byyearday) &&
             ((currentDay < ii.yearlen &&
                 !Object(helpers["c" /* includes */])(byyearday, currentDay + 1) &&
                 !Object(helpers["c" /* includes */])(byyearday, -ii.yearlen + currentDay)) ||
@@ -1914,13 +2047,13 @@ function makeTimeset(ii, counterDate, options) {
         return buildTimeset(options);
     }
     if ((freq >= src_rrule.HOURLY &&
-        Object(helpers["g" /* notEmpty */])(byhour) &&
+        Object(helpers["h" /* notEmpty */])(byhour) &&
         !Object(helpers["c" /* includes */])(byhour, counterDate.hour)) ||
         (freq >= src_rrule.MINUTELY &&
-            Object(helpers["g" /* notEmpty */])(byminute) &&
+            Object(helpers["h" /* notEmpty */])(byminute) &&
             !Object(helpers["c" /* includes */])(byminute, counterDate.minute)) ||
         (freq >= src_rrule.SECONDLY &&
-            Object(helpers["g" /* notEmpty */])(bysecond) &&
+            Object(helpers["h" /* notEmpty */])(bysecond) &&
             !Object(helpers["c" /* includes */])(bysecond, counterDate.second))) {
         return [];
     }
@@ -1949,13 +2082,13 @@ var getnlp = function () {
 // RRule
 // =============================================================================
 var Days = {
-    MO: new Weekday(0),
-    TU: new Weekday(1),
-    WE: new Weekday(2),
-    TH: new Weekday(3),
-    FR: new Weekday(4),
-    SA: new Weekday(5),
-    SU: new Weekday(6)
+    MO: new weekday["b" /* Weekday */](0),
+    TU: new weekday["b" /* Weekday */](1),
+    WE: new weekday["b" /* Weekday */](2),
+    TH: new weekday["b" /* Weekday */](3),
+    FR: new weekday["b" /* Weekday */](4),
+    SA: new weekday["b" /* Weekday */](5),
+    SU: new weekday["b" /* Weekday */](6)
 };
 var DEFAULT_OPTIONS = {
     freq: Frequency.YEARLY,
@@ -2116,8 +2249,8 @@ var rrule_RRule = /** @class */ (function () {
      * Will convert all rules described in nlp:ToText
      * to text.
      */
-    RRule.prototype.toText = function (gettext, language) {
-        return getnlp().toText(this, gettext, language);
+    RRule.prototype.toText = function (gettext, language, dateFormatter) {
+        return getnlp().toText(this, gettext, language, dateFormatter);
     };
     RRule.prototype.isFullyConvertibleToText = function () {
         return getnlp().isFullyConvertible(this);
@@ -2179,6 +2312,8 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
     });
     iterResult.accept = function (date) {
         var dt = Number(date);
+        if (isNaN(dt))
+            return _accept.call(this, date);
         if (!_exdateHash[dt]) {
             evalExdate(new Date(dt - 1), new Date(dt + 1));
             if (!_exdateHash[dt]) {
@@ -2221,170 +2356,8 @@ function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
     }
 }
 
-// CONCATENATED MODULE: ./src/rruleset.ts
-var rruleset_extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-
-
-var rruleset_RRuleSet = /** @class */ (function (_super) {
-    rruleset_extends(RRuleSet, _super);
-    /**
-     *
-     * @param {Boolean?} noCache
-     *  The same stratagy as RRule on cache, default to false
-     * @constructor
-     */
-    function RRuleSet(noCache) {
-        if (noCache === void 0) { noCache = false; }
-        var _this = _super.call(this, {}, noCache) || this;
-        _this._rrule = [];
-        _this._rdate = [];
-        _this._exrule = [];
-        _this._exdate = [];
-        return _this;
-    }
-    RRuleSet.prototype.tzid = function (tzid) {
-        if (tzid !== undefined) {
-            this._tzid = tzid;
-        }
-        if (this._tzid !== undefined) {
-            return this._tzid;
-        }
-        for (var i = 0; i < this._rrule.length; i++) {
-            var tzid_1 = this._rrule[i].origOptions.tzid;
-            if (tzid_1) {
-                return tzid_1;
-            }
-        }
-        return undefined;
-    };
-    RRuleSet.prototype._iter = function (iterResult) {
-        return iterSet(iterResult, this._rrule, this._exrule, this._rdate, this._exdate, this.tzid());
-    };
-    /**
-     * Adds an RRule to the set
-     *
-     * @param {RRule}
-     */
-    RRuleSet.prototype.rrule = function (rrule) {
-        _addRule(rrule, this._rrule);
-    };
-    /**
-     * Adds an EXRULE to the set
-     *
-     * @param {RRule}
-     */
-    RRuleSet.prototype.exrule = function (rrule) {
-        _addRule(rrule, this._exrule);
-    };
-    /**
-     * Adds an RDate to the set
-     *
-     * @param {Date}
-     */
-    RRuleSet.prototype.rdate = function (date) {
-        _addDate(date, this._rdate);
-    };
-    /**
-     * Adds an EXDATE to the set
-     *
-     * @param {Date}
-     */
-    RRuleSet.prototype.exdate = function (date) {
-        _addDate(date, this._exdate);
-    };
-    RRuleSet.prototype.valueOf = function () {
-        var result = [];
-        this._rrule.forEach(function (rrule) {
-            result = result.concat(rrule.toString().split('\n'));
-        });
-        this._exrule.forEach(function (exrule) {
-            result = result.concat(exrule.toString().split('\n')
-                .map(function (line) { return line.replace(/^RRULE:/, 'EXRULE:'); })
-                .filter(function (line) { return !/^DTSTART/.test(line); }));
-        });
-        if (this._rdate.length) {
-            result.push(rdatesToString('RDATE', this._rdate, this.tzid()));
-        }
-        if (this._exdate.length) {
-            result.push(rdatesToString('EXDATE', this._exdate, this.tzid()));
-        }
-        return result;
-    };
-    /**
-     * to generate recurrence field such as:
-     *   DTSTART:19970902T010000Z
-     *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
-     *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
-     */
-    RRuleSet.prototype.toString = function () {
-        return this.valueOf().join('\n');
-    };
-    /**
-     * Create a new RRuleSet Object completely base on current instance
-     */
-    RRuleSet.prototype.clone = function () {
-        var rrs = new RRuleSet(!!this._cache);
-        this._rrule.forEach(function (rule) { return rrs.rrule(rule.clone()); });
-        this._exrule.forEach(function (rule) { return rrs.exrule(rule.clone()); });
-        this._rdate.forEach(function (date) { return rrs.rdate(new Date(date.getTime())); });
-        this._exdate.forEach(function (date) { return rrs.exdate(new Date(date.getTime())); });
-        return rrs;
-    };
-    return RRuleSet;
-}(src_rrule));
-/* harmony default export */ var rruleset = (rruleset_RRuleSet);
-function _addRule(rrule, collection) {
-    if (!(rrule instanceof src_rrule)) {
-        throw new TypeError(String(rrule) + ' is not RRule instance');
-    }
-    if (!Object(helpers["c" /* includes */])(collection.map(String), String(rrule))) {
-        collection.push(rrule);
-    }
-}
-function _addDate(date, collection) {
-    if (!(date instanceof Date)) {
-        throw new TypeError(String(date) + ' is not Date instance');
-    }
-    if (!Object(helpers["c" /* includes */])(collection.map(Number), Number(date))) {
-        collection.push(date);
-        src_dateutil.sort(collection);
-    }
-}
-function rdatesToString(param, rdates, tzid) {
-    var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
-    var header = isUTC ? param + ":" : param + ";TZID=" + tzid + ":";
-    var dateString = rdates
-        .map(function (rdate) { return src_dateutil.timeToUntilString(rdate.valueOf(), isUTC); })
-        .join(',');
-    return "" + header + dateString;
-}
-
 // CONCATENATED MODULE: ./src/rrulestr.ts
-var rrulestr_assign = (undefined && undefined.__assign) || function () {
-    rrulestr_assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return rrulestr_assign.apply(this, arguments);
-};
+
 
 
 
@@ -2464,6 +2437,7 @@ function buildRule(s, options) {
         exrulevals.length ||
         exdatevals.length) {
         var rset_1 = new rruleset(noCache);
+        rset_1.dtstart(dtstart);
         rset_1.tzid(tzid || undefined);
         rrulevals.forEach(function (val) {
             rset_1.rrule(new src_rrule(groomRruleOptions(val, dtstart, tzid), noCache));
@@ -2481,7 +2455,7 @@ function buildRule(s, options) {
             rset_1.rdate(dtstart);
         return rset_1;
     }
-    var val = rrulevals[0];
+    var val = rrulevals[0] || {};
     return new src_rrule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
 }
 function rrulestr(s, options) {
@@ -2489,7 +2463,7 @@ function rrulestr(s, options) {
     return buildRule(s, rrulestr_initializeOptions(options));
 }
 function groomRruleOptions(val, dtstart, tzid) {
-    return rrulestr_assign({}, val, { dtstart: dtstart,
+    return __assign(__assign({}, val), { dtstart: dtstart,
         tzid: tzid });
 }
 function rrulestr_initializeOptions(options) {
@@ -2503,13 +2477,7 @@ function rrulestr_initializeOptions(options) {
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    var initializedOptions = rrulestr_assign({}, options);
-    // Merge in default options
-    defaultKeys.forEach(function (key) {
-        if (!Object(helpers["c" /* includes */])(keys, key))
-            initializedOptions[key] = rrulestr_DEFAULT_OPTIONS[key];
-    });
-    return initializedOptions;
+    return __assign(__assign({}, rrulestr_DEFAULT_OPTIONS), options);
 }
 function extractName(line) {
     if (line.indexOf(':') === -1) {
@@ -2518,7 +2486,7 @@ function extractName(line) {
             value: line
         };
     }
-    var _a = Object(helpers["l" /* split */])(line, ':', 1), name = _a[0], value = _a[1];
+    var _a = Object(helpers["m" /* split */])(line, ':', 1), name = _a[0], value = _a[1];
     return {
         name: name,
         value: value
@@ -2577,12 +2545,193 @@ function parseRDate(rdateval, parms) {
         .map(function (datestr) { return src_dateutil.untilStringToDate(datestr); });
 }
 
+// CONCATENATED MODULE: ./src/rruleset.ts
+
+
+
+
+
+
+
+function createGetterSetter(fieldName) {
+    var _this = this;
+    return function (field) {
+        if (field !== undefined) {
+            _this["_" + fieldName] = field;
+        }
+        if (_this["_" + fieldName] !== undefined) {
+            return _this["_" + fieldName];
+        }
+        for (var i = 0; i < _this._rrule.length; i++) {
+            var field_1 = _this._rrule[i].origOptions[fieldName];
+            if (field_1) {
+                return field_1;
+            }
+        }
+    };
+}
+var rruleset_RRuleSet = /** @class */ (function (_super) {
+    __extends(RRuleSet, _super);
+    /**
+     *
+     * @param {Boolean?} noCache
+     *  The same stratagy as RRule on cache, default to false
+     * @constructor
+     */
+    function RRuleSet(noCache) {
+        if (noCache === void 0) { noCache = false; }
+        var _this = _super.call(this, {}, noCache) || this;
+        _this.dtstart = createGetterSetter.apply(_this, ['dtstart']);
+        _this.tzid = createGetterSetter.apply(_this, ['tzid']);
+        _this._rrule = [];
+        _this._rdate = [];
+        _this._exrule = [];
+        _this._exdate = [];
+        return _this;
+    }
+    RRuleSet.prototype._iter = function (iterResult) {
+        return iterSet(iterResult, this._rrule, this._exrule, this._rdate, this._exdate, this.tzid());
+    };
+    /**
+     * Adds an RRule to the set
+     *
+     * @param {RRule}
+     */
+    RRuleSet.prototype.rrule = function (rrule) {
+        _addRule(rrule, this._rrule);
+    };
+    /**
+     * Adds an EXRULE to the set
+     *
+     * @param {RRule}
+     */
+    RRuleSet.prototype.exrule = function (rrule) {
+        _addRule(rrule, this._exrule);
+    };
+    /**
+     * Adds an RDate to the set
+     *
+     * @param {Date}
+     */
+    RRuleSet.prototype.rdate = function (date) {
+        _addDate(date, this._rdate);
+    };
+    /**
+     * Adds an EXDATE to the set
+     *
+     * @param {Date}
+     */
+    RRuleSet.prototype.exdate = function (date) {
+        _addDate(date, this._exdate);
+    };
+    /**
+     * Get list of included rrules in this recurrence set.
+     *
+     * @return List of rrules
+     */
+    RRuleSet.prototype.rrules = function () {
+        return this._rrule.map(function (e) { return rrulestr(e.toString()); });
+    };
+    /**
+     * Get list of excluded rrules in this recurrence set.
+     *
+     * @return List of exrules
+     */
+    RRuleSet.prototype.exrules = function () {
+        return this._exrule.map(function (e) { return rrulestr(e.toString()); });
+    };
+    /**
+     * Get list of included datetimes in this recurrence set.
+     *
+     * @return List of rdates
+     */
+    RRuleSet.prototype.rdates = function () {
+        return this._rdate.map(function (e) { return new Date(e.getTime()); });
+    };
+    /**
+     * Get list of included datetimes in this recurrence set.
+     *
+     * @return List of exdates
+     */
+    RRuleSet.prototype.exdates = function () {
+        return this._exdate.map(function (e) { return new Date(e.getTime()); });
+    };
+    RRuleSet.prototype.valueOf = function () {
+        var result = [];
+        if (!this._rrule.length && this._dtstart) {
+            result = result.concat(optionsToString({ dtstart: this._dtstart }));
+        }
+        this._rrule.forEach(function (rrule) {
+            result = result.concat(rrule.toString().split('\n'));
+        });
+        this._exrule.forEach(function (exrule) {
+            result = result.concat(exrule.toString().split('\n')
+                .map(function (line) { return line.replace(/^RRULE:/, 'EXRULE:'); })
+                .filter(function (line) { return !/^DTSTART/.test(line); }));
+        });
+        if (this._rdate.length) {
+            result.push(rdatesToString('RDATE', this._rdate, this.tzid()));
+        }
+        if (this._exdate.length) {
+            result.push(rdatesToString('EXDATE', this._exdate, this.tzid()));
+        }
+        return result;
+    };
+    /**
+     * to generate recurrence field such as:
+     *   DTSTART:19970902T010000Z
+     *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
+     *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
+     */
+    RRuleSet.prototype.toString = function () {
+        return this.valueOf().join('\n');
+    };
+    /**
+     * Create a new RRuleSet Object completely base on current instance
+     */
+    RRuleSet.prototype.clone = function () {
+        var rrs = new RRuleSet(!!this._cache);
+        this._rrule.forEach(function (rule) { return rrs.rrule(rule.clone()); });
+        this._exrule.forEach(function (rule) { return rrs.exrule(rule.clone()); });
+        this._rdate.forEach(function (date) { return rrs.rdate(new Date(date.getTime())); });
+        this._exdate.forEach(function (date) { return rrs.exdate(new Date(date.getTime())); });
+        return rrs;
+    };
+    return RRuleSet;
+}(src_rrule));
+/* harmony default export */ var rruleset = (rruleset_RRuleSet);
+function _addRule(rrule, collection) {
+    if (!(rrule instanceof src_rrule)) {
+        throw new TypeError(String(rrule) + ' is not RRule instance');
+    }
+    if (!Object(helpers["c" /* includes */])(collection.map(String), String(rrule))) {
+        collection.push(rrule);
+    }
+}
+function _addDate(date, collection) {
+    if (!(date instanceof Date)) {
+        throw new TypeError(String(date) + ' is not Date instance');
+    }
+    if (!Object(helpers["c" /* includes */])(collection.map(Number), Number(date))) {
+        collection.push(date);
+        src_dateutil.sort(collection);
+    }
+}
+function rdatesToString(param, rdates, tzid) {
+    var isUTC = !tzid || tzid.toUpperCase() === 'UTC';
+    var header = isUTC ? param + ":" : param + ";TZID=" + tzid + ":";
+    var dateString = rdates
+        .map(function (rdate) { return src_dateutil.timeToUntilString(rdate.valueOf(), isUTC); })
+        .join(',');
+    return "" + header + dateString;
+}
+
 // CONCATENATED MODULE: ./src/index.ts
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return Weekday; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRule", function() { return src_rrule; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "rrulestr", function() { return rrulestr; });
+/* concated harmony reexport rrulestr */__webpack_require__.d(__webpack_exports__, "rrulestr", function() { return rrulestr; });
+/* concated harmony reexport Frequency */__webpack_require__.d(__webpack_exports__, "Frequency", function() { return Frequency; });
+/* concated harmony reexport Weekday */__webpack_require__.d(__webpack_exports__, "Weekday", function() { return weekday["b" /* Weekday */]; });
+/* concated harmony reexport RRule */__webpack_require__.d(__webpack_exports__, "RRule", function() { return src_rrule; });
+/* concated harmony reexport RRuleSet */__webpack_require__.d(__webpack_exports__, "RRuleSet", function() { return rruleset; });
 /*!
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
@@ -2603,18 +2752,54 @@ function parseRDate(rdateval, parms) {
 
 
 
-// =============================================================================
-// Export
-// =============================================================================
 
 /* harmony default export */ var src = __webpack_exports__["default"] = (src_rrule);
 
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__2__;
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ALL_WEEKDAYS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Weekday; });
+// =============================================================================
+// Weekday
+// =============================================================================
+var ALL_WEEKDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+var Weekday = /** @class */ (function () {
+    function Weekday(weekday, n) {
+        if (n === 0)
+            throw new Error("Can't create weekday with n == 0");
+        this.weekday = weekday;
+        this.n = n;
+    }
+    Weekday.fromStr = function (str) {
+        return new Weekday(ALL_WEEKDAYS.indexOf(str));
+    };
+    // __call__ - Cannot call the object directly, do it through
+    // e.g. RRule.TH.nth(-1) instead,
+    Weekday.prototype.nth = function (n) {
+        return this.n === n ? this : new Weekday(this.weekday, n);
+    };
+    // __eq__
+    Weekday.prototype.equals = function (other) {
+        return this.weekday === other.weekday && this.n === other.n;
+    };
+    // __repr__
+    Weekday.prototype.toString = function () {
+        var s = ALL_WEEKDAYS[this.weekday];
+        if (this.n)
+            s = (this.n > 0 ? '+' : '') + String(this.n) + s;
+        return s;
+    };
+    Weekday.prototype.getJsWeekday = function () {
+        return this.weekday === 6 ? 0 : this.weekday + 1;
+    };
+    return Weekday;
+}());
+
+
 
 /***/ }),
 /* 3 */
@@ -2684,7 +2869,7 @@ var ENGLISH = {
 };
 /* harmony default export */ var i18n = (ENGLISH);
 
-// EXTERNAL MODULE: ./src/index.ts + 22 modules
+// EXTERNAL MODULE: ./src/index.ts + 23 modules
 var src = __webpack_require__(1);
 
 // EXTERNAL MODULE: ./src/helpers.ts
@@ -2704,6 +2889,7 @@ var contains = function (arr, val) {
     return arr.indexOf(val) !== -1;
 };
 var defaultGetText = function (id) { return id.toString(); };
+var defaultDateFormatter = function (year, month, day) { return month + " " + day + ", " + year; };
 /**
  *
  * @param {RRule} rrule
@@ -2713,12 +2899,14 @@ var defaultGetText = function (id) { return id.toString(); };
  * @constructor
  */
 var totext_ToText = /** @class */ (function () {
-    function ToText(rrule, gettext, language) {
+    function ToText(rrule, gettext, language, dateFormatter) {
         if (gettext === void 0) { gettext = defaultGetText; }
         if (language === void 0) { language = i18n; }
+        if (dateFormatter === void 0) { dateFormatter = defaultDateFormatter; }
         this.text = [];
         this.language = language || i18n;
         this.gettext = gettext;
+        this.dateFormatter = dateFormatter;
         this.rrule = rrule;
         this.options = rrule.options;
         this.origOptions = rrule.origOptions;
@@ -2812,9 +3000,7 @@ var totext_ToText = /** @class */ (function () {
         if (this.options.until) {
             this.add(gettext('until'));
             var until = this.options.until;
-            this.add(this.language.monthNames[until.getUTCMonth()])
-                .add(until.getUTCDate() + ',')
-                .add(until.getUTCFullYear().toString());
+            this.add(this.dateFormatter(until.getUTCFullYear(), this.language.monthNames[until.getUTCMonth()], until.getUTCDate()));
         }
         else if (this.options.count) {
             this.add(gettext('for'))
@@ -2837,7 +3023,7 @@ var totext_ToText = /** @class */ (function () {
             this.add(this.options.interval.toString());
         this.add(this.plural(this.options.interval)
             ? gettext('minutes')
-            : gettext('minutes'));
+            : gettext('minute'));
     };
     ToText.prototype.DAILY = function () {
         var gettext = this.gettext;
@@ -3488,7 +3674,7 @@ function parseText(text, language) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fromText", function() { return fromText; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isFullyConvertible", function() { return isFullyConvertible; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toText", function() { return toText; });
-/* concated harmony reexport */__webpack_require__.d(__webpack_exports__, "parseText", function() { return parseText; });
+/* concated harmony reexport parseText */__webpack_require__.d(__webpack_exports__, "parseText", function() { return parseText; });
 
 
 
@@ -3604,8 +3790,8 @@ totext.IMPLEMENTED[src["default"].YEARLY] = ['byweekno', 'byyearday'].concat(com
 // =============================================================================
 // Export
 // =============================================================================
-var toText = function (rrule, gettext, language) {
-    return new totext(rrule, gettext, language).toString();
+var toText = function (rrule, gettext, language, dateFormatter) {
+    return new totext(rrule, gettext, language, dateFormatter).toString();
 };
 var isFullyConvertible = totext.isFullyConvertible;
 

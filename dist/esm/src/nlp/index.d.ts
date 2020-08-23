@@ -1,4 +1,4 @@
-import ToText, { GetText } from './totext';
+import ToText, { DateFormatter, GetText } from './totext';
 import parseText from './parsetext';
 import RRule from '../index';
 import { Language } from './i18n';
@@ -89,7 +89,7 @@ import { Language } from './i18n';
  * @return {Object, Boolean} the rule, or null.
  */
 declare const fromText: (text: string, language?: Language) => RRule;
-declare const toText: (rrule: RRule, gettext?: GetText | undefined, language?: Language | undefined) => string;
+declare const toText: (rrule: RRule, gettext?: GetText | undefined, language?: Language | undefined, dateFormatter?: DateFormatter | undefined) => string;
 declare const isFullyConvertible: typeof ToText.isFullyConvertible;
 export interface Nlp {
     fromText: typeof fromText;

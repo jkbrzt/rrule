@@ -1,14 +1,4 @@
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
+import { __assign } from "tslib";
 import RRule from './rrule';
 import RRuleSet from './rruleset';
 import dateutil from './dateutil';
@@ -88,6 +78,7 @@ function buildRule(s, options) {
         exrulevals.length ||
         exdatevals.length) {
         var rset_1 = new RRuleSet(noCache);
+        rset_1.dtstart(dtstart);
         rset_1.tzid(tzid || undefined);
         rrulevals.forEach(function (val) {
             rset_1.rrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache));
@@ -105,7 +96,7 @@ function buildRule(s, options) {
             rset_1.rdate(dtstart);
         return rset_1;
     }
-    var val = rrulevals[0];
+    var val = rrulevals[0] || {};
     return new RRule(groomRruleOptions(val, val.dtstart || options.dtstart || dtstart, val.tzid || options.tzid || tzid), noCache);
 }
 export function rrulestr(s, options) {
@@ -113,7 +104,7 @@ export function rrulestr(s, options) {
     return buildRule(s, initializeOptions(options));
 }
 function groomRruleOptions(val, dtstart, tzid) {
-    return __assign({}, val, { dtstart: dtstart,
+    return __assign(__assign({}, val), { dtstart: dtstart,
         tzid: tzid });
 }
 function initializeOptions(options) {
@@ -127,13 +118,7 @@ function initializeOptions(options) {
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    var initializedOptions = __assign({}, options);
-    // Merge in default options
-    defaultKeys.forEach(function (key) {
-        if (!includes(keys, key))
-            initializedOptions[key] = DEFAULT_OPTIONS[key];
-    });
-    return initializedOptions;
+    return __assign(__assign({}, DEFAULT_OPTIONS), options);
 }
 function extractName(line) {
     if (line.indexOf(':') === -1) {

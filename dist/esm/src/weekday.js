@@ -1,7 +1,7 @@
 // =============================================================================
 // Weekday
 // =============================================================================
-var WDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
+export var ALL_WEEKDAYS = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 var Weekday = /** @class */ (function () {
     function Weekday(weekday, n) {
         if (n === 0)
@@ -9,6 +9,9 @@ var Weekday = /** @class */ (function () {
         this.weekday = weekday;
         this.n = n;
     }
+    Weekday.fromStr = function (str) {
+        return new Weekday(ALL_WEEKDAYS.indexOf(str));
+    };
     // __call__ - Cannot call the object directly, do it through
     // e.g. RRule.TH.nth(-1) instead,
     Weekday.prototype.nth = function (n) {
@@ -20,7 +23,7 @@ var Weekday = /** @class */ (function () {
     };
     // __repr__
     Weekday.prototype.toString = function () {
-        var s = WDAYS[this.weekday];
+        var s = ALL_WEEKDAYS[this.weekday];
         if (this.n)
             s = (this.n > 0 ? '+' : '') + String(this.n) + s;
         return s;

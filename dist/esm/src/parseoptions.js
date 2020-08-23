@@ -1,5 +1,6 @@
+import { __assign } from "tslib";
 import { freqIsDailyOrGreater } from './types';
-import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers';
+import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers';
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule';
 import dateutil from './dateutil';
 import { Weekday } from './weekday';
@@ -7,29 +8,21 @@ import { Time } from './datetime';
 export function initializeOptions(options) {
     var invalid = [];
     var keys = Object.keys(options);
-    var initializedOptions = {};
     // Shallow copy for options and origOptions and check for invalid
-    keys.forEach(function (key) {
-        var value = options[key];
-        initializedOptions[key] = value;
+    for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+        var key = keys_1[_i];
         if (!includes(defaultKeys, key))
             invalid.push(key);
-        if (dateutil.isDate(value) && !dateutil.isValidDate(value))
+        if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key]))
             invalid.push(key);
-    });
+    }
     if (invalid.length) {
         throw new Error('Invalid options: ' + invalid.join(', '));
     }
-    return initializedOptions;
+    return __assign({}, options);
 }
 export function parseOptions(options) {
-    var opts = initializeOptions(options);
-    var keys = Object.keys(options);
-    // Merge in default options
-    defaultKeys.forEach(function (key) {
-        if (!includes(keys, key) || !isPresent(opts[key]))
-            opts[key] = DEFAULT_OPTIONS[key];
-    });
+    var opts = __assign(__assign({}, DEFAULT_OPTIONS), initializeOptions(options));
     if (isPresent(opts.byeaster))
         opts.freq = RRule.YEARLY;
     if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
@@ -127,6 +120,10 @@ export function parseOptions(options) {
         opts.byweekday = [opts.byweekday];
         opts.bynweekday = null;
     }
+    else if (isWeekdayStr(opts.byweekday)) {
+        opts.byweekday = [Weekday.fromStr(opts.byweekday).weekday];
+        opts.bynweekday = null;
+    }
     else if (opts.byweekday instanceof Weekday) {
         if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
             opts.byweekday = [opts.byweekday.weekday];
@@ -146,12 +143,15 @@ export function parseOptions(options) {
                 byweekday.push(wday);
                 continue;
             }
-            var wd = wday;
-            if (!wd.n || opts.freq > RRule.MONTHLY) {
-                byweekday.push(wd.weekday);
+            else if (isWeekdayStr(wday)) {
+                byweekday.push(Weekday.fromStr(wday).weekday);
+                continue;
+            }
+            if (!wday.n || opts.freq > RRule.MONTHLY) {
+                byweekday.push(wday.weekday);
             }
             else {
-                bynweekday.push([wd.weekday, wd.n]);
+                bynweekday.push([wday.weekday, wday.n]);
             }
         }
         opts.byweekday = notEmpty(byweekday) ? byweekday : null;

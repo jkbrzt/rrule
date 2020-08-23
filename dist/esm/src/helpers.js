@@ -1,11 +1,15 @@
 // =============================================================================
 // Helper functions
 // =============================================================================
+import { ALL_WEEKDAYS } from './weekday';
 export var isPresent = function (value) {
     return value !== null && value !== undefined;
 };
 export var isNumber = function (value) {
     return typeof value === 'number';
+};
+export var isWeekdayStr = function (value) {
+    return ALL_WEEKDAYS.indexOf(value) >= 0;
 };
 export var isArray = Array.isArray;
 /**

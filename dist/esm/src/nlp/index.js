@@ -113,8 +113,8 @@ ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common);
 // =============================================================================
 // Export
 // =============================================================================
-var toText = function (rrule, gettext, language) {
-    return new ToText(rrule, gettext, language).toString();
+var toText = function (rrule, gettext, language, dateFormatter) {
+    return new ToText(rrule, gettext, language, dateFormatter).toString();
 };
 var isFullyConvertible = ToText.isFullyConvertible;
 export { fromText, parseText, isFullyConvertible, toText };

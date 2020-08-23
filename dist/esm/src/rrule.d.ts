@@ -1,7 +1,7 @@
 import IterResult, { IterArgs } from './iterresult';
 import { Language } from './nlp/i18n';
-import { GetText } from './nlp/totext';
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types';
+import { DateFormatter, GetText } from './nlp/totext';
+import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types';
 import { parseString } from './parsestring';
 import { optionsToString } from './optionstostring';
 import { Cache, CacheKeys } from './cache';
@@ -16,7 +16,7 @@ export declare const Days: {
     SU: Weekday;
 };
 export declare const DEFAULT_OPTIONS: Options;
-export declare const defaultKeys: ("until" | "bymonthday" | "freq" | "dtstart" | "interval" | "wkst" | "count" | "tzid" | "bysetpos" | "bymonth" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
+export declare const defaultKeys: ("freq" | "dtstart" | "interval" | "wkst" | "count" | "until" | "tzid" | "bysetpos" | "bymonth" | "bymonthday" | "bynmonthday" | "byyearday" | "byweekno" | "byweekday" | "bynweekday" | "byhour" | "byminute" | "bysecond" | "byeaster")[];
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
@@ -28,13 +28,13 @@ export default class RRule implements QueryMethods {
     origOptions: Partial<Options>;
     options: ParsedOptions;
     static readonly FREQUENCIES: (keyof typeof Frequency)[];
-    static readonly YEARLY: Frequency;
-    static readonly MONTHLY: Frequency;
-    static readonly WEEKLY: Frequency;
-    static readonly DAILY: Frequency;
-    static readonly HOURLY: Frequency;
-    static readonly MINUTELY: Frequency;
-    static readonly SECONDLY: Frequency;
+    static readonly YEARLY = Frequency.YEARLY;
+    static readonly MONTHLY = Frequency.MONTHLY;
+    static readonly WEEKLY = Frequency.WEEKLY;
+    static readonly DAILY = Frequency.DAILY;
+    static readonly HOURLY = Frequency.HOURLY;
+    static readonly MINUTELY = Frequency.MINUTELY;
+    static readonly SECONDLY = Frequency.SECONDLY;
     static readonly MO: Weekday;
     static readonly TU: Weekday;
     static readonly WE: Weekday;
@@ -48,7 +48,7 @@ export default class RRule implements QueryMethods {
     static parseString: typeof parseString;
     static fromString(str: string): RRule;
     static optionsToString: typeof optionsToString;
-    protected _iter<M extends QueryMethodTypes>(iterResult: IterResult<M>): import("./types").IterResultType<M>;
+    protected _iter<M extends QueryMethodTypes>(iterResult: IterResult<M>): IterResultType<M>;
     private _cacheGet;
     _cacheAdd(what: CacheKeys | 'all', value: Date[] | Date | null, args?: Partial<IterArgs>): void;
     /**
@@ -95,7 +95,7 @@ export default class RRule implements QueryMethods {
      * Will convert all rules described in nlp:ToText
      * to text.
      */
-    toText(gettext?: GetText, language?: Language): string;
+    toText(gettext?: GetText, language?: Language, dateFormatter?: DateFormatter): string;
     isFullyConvertibleToText(): boolean;
     /**
      * @return a RRule instance with the same freq and options

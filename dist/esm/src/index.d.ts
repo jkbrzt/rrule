@@ -15,10 +15,10 @@
  */
 import RRule from './rrule';
 import RRuleSet from './rruleset';
-import { rrulestr } from './rrulestr';
+export { rrulestr } from './rrulestr';
 export { Frequency, ByWeekday, Options } from './types';
 export { Weekday, WeekdayStr } from './weekday';
 export { RRuleStrOptions } from './rrulestr';
-export { RRule, RRuleSet, rrulestr };
+export { RRule, RRuleSet };
 export default RRule;
 //# sourceMappingURL=index.d.ts.map

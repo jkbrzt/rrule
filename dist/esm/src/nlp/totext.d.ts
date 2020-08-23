@@ -3,6 +3,7 @@ import RRule from '../index';
 import { ByWeekday } from '../types';
 import { Weekday } from '../weekday';
 export declare type GetText = (id: string | number | Weekday) => string;
+export declare type DateFormatter = (year: number, month: string, day: number) => string;
 /**
  *
  * @param {RRule} rrule
@@ -16,12 +17,13 @@ export default class ToText {
     private rrule;
     private text;
     private gettext;
+    private dateFormatter;
     private language;
     private options;
     private origOptions;
     private bymonthday;
     private byweekday;
-    constructor(rrule: RRule, gettext?: GetText, language?: Language);
+    constructor(rrule: RRule, gettext?: GetText, language?: Language, dateFormatter?: DateFormatter);
     /**
      * Test whether the rrule can be fully converted to text.
      * @param {RRule} rrule

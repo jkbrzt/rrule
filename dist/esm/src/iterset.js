@@ -17,6 +17,8 @@ export function iterSet(iterResult, _rrule, _exrule, _rdate, _exdate, tzid) {
     });
     iterResult.accept = function (date) {
         var dt = Number(date);
+        if (isNaN(dt))
+            return _accept.call(this, date);
         if (!_exdateHash[dt]) {
             evalExdate(new Date(dt - 1), new Date(dt + 1));
             if (!_exdateHash[dt]) {

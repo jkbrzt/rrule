@@ -15,12 +15,9 @@
  */
 import RRule from './rrule';
 import RRuleSet from './rruleset';
-import { rrulestr } from './rrulestr';
+export { rrulestr } from './rrulestr';
 export { Frequency } from './types';
 export { Weekday } from './weekday';
-// =============================================================================
-// Export
-// =============================================================================
-export { RRule, RRuleSet, rrulestr };
+export { RRule, RRuleSet };
 export default RRule;
 //# sourceMappingURL=index.js.map

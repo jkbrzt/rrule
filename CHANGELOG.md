@@ -1,6 +1,10 @@
 ### Changelog
 
-- 2.6.3 (2019-12-18)
+- 2.6.5 (2020-08-23)
+  - Bugfixes:
+    - `luxon`-less binary should not contain any `luxon` imports (#410) 
+    - Fixed `toText` pluralization of “minutes“ (#415) 
+- 2.6.4 (2019-12-18)
   - Bugfixes:
     - Calculating series with unknown timezones will produce infinite loop (#320)
   - Internal:
@@ -10,10 +14,10 @@
     - Allow passing `WeekdayStr` to `byweekday` like the types suggest is possible (#371)
 - 2.6.2 (2019-06-08)
   - Features
-    - Allow two digits for BYDAY (#330)
-    - Add a quick way to format 'until' in toText (#313)
+    - Allow two digits for `BYDAY` (#330)
+    - Add a quick way to format `until` in `toText` (#313)
     - Add support for parsing an rrule string without frequency (#339)
-    - Add getters for rrules, exrules, rdates, exdates (#347)
+    - Add getters for `rrules`, `exrules`, `rdates`, `exdates` (#347)
 - 2.6.0 (2019-01-03)
   - Bugfixes:
     - Fix sourcemap structure (#303)

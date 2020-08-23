@@ -185,14 +185,7 @@ function initializeOptions (options: Partial<RRuleStrOptions>) {
     throw new Error('Invalid options: ' + invalid.join(', '))
   }
 
-  const initializedOptions = { ...options }
-
-  // Merge in default options
-  defaultKeys.forEach(function (key) {
-    if (!includes(keys, key)) initializedOptions[key] = DEFAULT_OPTIONS[key]
-  })
-
-  return initializedOptions
+  return { ...DEFAULT_OPTIONS, ...options }
 }
 
 function extractName (line: string) {

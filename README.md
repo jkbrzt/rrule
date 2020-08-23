@@ -113,7 +113,7 @@ rruleSet.rdate(new Date(Date.UTC(2012, 6, 1, 10, 30)))
 rruleSet.rdate(new Date(Date.UTC(2012, 6, 2, 10, 30)))
 
 // Add a exclusion rrule to rruleSet
-rruleSet.exrule(new r.RRule({
+rruleSet.exrule(new RRule({
   freq: RRule.MONTHLY,
   count: 2,
   dtstart: new Date(Date.UTC(2012, 2, 1, 10, 30))
@@ -246,7 +246,7 @@ new RRule({
   until: new Date(2018, 2, 31)
 }).all()
 
-[ '2018-02-01T18:30:00.000Z' ]
+[ '2018-02-01T18:30:00.000Z', '2018-03-01T18:30:00.000Z' ]
 
 // RIGHT: Will produce dates with recurrences at the correct time
 new RRule({
@@ -255,7 +255,7 @@ new RRule({
   until: new Date(Date.UTC(2018, 2, 31))
 }).all()
 
-[ '2018-02-01T10:30:00.000Z' ]
+[ '2018-02-01T10:30:00.000Z', '2018-03-01T10:30:00.000Z' ]
 ```
 
 ### API

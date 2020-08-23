@@ -54,9 +54,9 @@ const rruleConfig = Object.assign({
     rrule: path.join(paths.source, "index.ts"),
     'rrule.min': path.join(paths.source, "index.ts")
   },
-  externals: {
-    luxon: 'luxon'
-  },
+  plugins: [
+    new webpack.NormalModuleReplacementPlugin(/^luxon$/, './fake-luxon.ts'),
+  ]
 }, commonConfig);
 
 const rruleWithLuxonConfig = Object.assign({

@@ -714,6 +714,20 @@ describe('RRuleSet', function () {
     }
   })
 
+  it('generates invalid date objects on an rruleset with invalid TZID and exdate', () => {
+    const set = new RRuleSet()
+    set.rrule(new RRule({
+      count: 1,
+      dtstart: parse('19970902T090000'),
+      tzid: 'America/Unknown'
+    }))
+    set.exdate(parse('19970902T090000'))
+
+    expect(set.all().map(String)).to.deep.equal([
+      'Invalid Date'
+    ])
+  })
+
   it('throws an error if non-rrules are added via rrule or exrule', () => {
     const set = new RRuleSet()
 

@@ -79,6 +79,18 @@ describe('NLP', () => {
     expect(rule.toText()).to.equal('every day')
   })
 
+  it('shows correct text for every minute', () => {
+    const options = { 'freq': RRule.MINUTELY };
+    const rule = new RRule(options);
+    expect(rule.toText()).to.equal('every minute');
+  });
+
+  it('shows correct text for every (plural) minutes', () => {
+    const options = { 'freq': RRule.MINUTELY, 'interval': 2 };
+    const rule = new RRule(options);
+    expect(rule.toText()).to.equal('every 2 minutes');
+  });
+
   it('by default formats \'until\' correctly', () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,

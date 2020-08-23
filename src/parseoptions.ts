@@ -1,5 +1,5 @@
 import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
-import { includes, notEmpty, isPresent, isNumber, isArray } from './helpers'
+import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers'
 import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import { Weekday } from './weekday'
@@ -8,31 +8,22 @@ import { Time } from './datetime'
 export function initializeOptions (options: Partial<Options>) {
   const invalid: string[] = []
   const keys = Object.keys(options) as (keyof Options)[]
-  const initializedOptions: Partial<Options> = {}
 
   // Shallow copy for options and origOptions and check for invalid
-  keys.forEach(key => {
-    const value = options[key]
-    initializedOptions[key] = value
+  for (const key of keys) {
     if (!includes(defaultKeys, key)) invalid.push(key)
-    if (dateutil.isDate(value) && !dateutil.isValidDate(value)) invalid.push(key)
-  })
+    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key])) invalid.push(key)
+  }
 
   if (invalid.length) {
     throw new Error('Invalid options: ' + invalid.join(', '))
   }
 
-  return initializedOptions
+  return { ...options }
 }
 
 export function parseOptions (options: Partial<Options>) {
-  const opts = initializeOptions(options)
-  const keys = Object.keys(options) as (keyof Options)[]
-
-  // Merge in default options
-  defaultKeys.forEach(key => {
-    if (!includes(keys, key) || !isPresent(opts[key])) opts[key] = DEFAULT_OPTIONS[key]
-  })
+  const opts = { ...DEFAULT_OPTIONS, ...initializeOptions(options) }
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
 
@@ -139,6 +130,9 @@ export function parseOptions (options: Partial<Options>) {
   } else if (isNumber(opts.byweekday)) {
     opts.byweekday = [opts.byweekday]
     opts.bynweekday = null
+  } else if (isWeekdayStr(opts.byweekday)) {
+    opts.byweekday = [Weekday.fromStr(opts.byweekday).weekday]
+    opts.bynweekday = null
   } else if (opts.byweekday instanceof Weekday) {
     if (!opts.byweekday.n || opts.freq > RRule.MONTHLY) {
       opts.byweekday = [opts.byweekday.weekday]
@@ -148,7 +142,7 @@ export function parseOptions (options: Partial<Options>) {
       opts.byweekday = null
     }
   } else {
-    const byweekday = []
+    const byweekday: number[] = []
     const bynweekday = []
 
     for (let i = 0; i < opts.byweekday.length; i++) {
@@ -157,13 +151,15 @@ export function parseOptions (options: Partial<Options>) {
       if (isNumber(wday)) {
         byweekday.push(wday)
         continue
+      } else if (isWeekdayStr(wday)) {
+        byweekday.push(Weekday.fromStr(wday).weekday)
+        continue
       }
 
-      const wd = wday as Weekday
-      if (!wd.n || opts.freq > RRule.MONTHLY) {
-        byweekday.push(wd.weekday)
+      if (!wday.n || opts.freq > RRule.MONTHLY) {
+        byweekday.push(wday.weekday)
       } else {
-        bynweekday.push([wd.weekday, wd.n])
+        bynweekday.push([wday.weekday, wday.n])
       }
     }
     opts.byweekday = notEmpty(byweekday) ? byweekday : null

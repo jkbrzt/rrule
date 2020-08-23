@@ -1,6 +1,8 @@
 import { expect } from 'chai'
+import { DateTime } from 'luxon'
 import RRule from '../src';
 import { optionsToString } from '../src/optionstostring';
+import {DateFormatter} from '../src/nlp/totext'
 
 const texts = [
   ['Every day', 'RRULE:FREQ=DAILY'],
@@ -15,6 +17,8 @@ const texts = [
   ['Every month', 'RRULE:FREQ=MONTHLY'],
   ['Every 6 months', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
   ['Every year', 'RRULE:FREQ=YEARLY'],
+  ['Every year on the 1st Friday', 'RRULE:FREQ=YEARLY;BYDAY=+1FR'],
+  ['Every year on the 13th Friday', 'RRULE:FREQ=YEARLY;BYDAY=+13FR'],
   ['Every month on the 4th', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
   ['Every month on the 4th last', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4'],
   ['Every month on the 3rd Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],
@@ -73,5 +77,37 @@ describe('NLP', () => {
     ]}
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every day')
+  })
+
+  it('shows correct text for every minute', () => {
+    const options = { 'freq': RRule.MINUTELY };
+    const rule = new RRule(options);
+    expect(rule.toText()).to.equal('every minute');
+  });
+
+  it('shows correct text for every (plural) minutes', () => {
+    const options = { 'freq': RRule.MINUTELY, 'interval': 2 };
+    const rule = new RRule(options);
+    expect(rule.toText()).to.equal('every 2 minutes');
+  });
+
+  it('by default formats \'until\' correctly', () => {
+    const rrule = new RRule({
+      freq: RRule.WEEKLY,
+      until: DateTime.utc(2012, 11, 10).toJSDate()
+    })
+
+    expect(rrule.toText()).to.equal('every week until November 10, 2012')
+  })
+
+  it('formats \'until\' as desired if asked', () => {
+    const rrule = new RRule({
+      freq: RRule.WEEKLY,
+      until: DateTime.utc(2012, 11, 10).toJSDate()
+    })
+
+    const dateFormatter: DateFormatter = (year, month, day) => `${day}. ${month}, ${year}`
+
+    expect(rrule.toText(undefined, undefined, dateFormatter)).to.equal('every week until 10. November, 2012')
   })
 })

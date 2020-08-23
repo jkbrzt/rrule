@@ -1,4 +1,5 @@
 import { expect } from 'chai'
+import { ExclusiveTestFunction, TestFunction } from 'mocha'
 import { RRule, RRuleSet } from '../../src'
 import { DateTime } from 'luxon';
 
@@ -53,10 +54,16 @@ export const parse = function (str: string) {
 
 interface TestRecurring {
   (m: string, testObj: any, expectedDates: Date | Date[]): void
+  only: (...args: any[]) => void
   skip: (...args: any[]) => void
 }
 
-export const testRecurring = function (msg: string, testObj: any, expectedDates: Date | Date[]) {
+export const testRecurring = function (
+  msg: string,
+  testObj: any,
+  expectedDates: Date | Date[],
+  itFunc: TestFunction | ExclusiveTestFunction = it,
+) {
   let rule: any
   let method: string
   let args: any
@@ -84,7 +91,7 @@ export const testRecurring = function (msg: string, testObj: any, expectedDates:
     msg = msg + ' ' + rule.toString()
   }
 
-  it(msg, function () {
+  itFunc(msg, function () {
     const ctx = this.test.ctx
     let time = Date.now()
     let actualDates = rule[method].apply(rule, args)
@@ -179,6 +186,10 @@ export const testRecurring = function (msg: string, testObj: any, expectedDates:
     }
   })
 } as TestRecurring
+
+testRecurring.only = function (...args) {
+  testRecurring.apply(it, [...args, it.only])
+}
 
 testRecurring.skip = function () {
   it.skip.apply(it, arguments)

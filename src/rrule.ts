@@ -4,8 +4,8 @@ import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { Nlp } from './nlp/index'
-import { GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
+import { DateFormatter, GetText } from './nlp/totext'
+import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
@@ -129,7 +129,7 @@ export default class RRule implements QueryMethods {
 
   static optionsToString = optionsToString
 
-  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
     return iter(iterResult, this.options)
   }
 
@@ -255,8 +255,8 @@ export default class RRule implements QueryMethods {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext?: GetText, language?: Language) {
-    return getnlp().toText(this, gettext, language)
+  toText (gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
+    return getnlp().toText(this, gettext, language, dateFormatter)
   }
 
   isFullyConvertibleToText () {

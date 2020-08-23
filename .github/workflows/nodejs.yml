@@ -1,0 +1,21 @@
+name: Node CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install -g codecov nyc
+      - run: yarn install
+      - run: yarn build
+      - run: TZ=America/Vancouver yarn test
+      - run: TZ=America/Los_Angeles yarn test
+      - run: TZ=Africa/Nairobi yarn test
+      - run: TZ=Asia/Tokyo yarn test-ci
+      - run: nyc report --reporter=json && codecov -t ${{ secrets.CODECOV_REPO_TOKEN }} -f coverage/*.json

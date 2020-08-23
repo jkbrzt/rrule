@@ -714,6 +714,20 @@ describe('RRuleSet', function () {
     }
   })
 
+  it('generates invalid date objects on an rruleset with invalid TZID and exdate', () => {
+    const set = new RRuleSet()
+    set.rrule(new RRule({
+      count: 1,
+      dtstart: parse('19970902T090000'),
+      tzid: 'America/Unknown'
+    }))
+    set.exdate(parse('19970902T090000'))
+
+    expect(set.all().map(String)).to.deep.equal([
+      'Invalid Date'
+    ])
+  })
+
   it('throws an error if non-rrules are added via rrule or exrule', () => {
     const set = new RRuleSet()
 
@@ -727,4 +741,48 @@ describe('RRuleSet', function () {
     expect(() => set.rdate('foo' as any)).to.throw()
     expect(() => set.exdate('foo' as any)).to.throw()
   })
-})
+
+  describe('getters', () => {
+    it('rrules()', () => {
+      let set = new RRuleSet();
+      let rrule = new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      });
+      set.rrule(rrule);
+
+      expect(set.rrules().map(e => e.toString())).eql([rrule.toString()]);
+    });
+    
+    it('exrules()', () => {
+      let set = new RRuleSet();
+      let rrule = new RRule({
+        freq: RRule.YEARLY,
+        count: 2,
+        dtstart: parse('19600101T090000'),
+        tzid: 'America/New_York'
+      });
+      set.exrule(rrule);
+
+      expect(set.exrules().map(e => e.toString())).eql([rrule.toString()]);
+    });
+
+    it('rdates()', () => {
+      let set = new RRuleSet();
+      let dt = parse('19610201T090000');
+      set.rdate(dt);
+      
+      expect(set.rdates()).eql([dt]);
+    });
+
+    it('exdates()', () => {
+      let set = new RRuleSet();
+      let dt = parse('19610201T090000');
+      set.exdate(dt);
+
+      expect(set.exdates()).eql([dt]);
+    });
+  });
+});

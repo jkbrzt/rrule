@@ -3,7 +3,7 @@
 // =============================================================================
 
 export type WeekdayStr = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU'
-const WDAYS: WeekdayStr[] = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
+export const ALL_WEEKDAYS: WeekdayStr[] = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
 
 export class Weekday {
   public readonly weekday: number
@@ -13,6 +13,10 @@ export class Weekday {
     if (n === 0) throw new Error("Can't create weekday with n == 0")
     this.weekday = weekday
     this.n = n
+  }
+
+  static fromStr (str: WeekdayStr): Weekday {
+    return new Weekday(ALL_WEEKDAYS.indexOf(str))
   }
 
   // __call__ - Cannot call the object directly, do it through
@@ -28,7 +32,7 @@ export class Weekday {
 
   // __repr__
   toString () {
-    let s: string = WDAYS[this.weekday]
+    let s: string = ALL_WEEKDAYS[this.weekday]
     if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s
     return s
   }

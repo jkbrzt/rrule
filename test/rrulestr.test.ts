@@ -26,6 +26,17 @@ describe('rrulestr', function () {
     )).to.be.instanceof(RRule)
   })
 
+  it('parses an rrule without frequency', () => {
+    const rRuleString = 'DTSTART:19970902T090000Z';
+    const parsedRRuleSet = rrulestr(
+      rRuleString, { forceset: true }
+    ) as RRuleSet;
+    expect(parsedRRuleSet.toString()).to.be.equal(rRuleString);
+
+    const parsedRRule = rrulestr(rRuleString) as RRule;
+    expect(parsedRRule.toString()).to.be.equal(rRuleString);
+  })
+
   it('parses an rruleset when forceset=true', () => {
     expect(rrulestr(
       'DTSTART:19970902T090000Z\n' +
@@ -251,6 +262,18 @@ describe('rrulestr', function () {
       datetimeUTC(1997, 12, 25, 9, 0),
       datetimeUTC(1998, 1, 6, 9, 0),
       datetimeUTC(1998, 12, 31, 9, 0)
+    ]
+  )
+
+  testRecurring('testStrNWeekDayLarge',
+    rrulestr(
+      'DTSTART:19970902T090000Z\n' +
+      'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=13TU,-13TH\n'
+    ),
+    [
+      datetimeUTC(1997, 10, 2, 9, 0),
+      datetimeUTC(1998, 3, 31, 9, 0),
+      datetimeUTC(1998, 10, 8, 9, 0)
     ]
   )
 

@@ -4,7 +4,7 @@ rrule.js
 **Library for working with recurrence rules for calendar dates.**
 
 [![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status][ci-image]][ci-url]
 [![js-standard-style][js-standard-image]][js-standard-url]
 [![Downloads][downloads-image]][downloads-url]
 [![Gitter][gitter-image]][gitter-url]
@@ -113,7 +113,7 @@ rruleSet.rdate(new Date(Date.UTC(2012, 6, 1, 10, 30)))
 rruleSet.rdate(new Date(Date.UTC(2012, 6, 2, 10, 30)))
 
 // Add a exclusion rrule to rruleSet
-rruleSet.exrule(new r.RRule({
+rruleSet.exrule(new RRule({
   freq: RRule.MONTHLY,
   count: 2,
   dtstart: new Date(Date.UTC(2012, 2, 1, 10, 30))
@@ -246,7 +246,7 @@ new RRule({
   until: new Date(2018, 2, 31)
 }).all()
 
-[ '2018-02-01T18:30:00.000Z' ]
+[ '2018-02-01T18:30:00.000Z', '2018-03-01T18:30:00.000Z' ]
 
 // RIGHT: Will produce dates with recurrences at the correct time
 new RRule({
@@ -255,7 +255,7 @@ new RRule({
   until: new Date(Date.UTC(2018, 2, 31))
 }).all()
 
-[ '2018-02-01T10:30:00.000Z' ]
+[ '2018-02-01T10:30:00.000Z', '2018-03-01T10:30:00.000Z' ]
 ```
 
 ### API
@@ -680,6 +680,22 @@ Same as `RRule.prototype.before`.
 
 Same as `RRule.prototype.after`.
 
+##### `RRuleSet.prototype.rrules()`
+
+Get list of included rrules in this recurrence set.
+
+##### `RRuleSet.prototype.exrules()`
+
+Get list of excluded rrules in this recurrence set.
+
+##### `RRuleSet.prototype.rdates()`
+
+Get list of included datetimes in this recurrence set.
+
+##### `RRuleSet.prototype.exdates()`
+
+Get list of excluded datetimes in this recurrence set.
+
 * * * * *
 
 #### `rrulestr` Function
@@ -792,8 +808,8 @@ more details.
 [npm-url]: https://npmjs.org/package/rrule
 [npm-image]: http://img.shields.io/npm/v/rrule.svg
 
-[travis-url]: https://travis-ci.org/jakubroztocil/rrule
-[travis-image]: http://img.shields.io/travis/jakubroztocil/rrule.svg
+[ci-url]: https://github.com/jakubroztocil/rrule/actions
+[ci-image]: https://github.com/jakubroztocil/rrule/workflows/Node%20CI/badge.svg
 
 [downloads-url]: https://npmjs.org/package/rrule
 [downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
@@ -803,3 +819,9 @@ more details.
 
 [gitter-url]: https://gitter.im/rrule-js/Lobby
 [gitter-image]: https://img.shields.io/gitter/room/nwjs/nw.js.svg
+
+
+#### Related projects
+
+* https://rrules.com/ — RESTful API to get back occurrences of RRULEs that conform to RFC 5545.
+

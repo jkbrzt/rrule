@@ -31,6 +31,7 @@ export function iterSet <M extends QueryMethodTypes> (
 
   iterResult.accept = function (date) {
     const dt = Number(date)
+    if (isNaN(dt)) return _accept.call(this, date)
     if (!_exdateHash[dt]) {
       evalExdate(new Date(dt - 1), new Date(dt + 1))
       if (!_exdateHash[dt]) {

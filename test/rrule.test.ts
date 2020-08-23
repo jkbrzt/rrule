@@ -264,13 +264,13 @@ describe('RRule', function () {
   testRecurring('testYearlyByNWeekDayLarge',
     new RRule({freq: RRule.YEARLY,
       count: 3,
-      byweekday: [RRule.TU.nth(3), RRule.TH.nth(-3)],
+      byweekday: [RRule.TU.nth(13), RRule.TH.nth(-13)],
       dtstart: parse('19970902T090000')
     }),
     [
-      datetime(1997, 12, 11, 9, 0),
-      datetime(1998, 1, 20, 9, 0),
-      datetime(1998, 12, 17, 9, 0)
+      datetime(1997, 10, 2, 9, 0),
+      datetime(1998, 3, 31, 9, 0),
+      datetime(1998, 10, 8, 9, 0)
     ]
   )
 

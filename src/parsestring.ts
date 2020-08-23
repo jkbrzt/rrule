@@ -128,8 +128,8 @@ function parseWeekday (value: string) {
       return Days[day as keyof typeof Days] // wday instanceof Weekday
     }
 
-    // -1MO, +3FR, 1SO, ...
-    const parts = day.match(/^([+-]?\d)([A-Z]{2})$/)!
+    // -1MO, +3FR, 1SO, 13TU ...
+    const parts = day.match(/^([+-]?\d{1,2})([A-Z]{2})$/)!
     const n = Number(parts[1])
     const wdaypart = parts[2] as keyof typeof Days
     const wday = Days[wdaypart].weekday

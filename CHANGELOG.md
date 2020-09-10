@@ -1,5 +1,9 @@
 ### Changelog
 
+- 2.6.6 (2020-08-23)
+  - Bugfixes:
+    - Fixed broken npm package (#417)
+
 - 2.6.5 (2020-08-23)
   - Bugfixes:
     - `luxon`-less binary should not contain any `luxon` imports (#410) 

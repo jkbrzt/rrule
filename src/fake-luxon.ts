@@ -1,5 +1,5 @@
 export const DateTime = {
-  fromJSDate() {
-    throw new TypeError();
+  fromJSDate () {
+    throw new TypeError()
   }
-};
+}

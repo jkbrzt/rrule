@@ -158,6 +158,10 @@ export default class RRule implements QueryMethods {
       return this._iter(new CallbackIterResult('all', {}, iterator))
     }
 
+    if (!this.isFinite()) {
+      throw new Error('Calling RRule.all() without an iterator on this RRule would result in an infinite loop as its recurrence set is not finite')
+    }
+
     let result = this._cacheGet('all') as Date[] | false
     if (result === false) {
       result = this._iter(new IterResult('all', {}))
@@ -271,8 +275,14 @@ export default class RRule implements QueryMethods {
   /**
    * Returns the number of recurrences in this set. It will have go trough
    * the whole recurrence, if this hasn't been done before.
+   *
+   * If the number of recurrence in this set is infinite, Positive infinity will be returned.
    */
   count (): number {
+    if (!this.isFinite()) {
+      return Number.POSITIVE_INFINITY
+    }
+
     return this.all().length
   }
 

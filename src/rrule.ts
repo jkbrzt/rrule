@@ -235,6 +235,40 @@ export default class RRule implements QueryMethods {
   }
 
   /**
+   * Returns the very first occurrence of this rrule if it exists, null otherwise
+   *
+   * @returns {Date | null}
+   */
+  first (): Date | null {
+    return this.after(this.options.dtstart, true) || null
+  }
+
+  /**
+   * Returns the last occurrence of this rrule if it exists, null otherwise
+   * @returns {Date | null}
+   */
+  last (): Date | null {
+    if (!this.isFinite()) {
+      return null
+    }
+
+    if (this.options.until) {
+      return this.before(this.options.until, true)
+    }
+
+    const allDates = this.all()
+    return allDates[allDates.length - 1] || null
+  }
+
+  /**
+   * Returns whether the number of recurrence in this set is finite.
+   * @returns {boolean}
+   */
+  isFinite (): boolean {
+    return this.options.until != null || this.options.count != null || this.options.interval === 0
+  }
+
+  /**
    * Returns the number of recurrences in this set. It will have go trough
    * the whole recurrence, if this hasn't been done before.
    */

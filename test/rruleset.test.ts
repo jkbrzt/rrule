@@ -575,6 +575,237 @@ describe('RRuleSet', function () {
     })
   })
 
+  describe('first', () => {
+    testRecurring('with simple rrule',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        return {
+          rrule: set,
+          method: 'first'
+        }
+      },
+      datetime(2020, 9, 28, 9, 0)
+    )
+
+    testRecurring('with simple rrule and rdate',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        set.rdate(datetime(2020, 9, 26, 9, 0))
+
+        return {
+          rrule: set,
+          method: 'first'
+        }
+      },
+      datetime(2020, 9, 26, 9, 0)
+    )
+
+    testRecurring('with simple rrule and exdate',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        set.exdate(datetime(2020, 9, 28, 9, 0))
+
+        return {
+          rrule: set,
+          method: 'first'
+        }
+      },
+      datetime(2020, 9, 29, 9, 0)
+    )
+
+    testRecurring('with simple rrule and exrule',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        set.exrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200927T090000')
+        }))
+
+        return {
+          rrule: set,
+          method: 'first'
+        }
+      },
+      datetime(2020, 9, 29, 9, 0)
+    )
+
+    it('returns null if empty', () => {
+      const set = new RRuleSet()
+      expect(set.first()).to.equal(null)
+    })
+
+    it('returns null if rules exclude each-other', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.DAILY,
+        count: 2,
+        dtstart: parse('20200928T090000')
+      }))
+
+      set.exrule(new RRule({
+        freq: RRule.DAILY,
+        count: 2,
+        dtstart: parse('20200928T090000')
+      }))
+
+      expect(set.first()).to.equal(null)
+    })
+  })
+
+  describe('last', () => {
+    testRecurring('with simple rrule',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        return {
+          rrule: set,
+          method: 'last'
+        }
+      },
+      datetime(2020, 9, 29, 9, 0)
+    )
+
+    testRecurring('with simple rrule and rdate',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200928T090000')
+        }))
+
+        set.rdate(datetime(2021, 9, 26, 9, 0))
+
+        return {
+          rrule: set,
+          method: 'last'
+        }
+      },
+      datetime(2021, 9, 26, 9, 0)
+    )
+
+    testRecurring('with simple rrule and exdate',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 3,
+          dtstart: parse('20200928T090000')
+        }))
+
+        set.exdate(datetime(2020, 9, 30, 9, 0))
+
+        return {
+          rrule: set,
+          method: 'last'
+        }
+      },
+      datetime(2020, 9, 29, 9, 0)
+    )
+
+    testRecurring('with simple rrule and exrule',
+      () => {
+        const set = new RRuleSet()
+
+        set.rrule(new RRule({
+          freq: RRule.DAILY,
+          count: 4,
+          dtstart: parse('20200927T090000')
+        }))
+
+        set.exrule(new RRule({
+          freq: RRule.DAILY,
+          count: 2,
+          dtstart: parse('20200929T090000')
+        }))
+
+        return {
+          rrule: set,
+          method: 'last'
+        }
+      },
+      datetime(2020, 9, 28, 9, 0)
+    )
+
+    it('returns null if infinite', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.DAILY,
+        count: 2,
+        dtstart: parse('20200928T090000')
+      }))
+
+      set.rrule(new RRule({
+        freq: RRule.DAILY,
+        dtstart: parse('20200928T090000')
+      }))
+
+      expect(set.last()).to.equal(null)
+    })
+
+    it('returns null if empty', () => {
+      const set = new RRuleSet()
+      expect(set.last()).to.equal(null)
+    })
+
+    it('returns null if rules exclude each-other', () => {
+      const set = new RRuleSet()
+
+      set.rrule(new RRule({
+        freq: RRule.DAILY,
+        count: 2,
+        dtstart: parse('20200928T090000')
+      }))
+
+      set.exrule(new RRule({
+        freq: RRule.DAILY,
+        count: 2,
+        dtstart: parse('20200928T090000')
+      }))
+
+      expect(set.last()).to.equal(null)
+    })
+  })
+
   describe('with end date', () => {
     let cursor: DateTime
 

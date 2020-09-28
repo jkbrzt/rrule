@@ -35,7 +35,10 @@ describe('RRule', function () {
     'FREQ=HOURLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=MINUTELY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=SECONDLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO']
-    .map((s) => expect(rrulestr(s).count()).to.equal(0))
+    .map((s) => {
+      expect(rrulestr(s).count()).to.equal(0);
+      expect(rrulestr(s).isFinite()).to.equal(true);
+    })
   })
 
   it('does not mutate the passed-in options object', function () {
@@ -155,6 +158,76 @@ describe('RRule', function () {
       datetime(1997, 9, 6, 9, 0)
     ]
   )
+
+  testRecurring('testFirst',
+    {
+      rrule: new RRule({
+        freq: RRule.DAILY,
+        dtstart: parse('19970902T090000')
+      }),
+      method: 'first'
+    },
+    [
+      datetime(1997, 9, 2, 9, 0)
+    ]
+  )
+
+  it('testLastZeroInterval', () => {
+    const rrule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: parse('19970902T090000'),
+      interval: 0
+    })
+
+    expect(rrule.first()).to.equal(null)
+  })
+
+  testRecurring('testLastFiniteCount',
+    {
+      rrule: new RRule({
+        freq: RRule.DAILY,
+        dtstart: parse('19970902T090000'),
+        count: 4
+      }),
+      method: 'last'
+    },
+    [
+      datetime(1997, 9, 5, 9, 0)
+    ]
+  )
+
+  testRecurring('testLastFiniteUntil',
+    {
+      rrule: new RRule({
+        freq: RRule.DAILY,
+        dtstart: parse('19970902T090000'),
+        until: parse('19970910T090000')
+      }),
+      method: 'last'
+    },
+    [
+      datetime(1997, 9, 10, 9, 0)
+    ]
+  )
+
+  it('testLastInfinite', () => {
+    const rrule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: parse('19970902T090000')
+    })
+
+    expect(rrule.last()).to.equal(null)
+  })
+
+  it('testLastZeroInterval', () => {
+    const rrule = new RRule({
+      freq: RRule.DAILY,
+      dtstart: parse('19970902T090000'),
+      interval: 0
+    })
+
+    expect(rrule.last()).to.equal(null)
+  })
 
   testRecurring('testYearly',
     new RRule({

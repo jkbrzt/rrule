@@ -288,6 +288,36 @@ describe('rrulestr', function () {
     })
   })
 
+  it('adds dtstart when forceset is applied', () => {
+    const rruleset = rrulestr(
+      'RRULE:FREQ=WEEKLY',
+      {
+        forceset: true,
+        dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0))
+      }
+    )
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      "DTSTART:19970902T090000Z",
+      "RRULE:FREQ=WEEKLY"
+    ])
+  })
+
+  it('adds dtstart from options overriding rule\'s dtstart', () => {
+    const rruleset = rrulestr(
+      'RRULE:DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE',
+      {
+        forceset: true,
+        dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0))
+      }
+    )
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      "DTSTART:19970902T090000Z",
+      "RRULE:FREQ=WEEKLY;BYDAY=TU,WE"
+    ])
+  })
+
   it('parses TZID', () => {
     const rrule = rrulestr(
       'DTSTART;TZID=America/New_York:19970902T090000\n' +
@@ -355,7 +385,7 @@ describe('rrulestr', function () {
       "RRULE:FREQ=DAILY;INTERVAL=1",
       "RDATE:20180720T111500Z",
       "EXDATE:20180721T111500Z"
-    ]) 
+    ])
   })
 
   it('parses an RDATE with a TZID param', () => {
@@ -371,7 +401,7 @@ describe('rrulestr', function () {
       "RRULE:FREQ=DAILY;INTERVAL=1",
       "RDATE;TZID=America/Los_Angeles:20180720T111500",
       "EXDATE;TZID=America/Los_Angeles:20180721T111500"
-    ]) 
+    ])
   })
 })
 

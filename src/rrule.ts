@@ -3,7 +3,7 @@ import dateutil from './dateutil'
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
-import { Nlp } from './nlp/index'
+import { fromText, parseText, toText, isFullyConvertible } from './nlp/index'
 import { DateFormatter, GetText } from './nlp/totext'
 import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
@@ -12,19 +12,6 @@ import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
 import { iter } from './iter/index'
-
-interface GetNlp {
-  _nlp: Nlp
-  (): Nlp
-}
-
-const getnlp: GetNlp = function () {
-  // Lazy, runtime import to avoid circular refs.
-  if (!getnlp._nlp) {
-    getnlp._nlp = require('./nlp')
-  }
-  return getnlp._nlp
-} as GetNlp
 
 // =============================================================================
 // RRule
@@ -114,11 +101,11 @@ export default class RRule implements QueryMethods {
   }
 
   static parseText (text: string, language?: Language) {
-    return getnlp().parseText(text, language)
+    return parseText(text, language)
   }
 
   static fromText (text: string, language?: Language) {
-    return getnlp().fromText(text, language)
+    return fromText(text, language)
   }
 
   static parseString = parseString
@@ -256,11 +243,11 @@ export default class RRule implements QueryMethods {
    * to text.
    */
   toText (gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
-    return getnlp().toText(this, gettext, language, dateFormatter)
+    return toText(this, gettext, language, dateFormatter)
   }
 
   isFullyConvertibleToText () {
-    return getnlp().isFullyConvertible(this)
+    return isFullyConvertible(this)
   }
 
   /**

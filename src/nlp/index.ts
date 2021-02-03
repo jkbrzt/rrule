@@ -1,6 +1,7 @@
 import ToText, { DateFormatter, GetText } from './totext'
 import parseText from './parsetext'
 import RRule from '../index'
+import { Frequency } from '../types'
 import ENGLISH, { Language } from './i18n'
 
 /*!
@@ -108,12 +109,12 @@ const common = [
 ]
 
 ToText.IMPLEMENTED = []
-ToText.IMPLEMENTED[RRule.HOURLY] = common
-ToText.IMPLEMENTED[RRule.MINUTELY] = common
-ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common)
-ToText.IMPLEMENTED[RRule.WEEKLY] = common
-ToText.IMPLEMENTED[RRule.MONTHLY] = common
-ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
+ToText.IMPLEMENTED[Frequency.HOURLY] = common
+ToText.IMPLEMENTED[Frequency.MINUTELY] = common
+ToText.IMPLEMENTED[Frequency.DAILY] = ['byhour'].concat(common)
+ToText.IMPLEMENTED[Frequency.WEEKLY] = common
+ToText.IMPLEMENTED[Frequency.MONTHLY] = common
+ToText.IMPLEMENTED[Frequency.YEARLY] = ['byweekno', 'byyearday'].concat(common)
 
 // =============================================================================
 // Export

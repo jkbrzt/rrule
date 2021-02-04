@@ -1,5 +1,9 @@
 ### Changelog
 
+- 2.6.8 (2021-02-04)
+  - Bugfixes:
+    - Solve circular imports (#444)
+
 - 2.6.6 (2020-08-23)
   - Bugfixes:
     - Fixed broken npm package (#417)

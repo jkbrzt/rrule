@@ -210,7 +210,7 @@ export default class RRule implements QueryMethods {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  after (dt: Date, inc = false): Date {
+  after (dt: Date, inc = false): Date | null {
     if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.after')
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
@@ -218,7 +218,7 @@ export default class RRule implements QueryMethods {
       result = this._iter(new IterResult('after', args))
       this._cacheAdd('after', result, args)
     }
-    return result as Date
+    return result as Date | null
   }
 
   /**

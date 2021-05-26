@@ -1,7 +1,7 @@
 import ENGLISH, { Language } from './i18n'
-import RRule from '../index'
 import { Options } from '../types'
 import { WeekdayStr } from '../weekday'
+import RRule from '../rrule'
 
 // =============================================================================
 // Parser

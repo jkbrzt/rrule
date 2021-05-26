@@ -3,7 +3,7 @@ import dateutil from './dateutil'
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
-import { fromText, parseText, toText, isFullyConvertible } from './nlp/index'
+import { fromText, parseText, toText, isFullyConvertible } from './nlp'
 import { DateFormatter, GetText } from './nlp/totext'
 import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes, IterResultType } from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
@@ -11,7 +11,7 @@ import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
-import { iter } from './iter/index'
+import { iter } from './iter'
 
 // =============================================================================
 // RRule

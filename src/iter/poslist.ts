@@ -1,5 +1,5 @@
 import dateutil from '../dateutil'
-import Iterinfo from '../iterinfo/index'
+import Iterinfo from '../iterinfo'
 import { pymod, isPresent, includes } from '../helpers'
 import { Time } from '../datetime'
 

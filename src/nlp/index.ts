@@ -1,8 +1,8 @@
 import ToText, { DateFormatter, GetText } from './totext'
 import parseText from './parsetext'
-import RRule from '../index'
 import { Frequency } from '../types'
 import ENGLISH, { Language } from './i18n'
+import RRule from '../rrule'
 
 /*!
 * rrule.js - Library for working with recurrence rules for calendar dates.

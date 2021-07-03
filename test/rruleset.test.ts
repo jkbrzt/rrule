@@ -1,5 +1,6 @@
 import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
-import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
+import { RRule, RRuleSet, rrulestr, Frequency } from '../src';
+
 import { DateTime } from 'luxon'
 import { expect } from 'chai'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
@@ -69,6 +70,7 @@ describe('RRuleSet', function () {
         byweekday: [RRule.TU, RRule.TH],
         dtstart: parse('19970902T090000')
       }))
+
       set.exrule(new RRule({
         freq: RRule.YEARLY,
         count: 3,
@@ -530,7 +532,7 @@ describe('RRuleSet', function () {
 
       set.rdate(
         DateTime.fromISO('20020301T090000').toJSDate(),
-      )     
+      )
 
       expect(set.all()).to.deep.equal([
         expectedDate(DateTime.fromISO('20000101T090000'), currentLocalDate, targetZone),
@@ -663,9 +665,9 @@ describe('RRuleSet', function () {
 
       const newRuleSet = new RRuleSet()
       const rule = new RRule({
-          ...rrule.origOptions,
-          until: newEndDate.toJSDate(),
-        })
+        ...rrule.origOptions,
+        until: newEndDate.toJSDate(),
+      })
 
       newRuleSet.rrule(rule)
 
@@ -742,6 +744,40 @@ describe('RRuleSet', function () {
     expect(() => set.exdate('foo' as any)).to.throw()
   })
 
+  // Fixes https://github.com/jakubroztocil/rrule/issues/325
+  it('should generated the first n dates with multiple rruels', () => {
+    var r1 = "DTSTART:20190228T141000\nRRULE:FREQ=DAILY;BYDAY=TH;BYHOUR=12,13,14"
+    var r2 = "DTSTART:20190227T105000\nRRULE:FREQ=DAILY;BYDAY=SA;BYHOUR=20,22,23"
+
+    var set = new RRuleSet()
+    set.rrule(rrulestr(r1))
+    set.rrule(rrulestr(r2))
+
+    const iter = set.createIterator();
+    
+    // Include results from both rrules
+    expect([
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value
+    ].map((v) => v.toISOString())).to.deep.equal([
+      '2019-02-28T14:10:00.000Z',
+      '2019-03-02T20:50:00.000Z',
+      '2019-03-02T22:50:00.000Z',
+      '2019-03-02T23:50:00.000Z',
+      '2019-03-07T12:10:00.000Z',
+      '2019-03-07T13:10:00.000Z',
+      '2019-03-07T14:10:00.000Z',
+      '2019-03-09T20:50:00.000Z'
+
+    ])
+  })
+
   describe('getters', () => {
     it('rrules()', () => {
       let set = new RRuleSet();
@@ -755,7 +791,7 @@ describe('RRuleSet', function () {
 
       expect(set.rrules().map(e => e.toString())).eql([rrule.toString()]);
     });
-    
+
     it('exrules()', () => {
       let set = new RRuleSet();
       let rrule = new RRule({
@@ -773,7 +809,7 @@ describe('RRuleSet', function () {
       let set = new RRuleSet();
       let dt = parse('19610201T090000');
       set.rdate(dt);
-      
+
       expect(set.rdates()).eql([dt]);
     });
 

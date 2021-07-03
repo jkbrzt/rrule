@@ -1,7 +1,6 @@
 import dateutil from './dateutil'
 
 import IterResult, { IterArgs } from './iterresult'
-import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
 import { fromText, parseText, toText, isFullyConvertible } from './nlp/index'
 import { DateFormatter, GetText } from './nlp/totext'
@@ -12,6 +11,7 @@ import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
 import { iter } from './iter/index'
+import { IteratorSetReturn } from './types';
 
 // =============================================================================
 // RRule
@@ -90,7 +90,7 @@ export default class RRule implements QueryMethods {
   static readonly SA = Days.SA
   static readonly SU = Days.SU
 
-  constructor (options: Partial<Options> = {}, noCache: boolean = false) {
+  constructor(options: Partial<Options> = {}, noCache: boolean = false) {
     // RFC string
     this._cache = noCache ? null : new Cache()
 
@@ -100,32 +100,32 @@ export default class RRule implements QueryMethods {
     this.options = parsedOptions
   }
 
-  static parseText (text: string, language?: Language) {
+  static parseText(text: string, language?: Language) {
     return parseText(text, language)
   }
 
-  static fromText (text: string, language?: Language) {
+  static fromText(text: string, language?: Language) {
     return fromText(text, language)
   }
 
   static parseString = parseString
 
-  static fromString (str: string) {
+  static fromString(str: string) {
     return new RRule(RRule.parseString(str) || undefined)
   }
 
   static optionsToString = optionsToString
 
-  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
+  protected _iter<M extends QueryMethodTypes>(iterResult: IterResult<M>): IterableIterator<Date> {
     return iter(iterResult, this.options)
   }
 
-  private _cacheGet (what: CacheKeys | 'all', args?: Partial<IterArgs>) {
+  private _cacheGet(what: CacheKeys | 'all', args?: Partial<IterArgs>) {
     if (!this._cache) return false
     return this._cache._cacheGet(what, args)
   }
 
-  public _cacheAdd (
+  public _cacheAdd(
     what: CacheKeys | 'all',
     value: Date[] | Date | null,
     args?: Partial<IterArgs>
@@ -140,18 +140,38 @@ export default class RRule implements QueryMethods {
    *                   to stop the iteration.
    * @return Array containing all recurrences.
    */
-  all (iterator?: (d: Date, len: number) => boolean): Date[] {
-    if (iterator) {
-      return this._iter(new CallbackIterResult('all', {}, iterator))
+  all(iterator?: (d: Date, len: number) => boolean): Date[] {
+    let cachedValue = iterator ? this._cacheGet('all', {}) : false
+    if (cachedValue) return cachedValue as Date[]
+
+    let results: Date[] = []
+    let i = 0
+    for (const date of this.createIterator('all')) {
+      if (iterator && iterator(date, i) === false) {
+        break
+      }
+      results.push(date)
+      ++i
     }
 
-    let result = this._cacheGet('all') as Date[] | false
-    if (result === false) {
-      result = this._iter(new IterResult('all', {}))
-      this._cacheAdd('all', result)
-    }
-    return result
+    return results
   }
+
+  /**
+   * Creates an iterator the the mode and args
+   * @param mode 
+   * @param args 
+   * @returns An iterator to traverse the query
+   */
+  createIterator<M extends QueryMethodTypes>(
+    method?: M,
+    args: Partial<IterArgs> = {}
+  ): IterableIterator<Date> {
+    const _method = method || 'all';
+    return this._iter(new IterResult(_method, args));
+  }
+
+
 
   /**
    * Returns all the occurrences of the rrule between after and before.
@@ -160,7 +180,7 @@ export default class RRule implements QueryMethods {
    * list, if they are found in the recurrence set.
    * @return Array
    */
-  between (
+  between(
     after: Date,
     before: Date,
     inc: boolean = false,
@@ -173,18 +193,20 @@ export default class RRule implements QueryMethods {
       inc
     }
 
-    if (iterator) {
-      return this._iter(
-        new CallbackIterResult('between', args, iterator)
-      )
+    let cachedValue = iterator ? this._cacheGet('between', args) : false
+    if (cachedValue) return cachedValue as Date[]
+
+    let results: Date[] = []
+    let i = 0
+    for (const date of this.createIterator('between', args)) {
+      if (iterator && iterator(date, i) === false) {
+        break
+      }
+      results.push(date)
+      ++i
     }
 
-    let result = this._cacheGet('between', args)
-    if (result === false) {
-      result = this._iter(new IterResult('between', args))
-      this._cacheAdd('between', result, args)
-    }
-    return result as Date[]
+    return results
   }
 
   /**
@@ -193,15 +215,18 @@ export default class RRule implements QueryMethods {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  before (dt: Date, inc = false): Date {
+  before(dt: Date, inc = false): Date {
     if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.before')
     const args = { dt: dt, inc: inc }
-    let result = this._cacheGet('before', args)
-    if (result === false) {
-      result = this._iter(new IterResult('before', args))
-      this._cacheAdd('before', result, args)
+
+    let result: Date | null = null
+    for (const date of this.createIterator('before', args)) {
+      result = date
     }
-    return result as Date
+
+    if (!result) return (result as any)
+    this._cacheAdd('before', (result), args)
+    return (result)
   }
 
   /**
@@ -210,22 +235,24 @@ export default class RRule implements QueryMethods {
    * With inc == True, if dt itself is an occurrence, it will be returned.
    * @return Date or null
    */
-  after (dt: Date, inc = false): Date {
+  after(dt: Date, inc = false): Date {
     if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.after')
     const args = { dt: dt, inc: inc }
-    let result = this._cacheGet('after', args)
-    if (result === false) {
-      result = this._iter(new IterResult('after', args))
-      this._cacheAdd('after', result, args)
+    let result: Date | null = null
+    for (const date of this.createIterator('after', args)) {
+      result = date
     }
-    return result as Date
+
+    if (!result) return (result as any)
+    this._cacheAdd('after', (result), args)
+    return (result)
   }
 
   /**
    * Returns the number of recurrences in this set. It will have go trough
    * the whole recurrence, if this hasn't been done before.
    */
-  count (): number {
+  count(): number {
     return this.all().length
   }
 
@@ -234,7 +261,7 @@ export default class RRule implements QueryMethods {
    * @see <http://www.ietf.org/rfc/rfc2445.txt>
    * @return String
    */
-  toString () {
+  toString() {
     return optionsToString(this.origOptions)
   }
 
@@ -242,11 +269,11 @@ export default class RRule implements QueryMethods {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
+  toText(gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
     return toText(this, gettext, language, dateFormatter)
   }
 
-  isFullyConvertibleToText () {
+  isFullyConvertibleToText() {
     return isFullyConvertible(this)
   }
 
@@ -254,7 +281,7 @@ export default class RRule implements QueryMethods {
    * @return a RRule instance with the same freq and options
    *          as this one (cache is not cloned)
    */
-  clone (): RRule {
+  clone(): RRule {
     return new RRule(this.origOptions)
   }
 }

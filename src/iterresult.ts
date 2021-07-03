@@ -20,7 +20,6 @@ export default class IterResult<M extends QueryMethodTypes> {
   public readonly args: Partial<IterArgs>
   public readonly minDate: Date | null = null
   public readonly maxDate: Date | null = null
-  public _result: Date[] = []
   public total = 0
 
   constructor (method: M, args: Partial<IterArgs>) {
@@ -40,14 +39,38 @@ export default class IterResult<M extends QueryMethodTypes> {
   }
 
   /**
-   * Possibly adds a date into the result.
+   * Checks a date against the boundary conditions
+   *
+   * @param {Date} date
+   * @return {Boolean} true this is a date of interest
+   */
+  accept (date: Date) {
+    ++this.total
+    const tooEarly = this.minDate && date < this.minDate
+    const tooLate = this.maxDate && date > this.maxDate
+
+    if (this.method === 'between') {
+      if (tooEarly) return false
+      if (tooLate) return false
+    } else if (this.method === 'before') {
+      if (tooLate) return false
+    } else if (this.method === 'after') {
+      if (tooEarly) return false
+      return true
+    }
+
+    return true
+  }
+
+  /**
+   * Checks if we should continue hte
    *
    * @param {Date} date - the date isn't necessarly added to the result
    *                      list (if it is too late/too early)
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept (date: Date) {
+  shouldContinue (date: Date) {
     ++this.total
     const tooEarly = this.minDate && date < this.minDate
     const tooLate = this.maxDate && date > this.maxDate
@@ -59,39 +82,10 @@ export default class IterResult<M extends QueryMethodTypes> {
       if (tooLate) return false
     } else if (this.method === 'after') {
       if (tooEarly) return true
-      this.add(date)
-      return false
+      if (tooLate) return false
     }
 
-    return this.add(date)
-  }
-
-  /**
-   *
-   * @param {Date} date that is part of the result.
-   * @return {Boolean} whether we are interested in more values.
-   */
-  add (date: Date) {
-    this._result.push(date)
     return true
-  }
-
-  /**
-   * 'before' and 'after' return only one date, whereas 'all'
-   * and 'between' an array.
-   * @return {Date,Array?}
-   */
-  getValue (): IterResultType<M> {
-    const res = this._result
-    switch (this.method) {
-      case 'all':
-      case 'between':
-        return res as IterResultType<M>
-      case 'before':
-      case 'after':
-      default:
-        return (res.length ? res[res.length - 1] : null) as IterResultType<M>
-    }
   }
 
   clone () {

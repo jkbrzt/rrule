@@ -76,10 +76,25 @@ export class Cache {
       // Not in the cache, but we already know all the occurrences,
       // so we can find the correct dates from the cached ones.
       const iterResult = new IterResult(what, args!)
+      let results = []
       for (let i = 0; i < (this.all as Date[]).length; i++) {
-        if (!iterResult.accept((this.all as Date[])[i])) break
+        const date = (this.all as Date[])[i]
+        if (iterResult.accept(date)) results.push(date)
+        if (iterResult.shouldContinue(date)) break
       }
-      cached = iterResult.getValue() as Date
+
+      let cached
+      switch (iterResult.method) {
+        case 'all':
+        case 'between':
+          cached = results
+          break
+        case 'before':
+        case 'after':
+        default:
+          cached = (results.length ? results[results.length - 1] : null)
+      }
+
       this._cacheAdd(what, cached, args)
     }
 

@@ -9,7 +9,7 @@ import { DateWithZone } from '../datewithzone'
 import { buildPoslist } from './poslist'
 import { Time, DateTime } from '../datetime'
 
-export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, options: ParsedOptions) {
+export function* iter<M extends QueryMethodTypes> (iterResult: IterResult<M>, options: ParsedOptions): IterableIterator<Date> {
   const {
     dtstart,
     freq,
@@ -20,7 +20,7 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
 
   let count = options.count
   if (count === 0 || interval === 0) {
-    return emitResult(iterResult)
+    return
   }
 
   let counterDate = DateTime.fromDate(dtstart)
@@ -45,19 +45,27 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
       for (let j = 0; j < poslist.length; j++) {
         const res = poslist[j]
         if (until && res > until) {
-          return emitResult(iterResult)
+          return
         }
 
         if (res >= dtstart) {
           const rezonedDate = rezoneIfNeeded(res, options)
-          if (!iterResult.accept(rezonedDate)) {
-            return emitResult(iterResult)
+          if (iterResult.accept(rezonedDate)) {
+            yield rezonedDate
+
+            if (iterResult.method === 'after') {
+              return
+            }
+          }
+
+          if (iterResult.shouldContinue(rezonedDate) === false) {
+            return
           }
 
           if (count) {
             --count
             if (!count) {
-              return emitResult(iterResult)
+              return
             }
           }
         }
@@ -74,19 +82,28 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
           const time = timeset![k]
           const res = dateutil.combine(date, time)
           if (until && res > until) {
-            return emitResult(iterResult)
+            return
           }
 
           if (res >= dtstart) {
             const rezonedDate = rezoneIfNeeded(res, options)
-            if (!iterResult.accept(rezonedDate)) {
-              return emitResult(iterResult)
+
+            if (iterResult.accept(rezonedDate)) {
+              yield rezonedDate
+
+              if (iterResult.method === 'after') {
+                return
+              }
+            }
+
+            if (iterResult.shouldContinue(rezonedDate) === false) {
+              return
             }
 
             if (count) {
               --count
               if (!count) {
-                return emitResult(iterResult)
+                return
               }
             }
           }
@@ -94,14 +111,14 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
       }
     }
     if (options.interval === 0) {
-      return emitResult(iterResult)
+      return
     }
 
     // Handle frequency and interval
     counterDate.add(options, filtered)
 
     if (counterDate.year > dateutil.MAXYEAR) {
-      return emitResult(iterResult)
+      return
     }
 
     if (!freqIsDailyOrGreater(freq)) {
@@ -148,10 +165,6 @@ function isFiltered (
 
 function rezoneIfNeeded (date: Date, options: ParsedOptions) {
   return new DateWithZone(date, options.tzid).rezonedDate()
-}
-
-function emitResult <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
-  return iterResult.getValue()
 }
 
 function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {

@@ -3,7 +3,6 @@ import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
-import { optionsToString } from '../src/optionstostring';
 
 describe('RRule', function () {
   // Enable additional toString() / fromString() tests
@@ -3731,5 +3730,25 @@ describe('RRule', function () {
     expect(() => rule.before(invalidDate)).to.throw('Invalid date passed in to RRule.before')
     expect(() => rule.between(invalidDate, validDate)).to.throw('Invalid date passed in to RRule.between')
     expect(() => rule.between(validDate, invalidDate)).to.throw('Invalid date passed in to RRule.between')
+  })
+
+  it('should itereate one record at a time when iterating over results', () => {
+    const ruleString = 'DTSTART:20181101T120000Z\nRRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=4;WKST=SU';
+    const rrule = RRule.fromString(ruleString);
+
+
+    const iter = rrule.createIterator();
+    const results = [
+      iter.next().value,
+      iter.next().value,
+      iter.next().value,
+      iter.next().value
+    ]
+    expect(results).to.deep.equal([
+      new Date('2018-11-02T12:00:00.000Z'),
+      new Date('2018-11-05T12:00:00.000Z'),
+      new Date('2018-11-07T12:00:00.000Z'),
+      new Date('2018-11-09T12:00:00.000Z')
+    ])
   })
 })

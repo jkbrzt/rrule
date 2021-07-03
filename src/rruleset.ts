@@ -53,8 +53,8 @@ export default class RRuleSet extends RRule {
   dtstart = createGetterSetter.apply(this, ['dtstart'])
   tzid = createGetterSetter.apply(this, ['tzid'])
 
-  _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
-    return iterSet(
+  protected* _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterableIterator<Date> {
+    const iter = iterSet(
       iterResult,
       this._rrule,
       this._exrule,
@@ -62,6 +62,10 @@ export default class RRuleSet extends RRule {
       this._exdate,
       this.tzid()
     )
+
+    for (const [date] of iter) {
+      yield date
+    }
   }
 
   /**

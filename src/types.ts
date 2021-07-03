@@ -1,3 +1,4 @@
+import RRule from '.'
 import { Weekday, WeekdayStr } from './weekday'
 
 export interface QueryMethods {
@@ -9,6 +10,7 @@ export interface QueryMethods {
 
 export type QueryMethodTypes = keyof QueryMethods
 export type IterResultType<M extends QueryMethodTypes> = M extends 'all' | 'between' ? Date[] : (Date | null)
+export type IteratorSetReturn = [Date, RRule | Date]
 
 export enum Frequency {
   YEARLY = 0,

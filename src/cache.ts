@@ -11,7 +11,6 @@ function argsMatch (
   if (Array.isArray(left)) {
     if (!Array.isArray(right)) return false
     if (left.length !== right.length) return false
-    if (left.length === 0) return true
     return left.every((date, i) => date.getTime() === right[i].getTime())
   }
 

@@ -4,6 +4,24 @@ import { isArray } from './helpers'
 
 export type CacheKeys = 'before' | 'after' | 'between'
 
+function argsMatch (
+  left: IterArgs[keyof IterArgs] | undefined,
+  right: IterArgs[keyof IterArgs] | undefined
+) {
+  if (Array.isArray(left)) {
+    if (!Array.isArray(right)) return false
+    if (left.length !== right.length) return false
+    if (left.length === 0) return true
+    return left.every((date, i) => date.getTime() === right[i].getTime())
+  }
+
+  if (left instanceof Date) {
+    return right instanceof Date && left.getTime() === right.getTime()
+  }
+
+  return left === right
+}
+
 export class Cache {
   all: Date[] | Partial<IterArgs> | false = false
   before: IterArgs[] = []
@@ -51,7 +69,7 @@ export class Cache {
     const findCacheDiff = function (item: IterArgs) {
       for (let i = 0; i < argsKeys.length; i++) {
         const key = argsKeys[i]
-        if (String(args![key]) !== String(item[key])) {
+        if (!argsMatch(args![key], item[key])) {
           return true
         }
       }
@@ -89,5 +107,4 @@ export class Cache {
         ? dateutil.clone(cached)
         : cached
   }
-
 }

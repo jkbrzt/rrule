@@ -1,5 +1,5 @@
 
-export class RRuleErrorHandler {
+export default class RRuleError {
 
   static emitLuxonTzidError = true
 

@@ -16,6 +16,7 @@
 
 import RRule from './rrule'
 import RRuleSet from './rruleset'
+import RRuleError from './rruleerror'
 
 export { rrulestr } from './rrulestr'
 export { Frequency, ByWeekday, Options } from './types'
@@ -24,7 +25,8 @@ export { RRuleStrOptions } from './rrulestr'
 
 export {
   RRule,
-  RRuleSet
+  RRuleSet,
+  RRuleError
 }
 
 export default RRule

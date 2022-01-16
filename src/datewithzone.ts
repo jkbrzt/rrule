@@ -1,6 +1,6 @@
 import dateutil from './dateutil'
 import { DateTime } from 'luxon'
-import { RRuleErrorHandler } from './error'
+import RRuleError from './rruleerror'
 
 export class DateWithZone {
   public date: Date
@@ -42,7 +42,7 @@ export class DateWithZone {
       return rezoned.toJSDate()
     } catch (e) {
       if (e instanceof TypeError) {
-        RRuleErrorHandler.logLuxonTzidError(e)
+        RRuleError.logLuxonTzidError(e)
       }
       return this.date
     }

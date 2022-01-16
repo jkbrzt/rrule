@@ -6,16 +6,16 @@ export class DateWithZone {
   public date: Date
   public tzid?: string | null
 
-  constructor(date: Date, tzid?: string | null) {
+  constructor (date: Date, tzid?: string | null) {
     this.date = date
     this.tzid = tzid
   }
 
-  private get isUTC() {
+  private get isUTC () {
     return !this.tzid || this.tzid.toUpperCase() === 'UTC'
   }
 
-  public toString() {
+  public toString () {
     const datestr = dateutil.timeToUntilString(this.date.getTime(), this.isUTC)
     if (!this.isUTC) {
       return `;TZID=${this.tzid}:${datestr}`
@@ -24,11 +24,11 @@ export class DateWithZone {
     return `:${datestr}`
   }
 
-  public getTime() {
+  public getTime () {
     return this.date.getTime()
   }
 
-  public rezonedDate() {
+  public rezonedDate () {
     if (this.isUTC) {
       return this.date
     }
@@ -42,7 +42,7 @@ export class DateWithZone {
       return rezoned.toJSDate()
     } catch (e) {
       if (e instanceof TypeError) {
-        RRuleErrorHandler.logLuxonTzidError(e);
+        RRuleErrorHandler.logLuxonTzidError(e)
       }
       return this.date
     }

@@ -317,7 +317,7 @@ describe('rrulestr', function () {
 
   it('parses a DTSTART with a TZID inside an RRULE', () => {
     const rrule = rrulestr(
-      'RRULE:UNTIL=19990404T110000Z;DTSTART;TZID=America/New_York:19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'
+      'RRULE:UNTIL=19990404T110000Z;DTSTART;TZID=America/New_York:19990104T110000;FREQ=WEEKLY;BYDAY=TU,WE'
     )
 
     expect(rrule.options).to.deep.include({

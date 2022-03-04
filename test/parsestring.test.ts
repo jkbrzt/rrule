@@ -37,8 +37,31 @@ describe('parseString', () => {
         'RRULE:FREQ=YEARLY;COUNT=3\n',
         {
           dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+          tzid: 'UTC',
           freq: RRule.YEARLY,
           count: 3
+        }
+      ],
+      [
+        'DTSTART:19970902T090000Z\n' +
+        'DTEND:19970903T090000Z\n' +
+        'RRULE:FREQ=WEEKLY\n',
+        {
+          dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+          dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
+          tzid: 'UTC',
+          freq: RRule.WEEKLY
+        }
+      ],
+      [
+        'RRULE:FREQ=WEEKLY\n' +
+        'DTEND:19970903T090000Z\n' +
+        'DTSTART:19970902T090000Z\n',
+        {
+          dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+          dtend: new Date(Date.UTC(1997, 8, 3, 9, 0, 0)),
+          tzid: 'UTC',
+          freq: RRule.WEEKLY
         }
       ]
     ]

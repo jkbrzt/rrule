@@ -2,6 +2,7 @@ import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
 import { expect } from 'chai'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { DateTime } from 'luxon'
+import { DateWithZone } from '../src/datewithzone'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 import { optionsToString } from '../src/optionstostring';
 
@@ -27,8 +28,8 @@ describe('RRule', function () {
     const s2 = rrulestr(s1).toString()
     expect(s1).equals(s2, s1 + ' => ' + s2)
   })
-  
-  it('rrulestr itteration not infinite when interval 0', function () {
+
+  it('rrulestr iteration not infinite when interval 0', function () {
     ['FREQ=YEARLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=MONTHLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
     'FREQ=DAILY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
@@ -3504,6 +3505,7 @@ describe('RRule', function () {
     [6, RRule.SU].forEach(function (wkst) {
       const rr = new RRule({
         dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
+        tzid: 'UTC',
         until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),
         freq: RRule.MONTHLY,
         interval: 1,
@@ -3642,7 +3644,7 @@ describe('RRule', function () {
     const ruleString = rrule.toString()
     const rrule2 = RRule.fromString(ruleString)
 
-    expect(ruleString).to.equal('DTSTART:09900101T000000Z\nRRULE:COUNT=1')
+    expect(ruleString).to.equal('DTSTART:09900101T000000\nRRULE:COUNT=1')
     expect(rrule2.count()).to.equal(1)
     expect(rrule2.all()).to.deep.equal([
       new Date(Date.UTC(990, 0, 1, 0, 0, 0))

@@ -366,7 +366,8 @@ describe('RRuleSet', function () {
       set.rrule(new RRule({
         freq: RRule.YEARLY,
         count: 2,
-        dtstart: parse('19600101T090000')
+        dtstart: parse('19600101T090000'),
+        tzid: 'UTC'
       }))
 
       expect(set.valueOf()).to.deep.equal([
@@ -381,7 +382,8 @@ describe('RRuleSet', function () {
       set.rrule(new RRule({
         freq: RRule.YEARLY,
         count: 2,
-        dtstart: parse('19600101T090000')
+        dtstart: parse('19600101T090000'),
+        tzid: 'UTC'
       }))
 
       set.rrule(new RRule({
@@ -649,6 +651,21 @@ describe('RRuleSet', function () {
 
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
         'DTSTART;TZID=America/New_York:20171201T080000',
+        'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
+      ].join('\n'))
+    })
+
+    it('handles rule with floating time', () => {
+      const legacy = [
+        'RRULE:DTSTART=20171201T080000;FREQ=WEEKLY',
+      ]
+      const original = [
+        'DTSTART:20171201T080000',
+        'RRULE:FREQ=WEEKLY',
+      ]
+
+      expectRecurrence([original, legacy]).toBeUpdatedWithEndDate([
+        'DTSTART:20171201T080000',
         'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
       ].join('\n'))
     })

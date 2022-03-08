@@ -225,7 +225,7 @@ Example with `TZID`:
 
 ```js
 new RRule({
-  dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
+  dtstart: new Date(Date.UTC(2018, 2, 1, 10, 30)),
   count: 1,
   tzid: 'Asia/Tokyo'
 }).all()

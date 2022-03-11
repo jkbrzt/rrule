@@ -114,13 +114,13 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
   ) {
     const rset = new RRuleSet(noCache)
 
-    rset.dtstart(dtstart)
+    rset.dtstart(options.dtstart || dtstart)
     rset.tzid(tzid || undefined)
 
     rrulevals.forEach(val => {
       rset.rrule(
         new RRule(
-          groomRruleOptions(val, dtstart, tzid),
+          groomRruleOptions(val, options.dtstart || dtstart, tzid),
           noCache
         )
       )
@@ -133,7 +133,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exrulevals.forEach(val => {
       rset.exrule(
         new RRule(
-          groomRruleOptions(val, dtstart, tzid),
+          groomRruleOptions(val, options.dtstart || dtstart, tzid),
           noCache
         )
       )
@@ -143,7 +143,7 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
       rset.exdate(date)
     })
 
-    if (options.compatible && options.dtstart) rset.rdate(dtstart!)
+    if (options.compatible && options.dtstart) rset.rdate((options.dtstart || dtstart))
     return rset
   }
 

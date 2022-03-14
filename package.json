@@ -81,7 +81,7 @@
     "README.md"
   ],
   "optionalDependencies": {
-    "luxon": "^1.21.3"
+    "luxon": "^1.0.0 || ^2.0.0"
   },
   "peerDependencies": {},
   "dependencies": {

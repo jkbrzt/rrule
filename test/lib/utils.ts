@@ -17,8 +17,8 @@ const assertDatesEqual = function (actual: Date | Date[], expected: Date | Date[
   for (let i = 0; i < expected.length; i++) {
     const act = actual[i]
     const exp = expected[i]
-    expect(exp instanceof Date ? exp.toString() : exp).to.equal(
-      act.toString(), msg + (i + 1) + '/' + expected.length)
+    expect(act.toString()).to.equal(
+      exp instanceof Date ? exp.toString() : exp, msg + (i + 1) + '/' + expected.length)
   }
 }
 

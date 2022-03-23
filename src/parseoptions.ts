@@ -33,6 +33,15 @@ export function parseOptions (options: Partial<Options>) {
 
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
+  // infinite count is handled by null
+  if (isNumber(opts.count)) {
+    if (opts.count === Number.POSITIVE_INFINITY) {
+      opts.count = null
+    } else if (!Number.isSafeInteger(opts.count)) {
+      throw new Error('Invalid option: Count can only be a safe integer, null, or positive infinity')
+    }
+  }
+
   if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday
   } else if (isNumber(opts.wkst)) {

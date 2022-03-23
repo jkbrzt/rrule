@@ -136,6 +136,59 @@ export default class RRuleSet extends RRule {
     return this._exdate.map(e => new Date(e.getTime()))
   }
 
+  /**
+   * Returns the very first occurrence of this rrule set if it exists, null otherwise
+   *
+   * @returns {Date | null}
+   */
+  first (): Date | null {
+    let earliestDate = null
+    for (const rrule of this._rrule) {
+      if (!earliestDate || rrule.options.dtstart < earliestDate) {
+        earliestDate = rrule.options.dtstart
+      }
+    }
+
+    for (const rdate of this._rdate) {
+      if (!earliestDate || rdate < earliestDate) {
+        earliestDate = rdate
+      }
+    }
+
+    if (earliestDate == null) {
+      return null
+    }
+
+    return this.after(earliestDate, true)
+  }
+
+  /**
+   * Returns the last occurrence of this rrule set if it exists, null otherwise
+   * @returns {Date | null}
+   */
+  last (): Date | null {
+    if (!this.isFinite()) {
+      return null
+    }
+
+    const allDates = this.all()
+    return allDates[allDates.length - 1] || null
+  }
+
+  /**
+   * Returns whether the number of recurrence in this set is finite.
+   * @returns {boolean}
+   */
+  isFinite (): boolean {
+    for (const rrule of this._rrule) {
+      if (!rrule.isFinite()) {
+        return false
+      }
+    }
+
+    return true
+  }
+
   valueOf () {
     let result: string[] = []
 

@@ -1,5 +1,5 @@
 {
-  "name": "rrule",
+  "name": "@akiflow/rrule",
   "version": "2.6.8",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
@@ -17,7 +17,7 @@
   "typings": "dist/esm/src/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git://github.com/jakubroztocil/rrule.git"
+    "url": "git://github.com/akiflow/rrule.git"
   },
   "husky": {
     "hooks": {

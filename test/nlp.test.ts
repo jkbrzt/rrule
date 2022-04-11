@@ -24,6 +24,7 @@ const texts = [
   ['Every month on the 3rd Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],
   ['Every month on the 3rd last Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=-3TU'],
   ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
+  ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=MO;BYSETPOS=-1'],
   ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
   // ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
   ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20']

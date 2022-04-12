@@ -77,7 +77,7 @@ export default class ToText {
         ? [this.origOptions.byweekday]
         : this.origOptions.byweekday
       if(this.origOptions.bysetpos){
-        byweekday.forEach((weekday: Weekday) => weekday.nth(Number(this.origOptions.bysetpos))))
+        byweekday.forEach((weekday: Weekday) => weekday.nth(Number(this.origOptions.bysetpos)))
       }
       const days = String(byweekday)
 

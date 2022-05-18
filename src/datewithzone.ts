@@ -1,5 +1,6 @@
 import dateutil from './dateutil'
 import { DateTime } from 'luxon'
+import rrule from './rrule'
 
 export class DateWithZone {
   public date: Date
@@ -33,6 +34,10 @@ export class DateWithZone {
     }
 
     try {
+      if (rrule.customRezonedDate) {
+        return (rrule.customRezonedDate(this.date, this.tzid!))
+      }
+
       const datetime = DateTime
         .fromJSDate(this.date)
 

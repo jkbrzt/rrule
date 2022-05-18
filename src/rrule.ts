@@ -100,6 +100,8 @@ export default class RRule implements QueryMethods {
     this.options = parsedOptions
   }
 
+  static customRezonedDate: (date: Date, timezone: String) => Date
+
   static parseText (text: string, language?: Language) {
     return parseText(text, language)
   }

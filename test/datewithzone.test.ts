@@ -1,4 +1,5 @@
 import { DateWithZone } from "../src/datewithzone";
+import rrule from "../src/rrule";
 import { expect } from "chai";
 import { DateTime } from "luxon";
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
@@ -62,5 +63,16 @@ describe('rezonedDate', () => {
 
     DateTime.fromJSDate = origfromJSDate
     resetMockDate()
+  })
+
+  it('uses custom rezoned date method if specified', () => {
+    const date = new Date(1998, 6, 12)
+    rrule.customRezonedDate = (date, timezone) => date
+
+    const targetZone = 'Europe/Paris'
+    const dt = new DateWithZone(date, targetZone)
+    expect(dt.rezonedDate()).to.deep.equal(date)
+
+    delete rrule.customRezonedDate
   })
 })

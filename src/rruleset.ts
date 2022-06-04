@@ -1,4 +1,4 @@
-import RRule from './rrule'
+import { RRule } from './rrule'
 import dateutil from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
@@ -26,7 +26,7 @@ function createGetterSetter <T> (fieldName: string) {
   }
 }
 
-export default class RRuleSet extends RRule {
+export class RRuleSet extends RRule {
   public readonly _rrule: RRule[]
   public readonly _rdate: Date[]
   public readonly _exrule: RRule[]

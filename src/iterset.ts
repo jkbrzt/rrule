@@ -1,7 +1,7 @@
 import IterResult from './iterresult'
-import RRule from './rrule'
+import { RRule } from './rrule'
 import { DateWithZone } from './datewithzone'
-import { iter } from './iter/index'
+import { iter } from './iter'
 import dateutil from './dateutil'
 import { QueryMethodTypes, IterResultType } from './types'
 

@@ -1,5 +1,5 @@
-import RRule from './rrule'
-import RRuleSet from './rruleset'
+import { RRule } from './rrule'
+import { RRuleSet } from './rruleset'
 import dateutil from './dateutil'
 import { includes, split } from './helpers'
 import { Options } from './types'

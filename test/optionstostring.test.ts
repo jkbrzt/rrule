@@ -1,5 +1,5 @@
 import { Options } from "../src/types";
-import RRule from "../src/rrule";
+import { RRule } from "../src/rrule";
 import { optionsToString } from "../src/optionstostring";
 import { expect } from "chai";
 

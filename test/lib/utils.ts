@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { ExclusiveTestFunction, TestFunction } from 'mocha'
 import { RRule, RRuleSet } from '../../src'
-import { DateTime } from 'luxon';
 
 const assertDatesEqual = function (actual: Date | Date[], expected: Date | Date[], msg?: string) {
   msg = msg ? ' [' + msg + '] ' : ''
@@ -195,15 +194,9 @@ testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
 
-export function expectedDate(startDate: DateTime, currentLocalDate: DateTime, targetZone: string): Date {
-  const targetOffset = startDate.setZone(targetZone).offset
-  const { zoneName: systemZone } = currentLocalDate
-  const {
-    offset: systemOffset,
-  } = startDate.setZone(systemZone)
+export function expectedDate(startDate: Date, currentLocalDate: Date, targetZone: string): Date {
+  const targetDate = new Date(currentLocalDate.toLocaleString(undefined, { timeZone: targetZone }))
+  const targetOffset = currentLocalDate.getTime() - targetDate.getTime()
 
-  const netOffset = targetOffset - systemOffset
-  const hours = -((netOffset / 60) % 24)
-  const minutes = -(netOffset % 60)
-  return startDate.plus({ hours, minutes }).toJSDate()
+  return new Date(startDate.getTime() + targetOffset)
 }

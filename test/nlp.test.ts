@@ -1,5 +1,4 @@
 import { expect } from 'chai'
-import { DateTime } from 'luxon'
 import RRule from '../src';
 import { optionsToString } from '../src/optionstostring';
 import {DateFormatter} from '../src/nlp/totext'
@@ -94,7 +93,7 @@ describe('NLP', () => {
   it('by default formats \'until\' correctly', () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,
-      until: DateTime.utc(2012, 11, 10).toJSDate()
+      until: new Date(Date.UTC(2012, 10, 10))
     })
 
     expect(rrule.toText()).to.equal('every week until November 10, 2012')
@@ -103,7 +102,7 @@ describe('NLP', () => {
   it('formats \'until\' as desired if asked', () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,
-      until: DateTime.utc(2012, 11, 10).toJSDate()
+      until: new Date(Date.UTC(2012, 10, 10))
     })
 
     const dateFormatter: DateFormatter = (year, month, day) => `${day}. ${month}, ${year}`

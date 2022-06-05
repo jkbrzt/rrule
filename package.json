@@ -47,7 +47,6 @@
     "@types/assert": "^1.4.3",
     "@types/chai": "^4.2.7",
     "@types/jquery": "^3.3.29",
-    "@types/luxon": "^1.21.0",
     "@types/mocha": "^5.2.5",
     "@types/mockdate": "^2.0.0",
     "@types/node": "^12.12.18",
@@ -80,9 +79,6 @@
     "dist",
     "README.md"
   ],
-  "optionalDependencies": {
-    "luxon": "^1.21.3"
-  },
   "peerDependencies": {},
   "dependencies": {
     "tslib": "^1.10.0"

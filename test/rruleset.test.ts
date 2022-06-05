@@ -1,6 +1,5 @@
 import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
-import { DateTime } from 'luxon'
 import { expect } from 'chai'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
@@ -512,31 +511,31 @@ describe('RRuleSet', function () {
 
     it('generates correcty zoned recurrences when a tzid is present', () => {
       const targetZone = 'America/New_York'
-      const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
-      setMockDate(currentLocalDate.toJSDate())
+      const currentLocalDate = new Date(2000, 1, 6, 11, 0, 0)
+      setMockDate(currentLocalDate)
 
       const set = new RRuleSet()
 
       set.rrule(new RRule({
         freq: RRule.YEARLY,
         count: 4,
-        dtstart: DateTime.fromISO('20000101T090000').toJSDate(),
+        dtstart: new Date(Date.UTC(2000, 0, 1, 9, 0, 0)),
         tzid: targetZone
       }))
 
       set.exdate(
-        DateTime.fromISO('20010101T090000').toJSDate(),
+        new Date(Date.UTC(2001, 0, 1, 9, 0, 0)),
       )
 
       set.rdate(
-        DateTime.fromISO('20020301T090000').toJSDate(),
-      )     
+        new Date(Date.UTC(2002, 2, 1, 9, 0, 0)),
+      )
 
       expect(set.all()).to.deep.equal([
-        expectedDate(DateTime.fromISO('20000101T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20020101T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone),
-        expectedDate(DateTime.fromISO('20030101T090000'), currentLocalDate, targetZone),
+        expectedDate(new Date(Date.UTC(2000,0,1,9,0,0)), currentLocalDate, targetZone),
+        expectedDate(new Date(Date.UTC(2002,0,1,9,0,0)), currentLocalDate, targetZone),
+        expectedDate(new Date(Date.UTC(2002,2,1,9,0,0)), currentLocalDate, targetZone),
+        expectedDate(new Date(Date.UTC(2003,0,1,9,0,0)), currentLocalDate, targetZone),
       ])
 
       resetMockDate()
@@ -556,19 +555,19 @@ describe('RRuleSet', function () {
 
     it('generates correcty zoned recurrences when a tzid is present but no rrule is present', () => {
       const targetZone = 'America/New_York'
-      const currentLocalDate = DateTime.local(2000, 2, 6, 11, 0, 0)
-      setMockDate(currentLocalDate.toJSDate())
+      const currentLocalDate = new Date(2000, 1, 6, 11, 0, 0)
+      setMockDate(currentLocalDate)
 
       const set = new RRuleSet()
 
       set.tzid(targetZone)
 
       set.rdate(
-        DateTime.fromISO('20020301T090000').toJSDate(),
+        new Date(Date.parse('20020301T090000')),
       )
 
       expect(set.all()).to.deep.equal([
-        expectedDate(DateTime.fromISO('20020301T090000'), currentLocalDate, targetZone)
+        expectedDate(new Date(Date.parse('20020301T090000')), currentLocalDate, targetZone)
       ])
 
       resetMockDate()
@@ -576,17 +575,17 @@ describe('RRuleSet', function () {
   })
 
   describe('with end date', () => {
-    let cursor: DateTime
+    let cursor: Date
 
     beforeEach(() => {
-      cursor = DateTime.utc(2017, 12, 25, 16, 0, 0)
+      cursor = new Date(Date.UTC(2017, 11, 25, 16, 0, 0))
     })
 
     it('updates the ruleset to exclude recurrence date', () => {
       const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
       const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
 
-      const recurrenceDate = DateTime.utc(2017, 8, 21, 16, 0, 0)
+      const recurrenceDate = new Date(Date.UTC(2017, 7, 21, 16, 0, 0))
 
       expectRecurrence([repeat, legacy]).toAmendExdate(recurrenceDate, [
         'DTSTART:19990104T110000Z',
@@ -655,16 +654,23 @@ describe('RRuleSet', function () {
 
     const updateWithEndDate = (
       recurrence: string[],
-      updatedCursor: DateTime,
+      updatedCursor: Date,
     ): string => {
-      const newEndDate = updatedCursor.minus({ days: 1 }).endOf('day')
+      const oneDay = 24 * 60 * 60 * 1000
+      const oneDayEarlier = new Date(updatedCursor.getTime() - oneDay)
+      const newEndDate = new Date(Date.UTC(
+        oneDayEarlier.getUTCFullYear(),
+        oneDayEarlier.getUTCMonth(),
+        oneDayEarlier.getUTCDate(),
+        23, 59, 59
+      ))
 
       const rrule = rrulestr(recurrence.join('\n'))
 
       const newRuleSet = new RRuleSet()
       const rule = new RRule({
           ...rrule.origOptions,
-          until: newEndDate.toJSDate(),
+          until: newEndDate,
         })
 
       newRuleSet.rrule(rule)
@@ -674,10 +680,10 @@ describe('RRuleSet', function () {
 
     const amendRuleSetWithExceptionDate = (
       recurrence: string[],
-      cursor: DateTime,
+      cursor: Date,
     ): string => {
       const ruleSet = rrulestr(recurrence.join('\n'), { forceset: true }) as RRuleSet
-      ruleSet.exdate(cursor.toJSDate())
+      ruleSet.exdate(cursor)
       return ruleSet.toString()
     }
 
@@ -698,7 +704,7 @@ describe('RRuleSet', function () {
             expect(actual).to.equal(expected.join('\n'))
           })
         },
-        toAmendExdate(excluded: DateTime, expected: string[]) {
+        toAmendExdate(excluded: Date, expected: string[]) {
           recurrences.forEach(recurrence => {
             const actual = amendRuleSetWithExceptionDate(recurrence, excluded)
             expect(actual).to.equal(expected.join('\n'))
@@ -714,7 +720,7 @@ describe('RRuleSet', function () {
     }
   })
 
-  it('generates invalid date objects on an rruleset with invalid TZID and exdate', () => {
+  it('throws a RangeError on an rruleset with invalid TZID and exdate', () => {
     const set = new RRuleSet()
     set.rrule(new RRule({
       count: 1,
@@ -723,9 +729,7 @@ describe('RRuleSet', function () {
     }))
     set.exdate(parse('19970902T090000'))
 
-    expect(set.all().map(String)).to.deep.equal([
-      'Invalid Date'
-    ])
+    expect(() => set.all().map(String)).to.throw(RangeError)
   })
 
   it('throws an error if non-rrules are added via rrule or exrule', () => {

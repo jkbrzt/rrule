@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 import { ExclusiveTestFunction, TestFunction } from 'mocha'
 import { RRule, RRuleSet } from '../../src'
-import { DateTime } from 'luxon';
 
 const assertDatesEqual = function (actual: Date | Date[], expected: Date | Date[], msg?: string) {
   msg = msg ? ' [' + msg + '] ' : ''
@@ -195,15 +194,13 @@ testRecurring.skip = function () {
   it.skip.apply(it, arguments)
 }
 
-export function expectedDate(startDate: DateTime, currentLocalDate: DateTime, targetZone: string): Date {
-  const targetOffset = startDate.setZone(targetZone).offset
-  const { zoneName: systemZone } = currentLocalDate
-  const {
-    offset: systemOffset,
-  } = startDate.setZone(systemZone)
+export function expectedDate(startDate: Date, currentLocalDate: Date, targetZone: string): Date {
+  // get the tzoffset between the client tz and the target tz
+  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const dateInLocalTZ = new Date(startDate.toLocaleString(undefined, { timeZone: localTimeZone }))
+  const dateInTargetTZ = new Date(startDate.toLocaleString(undefined, { timeZone: targetZone }))
+  const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
 
-  const netOffset = targetOffset - systemOffset
-  const hours = -((netOffset / 60) % 24)
-  const minutes = -(netOffset % 60)
-  return startDate.plus({ hours, minutes }).toJSDate()
+  return new Date(startDate.getTime() - tzOffset)
+  // return new Date(new Date(startDate.getTime() + tzOffset).toLocaleDateString(undefined, { timeZone: localTimeZone }))
 }

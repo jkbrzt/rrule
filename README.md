@@ -190,7 +190,7 @@ date.getUTCDate() // --> 1
 date.getUTCHours() // --> 18
 ```
 
-If you want to get the same times in true UTC, you may do so eg. using Luxon:
+If you want to get the same times in true UTC, you may do so eg. using [Luxon](https://moment.github.io/luxon/#/):
 
 ```ts
 rule.all().map(date =>

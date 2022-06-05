@@ -1,5 +1,5 @@
-import dateutil from './dateutil'
 import { DateTime } from 'luxon'
+import { dayjs } from './lib/dayjs'
 
 export class DateWithZone {
   public date: Date
@@ -15,12 +15,11 @@ export class DateWithZone {
   }
 
   public toString () {
-    const datestr = dateutil.timeToUntilString(this.date.getTime(), this.isUTC)
     if (!this.isUTC) {
-      return `;TZID=${this.tzid}:${datestr}`
+      return `;TZID=${this.tzid}:${dayjs.tz(this.date, this.tzid).format('YYYYMMDDTHHmmss')}`
     }
 
-    return `:${datestr}`
+    return `:${dayjs(this.date).utc().format('YYYYMMDDTHHmmss')}Z`
   }
 
   public getTime () {

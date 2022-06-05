@@ -3647,12 +3647,12 @@ describe('RRule', function () {
     ])
   })
 
-  describe('time zones', () => {
+  describe('time zones, when recurrence is in dst', () => {
     const targetZone = 'America/Los_Angeles'
     const startDate = new Date(Date.UTC(2013, 7, 6, 11, 0, 0))
     const dtstart = startDate
 
-    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+    it('generates correct recurrences when current time is standard time', () => {
       const currentLocalDate = new Date(2013, 1, 6, 11, 0, 0)
       setMockDate(currentLocalDate)
 
@@ -3672,7 +3672,7 @@ describe('RRule', function () {
       resetMockDate()
     })
 
-    it('generates correct recurrences when recurrence is in dst and current time is dst', () => {
+    it('generates correct recurrences when current time is dst', () => {
       const currentLocalDate = new Date(2013, 7, 6, 11, 0, 0)
       setMockDate(currentLocalDate)
 
@@ -3692,7 +3692,7 @@ describe('RRule', function () {
       resetMockDate()
     })
 
-    it('generates correct recurrences when recurrence is in dst and current time is standard time', () => {
+    it('generates correct recurrences using after and current time is standard time', () => {
       const currentLocalDate = new Date(2013, 1, 6, 11, 0, 0)
       setMockDate(currentLocalDate)
 

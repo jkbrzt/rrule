@@ -195,8 +195,12 @@ testRecurring.skip = function () {
 }
 
 export function expectedDate(startDate: Date, currentLocalDate: Date, targetZone: string): Date {
-  const targetDate = new Date(currentLocalDate.toLocaleString(undefined, { timeZone: targetZone }))
-  const targetOffset = currentLocalDate.getTime() - targetDate.getTime()
+  // get the tzoffset between the client tz and the target tz
+  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const dateInLocalTZ = new Date(startDate.toLocaleString(undefined, { timeZone: localTimeZone }))
+  const dateInTargetTZ = new Date(startDate.toLocaleString(undefined, { timeZone: targetZone }))
+  const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
 
-  return new Date(startDate.getTime() + targetOffset)
+  return new Date(startDate.getTime() - tzOffset)
+  // return new Date(new Date(startDate.getTime() + tzOffset).toLocaleDateString(undefined, { timeZone: localTimeZone }))
 }

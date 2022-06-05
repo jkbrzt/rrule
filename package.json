@@ -85,6 +85,7 @@
   },
   "peerDependencies": {},
   "dependencies": {
+    "dayjs": "^1.11.0",
     "tslib": "^1.10.0"
   }
 }

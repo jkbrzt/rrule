@@ -6,3 +6,5 @@ bower_components/
 coverage
 .nyc_output
 dist/
+
+.DS_Store

@@ -1,5 +1,4 @@
 import dateutil from './dateutil'
-import { DateTime } from 'luxon'
 
 export class DateWithZone {
   public date: Date
@@ -32,18 +31,11 @@ export class DateWithZone {
       return this.date
     }
 
-    try {
-      const datetime = DateTime
-        .fromJSDate(this.date)
+    const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const dateInLocalTZ = new Date(this.date.toLocaleString(undefined, { timeZone: localTimeZone }))
+    const dateInTargetTZ = new Date(this.date.toLocaleString(undefined, { timeZone: this.tzid ?? 'UTC' }))
+    const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
 
-      const rezoned = datetime.setZone(this.tzid!, { keepLocalTime: true })
-
-      return rezoned.toJSDate()
-    } catch (e) {
-      if (e instanceof TypeError) {
-        console.error('Using TZID without Luxon available is unsupported. Returned times are in UTC, not the requested time zone')
-      }
-      return this.date
-    }
+    return new Date(this.date.getTime() - tzOffset)
   }
 }

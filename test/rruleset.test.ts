@@ -529,7 +529,7 @@ describe('RRuleSet', function () {
 
       set.rdate(
         new Date(Date.UTC(2002, 2, 1, 9, 0, 0)),
-      )     
+      )
 
       expect(set.all()).to.deep.equal([
         expectedDate(new Date(Date.UTC(2000,0,1,9,0,0)), currentLocalDate, targetZone),

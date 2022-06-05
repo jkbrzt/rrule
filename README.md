@@ -35,8 +35,6 @@ Alternatively, download manually:
 
  * [rrule.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
  * [rrule.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
- * [rrule-tz.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule-tz.min.js) (with timezone support, bundled, minified)
- * [rrule-tz.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule-tz.js) (with timezone support, bundled, not minified)
 
 ```html
 <script src="rrule/dist/es5/rrule.min.js"></script>
@@ -215,11 +213,11 @@ For more examples see
 
 ### Timezone Support
 
-Optionally, it also supports use of the `TZID` parameter in the
-[RFC](https://tools.ietf.org/html/rfc5545#section-3.2.19)
-when the [Luxon](https://github.com/moment/luxon) library is provided. The 
-[specification](https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone)
-and [support matrix](https://moment.github.io/luxon/docs/manual/matrix.html) for Luxon apply.
+Rrule also supports use of the `TZID` parameter in the
+[RFC](https://tools.ietf.org/html/rfc5545#section-3.2.19) using the
+[Intl API](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl).
+Support matrix for the Intl API applies. If you need to support additional environments,
+please consider using a [polyfill](https://formatjs.io/docs/polyfills/).
 
 Example with `TZID`:
 
@@ -336,8 +334,7 @@ iCalendar RFC. Only `freq` is required.
     </tr>
     <tr>
       <td><code>tzid</code></td>
-      <td>If given, this must be a string <a href="https://moment.github.io/luxon/docs/manual/zones.html#specifying-a-zone">supported</a>
-      by Luxon, and the <a href="https://moment.github.io/luxon/">Luxon</a> library must be provided. See
+      <td>If given, this must be a IANA string recognized by the Intl API. See
       discussion under <a href="#timezone-support">Timezone support</a>.
       </td>
     </tr>

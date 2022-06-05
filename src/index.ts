@@ -14,8 +14,8 @@
  *
  */
 
-import RRule from './rrule'
-import RRuleSet from './rruleset'
+import { RRule } from './rrule'
+import { RRuleSet } from './rruleset'
 
 export { rrulestr } from './rrulestr'
 export { Frequency, ByWeekday, Options } from './types'

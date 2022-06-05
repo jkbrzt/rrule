@@ -57,7 +57,7 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
  *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule implements QueryMethods {
+export class RRule implements QueryMethods {
   public _cache: Cache | null
   public origOptions: Partial<Options>
   public options: ParsedOptions

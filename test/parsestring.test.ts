@@ -1,4 +1,4 @@
-import RRule from '../src/rrule'
+import { RRule } from '../src/rrule'
 import { expect } from 'chai'
 import { parseString } from '../src/parsestring'
 import { Options, Frequency } from '../src/types';

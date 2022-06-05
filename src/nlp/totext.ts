@@ -1,5 +1,5 @@
 import ENGLISH, { Language } from './i18n'
-import RRule from '../rrule'
+import { RRule } from '../rrule'
 import { Options, ByWeekday } from '../types'
 import { Weekday } from '../weekday'
 import { isArray, isNumber, isPresent } from '../helpers'

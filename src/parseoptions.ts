@@ -1,6 +1,6 @@
 import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
 import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers'
-import RRule, { defaultKeys, DEFAULT_OPTIONS } from './rrule'
+import { RRule, defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import { Weekday } from './weekday'
 import { Time } from './datetime'

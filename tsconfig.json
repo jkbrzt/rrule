@@ -13,8 +13,8 @@
     "jsx": "react",
     "strictNullChecks": true,
     "importHelpers": true,
-    "rootDirs": ["./src/", "./test/", "./demo/"]
+    "rootDirs": ["./src/", "./test/"]
   },
-  "include": ["./src/**/*", "./demo/**/*"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "./test/**/*"]
 }

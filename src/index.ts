@@ -26,5 +26,3 @@ export {
   RRule,
   RRuleSet
 }
-
-export default RRule

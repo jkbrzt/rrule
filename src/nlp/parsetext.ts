@@ -14,21 +14,21 @@ class Parser {
   public value: RegExpExecArray | null
   private done = true
 
-  constructor (rules: { [k: string]: RegExp }) {
+  constructor(rules: { [k: string]: RegExp }) {
     this.rules = rules
   }
 
-  start (text: string) {
+  start(text: string) {
     this.text = text
     this.done = false
     return this.nextSymbol()
   }
 
-  isDone () {
+  isDone() {
     return this.done && this.symbol === null
   }
 
-  nextSymbol () {
+  nextSymbol() {
     let best: RegExpExecArray | null
     let bestSymbol: string
     const p = this
@@ -63,7 +63,7 @@ class Parser {
         this.value = null
         return
       }
-    // @ts-ignore
+      // @ts-ignore
     } while (bestSymbol === 'SKIP')
 
     // @ts-ignore
@@ -72,7 +72,7 @@ class Parser {
     return true
   }
 
-  accept (name: string) {
+  accept(name: string) {
     if (this.symbol === name) {
       if (this.value) {
         const v = this.value
@@ -87,18 +87,18 @@ class Parser {
     return false
   }
 
-  acceptNumber () {
+  acceptNumber() {
     return this.accept('number') as RegExpExecArray
   }
 
-  expect (name: string) {
+  expect(name: string) {
     if (this.accept(name)) return true
 
     throw new Error('expected ' + name + ' but found ' + this.symbol)
   }
 }
 
-export default function parseText (text: string, language: Language = ENGLISH) {
+export default function parseText(text: string, language: Language = ENGLISH) {
   const options: Partial<Options> = {}
   const ttr = new Parser(language.tokens)
 
@@ -107,7 +107,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
   S()
   return options
 
-  function S () {
+  function S() {
     // every [n]
     ttr.expect('every')
     let n = ttr.acceptNumber()
@@ -127,13 +127,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       // DAILY on weekdays is not a valid rule
       case 'weekday(s)':
         options.freq = RRule.WEEKLY
-        options.byweekday = [
-          RRule.MO,
-          RRule.TU,
-          RRule.WE,
-          RRule.TH,
-          RRule.FR
-        ]
+        options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR]
         ttr.nextSymbol()
         F()
         break
@@ -186,7 +180,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       case 'saturday':
       case 'sunday':
         options.freq = RRule.WEEKLY
-        const key: WeekdayStr = ttr.symbol.substr(0, 2).toUpperCase() as WeekdayStr
+        const key: WeekdayStr = ttr.symbol
+          .substr(0, 2)
+          .toUpperCase() as WeekdayStr
         options.byweekday = [RRule[key]]
 
         if (!ttr.nextSymbol()) return
@@ -197,7 +193,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
 
           let wkd = decodeWKD() as keyof typeof RRule
           if (!wkd) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + ', expected weekday')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + ', expected weekday'
+            )
           }
 
           // @ts-ignore
@@ -231,7 +229,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
 
           let m = decodeM()
           if (!m) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + ', expected month')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + ', expected month'
+            )
           }
 
           options.bymonth.push(m)
@@ -247,7 +247,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     }
   }
 
-  function ON () {
+  function ON() {
     const on = ttr.accept('on')
     const the = ttr.accept('the')
     if (!(on || the)) return
@@ -282,25 +282,23 @@ export default function parseText (text: string, language: Language = ENGLISH) {
       } else if (ttr.symbol === 'weekday(s)') {
         ttr.nextSymbol()
         if (!options.byweekday) {
-          options.byweekday = [
-            RRule.MO,
-            RRule.TU,
-            RRule.WE,
-            RRule.TH,
-            RRule.FR
-          ]
+          options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR]
         }
       } else if (ttr.symbol === 'week(s)') {
         ttr.nextSymbol()
         let n = ttr.acceptNumber()
         if (!n) {
-          throw new Error('Unexpected symbol ' + ttr.symbol + ', expected week number')
+          throw new Error(
+            'Unexpected symbol ' + ttr.symbol + ', expected week number'
+          )
         }
         options.byweekno = [parseInt(n[0], 10)]
         while (ttr.accept('comma')) {
           n = ttr.acceptNumber()
           if (!n) {
-            throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
+            throw new Error(
+              'Unexpected symbol ' + ttr.symbol + '; expected monthday'
+            )
           }
           options.byweekno.push(parseInt(n[0], 10))
         }
@@ -316,7 +314,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     } while (ttr.accept('comma') || ttr.accept('the') || ttr.accept('on'))
   }
 
-  function AT () {
+  function AT() {
     const at = ttr.accept('at')
     if (!at) return
 
@@ -336,7 +334,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     } while (ttr.accept('comma') || ttr.accept('at'))
   }
 
-  function decodeM () {
+  function decodeM() {
     switch (ttr.symbol) {
       case 'january':
         return 1
@@ -367,7 +365,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     }
   }
 
-  function decodeWKD () {
+  function decodeWKD() {
     switch (ttr.symbol) {
       case 'monday':
       case 'tuesday':
@@ -382,7 +380,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     }
   }
 
-  function decodeNTH () {
+  function decodeNTH() {
     switch (ttr.symbol) {
       case 'last':
         ttr.nextSymbol()
@@ -408,7 +406,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     }
   }
 
-  function MDAYs () {
+  function MDAYs() {
     ttr.accept('on')
     ttr.accept('the')
 
@@ -421,7 +419,9 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     while (ttr.accept('comma')) {
       nth = decodeNTH()
       if (!nth) {
-        throw new Error('Unexpected symbol ' + ttr.symbol + '; expected monthday')
+        throw new Error(
+          'Unexpected symbol ' + ttr.symbol + '; expected monthday'
+        )
       }
 
       options.bymonthday.push(nth)
@@ -429,7 +429,7 @@ export default function parseText (text: string, language: Language = ENGLISH) {
     }
   }
 
-  function F () {
+  function F() {
     if (ttr.symbol === 'until') {
       const date = Date.parse(ttr.text)
 

@@ -4,7 +4,7 @@ import { isArray } from './helpers'
 
 export type CacheKeys = 'before' | 'after' | 'between'
 
-function argsMatch (
+function argsMatch(
   left: IterArgs[keyof IterArgs] | undefined,
   right: IterArgs[keyof IterArgs] | undefined
 ) {
@@ -32,7 +32,7 @@ export class Cache {
    * @param {Array,Date} value - an array of dates, one date, or null
    * @param {Object?} args - _iter arguments
    */
-  public _cacheAdd (
+  public _cacheAdd(
     what: CacheKeys | 'all',
     value: Date[] | Date | null,
     args?: Partial<IterArgs>
@@ -59,7 +59,7 @@ export class Cache {
    *         []    - cached, but zero occurrences (all/between)
    *         [Date1, DateN] - cached (all/between)
    */
-  public _cacheGet (
+  public _cacheGet(
     what: CacheKeys | 'all',
     args?: Partial<IterArgs>
   ): Date | Date[] | false | null {
@@ -103,7 +103,7 @@ export class Cache {
     return isArray(cached)
       ? dateutil.cloneDates(cached)
       : cached instanceof Date
-        ? dateutil.clone(cached)
-        : cached
+      ? dateutil.clone(cached)
+      : cached
   }
 }

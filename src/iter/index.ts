@@ -9,14 +9,11 @@ import { DateWithZone } from '../datewithzone'
 import { buildPoslist } from './poslist'
 import { Time, DateTime } from '../datetime'
 
-export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, options: ParsedOptions) {
-  const {
-    dtstart,
-    freq,
-    interval,
-    until,
-    bysetpos
-  } = options
+export function iter<M extends QueryMethodTypes>(
+  iterResult: IterResult<M>,
+  options: ParsedOptions
+) {
+  const { dtstart, freq, interval, until, bysetpos } = options
 
   let count = options.count
   if (count === 0 || interval === 0) {
@@ -105,14 +102,19 @@ export function iter <M extends QueryMethodTypes> (iterResult: IterResult<M>, op
     }
 
     if (!freqIsDailyOrGreater(freq)) {
-      timeset = ii.gettimeset(freq)(counterDate.hour, counterDate.minute, counterDate.second, 0)
+      timeset = ii.gettimeset(freq)(
+        counterDate.hour,
+        counterDate.minute,
+        counterDate.second,
+        0
+      )
     }
 
     ii.rebuild(counterDate.year, counterDate.month)
   }
 }
 
-function isFiltered (
+function isFiltered(
   ii: Iterinfo,
   currentDay: number,
   options: ParsedOptions
@@ -124,7 +126,7 @@ function isFiltered (
     byeaster,
     bymonthday,
     bynmonthday,
-    byyearday
+    byyearday,
   } = options
 
   return (
@@ -146,24 +148,26 @@ function isFiltered (
   )
 }
 
-function rezoneIfNeeded (date: Date, options: ParsedOptions) {
+function rezoneIfNeeded(date: Date, options: ParsedOptions) {
   return new DateWithZone(date, options.tzid).rezonedDate()
 }
 
-function emitResult <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+function emitResult<M extends QueryMethodTypes>(iterResult: IterResult<M>) {
   return iterResult.getValue()
 }
 
-function removeFilteredDays (dayset: (number | null)[], start: number, end: number, ii: Iterinfo, options: ParsedOptions) {
+function removeFilteredDays(
+  dayset: (number | null)[],
+  start: number,
+  end: number,
+  ii: Iterinfo,
+  options: ParsedOptions
+) {
   let filtered = false
   for (let dayCounter = start; dayCounter < end; dayCounter++) {
     let currentDay = dayset[dayCounter] as number
 
-    filtered = isFiltered(
-      ii,
-      currentDay,
-      options
-    )
+    filtered = isFiltered(ii, currentDay, options)
 
     if (filtered) dayset[currentDay] = null
   }
@@ -171,13 +175,12 @@ function removeFilteredDays (dayset: (number | null)[], start: number, end: numb
   return filtered
 }
 
-function makeTimeset (ii: Iterinfo, counterDate: DateTime, options: ParsedOptions): Time[] | null {
-  const {
-    freq,
-    byhour,
-    byminute,
-    bysecond
-  } = options
+function makeTimeset(
+  ii: Iterinfo,
+  counterDate: DateTime,
+  options: ParsedOptions
+): Time[] | null {
+  const { freq, byhour, byminute, bysecond } = options
 
   if (freqIsDailyOrGreater(freq)) {
     return buildTimeset(options)

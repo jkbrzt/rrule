@@ -1,22 +1,25 @@
 ### Changelog
 
 - 2.7.0 (2022-06-05)
+
   - Features:
     - **BREAKING CHANGE** Removes default export in favor of named exports
     - Removes Luxon dependency
 
 - 2.6.8 (2021-02-04)
+
   - Bugfixes:
     - Solve circular imports (#444)
 
 - 2.6.6 (2020-08-23)
+
   - Bugfixes:
     - Fixed broken npm package (#417)
 
 - 2.6.5 (2020-08-23)
   - Bugfixes:
-    - `luxon`-less binary should not contain any `luxon` imports (#410) 
-    - Fixed `toText` pluralization of “minutes“ (#415) 
+    - `luxon`-less binary should not contain any `luxon` imports (#410)
+    - Fixed `toText` pluralization of “minutes“ (#415)
 - 2.6.4 (2019-12-18)
   - Bugfixes:
     - Calculating series with unknown timezones will produce infinite loop (#320)

@@ -5,7 +5,7 @@ import { Weekday } from './weekday'
 import dateutil from './dateutil'
 import { DateWithZone } from './datewithzone'
 
-export function optionsToString (options: Partial<Options>) {
+export function optionsToString(options: Partial<Options>) {
   let rrule: string[][] = []
   let dtstart: string = ''
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
@@ -33,7 +33,7 @@ export function optionsToString (options: Partial<Options>) {
         }
         break
       case 'BYWEEKDAY':
-          /*
+        /*
           NOTE: BYWEEKDAY is a special case.
           RRule() deconstructs the rule.options.byweekday array
           into an array of Weekday arguments.
@@ -45,17 +45,19 @@ export function optionsToString (options: Partial<Options>) {
 
           */
         key = 'BYDAY'
-        outValue = toArray<Weekday | number[] | number>(value).map(wday => {
-          if (wday instanceof Weekday) {
-            return wday
-          }
+        outValue = toArray<Weekday | number[] | number>(value)
+          .map((wday) => {
+            if (wday instanceof Weekday) {
+              return wday
+            }
 
-          if (isArray(wday)) {
-            return new Weekday(wday[0], wday[1])
-          }
+            if (isArray(wday)) {
+              return new Weekday(wday[0], wday[1])
+            }
 
-          return new Weekday(wday)
-        }).toString()
+            return new Weekday(wday)
+          })
+          .toString()
 
         break
       case 'DTSTART':
@@ -83,16 +85,18 @@ export function optionsToString (options: Partial<Options>) {
     }
   }
 
-  const rules = rrule.map(([key, value]) => `${key}=${value.toString()}`).join(';')
+  const rules = rrule
+    .map(([key, value]) => `${key}=${value.toString()}`)
+    .join(';')
   let ruleString = ''
   if (rules !== '') {
     ruleString = `RRULE:${rules}`
   }
 
-  return [ dtstart, ruleString ].filter(x => !!x).join('\n')
+  return [dtstart, ruleString].filter((x) => !!x).join('\n')
 }
 
-function buildDtstart (dtstart?: number, tzid?: string | null) {
+function buildDtstart(dtstart?: number, tzid?: string | null) {
   if (!dtstart) {
     return ''
   }

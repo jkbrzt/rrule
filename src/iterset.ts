@@ -5,7 +5,7 @@ import { iter } from './iter'
 import dateutil from './dateutil'
 import { QueryMethodTypes, IterResultType } from './types'
 
-export function iterSet <M extends QueryMethodTypes> (
+export function iterSet<M extends QueryMethodTypes>(
   iterResult: IterResult<M>,
   _rrule: RRule[],
   _exrule: RRule[],
@@ -16,7 +16,7 @@ export function iterSet <M extends QueryMethodTypes> (
   const _exdateHash: { [k: number]: boolean } = {}
   const _accept = iterResult.accept
 
-  function evalExdate (after: Date, before: Date) {
+  function evalExdate(after: Date, before: Date) {
     _exrule.forEach(function (rrule) {
       rrule.between(after, before, true).forEach(function (date) {
         _exdateHash[Number(date)] = true

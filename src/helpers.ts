@@ -4,7 +4,9 @@
 
 import { ALL_WEEKDAYS, WeekdayStr } from './weekday'
 
-export const isPresent = function<T>(value?: T | null | undefined): value is T {
+export const isPresent = function <T>(
+  value?: T | null | undefined
+): value is T {
   return value !== null && value !== undefined
 }
 
@@ -31,11 +33,11 @@ export const range = function (start: number, end: number = start): number[] {
   return rang
 }
 
-export const clone = function<T>(array: T[]): T[] {
+export const clone = function <T>(array: T[]): T[] {
   return ([] as T[]).concat(array)
 }
 
-export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
+export const repeat = function <T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
   const array: (T | T[])[] = []
 
@@ -47,15 +49,19 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   return array
 }
 
-export const toArray = function<T>(item: T | T[]): T[] {
+export const toArray = function <T>(item: T | T[]): T[] {
   if (isArray(item)) {
     return item
   }
 
-  return [ item ]
+  return [item]
 }
 
-export function padStart (item: string | number, targetLength: number, padString: string = ' ') {
+export function padStart(
+  item: string | number,
+  targetLength: number,
+  padString: string = ' '
+) {
   const str = String(item)
   targetLength = targetLength >> 0
   if (str.length > targetLength) {
@@ -67,7 +73,7 @@ export function padStart (item: string | number, targetLength: number, padString
     padString += repeat(padString, targetLength / padString.length)
   }
 
-  return padString.slice(0,targetLength) + String(str)
+  return padString.slice(0, targetLength) + String(str)
 }
 
 /**
@@ -108,7 +114,7 @@ export const divmod = function (a: number, b: number) {
   return { div: Math.floor(a / b), mod: pymod(a, b) }
 }
 
-export const empty = function<T>(obj: T[] | null | undefined) {
+export const empty = function <T>(obj: T[] | null | undefined) {
   return !isPresent(obj) || obj.length === 0
 }
 
@@ -118,13 +124,13 @@ export const empty = function<T>(obj: T[] | null | undefined) {
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-export const notEmpty = function<T>(obj: T[] | null | undefined): obj is T[] {
+export const notEmpty = function <T>(obj: T[] | null | undefined): obj is T[] {
   return !empty(obj)
 }
 
 /**
  * Return true if a value is in an array
  */
-export const includes = function<T>(arr: T[] | null | undefined, val: T) {
+export const includes = function <T>(arr: T[] | null | undefined, val: T) {
   return notEmpty(arr) && arr.indexOf(val) !== -1
 }

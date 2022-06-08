@@ -5,14 +5,14 @@ import { Frequency } from '../types'
 import ENGLISH, { Language } from './i18n'
 
 /*!
-* rrule.js - Library for working with recurrence rules for calendar dates.
-* https://github.com/jakubroztocil/rrule
-*
-* Copyright 2010, Jakub Roztocil and Lars Schoning
-* Licenced under the BSD licence.
-* https://github.com/jakubroztocil/rrule/blob/master/LICENCE
-*
-*/
+ * rrule.js - Library for working with recurrence rules for calendar dates.
+ * https://github.com/jakubroztocil/rrule
+ *
+ * Copyright 2010, Jakub Roztocil and Lars Schoning
+ * Licenced under the BSD licence.
+ * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+ *
+ */
 
 /**
  *
@@ -105,7 +105,7 @@ const common = [
   'interval',
   'byweekday',
   'bymonthday',
-  'bymonth'
+  'bymonth',
 ]
 
 ToText.IMPLEMENTED = []
@@ -120,7 +120,12 @@ ToText.IMPLEMENTED[Frequency.YEARLY] = ['byweekno', 'byyearday'].concat(common)
 // Export
 // =============================================================================
 
-const toText = function (rrule: RRule, gettext?: GetText, language?: Language, dateFormatter?: DateFormatter) {
+const toText = function (
+  rrule: RRule,
+  gettext?: GetText,
+  language?: Language,
+  dateFormatter?: DateFormatter
+) {
   return new ToText(rrule, gettext, language, dateFormatter).toString()
 }
 

@@ -3,21 +3,26 @@ import { Weekday } from './weekday'
 import dateutil from './dateutil'
 import { Days } from './rrule'
 
-export function parseString (rfcString: string): Partial<Options> {
-  const options = rfcString.split('\n').map(parseLine).filter(x => x !== null)
+export function parseString(rfcString: string): Partial<Options> {
+  const options = rfcString
+    .split('\n')
+    .map(parseLine)
+    .filter((x) => x !== null)
   return { ...options[0], ...options[1] }
 }
 
-export function parseDtstart (line: string) {
+export function parseDtstart(line: string) {
   const options: Partial<Options> = {}
 
-  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(line)
+  const dtstartWithZone = /DTSTART(?:;TZID=([^:=]+?))?(?::|=)([^;\s]+)/i.exec(
+    line
+  )
 
   if (!dtstartWithZone) {
     return options
   }
 
-  const [ _, tzid, dtstart ] = dtstartWithZone
+  const [_, tzid, dtstart] = dtstartWithZone
 
   if (tzid) {
     options.tzid = tzid
@@ -26,7 +31,7 @@ export function parseDtstart (line: string) {
   return options
 }
 
-function parseLine (rfcString: string) {
+function parseLine(rfcString: string) {
   rfcString = rfcString.replace(/^\s+|\s+$/, '')
   if (!rfcString.length) return null
 
@@ -35,7 +40,7 @@ function parseLine (rfcString: string) {
     return parseRrule(rfcString)
   }
 
-  const [ _, key ] = header
+  const [_, key] = header
   switch (key.toUpperCase()) {
     case 'RRULE':
     case 'EXRULE':
@@ -47,14 +52,14 @@ function parseLine (rfcString: string) {
   }
 }
 
-function parseRrule (line: string) {
+function parseRrule(line: string) {
   const strippedLine = line.replace(/^RRULE:/i, '')
   const options = parseDtstart(strippedLine)
 
   const attrs = line.replace(/^(?:RRULE|EXRULE):/i, '').split(';')
 
-  attrs.forEach(attr => {
-    const [ key, value ] = attr.split('=')
+  attrs.forEach((attr) => {
+    const [key, value] = attr.split('=')
     switch (key.toUpperCase()) {
       case 'FREQ':
         options.freq = Frequency[value.toUpperCase() as keyof typeof Frequency]
@@ -102,7 +107,7 @@ function parseRrule (line: string) {
   return options
 }
 
-function parseNumber (value: string) {
+function parseNumber(value: string) {
   if (value.indexOf(',') !== -1) {
     const values = value.split(',')
     return values.map(parseIndividualNumber)
@@ -111,7 +116,7 @@ function parseNumber (value: string) {
   return parseIndividualNumber(value)
 }
 
-function parseIndividualNumber (value: string) {
+function parseIndividualNumber(value: string) {
   if (/^[+-]?\d+$/.test(value)) {
     return Number(value)
   }
@@ -119,10 +124,10 @@ function parseIndividualNumber (value: string) {
   return value
 }
 
-function parseWeekday (value: string) {
+function parseWeekday(value: string) {
   const days = value.split(',')
 
-  return days.map(day => {
+  return days.map((day) => {
     if (day.length === 2) {
       // MO, TU, ...
       return Days[day as keyof typeof Days] // wday instanceof Weekday

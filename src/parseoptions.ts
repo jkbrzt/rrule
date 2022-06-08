@@ -1,18 +1,26 @@
 import { Options, ParsedOptions, freqIsDailyOrGreater } from './types'
-import { includes, notEmpty, isPresent, isNumber, isArray, isWeekdayStr } from './helpers'
+import {
+  includes,
+  notEmpty,
+  isPresent,
+  isNumber,
+  isArray,
+  isWeekdayStr,
+} from './helpers'
 import { RRule, defaultKeys, DEFAULT_OPTIONS } from './rrule'
 import dateutil from './dateutil'
 import { Weekday } from './weekday'
 import { Time } from './datetime'
 
-export function initializeOptions (options: Partial<Options>) {
+export function initializeOptions(options: Partial<Options>) {
   const invalid: string[] = []
   const keys = Object.keys(options) as (keyof Options)[]
 
   // Shallow copy for options and origOptions and check for invalid
   for (const key of keys) {
     if (!includes(defaultKeys, key)) invalid.push(key)
-    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key])) invalid.push(key)
+    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key]))
+      invalid.push(key)
   }
 
   if (invalid.length) {
@@ -22,7 +30,7 @@ export function initializeOptions (options: Partial<Options>) {
   return { ...options }
 }
 
-export function parseOptions (options: Partial<Options>) {
+export function parseOptions(options: Partial<Options>) {
   const opts = { ...DEFAULT_OPTIONS, ...initializeOptions(options) }
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
@@ -168,8 +176,7 @@ export function parseOptions (options: Partial<Options>) {
 
   // byhour
   if (!isPresent(opts.byhour)) {
-    opts.byhour =
-      opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
+    opts.byhour = opts.freq < RRule.HOURLY ? [opts.dtstart.getUTCHours()] : null
   } else if (isNumber(opts.byhour)) {
     opts.byhour = [opts.byhour]
   }
@@ -193,16 +200,16 @@ export function parseOptions (options: Partial<Options>) {
   return { parsedOptions: opts as ParsedOptions }
 }
 
-export function buildTimeset (opts: ParsedOptions) {
+export function buildTimeset(opts: ParsedOptions) {
   const millisecondModulo = opts.dtstart.getTime() % 1000
   if (!freqIsDailyOrGreater(opts.freq)) {
     return []
   }
 
   const timeset: Time[] = []
-  opts.byhour.forEach(hour => {
-    opts.byminute.forEach(minute => {
-      opts.bysecond.forEach(second => {
+  opts.byhour.forEach((hour) => {
+    opts.byminute.forEach((minute) => {
+      opts.bysecond.forEach((second) => {
         timeset.push(new Time(hour, minute, second, millisecondModulo))
       })
     })

@@ -19,7 +19,7 @@ const M365MASK = [
   ...repeat(10, 31),
   ...repeat(11, 30),
   ...repeat(12, 31),
-  ...repeat(1, 7)
+  ...repeat(1, 7),
 ]
 
 const M366MASK = [
@@ -35,7 +35,7 @@ const M366MASK = [
   ...repeat(10, 31),
   ...repeat(11, 30),
   ...repeat(12, 31),
-  ...repeat(1, 7)
+  ...repeat(1, 7),
 ]
 
 const M28 = range(1, 29)
@@ -56,7 +56,7 @@ const MDAY366MASK = [
   ...M31,
   ...M30,
   ...M31,
-  ...M31.slice(0, 7)
+  ...M31.slice(0, 7),
 ]
 
 const MDAY365MASK = [
@@ -72,7 +72,7 @@ const MDAY365MASK = [
   ...M31,
   ...M30,
   ...M31,
-  ...M31.slice(0, 7)
+  ...M31.slice(0, 7),
 ]
 
 const NM28 = range(-28, 0)
@@ -93,7 +93,7 @@ const NMDAY366MASK = [
   ...NM31,
   ...NM30,
   ...NM31,
-  ...NM31.slice(0, 7)
+  ...NM31.slice(0, 7),
 ]
 
 const NMDAY365MASK = [
@@ -109,7 +109,7 @@ const NMDAY365MASK = [
   ...NM31,
   ...NM30,
   ...NM31,
-  ...NM31.slice(0, 7)
+  ...NM31.slice(0, 7),
 ]
 
 const M366RANGE = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366]
@@ -130,5 +130,5 @@ export {
   MDAY365MASK,
   MDAY366MASK,
   NMDAY365MASK,
-  NMDAY366MASK
+  NMDAY366MASK,
 }

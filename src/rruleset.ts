@@ -7,7 +7,7 @@ import { QueryMethodTypes, IterResultType } from './types'
 import { rrulestr } from './rrulestr'
 import { optionsToString } from './optionstostring'
 
-function createGetterSetter <T> (fieldName: string) {
+function createGetterSetter<T>(fieldName: string) {
   return (field?: T) => {
     if (field !== undefined) {
       this[`_${fieldName}`] = field
@@ -41,7 +41,7 @@ export class RRuleSet extends RRule {
    *  The same stratagy as RRule on cache, default to false
    * @constructor
    */
-  constructor (noCache: boolean = false) {
+  constructor(noCache: boolean = false) {
     super({}, noCache)
 
     this._rrule = []
@@ -53,7 +53,9 @@ export class RRuleSet extends RRule {
   dtstart = createGetterSetter.apply(this, ['dtstart'])
   tzid = createGetterSetter.apply(this, ['tzid'])
 
-  _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>): IterResultType<M> {
+  _iter<M extends QueryMethodTypes>(
+    iterResult: IterResult<M>
+  ): IterResultType<M> {
     return iterSet(
       iterResult,
       this._rrule,
@@ -69,7 +71,7 @@ export class RRuleSet extends RRule {
    *
    * @param {RRule}
    */
-  rrule (rrule: RRule) {
+  rrule(rrule: RRule) {
     _addRule(rrule, this._rrule)
   }
 
@@ -78,7 +80,7 @@ export class RRuleSet extends RRule {
    *
    * @param {RRule}
    */
-  exrule (rrule: RRule) {
+  exrule(rrule: RRule) {
     _addRule(rrule, this._exrule)
   }
 
@@ -87,7 +89,7 @@ export class RRuleSet extends RRule {
    *
    * @param {Date}
    */
-  rdate (date: Date) {
+  rdate(date: Date) {
     _addDate(date, this._rdate)
   }
 
@@ -96,7 +98,7 @@ export class RRuleSet extends RRule {
    *
    * @param {Date}
    */
-  exdate (date: Date) {
+  exdate(date: Date) {
     _addDate(date, this._exdate)
   }
 
@@ -105,8 +107,8 @@ export class RRuleSet extends RRule {
    *
    * @return List of rrules
    */
-  rrules () {
-    return this._rrule.map(e => rrulestr(e.toString()))
+  rrules() {
+    return this._rrule.map((e) => rrulestr(e.toString()))
   }
 
   /**
@@ -114,8 +116,8 @@ export class RRuleSet extends RRule {
    *
    * @return List of exrules
    */
-  exrules () {
-    return this._exrule.map(e => rrulestr(e.toString()))
+  exrules() {
+    return this._exrule.map((e) => rrulestr(e.toString()))
   }
 
   /**
@@ -123,8 +125,8 @@ export class RRuleSet extends RRule {
    *
    * @return List of rdates
    */
-  rdates () {
-    return this._rdate.map(e => new Date(e.getTime()))
+  rdates() {
+    return this._rdate.map((e) => new Date(e.getTime()))
   }
 
   /**
@@ -132,11 +134,11 @@ export class RRuleSet extends RRule {
    *
    * @return List of exdates
    */
-  exdates () {
-    return this._exdate.map(e => new Date(e.getTime()))
+  exdates() {
+    return this._exdate.map((e) => new Date(e.getTime()))
   }
 
-  valueOf () {
+  valueOf() {
     let result: string[] = []
 
     if (!this._rrule.length && this._dtstart) {
@@ -149,22 +151,20 @@ export class RRuleSet extends RRule {
 
     this._exrule.forEach(function (exrule) {
       result = result.concat(
-        exrule.toString().split('\n')
-          .map(line => line.replace(/^RRULE:/, 'EXRULE:'))
-          .filter(line => !/^DTSTART/.test(line))
+        exrule
+          .toString()
+          .split('\n')
+          .map((line) => line.replace(/^RRULE:/, 'EXRULE:'))
+          .filter((line) => !/^DTSTART/.test(line))
       )
     })
 
     if (this._rdate.length) {
-      result.push(
-        rdatesToString('RDATE', this._rdate, this.tzid())
-      )
+      result.push(rdatesToString('RDATE', this._rdate, this.tzid()))
     }
 
     if (this._exdate.length) {
-      result.push(
-        rdatesToString('EXDATE', this._exdate, this.tzid())
-      )
+      result.push(rdatesToString('EXDATE', this._exdate, this.tzid()))
     }
 
     return result
@@ -176,26 +176,26 @@ export class RRuleSet extends RRule {
    *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
    *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
    */
-  toString () {
+  toString() {
     return this.valueOf().join('\n')
   }
 
   /**
    * Create a new RRuleSet Object completely base on current instance
    */
-  clone (): RRuleSet {
+  clone(): RRuleSet {
     const rrs = new RRuleSet(!!this._cache)
 
-    this._rrule.forEach(rule => rrs.rrule(rule.clone()))
-    this._exrule.forEach(rule => rrs.exrule(rule.clone()))
-    this._rdate.forEach(date => rrs.rdate(new Date(date.getTime())))
-    this._exdate.forEach(date => rrs.exdate(new Date(date.getTime())))
+    this._rrule.forEach((rule) => rrs.rrule(rule.clone()))
+    this._exrule.forEach((rule) => rrs.exrule(rule.clone()))
+    this._rdate.forEach((date) => rrs.rdate(new Date(date.getTime())))
+    this._exdate.forEach((date) => rrs.exdate(new Date(date.getTime())))
 
     return rrs
   }
 }
 
-function _addRule (rrule: RRule, collection: RRule[]) {
+function _addRule(rrule: RRule, collection: RRule[]) {
   if (!(rrule instanceof RRule)) {
     throw new TypeError(String(rrule) + ' is not RRule instance')
   }
@@ -205,7 +205,7 @@ function _addRule (rrule: RRule, collection: RRule[]) {
   }
 }
 
-function _addDate (date: Date, collection: Date[]) {
+function _addDate(date: Date, collection: Date[]) {
   if (!(date instanceof Date)) {
     throw new TypeError(String(date) + ' is not Date instance')
   }
@@ -215,13 +215,17 @@ function _addDate (date: Date, collection: Date[]) {
   }
 }
 
-function rdatesToString (param: string, rdates: Date[], tzid: string | undefined) {
+function rdatesToString(
+  param: string,
+  rdates: Date[],
+  tzid: string | undefined
+) {
   const isUTC = !tzid || tzid.toUpperCase() === 'UTC'
   const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
 
   const dateString = rdates
-      .map(rdate => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
-      .join(',')
+    .map((rdate) => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
+    .join(',')
 
   return `${header}${dateString}`
 }

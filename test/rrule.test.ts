@@ -3527,7 +3527,7 @@ describe('RRule', function () {
     ].forEach(function (pair) {
       const rule = pair[0]
       const rr = RRule.fromString(rule)
-      // tslint:disable-next-line:no-unused-expression
+      // eslint-disable-next-line no-unused-expression
       expect(rr.toText()).to.be.ok
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })

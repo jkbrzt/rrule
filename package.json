@@ -20,9 +20,10 @@
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
   "scripts": {
-    "build": "yarn lint && yarn format && tsc && webpack && tsc dist/esm/**/*.d.ts",
+    "build": "yarn lint && yarn format-check && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn eslint --ext .ts,.js --fix --config .eslintrc.js",
     "format": "yarn prettier --write .",
+    "format-check": "yarn prettier --check .",
     "run-ts": "TS_NODE_PROJECT=tsconfig.test.json node --loader ts-node/esm",
     "test": "yarn run-ts ./node_modules/.bin/mocha **/*.test.ts",
     "test-ci": "yarn run-ts ./node_modules/.bin/nyc yarn run-ts ./node_modules/.bin/mocha **/*.test.ts"

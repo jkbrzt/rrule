@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import RRule from '../src';
+import { RRule } from '../src';
 import { optionsToString } from '../src/optionstostring';
 import {DateFormatter} from '../src/nlp/totext'
 

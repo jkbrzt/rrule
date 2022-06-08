@@ -1,13 +1,9 @@
-const webpack = require("webpack");
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require("terser-webpack-plugin");
 
 const paths = {
   source: path.resolve(__dirname, 'src'),
   es5: path.resolve(__dirname, "dist", "es5"),
-  esm: path.resolve(__dirname, "dist", "esm")
 };
 
 const commonConfig = {
@@ -35,10 +31,7 @@ const commonConfig = {
   optimization: {
     minimize: true,
     minimizer: [
-      new UglifyJsPlugin({
-        exclude: /\.ts$/,
-        include: /\.min\.js$/
-      })
+      new TerserPlugin(),
     ]
   }
 };

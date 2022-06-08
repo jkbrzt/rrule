@@ -6,6 +6,7 @@
     "sourceMap": true,
     "module": "commonjs",
     "noEmitOnError": true,
+    "esModuleInterop": true,
     "target": "es6",
     "jsx": "react",
     "baseUrl": ".",

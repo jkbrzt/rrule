@@ -19,16 +19,12 @@
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint"
-    }
-  },
   "scripts": {
     "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
-    "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
-    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
+    "run-ts": "TS_NODE_PROJECT=tsconfig.test.json node --loader ts-node/esm",
+    "test": "yarn run-ts ./node_modules/.bin/mocha **/*.test.ts",
+    "test-ci": "yarn run-ts ./node_modules/.bin/nyc yarn run-ts ./node_modules/.bin/mocha **/*.test.ts"
   },
   "nyc": {
     "extension": [
@@ -46,27 +42,25 @@
   "devDependencies": {
     "@types/assert": "^1.4.3",
     "@types/chai": "^4.2.7",
-    "@types/mocha": "^5.2.5",
-    "@types/mockdate": "^2.0.0",
-    "@types/node": "^12.12.18",
+    "@types/mocha": "^9.1.1",
+    "@types/mockdate": "^3.0.0",
+    "@types/node": "^17.0.41",
     "chai": "^4.2.0",
-    "copy-webpack-plugin": "^5.1.1",
     "coverage": "^0.4.1",
-    "html-webpack-plugin": "^3.2.0",
-    "husky": "^3.1.0",
-    "mocha": "^6.2.2",
-    "mockdate": "^2.0.5",
-    "nyc": "^14.1.1",
-    "source-map-loader": "^0.2.4",
+    "husky": "^8.0.1",
+    "mocha": "^10.0.0",
+    "mockdate": "^3.0.5",
+    "nyc": "^15.1.0",
+    "source-map-loader": "^3.0.1",
     "source-map-support": "^0.5.16",
-    "ts-loader": "^6.2.1",
-    "ts-node": "^8.5.4",
+    "terser-webpack-plugin": "^5.3.3",
+    "ts-loader": "^9.3.0",
+    "ts-node": "^10.8.1",
     "tslint": "^5.20.1",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.7.3",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.41.3",
-    "webpack-cli": "^3.3.10"
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2"
   },
   "files": [
     "dist",
@@ -74,6 +68,6 @@
   ],
   "peerDependencies": {},
   "dependencies": {
-    "tslib": "^1.10.0"
+    "tslib": "^2.4.0"
   }
 }

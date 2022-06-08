@@ -13,6 +13,7 @@
     "jsx": "react",
     "strictNullChecks": true,
     "importHelpers": true,
+    "esModuleInterop": true,
     "rootDirs": ["./src/", "./test/"]
   },
   "include": ["./src/**/*"],

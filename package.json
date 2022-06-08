@@ -27,8 +27,9 @@
   "scripts": {
     "build": "yarn lint && tsc && webpack && tsc dist/esm/**/*.d.ts",
     "lint": "yarn tslint --project . --fix --config tslint.json",
-    "test": "TS_NODE_PROJECT=tsconfig.test.json mocha **/*.test.ts",
-    "test-ci": "TS_NODE_PROJECT=tsconfig.test.json nyc mocha **/*.test.ts"
+    "run-ts": "TS_NODE_PROJECT=tsconfig.test.json node --loader ts-node/esm",
+    "test": "yarn run-ts ./node_modules/.bin/mocha **/*.test.ts",
+    "test-ci": "yarn run-ts ./node_modules/.bin/nyc yarn run-ts ./node_modules/.bin/mocha **/*.test.ts"
   },
   "nyc": {
     "extension": [
@@ -46,15 +47,15 @@
   "devDependencies": {
     "@types/assert": "^1.4.3",
     "@types/chai": "^4.2.7",
-    "@types/mocha": "^5.2.5",
-    "@types/mockdate": "^2.0.0",
-    "@types/node": "^12.12.18",
+    "@types/mocha": "^9.1.1",
+    "@types/mockdate": "^3.0.0",
+    "@types/node": "^17.0.41",
     "chai": "^4.2.0",
     "coverage": "^0.4.1",
-    "husky": "^3.1.0",
-    "mocha": "^6.2.2",
-    "mockdate": "^2.0.5",
-    "nyc": "^14.1.1",
+    "husky": "^8.0.1",
+    "mocha": "^10.0.0",
+    "mockdate": "^3.0.5",
+    "nyc": "^15.1.0",
     "source-map-loader": "^3.0.1",
     "source-map-support": "^0.5.16",
     "terser-webpack-plugin": "^5.3.3",

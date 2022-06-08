@@ -1,10 +1,10 @@
-const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
+const path = require('path')
+const TerserPlugin = require('terser-webpack-plugin')
 
 const paths = {
   source: path.resolve(__dirname, 'src'),
-  es5: path.resolve(__dirname, "dist", "es5"),
-};
+  es5: path.resolve(__dirname, 'dist', 'es5'),
+}
 
 const commonConfig = {
   output: {
@@ -30,11 +30,9 @@ const commonConfig = {
   },
   optimization: {
     minimize: true,
-    minimizer: [
-      new TerserPlugin(),
-    ]
-  }
-};
+    minimizer: [new TerserPlugin()],
+  },
+}
 
 const rruleConfig = Object.assign(
   {

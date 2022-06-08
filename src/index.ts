@@ -14,17 +14,10 @@
  *
  */
 
-import { RRule } from './rrule'
-import { RRuleSet } from './rruleset'
+export { RRule } from './rrule'
+export { RRuleSet } from './rruleset'
 
 export { rrulestr } from './rrulestr'
 export { Frequency, ByWeekday, Options } from './types'
 export { Weekday, WeekdayStr } from './weekday'
 export { RRuleStrOptions } from './rrulestr'
-
-export {
-  RRule,
-  RRuleSet
-}
-
-export default RRule

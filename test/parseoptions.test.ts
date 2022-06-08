@@ -1,6 +1,6 @@
 import { parseOptions } from '../src/parseoptions'
 import { expect } from 'chai'
-import RRule from '../src'
+import { RRule } from '../src'
 
 describe('TZID', () => {
   it('leaves null when null', () => {

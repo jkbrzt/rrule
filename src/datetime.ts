@@ -8,38 +8,38 @@ export class Time {
   public second: number
   public millisecond: number
 
-  constructor (
-      hour: number,
-      minute: number,
-      second: number,
-      millisecond: number
-    ) {
+  constructor(
+    hour: number,
+    minute: number,
+    second: number,
+    millisecond: number
+  ) {
     this.hour = hour
     this.minute = minute
     this.second = second
     this.millisecond = millisecond || 0
   }
 
-  getHours () {
+  getHours() {
     return this.hour
   }
 
-  getMinutes () {
+  getMinutes() {
     return this.minute
   }
 
-  getSeconds () {
+  getSeconds() {
     return this.second
   }
 
-  getMilliseconds () {
+  getMilliseconds() {
     return this.millisecond
   }
 
-  getTime () {
+  getTime() {
     return (
-        (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
-        this.millisecond
+      (this.hour * 60 * 60 + this.minute * 60 + this.second) * 1000 +
+      this.millisecond
     )
   }
 }
@@ -49,62 +49,68 @@ export class DateTime extends Time {
   public month: number
   public year: number
 
-  static fromDate (date: Date) {
+  static fromDate(date: Date) {
     return new this(
-        date.getUTCFullYear(),
-        date.getUTCMonth() + 1,
-        date.getUTCDate(),
-        date.getUTCHours(),
-        date.getUTCMinutes(),
-        date.getUTCSeconds(),
-        date.valueOf() % 1000
-      )
+      date.getUTCFullYear(),
+      date.getUTCMonth() + 1,
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+      date.getUTCSeconds(),
+      date.valueOf() % 1000
+    )
   }
 
-  constructor (
-      year: number,
-      month: number,
-      day: number,
-      hour: number,
-      minute: number,
-      second: number,
-      millisecond: number
-    ) {
+  constructor(
+    year: number,
+    month: number,
+    day: number,
+    hour: number,
+    minute: number,
+    second: number,
+    millisecond: number
+  ) {
     super(hour, minute, second, millisecond)
     this.year = year
     this.month = month
     this.day = day
   }
 
-  getWeekday () {
+  getWeekday() {
     return dateutil.getWeekday(new Date(this.getTime()))
   }
 
-  getTime () {
+  getTime() {
     return new Date(
-        Date.UTC(
-          this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond
-        )
-      ).getTime()
+      Date.UTC(
+        this.year,
+        this.month - 1,
+        this.day,
+        this.hour,
+        this.minute,
+        this.second,
+        this.millisecond
+      )
+    ).getTime()
   }
 
-  getDay () {
+  getDay() {
     return this.day
   }
 
-  getMonth () {
+  getMonth() {
     return this.month
   }
 
-  getYear () {
+  getYear() {
     return this.year
   }
 
-  public addYears (years: number) {
+  public addYears(years: number) {
     this.year += years
   }
 
-  public addMonths (months: number) {
+  public addMonths(months: number) {
     this.month += months
     if (this.month > 12) {
       const yearDiv = Math.floor(this.month / 12)
@@ -118,7 +124,7 @@ export class DateTime extends Time {
     }
   }
 
-  public addWeekly (days: number, wkst: number) {
+  public addWeekly(days: number, wkst: number) {
     if (wkst > this.getWeekday()) {
       this.day += -(this.getWeekday() + 1 + (6 - wkst)) + days * 7
     } else {
@@ -128,14 +134,14 @@ export class DateTime extends Time {
     this.fixDay()
   }
 
-  public addDaily (days: number) {
+  public addDaily(days: number) {
     this.day += days
     this.fixDay()
   }
 
-  public addHours (hours: number, filtered: boolean, byhour: number[]) {
+  public addHours(hours: number, filtered: boolean, byhour: number[]) {
     if (filtered) {
-        // Jump to one iteration before next day
+      // Jump to one iteration before next day
       this.hour += Math.floor((23 - this.hour) / hours) * hours
     }
 
@@ -151,11 +157,16 @@ export class DateTime extends Time {
     }
   }
 
-  public addMinutes (minutes: number, filtered: boolean, byhour: number[], byminute: number[]) {
+  public addMinutes(
+    minutes: number,
+    filtered: boolean,
+    byhour: number[],
+    byminute: number[]
+  ) {
     if (filtered) {
-        // Jump to one iteration before next day
+      // Jump to one iteration before next day
       this.minute +=
-              Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
+        Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
     }
 
     while (true) {
@@ -167,21 +178,28 @@ export class DateTime extends Time {
       }
 
       if (
-          (empty(byhour) || includes(byhour, this.hour)) &&
-          (empty(byminute) || includes(byminute, this.minute))
-        ) {
+        (empty(byhour) || includes(byhour, this.hour)) &&
+        (empty(byminute) || includes(byminute, this.minute))
+      ) {
         break
       }
     }
   }
 
-  public addSeconds (seconds: number, filtered: boolean, byhour: number[], byminute: number[], bysecond: number[]) {
+  public addSeconds(
+    seconds: number,
+    filtered: boolean,
+    byhour: number[],
+    byminute: number[],
+    bysecond: number[]
+  ) {
     if (filtered) {
-        // Jump to one iteration before next day
+      // Jump to one iteration before next day
       this.second +=
-          Math.floor(
-            (86399 - (this.hour * 3600 + this.minute * 60 + this.second)) / seconds
-          ) * seconds
+        Math.floor(
+          (86399 - (this.hour * 3600 + this.minute * 60 + this.second)) /
+            seconds
+        ) * seconds
     }
 
     while (true) {
@@ -193,16 +211,16 @@ export class DateTime extends Time {
       }
 
       if (
-          (empty(byhour) || includes(byhour, this.hour)) &&
-          (empty(byminute) || includes(byminute, this.minute)) &&
-          (empty(bysecond) || includes(bysecond, this.second))
-        ) {
+        (empty(byhour) || includes(byhour, this.hour)) &&
+        (empty(byminute) || includes(byminute, this.minute)) &&
+        (empty(bysecond) || includes(bysecond, this.second))
+      ) {
         break
       }
     }
   }
 
-  public fixDay () {
+  public fixDay() {
     if (this.day <= 28) {
       return
     }
@@ -227,24 +245,24 @@ export class DateTime extends Time {
     }
   }
 
-  public add (options: ParsedOptions, filtered: boolean) {
-    const {
-      freq,
-      interval,
-      wkst,
-      byhour,
-      byminute,
-      bysecond
-    } = options
+  public add(options: ParsedOptions, filtered: boolean) {
+    const { freq, interval, wkst, byhour, byminute, bysecond } = options
 
     switch (freq) {
-      case Frequency.YEARLY: return this.addYears(interval)
-      case Frequency.MONTHLY: return this.addMonths(interval)
-      case Frequency.WEEKLY: return this.addWeekly(interval, wkst)
-      case Frequency.DAILY: return this.addDaily(interval)
-      case Frequency.HOURLY: return this.addHours(interval, filtered, byhour)
-      case Frequency.MINUTELY: return this.addMinutes(interval, filtered, byhour, byminute)
-      case Frequency.SECONDLY: return this.addSeconds(interval, filtered, byhour, byminute, bysecond)
+      case Frequency.YEARLY:
+        return this.addYears(interval)
+      case Frequency.MONTHLY:
+        return this.addMonths(interval)
+      case Frequency.WEEKLY:
+        return this.addWeekly(interval, wkst)
+      case Frequency.DAILY:
+        return this.addDaily(interval)
+      case Frequency.HOURLY:
+        return this.addHours(interval, filtered, byhour)
+      case Frequency.MINUTELY:
+        return this.addMinutes(interval, filtered, byhour, byminute)
+      case Frequency.SECONDLY:
+        return this.addSeconds(interval, filtered, byhour, byminute, bysecond)
     }
   }
 }

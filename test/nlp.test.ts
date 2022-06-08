@@ -1,7 +1,7 @@
 import { expect } from 'chai'
-import { RRule } from '../src';
-import { optionsToString } from '../src/optionstostring';
-import {DateFormatter} from '../src/nlp/totext'
+import { RRule } from '../src'
+import { optionsToString } from '../src/optionstostring'
+import { DateFormatter } from '../src/nlp/totext'
 
 const texts = [
   ['Every day', 'RRULE:FREQ=DAILY'],
@@ -25,7 +25,7 @@ const texts = [
   ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
   ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
   // ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
-  ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20']
+  ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
 ]
 
 describe('NLP', () => {
@@ -41,8 +41,10 @@ describe('NLP', () => {
     texts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
-      expect(RRule.fromString(str).toText().toLowerCase()).equals(text.toLowerCase(),
-        str + ' => ' + text)
+      expect(RRule.fromString(str).toText().toLowerCase()).equals(
+        text.toLowerCase(),
+        str + ' => ' + text
+      )
     })
   })
 
@@ -50,14 +52,17 @@ describe('NLP', () => {
     texts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
-      expect(optionsToString(RRule.parseText(text))).equals(str, text + ' => ' + str)
+      expect(optionsToString(RRule.parseText(text))).equals(
+        str,
+        text + ' => ' + str
+      )
     })
   })
 
   it('permits integers in byweekday (#153)', () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,
-      byweekday: 0
+      byweekday: 0,
     })
 
     expect(rrule.toText()).to.equal('every week on Monday')
@@ -65,48 +70,60 @@ describe('NLP', () => {
   })
 
   it('sorts monthdays correctly (#101)', () => {
-    const options = { "freq": 2, "bymonthday": [3, 10, 17, 24] }
+    const options = { freq: 2, bymonthday: [3, 10, 17, 24] }
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every week on the 3rd, 10th, 17th and 24th')
   })
 
   it('shows correct text for every day', () => {
-    const options = { "freq": RRule.WEEKLY, byweekday: [
-      RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA, RRule.SU
-    ]}
+    const options = {
+      freq: RRule.WEEKLY,
+      byweekday: [
+        RRule.MO,
+        RRule.TU,
+        RRule.WE,
+        RRule.TH,
+        RRule.FR,
+        RRule.SA,
+        RRule.SU,
+      ],
+    }
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('every day')
   })
 
   it('shows correct text for every minute', () => {
-    const options = { 'freq': RRule.MINUTELY };
-    const rule = new RRule(options);
-    expect(rule.toText()).to.equal('every minute');
-  });
+    const options = { freq: RRule.MINUTELY }
+    const rule = new RRule(options)
+    expect(rule.toText()).to.equal('every minute')
+  })
 
   it('shows correct text for every (plural) minutes', () => {
-    const options = { 'freq': RRule.MINUTELY, 'interval': 2 };
-    const rule = new RRule(options);
-    expect(rule.toText()).to.equal('every 2 minutes');
-  });
+    const options = { freq: RRule.MINUTELY, interval: 2 }
+    const rule = new RRule(options)
+    expect(rule.toText()).to.equal('every 2 minutes')
+  })
 
-  it('by default formats \'until\' correctly', () => {
+  it("by default formats 'until' correctly", () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,
-      until: new Date(Date.UTC(2012, 10, 10))
+      until: new Date(Date.UTC(2012, 10, 10)),
     })
 
     expect(rrule.toText()).to.equal('every week until November 10, 2012')
   })
 
-  it('formats \'until\' as desired if asked', () => {
+  it("formats 'until' as desired if asked", () => {
     const rrule = new RRule({
       freq: RRule.WEEKLY,
-      until: new Date(Date.UTC(2012, 10, 10))
+      until: new Date(Date.UTC(2012, 10, 10)),
     })
 
-    const dateFormatter: DateFormatter = (year, month, day) => `${day}. ${month}, ${year}`
+    const dateFormatter: DateFormatter = (year, month, day) =>
+      `${day}. ${month}, ${year}`
 
-    expect(rrule.toText(undefined, undefined, dateFormatter)).to.equal('every week until 10. November, 2012')
+    expect(rrule.toText(undefined, undefined, dateFormatter)).to.equal(
+      'every week until 10. November, 2012'
+    )
   })
 })

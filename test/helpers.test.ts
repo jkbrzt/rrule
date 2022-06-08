@@ -1,6 +1,17 @@
-import { empty, includes, pymod, divmod, split, clone, range, repeat, isPresent, isArray } from '../src/helpers'
+import {
+  empty,
+  includes,
+  pymod,
+  divmod,
+  split,
+  clone,
+  range,
+  repeat,
+  isPresent,
+  isArray,
+} from '../src/helpers'
 import { expect } from 'chai'
-import { isNumber } from 'util';
+import { isNumber } from 'util'
 
 describe('isPresent', () => {
   it('is false if object is null', () => {
@@ -95,7 +106,11 @@ describe('divmod', () => {
 
 describe('split', () => {
   it('splits on the separator', () => {
-    expect(split('one-two-three', '-', 0)).to.deep.equal(['one', 'two', 'three'])
+    expect(split('one-two-three', '-', 0)).to.deep.equal([
+      'one',
+      'two',
+      'three',
+    ])
   })
 
   it('only splits the specified number when nonzero', () => {

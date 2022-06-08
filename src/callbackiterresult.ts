@@ -9,7 +9,7 @@ type Iterator = (d: Date, len: number) => boolean
 export default class CallbackIterResult extends IterResult<'all' | 'between'> {
   private iterator: Iterator
 
-  constructor (
+  constructor(
     method: 'all' | 'between',
     args: Partial<IterArgs>,
     iterator: Iterator
@@ -19,7 +19,7 @@ export default class CallbackIterResult extends IterResult<'all' | 'between'> {
     this.iterator = iterator
   }
 
-  add (date: Date) {
+  add(date: Date) {
     if (this.iterator(date, this._result.length)) {
       this._result.push(date)
       return true

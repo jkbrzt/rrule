@@ -10,16 +10,8 @@
     "target": "es6",
     "jsx": "react",
     "baseUrl": ".",
-    "rootDirs": [
-      "./src/",
-      "./test/",
-    ]
+    "rootDirs": ["./src/", "./test/"]
   },
-  "include": [
-    "./src/**/*",
-    "./test/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-  ]
+  "include": ["./src/**/*", "./test/**/*"],
+  "exclude": ["node_modules"]
 }

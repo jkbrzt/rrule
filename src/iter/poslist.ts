@@ -3,7 +3,14 @@ import Iterinfo from '../iterinfo/index'
 import { pymod, isPresent, includes } from '../helpers'
 import { Time } from '../datetime'
 
-export function buildPoslist (bysetpos: number[], timeset: Time[], start: number, end: number, ii: Iterinfo, dayset: (number | null)[]) {
+export function buildPoslist(
+  bysetpos: number[],
+  timeset: Time[],
+  start: number,
+  end: number,
+  ii: Iterinfo,
+  dayset: (number | null)[]
+) {
   const poslist: Date[] = []
 
   for (let j = 0; j < bysetpos.length; j++) {

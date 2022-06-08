@@ -23,7 +23,7 @@ export default class IterResult<M extends QueryMethodTypes> {
   public _result: Date[] = []
   public total = 0
 
-  constructor (method: M, args: Partial<IterArgs>) {
+  constructor(method: M, args: Partial<IterArgs>) {
     this.method = method
     this.args = args
 
@@ -31,7 +31,9 @@ export default class IterResult<M extends QueryMethodTypes> {
       this.maxDate = args.inc
         ? args.before!
         : new Date(args.before!.getTime() - 1)
-      this.minDate = args.inc ? args.after! : new Date(args.after!.getTime() + 1)
+      this.minDate = args.inc
+        ? args.after!
+        : new Date(args.after!.getTime() + 1)
     } else if (method === 'before') {
       this.maxDate = args.inc ? args.dt! : new Date(args.dt!.getTime() - 1)
     } else if (method === 'after') {
@@ -47,7 +49,7 @@ export default class IterResult<M extends QueryMethodTypes> {
    * @return {Boolean} true if it makes sense to continue the iteration
    *                   false if we're done.
    */
-  accept (date: Date) {
+  accept(date: Date) {
     ++this.total
     const tooEarly = this.minDate && date < this.minDate
     const tooLate = this.maxDate && date > this.maxDate
@@ -71,7 +73,7 @@ export default class IterResult<M extends QueryMethodTypes> {
    * @param {Date} date that is part of the result.
    * @return {Boolean} whether we are interested in more values.
    */
-  add (date: Date) {
+  add(date: Date) {
     this._result.push(date)
     return true
   }
@@ -81,7 +83,7 @@ export default class IterResult<M extends QueryMethodTypes> {
    * and 'between' an array.
    * @return {Date,Array?}
    */
-  getValue (): IterResultType<M> {
+  getValue(): IterResultType<M> {
     const res = this._result
     switch (this.method) {
       case 'all':
@@ -94,7 +96,7 @@ export default class IterResult<M extends QueryMethodTypes> {
     }
   }
 
-  clone () {
+  clone() {
     return new IterResult(this.method, this.args)
   }
 }

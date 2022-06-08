@@ -12,21 +12,21 @@ const commonConfig = {
     path: paths.es5,
     library: 'rrule',
     libraryTarget: 'umd',
-    globalObject: "typeof self !== 'undefined' ? self : this"
+    globalObject: "typeof self !== 'undefined' ? self : this",
   },
   devtool: 'source-map',
   mode: 'production',
   resolve: {
-    extensions: ['.js', '.ts']
+    extensions: ['.js', '.ts'],
   },
   module: {
     rules: [
       {
         exclude: /node_modules/,
-        loader: "ts-loader",
-        test: /\.ts$/
-      }
-    ]
+        loader: 'ts-loader',
+        test: /\.ts$/,
+      },
+    ],
   },
   optimization: {
     minimize: true,
@@ -36,11 +36,14 @@ const commonConfig = {
   }
 };
 
-const rruleConfig = Object.assign({
-  entry: {
-    rrule: path.join(paths.source, "index.ts"),
-    'rrule.min': path.join(paths.source, "index.ts")
+const rruleConfig = Object.assign(
+  {
+    entry: {
+      rrule: path.join(paths.source, 'index.ts'),
+      'rrule.min': path.join(paths.source, 'index.ts'),
+    },
   },
-}, commonConfig);
+  commonConfig
+)
 
-module.exports = [rruleConfig];
+module.exports = [rruleConfig]

@@ -21,11 +21,15 @@ const contains = function (arr: string[], val: string) {
 
 export type GetText = (id: string | number | Weekday) => string
 
-const defaultGetText: GetText = id => id.toString()
+const defaultGetText: GetText = (id) => id.toString()
 
 export type DateFormatter = (year: number, month: string, day: number) => string
 
-const defaultDateFormatter: DateFormatter = (year: number, month: string, day: number) => `${month} ${day}, ${year}`
+const defaultDateFormatter: DateFormatter = (
+  year: number,
+  month: string,
+  day: number
+) => `${month} ${day}, ${year}`
 
 /**
  *
@@ -52,7 +56,12 @@ export default class ToText {
     isEveryDay: boolean
   } | null
 
-  constructor (rrule: RRule, gettext: GetText = defaultGetText, language: Language = ENGLISH, dateFormatter: DateFormatter = defaultDateFormatter) {
+  constructor(
+    rrule: RRule,
+    gettext: GetText = defaultGetText,
+    language: Language = ENGLISH,
+    dateFormatter: DateFormatter = defaultDateFormatter
+  ) {
     this.text = []
     this.language = language || ENGLISH
     this.gettext = gettext
@@ -100,7 +109,7 @@ export default class ToText {
           days.indexOf('TH') !== -1 &&
           days.indexOf('FR') !== -1 &&
           days.indexOf('SA') !== -1 &&
-          days.indexOf('SU') !== -1
+          days.indexOf('SU') !== -1,
       }
 
       const sortWeekDays = function (a: Weekday, b: Weekday) {
@@ -122,7 +131,7 @@ export default class ToText {
    * @param {RRule} rrule
    * @return {Boolean}
    */
-  static isFullyConvertible (rrule: RRule) {
+  static isFullyConvertible(rrule: RRule) {
     let canConvert = true
 
     if (!(rrule.options.freq in ToText.IMPLEMENTED)) return false
@@ -136,7 +145,7 @@ export default class ToText {
     return canConvert
   }
 
-  isFullyConvertible () {
+  isFullyConvertible() {
     return ToText.isFullyConvertible(this.rrule)
   }
 
@@ -146,7 +155,7 @@ export default class ToText {
    * be omitted from the output an "(~ approximate)" will be appended.
    * @return {*}
    */
-  toString () {
+  toString() {
     const gettext = this.gettext
 
     if (!(this.options.freq! in ToText.IMPLEMENTED)) {
@@ -160,7 +169,13 @@ export default class ToText {
     if (this.options.until) {
       this.add(gettext('until'))
       const until = this.options.until
-      this.add(this.dateFormatter(until.getUTCFullYear(), this.language.monthNames[until.getUTCMonth()], until.getUTCDate()))
+      this.add(
+        this.dateFormatter(
+          until.getUTCFullYear(),
+          this.language.monthNames[until.getUTCMonth()],
+          until.getUTCDate()
+        )
+      )
     } else if (this.options.count) {
       this.add(gettext('for'))
         .add(this.options.count.toString())
@@ -174,7 +189,7 @@ export default class ToText {
     return this.text.join('')
   }
 
-  HOURLY () {
+  HOURLY() {
     const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval!.toString())
@@ -184,7 +199,7 @@ export default class ToText {
     )
   }
 
-  MINUTELY () {
+  MINUTELY() {
     const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval!.toString())
@@ -196,7 +211,7 @@ export default class ToText {
     )
   }
 
-  DAILY () {
+  DAILY() {
     const gettext = this.gettext
 
     if (this.options.interval !== 1) this.add(this.options.interval!.toString())
@@ -211,7 +226,6 @@ export default class ToText {
       this.add(
         this.plural(this.options.interval!) ? gettext('days') : gettext('day')
       )
-
     }
 
     if (this.origOptions.bymonth) {
@@ -228,7 +242,7 @@ export default class ToText {
     }
   }
 
-  WEEKLY () {
+  WEEKLY() {
     const gettext = this.gettext
 
     if (this.options.interval !== 1) {
@@ -267,7 +281,7 @@ export default class ToText {
     }
   }
 
-  MONTHLY () {
+  MONTHLY() {
     const gettext = this.gettext
 
     if (this.origOptions.bymonth) {
@@ -279,7 +293,8 @@ export default class ToText {
       }
       this._bymonth()
     } else {
-      if (this.options.interval !== 1) this.add(this.options.interval!.toString())
+      if (this.options.interval !== 1)
+        this.add(this.options.interval!.toString())
       this.add(
         this.plural(this.options.interval!)
           ? gettext('months')
@@ -295,7 +310,7 @@ export default class ToText {
     }
   }
 
-  YEARLY () {
+  YEARLY() {
     const gettext = this.gettext
 
     if (this.origOptions.bymonth) {
@@ -307,7 +322,8 @@ export default class ToText {
       }
       this._bymonth()
     } else {
-      if (this.options.interval !== 1) this.add(this.options.interval!.toString())
+      if (this.options.interval !== 1)
+        this.add(this.options.interval!.toString())
       this.add(
         this.plural(this.options.interval!) ? gettext('years') : gettext('year')
       )
@@ -336,7 +352,7 @@ export default class ToText {
     }
   }
 
-  private _bymonthday () {
+  private _bymonthday() {
     const gettext = this.gettext
     if (this.byweekday && this.byweekday.allWeeks) {
       this.add(gettext('on'))
@@ -353,7 +369,7 @@ export default class ToText {
     // this.add(gettext('DAY'))
   }
 
-  private _byweekday () {
+  private _byweekday() {
     const gettext = this.gettext
     if (this.byweekday!.allWeeks && !this.byweekday!.isWeekdays) {
       this.add(gettext('on')).add(
@@ -370,7 +386,7 @@ export default class ToText {
     }
   }
 
-  private _byhour () {
+  private _byhour() {
     const gettext = this.gettext
 
     this.add(gettext('at')).add(
@@ -378,13 +394,13 @@ export default class ToText {
     )
   }
 
-  private _bymonth () {
+  private _bymonth() {
     this.add(
       this.list(this.options.bymonth!, this.monthtext, this.gettext('and'))
     )
   }
 
-  nth (n: number | string) {
+  nth(n: number | string) {
     n = parseInt(n.toString(), 10)
     let nth: string
     let npos: number
@@ -414,29 +430,34 @@ export default class ToText {
     return n < 0 ? nth + ' ' + gettext('last') : nth
   }
 
-  monthtext (m: number) {
+  monthtext(m: number) {
     return this.language.monthNames[m - 1]
   }
 
-  weekdaytext (wday: Weekday | number) {
-    const weekday =
-      isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday()
+  weekdaytext(wday: Weekday | number) {
+    const weekday = isNumber(wday) ? (wday + 1) % 7 : wday.getJsWeekday()
     return (
-      ((wday as Weekday).n ? this.nth((wday as Weekday).n!) + ' ' : '') + this.language.dayNames[weekday]
+      ((wday as Weekday).n ? this.nth((wday as Weekday).n!) + ' ' : '') +
+      this.language.dayNames[weekday]
     )
   }
 
-  plural (n: number) {
+  plural(n: number) {
     return n % 100 !== 1
   }
 
-  add (s: string) {
+  add(s: string) {
     this.text.push(' ')
     this.text.push(s)
     return this
   }
 
-  list (arr: ByWeekday | ByWeekday[], callback?: GetText, finalDelim?: string, delim: string = ',') {
+  list(
+    arr: ByWeekday | ByWeekday[],
+    callback?: GetText,
+    finalDelim?: string,
+    delim: string = ','
+  ) {
     if (!isArray(arr)) {
       arr = [arr]
     }

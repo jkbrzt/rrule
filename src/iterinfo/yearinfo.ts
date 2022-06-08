@@ -1,7 +1,17 @@
 import { ParsedOptions } from '../types'
 import dateutil from '../dateutil'
 import { empty, repeat, pymod, includes } from '../helpers'
-import { M365MASK, MDAY365MASK, NMDAY365MASK, WDAYMASK, M365RANGE, M366MASK, MDAY366MASK, NMDAY366MASK, M366RANGE } from '../masks'
+import {
+  M365MASK,
+  MDAY365MASK,
+  NMDAY365MASK,
+  WDAYMASK,
+  M365RANGE,
+  M366MASK,
+  MDAY366MASK,
+  NMDAY366MASK,
+  M366RANGE,
+} from '../masks'
 
 export interface YearInfo {
   yearlen: 365 | 366
@@ -16,7 +26,7 @@ export interface YearInfo {
   wnomask: number[] | null
 }
 
-export function rebuildYear (year: number, options: ParsedOptions) {
+export function rebuildYear(year: number, options: ParsedOptions) {
   const firstyday = new Date(Date.UTC(year, 0, 1))
 
   const yearlen = dateutil.isLeapYear(year) ? 366 : 365
@@ -30,7 +40,7 @@ export function rebuildYear (year: number, options: ParsedOptions) {
     yearordinal,
     yearweekday,
     ...baseYearMasks(year),
-    wnomask: null
+    wnomask: null,
   }
 
   if (empty(options.byweekno)) {
@@ -40,14 +50,13 @@ export function rebuildYear (year: number, options: ParsedOptions) {
   result.wnomask = repeat(0, yearlen + 7) as number[]
   let firstwkst: number
   let wyearlen: number
-  let no1wkst = firstwkst = pymod(7 - yearweekday + options.wkst, 7)
+  let no1wkst = (firstwkst = pymod(7 - yearweekday + options.wkst, 7))
 
   if (no1wkst >= 4) {
     no1wkst = 0
     // Number of days in the year, plus the days we got
     // from last year.
-    wyearlen =
-          result.yearlen + pymod(yearweekday - options.wkst, 7)
+    wyearlen = result.yearlen + pymod(yearweekday - options.wkst, 7)
   } else {
     // Number of days in the year, minus the days we
     // left in last year.
@@ -113,10 +122,7 @@ export function rebuildYear (year: number, options: ParsedOptions) {
         new Date(Date.UTC(year - 1, 0, 1))
       )
 
-      let lno1wkst = pymod(
-        7 - lyearweekday.valueOf() + options.wkst,
-        7
-      )
+      let lno1wkst = pymod(7 - lyearweekday.valueOf() + options.wkst, 7)
 
       const lyearlen = dateutil.isLeapYear(year - 1) ? 366 : 365
       let weekst: number
@@ -140,7 +146,7 @@ export function rebuildYear (year: number, options: ParsedOptions) {
   return result
 }
 
-function baseYearMasks (year: number) {
+function baseYearMasks(year: number) {
   const yearlen = dateutil.isLeapYear(year) ? 366 : 365
   const firstyday = new Date(Date.UTC(year, 0, 1))
   const wday = dateutil.getWeekday(firstyday)
@@ -151,7 +157,7 @@ function baseYearMasks (year: number) {
       mdaymask: MDAY365MASK,
       nmdaymask: NMDAY365MASK,
       wdaymask: WDAYMASK.slice(wday),
-      mrange: M365RANGE
+      mrange: M365RANGE,
     }
   }
 
@@ -160,6 +166,6 @@ function baseYearMasks (year: number) {
     mdaymask: MDAY366MASK,
     nmdaymask: NMDAY366MASK,
     wdaymask: WDAYMASK.slice(wday),
-    mrange: M366RANGE
+    mrange: M366RANGE,
   }
 }

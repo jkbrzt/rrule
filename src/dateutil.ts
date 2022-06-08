@@ -155,7 +155,7 @@ export namespace dateutil {
   /**
    * Sorts an array of Date or dateutil.Time objects
    */
-  export const sort = function<T extends Datelike>(dates: T[]) {
+  export const sort = function <T extends Datelike>(dates: T[]) {
     dates.sort(function (a, b) {
       return a.getTime() - b.getTime()
     })
@@ -171,7 +171,7 @@ export namespace dateutil {
       padStart(date.getUTCHours(), 2, '0'),
       padStart(date.getUTCMinutes(), 2, '0'),
       padStart(date.getUTCSeconds(), 2, '0'),
-      utc ? 'Z' : ''
+      utc ? 'Z' : '',
     ].join('')
   }
 
@@ -192,7 +192,6 @@ export namespace dateutil {
       )
     )
   }
-
 }
 
 export default dateutil

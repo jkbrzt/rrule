@@ -24,6 +24,7 @@ to natural language.
 ### Quick Start
 
 -   [Demo app](http://jakubroztocil.github.io/rrule/)
+-   For contributors and maintainers: the code for the demo app is only on `gh-pages` branch
 
 #### Client Side
 

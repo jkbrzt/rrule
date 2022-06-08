@@ -5,13 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const paths = {
-  demo: {
-    source: path.resolve(__dirname, 'demo'),
-    styles: path.resolve(__dirname, "demo", "demo.css"),
-    template: path.resolve(__dirname, "demo", "index.html")
-  },
   source: path.resolve(__dirname, 'src'),
-  demoDist: path.resolve(__dirname, "dist", "esm", "demo"),
   es5: path.resolve(__dirname, "dist", "es5"),
   esm: path.resolve(__dirname, "dist", "esm")
 };
@@ -56,48 +50,4 @@ const rruleConfig = Object.assign({
   },
 }, commonConfig);
 
-const demoConfig = {
-  entry: {
-    demo: path.join(paths.demo.source, "demo.ts"),
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: ["source-map-loader"],
-        enforce: "pre"
-      },
-      {
-        exclude: /node_modules/,
-        loader: "ts-loader",
-        test: /\.ts$/
-      }
-    ]
-  },
-  output: {
-    filename: "demo.js",
-    path: paths.demoDist
-  },
-  resolve: {
-    extensions: [".js", ".ts"]
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery"
-    }),
-    new CopyWebpackPlugin([
-      {
-        from: paths.demo.styles,
-        to: paths.demoDist
-      }
-    ]),
-    new HtmlWebpackPlugin({
-      template: paths.demo.template
-    })
-  ],
-  devtool: "source-map",
-  mode: "production"
-};
-
-module.exports = [rruleConfig, demoConfig];
+module.exports = [rruleConfig];

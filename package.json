@@ -13,8 +13,8 @@
   ],
   "author": "Jakub Roztocil, Lars Schöning, and David Golightly",
   "main": "dist/es5/rrule.js",
-  "module": "dist/esm/src/index.js",
-  "types": "dist/esm/src/index.d.ts",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/jakubroztocil/rrule.git"

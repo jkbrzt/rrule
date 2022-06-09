@@ -622,11 +622,11 @@ describe('RRuleSet', function () {
 
       set.tzid(targetZone)
 
-      set.rdate(new Date(Date.parse('20020301T090000')))
+      set.rdate(new Date(Date.parse('2002-03-01T09:00:00')))
 
       expect(set.all()).to.deep.equal([
         expectedDate(
-          new Date(Date.parse('20020301T090000')),
+          new Date(Date.parse('2002-03-01T09:00:00')),
           currentLocalDate,
           targetZone
         ),
@@ -826,8 +826,8 @@ describe('RRuleSet', function () {
 
   describe('getters', () => {
     it('rrules()', () => {
-      let set = new RRuleSet()
-      let rrule = new RRule({
+      const set = new RRuleSet()
+      const rrule = new RRule({
         freq: RRule.YEARLY,
         count: 2,
         dtstart: parse('19600101T090000'),
@@ -839,8 +839,8 @@ describe('RRuleSet', function () {
     })
 
     it('exrules()', () => {
-      let set = new RRuleSet()
-      let rrule = new RRule({
+      const set = new RRuleSet()
+      const rrule = new RRule({
         freq: RRule.YEARLY,
         count: 2,
         dtstart: parse('19600101T090000'),
@@ -852,16 +852,16 @@ describe('RRuleSet', function () {
     })
 
     it('rdates()', () => {
-      let set = new RRuleSet()
-      let dt = parse('19610201T090000')
+      const set = new RRuleSet()
+      const dt = parse('19610201T090000')
       set.rdate(dt)
 
       expect(set.rdates()).eql([dt])
     })
 
     it('exdates()', () => {
-      let set = new RRuleSet()
-      let dt = parse('19610201T090000')
+      const set = new RRuleSet()
+      const dt = parse('19610201T090000')
       set.exdate(dt)
 
       expect(set.exdates()).eql([dt])

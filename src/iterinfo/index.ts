@@ -18,6 +18,7 @@ export default class Iterinfo {
   public monthinfo: MonthInfo
   public eastermask: number[] | null
 
+  // eslint-disable-next-line no-empty-function
   constructor(private options: ParsedOptions) {}
 
   rebuild(year: number, month: number) {
@@ -28,7 +29,7 @@ export default class Iterinfo {
     }
 
     if (
-      notEmpty(options.bynweekday!) &&
+      notEmpty(options.bynweekday) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       const { yearlen, mrange, wdaymask } = this.yearinfo

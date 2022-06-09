@@ -3964,7 +3964,7 @@ describe('RRule', function () {
         rr.options.dtstart.getTime(),
         'the supplied dtstart differs from RRule.options.dtstart'
       )
-      let res: Date = rr.before(rr.after(rr.options.dtstart))
+      const res: Date = rr.before(rr.after(rr.options.dtstart))
 
       let resTimestamp: number
       if (res != null) resTimestamp = res.getTime()
@@ -4020,7 +4020,6 @@ describe('RRule', function () {
     ].forEach(function (pair) {
       const rule = pair[0]
       const rr = RRule.fromString(rule)
-      // eslint-disable-next-line no-unused-expression
       expect(rr.toText()).to.be.ok
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })
@@ -4052,7 +4051,7 @@ describe('RRule', function () {
   })
 
   it('calculates byweekday recurrences correctly across DST boundaries', () => {
-    let rule = new RRule({
+    const rule = new RRule({
       freq: RRule.WEEKLY,
       dtstart: new Date(Date.UTC(2018, 9, 0, 0, 0, 0)),
       interval: 1,

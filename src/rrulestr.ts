@@ -16,7 +16,7 @@ export interface RRuleStrOptions {
 
 /**
  * RRuleStr
- *  To parse a set of rrule strings
+ * To parse a set of rrule strings
  */
 const DEFAULT_OPTIONS: RRuleStrOptions = {
   dtstart: null,
@@ -28,12 +28,14 @@ const DEFAULT_OPTIONS: RRuleStrOptions = {
 }
 
 export function parseInput(s: string, options: Partial<RRuleStrOptions>) {
-  let rrulevals: Partial<Options>[] = []
+  const rrulevals: Partial<Options>[] = []
   let rdatevals: Date[] = []
-  let exrulevals: Partial<Options>[] = []
+  const exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let { dtstart, tzid } = parseDtstart(s)
+  const parsedDtstart = parseDtstart(s)
+  const { dtstart } = parsedDtstart
+  let { tzid } = parsedDtstart
 
   const lines = splitIntoLines(s, options.unfold)
 
@@ -51,7 +53,7 @@ export function parseInput(s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'RDATE':
-        const [_, rdateTzid] = /RDATE(?:;TZID=([^:=]+))?/i.exec(line)!
+        const [, rdateTzid] = /RDATE(?:;TZID=([^:=]+))?/i.exec(line) ?? []
         if (rdateTzid && !tzid) {
           tzid = rdateTzid
         }
@@ -127,7 +129,7 @@ function buildRule(s: string, options: Partial<RRuleStrOptions>) {
       rset.exdate(date)
     })
 
-    if (options.compatible && options.dtstart) rset.rdate(dtstart!)
+    if (options.compatible && options.dtstart) rset.rdate(dtstart)
     return rset
   }
 
@@ -196,7 +198,7 @@ function extractName(line: string) {
 
 function breakDownLine(line: string) {
   const { name, value } = extractName(line)
-  let parms = name.split(';')
+  const parms = name.split(';')
   if (!parms) throw new Error('empty property name')
 
   return {

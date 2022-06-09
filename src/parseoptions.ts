@@ -19,8 +19,9 @@ export function initializeOptions(options: Partial<Options>) {
   // Shallow copy for options and origOptions and check for invalid
   for (const key of keys) {
     if (!includes(defaultKeys, key)) invalid.push(key)
-    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key]))
+    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key])) {
       invalid.push(key)
+    }
   }
 
   if (invalid.length) {

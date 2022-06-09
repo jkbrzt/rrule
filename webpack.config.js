@@ -25,6 +25,9 @@ const commonConfig = {
         exclude: /node_modules/,
         loader: 'ts-loader',
         test: /\.ts$/,
+        options: {
+          configFile: 'tsconfig.build.json',
+        },
       },
     ],
   },

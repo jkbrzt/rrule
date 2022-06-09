@@ -60,7 +60,7 @@ export const toArray = function <T>(item: T | T[]): T[] {
 export function padStart(
   item: string | number,
   targetLength: number,
-  padString: string = ' '
+  padString = ' '
 ) {
   const str = String(item)
   targetLength = targetLength >> 0
@@ -99,7 +99,7 @@ export const split = function (str: string, sep: string, num: number) {
  * @param {number} a The dividend.
  * @param {number} b The divisor.
  * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
- *     or b < x <= 0, depending on the sign of b).
+ * or b < x <= 0, depending on the sign of b).
  */
 export const pymod = function (a: number, b: number) {
   const r = a % b
@@ -120,6 +120,7 @@ export const empty = function <T>(obj: T[] | null | undefined) {
 
 /**
  * Python-like boolean
+ *
  * @return {Boolean} value of an object/primitive, taking into account
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true

@@ -41,9 +41,9 @@ export const datetime = function (
   y: number,
   m: number,
   d: number,
-  h: number = 0,
-  i: number = 0,
-  s: number = 0
+  h = 0,
+  i = 0,
+  s = 0
 ) {
   return new Date(Date.UTC(y, m - 1, d, h, i, s))
 }
@@ -52,9 +52,9 @@ export const datetimeUTC = function (
   y: number,
   m: number,
   d: number,
-  h: number = 0,
-  i: number = 0,
-  s: number = 0
+  h = 0,
+  i = 0,
+  s = 0
 ) {
   return new Date(Date.UTC(y, m - 1, d, h, i, s))
 }
@@ -64,7 +64,7 @@ export const datetimeUTC = function (
  */
 export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
-  let [_, y, m, d, h, i, s] = parts
+  const [_, y, m, d, h, i, s] = parts
   const year = Number(y)
   const month = Number(m[0] === '0' ? m[1] : m) - 1
   const day = Number(d[0] === '0' ? d[1] : d)
@@ -88,7 +88,7 @@ export const testRecurring = function (
 ) {
   let rule: any
   let method: string
-  let args: any
+  let args: unknown[]
 
   if (typeof testObj === 'function') {
     testObj = testObj()
@@ -101,7 +101,7 @@ export const testRecurring = function (
   } else {
     rule = testObj.rrule
     method = testObj.method
-    args = testObj.args
+    args = testObj.args ?? []
   }
 
   // Use text and string representation of the rrule as the message.
@@ -121,13 +121,13 @@ export const testRecurring = function (
   itFunc(msg, function () {
     const ctx = this.test.ctx
     let time = Date.now()
-    let actualDates = rule[method].apply(rule, args)
+    let actualDates = rule[method](...args)
     time = Date.now() - time
 
     const maxTestDuration = 200
     expect(time).to.be.lessThan(
       maxTestDuration,
-      `${rule}\' method "${method}" should finish in ${maxTestDuration} ms, but took ${time} ms`
+      `${rule}' method "${method}" should finish in ${maxTestDuration} ms, but took ${time} ms`
     )
 
     if (!(actualDates instanceof Array)) actualDates = [actualDates]
@@ -239,6 +239,7 @@ testRecurring.only = function (...args) {
 }
 
 testRecurring.skip = function () {
+  // eslint-disable-next-line prefer-spread, prefer-rest-params
   it.skip.apply(it, arguments)
 }
 

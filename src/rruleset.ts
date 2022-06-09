@@ -38,10 +38,10 @@ export class RRuleSet extends RRule {
   /**
    *
    * @param {Boolean?} noCache
-   *  The same stratagy as RRule on cache, default to false
+   * The same stratagy as RRule on cache, default to false
    * @constructor
    */
-  constructor(noCache: boolean = false) {
+  constructor(noCache = false) {
     super({}, noCache)
 
     this._rrule = []
@@ -172,9 +172,9 @@ export class RRuleSet extends RRule {
 
   /**
    * to generate recurrence field such as:
-   *   DTSTART:19970902T010000Z
-   *   RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
-   *   RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
+   * DTSTART:19970902T010000Z
+   * RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU
+   * RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH
    */
   toString() {
     return this.valueOf().join('\n')

@@ -61,7 +61,7 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
- *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
+ * - The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
 export class RRule implements QueryMethods {
@@ -97,7 +97,7 @@ export class RRule implements QueryMethods {
   static readonly SA = Days.SA
   static readonly SU = Days.SU
 
-  constructor(options: Partial<Options> = {}, noCache: boolean = false) {
+  constructor(options: Partial<Options> = {}, noCache = false) {
     // RFC string
     this._cache = noCache ? null : new Cache()
 
@@ -145,8 +145,8 @@ export class RRule implements QueryMethods {
 
   /**
    * @param {Function} iterator - optional function that will be called
-   *                   on each date that is added. It can return false
-   *                   to stop the iteration.
+   * on each date that is added. It can return false
+   * to stop the iteration.
    * @return Array containing all recurrences.
    */
   all(iterator?: (d: Date, len: number) => boolean): Date[] {
@@ -167,16 +167,18 @@ export class RRule implements QueryMethods {
    * The inc keyword defines what happens if after and/or before are
    * themselves occurrences. With inc == True, they will be included in the
    * list, if they are found in the recurrence set.
+   *
    * @return Array
    */
   between(
     after: Date,
     before: Date,
-    inc: boolean = false,
+    inc = false,
     iterator?: (d: Date, len: number) => boolean
   ): Date[] {
-    if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before))
+    if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before)) {
       throw new Error('Invalid date passed in to RRule.between')
+    }
     const args = {
       before,
       after,
@@ -199,11 +201,13 @@ export class RRule implements QueryMethods {
    * Returns the last recurrence before the given datetime instance.
    * The inc keyword defines what happens if dt is an occurrence.
    * With inc == True, if dt itself is an occurrence, it will be returned.
+   *
    * @return Date or null
    */
   before(dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt))
+    if (!dateutil.isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.before')
+    }
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
@@ -217,11 +221,13 @@ export class RRule implements QueryMethods {
    * Returns the first recurrence after the given datetime instance.
    * The inc keyword defines what happens if dt is an occurrence.
    * With inc == True, if dt itself is an occurrence, it will be returned.
+   *
    * @return Date or null
    */
   after(dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt))
+    if (!dateutil.isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.after')
+    }
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {
@@ -241,6 +247,7 @@ export class RRule implements QueryMethods {
 
   /**
    * Converts the rrule into its string representation
+   *
    * @see <http://www.ietf.org/rfc/rfc2445.txt>
    * @return String
    */
@@ -266,7 +273,7 @@ export class RRule implements QueryMethods {
 
   /**
    * @return a RRule instance with the same freq and options
-   *          as this one (cache is not cloned)
+   * as this one (cache is not cloned)
    */
   clone(): RRule {
     return new RRule(this.origOptions)

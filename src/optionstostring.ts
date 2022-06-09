@@ -6,8 +6,8 @@ import dateutil from './dateutil'
 import { DateWithZone } from './datewithzone'
 
 export function optionsToString(options: Partial<Options>) {
-  let rrule: string[][] = []
-  let dtstart: string = ''
+  const rrule: string[][] = []
+  let dtstart = ''
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
   const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
@@ -17,13 +17,13 @@ export function optionsToString(options: Partial<Options>) {
 
     let key = keys[i].toUpperCase()
     const value: any = options[keys[i]]
-    let outValue: string = ''
+    let outValue = ''
 
     if (!isPresent(value) || (isArray(value) && !value.length)) continue
 
     switch (key) {
       case 'FREQ':
-        outValue = RRule.FREQUENCIES[options.freq!]
+        outValue = RRule.FREQUENCIES[options.freq]
         break
       case 'WKST':
         if (isNumber(value)) {

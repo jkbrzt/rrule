@@ -5,7 +5,6 @@ import { RRule } from '../src'
 describe('TZID', () => {
   it('leaves null when null', () => {
     const options = parseOptions({ tzid: null })
-    // eslint-disable-next-line no-unused-expression
     expect(options.parsedOptions.tzid).to.be.null
   })
 

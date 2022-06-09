@@ -20,24 +20,24 @@ export function iter<M extends QueryMethodTypes>(
     return emitResult(iterResult)
   }
 
-  let counterDate = DateTime.fromDate(dtstart)
+  const counterDate = DateTime.fromDate(dtstart)
 
   const ii = new Iterinfo(options)
   ii.rebuild(counterDate.year, counterDate.month)
 
   let timeset = makeTimeset(ii, counterDate, options)
 
-  while (true) {
-    let [dayset, start, end] = ii.getdayset(freq)(
+  for (;;) {
+    const [dayset, start, end] = ii.getdayset(freq)(
       counterDate.year,
       counterDate.month,
       counterDate.day
     )
 
-    let filtered = removeFilteredDays(dayset, start, end, ii, options)
+    const filtered = removeFilteredDays(dayset, start, end, ii, options)
 
     if (notEmpty(bysetpos)) {
-      const poslist = buildPoslist(bysetpos, timeset!, start, end, ii, dayset)
+      const poslist = buildPoslist(bysetpos, timeset, start, end, ii, dayset)
 
       for (let j = 0; j < poslist.length; j++) {
         const res = poslist[j]
@@ -67,8 +67,8 @@ export function iter<M extends QueryMethodTypes>(
         }
 
         const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
-        for (let k = 0; k < timeset!.length; k++) {
-          const time = timeset![k]
+        for (let k = 0; k < timeset.length; k++) {
+          const time = timeset[k]
           const res = dateutil.combine(date, time)
           if (until && res > until) {
             return emitResult(iterResult)
@@ -131,10 +131,10 @@ function isFiltered(
 
   return (
     (notEmpty(bymonth) && !includes(bymonth, ii.mmask[currentDay])) ||
-    (notEmpty(byweekno) && !ii.wnomask![currentDay]) ||
+    (notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
     (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask[currentDay])) ||
     (notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
-    (byeaster !== null && !includes(ii.eastermask!, currentDay)) ||
+    (byeaster !== null && !includes(ii.eastermask, currentDay)) ||
     ((notEmpty(bymonthday) || notEmpty(bynmonthday)) &&
       !includes(bymonthday, ii.mdaymask[currentDay]) &&
       !includes(bynmonthday, ii.nmdaymask[currentDay])) ||
@@ -165,7 +165,7 @@ function removeFilteredDays(
 ) {
   let filtered = false
   for (let dayCounter = start; dayCounter < end; dayCounter++) {
-    let currentDay = dayset[dayCounter] as number
+    const currentDay = dayset[dayCounter]
 
     filtered = isFiltered(ii, currentDay, options)
 

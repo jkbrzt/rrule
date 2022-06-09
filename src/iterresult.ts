@@ -29,15 +29,13 @@ export default class IterResult<M extends QueryMethodTypes> {
 
     if (method === 'between') {
       this.maxDate = args.inc
-        ? args.before!
-        : new Date(args.before!.getTime() - 1)
-      this.minDate = args.inc
-        ? args.after!
-        : new Date(args.after!.getTime() + 1)
+        ? args.before
+        : new Date(args.before.getTime() - 1)
+      this.minDate = args.inc ? args.after : new Date(args.after.getTime() + 1)
     } else if (method === 'before') {
-      this.maxDate = args.inc ? args.dt! : new Date(args.dt!.getTime() - 1)
+      this.maxDate = args.inc ? args.dt : new Date(args.dt.getTime() - 1)
     } else if (method === 'after') {
-      this.minDate = args.inc ? args.dt! : new Date(args.dt!.getTime() + 1)
+      this.minDate = args.inc ? args.dt : new Date(args.dt.getTime() + 1)
     }
   }
 
@@ -45,9 +43,9 @@ export default class IterResult<M extends QueryMethodTypes> {
    * Possibly adds a date into the result.
    *
    * @param {Date} date - the date isn't necessarly added to the result
-   *                      list (if it is too late/too early)
+   * list (if it is too late/too early)
    * @return {Boolean} true if it makes sense to continue the iteration
-   *                   false if we're done.
+   * false if we're done.
    */
   accept(date: Date) {
     ++this.total
@@ -81,6 +79,7 @@ export default class IterResult<M extends QueryMethodTypes> {
   /**
    * 'before' and 'after' return only one date, whereas 'all'
    * and 'between' an array.
+   *
    * @return {Date,Array?}
    */
   getValue(): IterResultType<M> {

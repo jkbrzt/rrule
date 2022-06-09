@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 import { padStart } from './helpers'
 import { Time } from './datetime'
 

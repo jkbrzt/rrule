@@ -79,6 +79,7 @@ function parseRrule(line: string) {
       case 'BYSECOND':
         const num = parseNumber(value)
         const optionKey = key.toLowerCase()
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         options[optionKey] = num
         break

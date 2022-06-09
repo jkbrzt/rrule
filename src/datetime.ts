@@ -145,7 +145,7 @@ export class DateTime extends Time {
       this.hour += Math.floor((23 - this.hour) / hours) * hours
     }
 
-    while (true) {
+    for (;;) {
       this.hour += hours
       const { div: dayDiv, mod: hourMod } = divmod(this.hour, 24)
       if (dayDiv) {
@@ -169,7 +169,7 @@ export class DateTime extends Time {
         Math.floor((1439 - (this.hour * 60 + this.minute)) / minutes) * minutes
     }
 
-    while (true) {
+    for (;;) {
       this.minute += minutes
       const { div: hourDiv, mod: minuteMod } = divmod(this.minute, 60)
       if (hourDiv) {
@@ -202,7 +202,7 @@ export class DateTime extends Time {
         ) * seconds
     }
 
-    while (true) {
+    for (;;) {
       this.second += seconds
       const { div: minuteDiv, mod: secondMod } = divmod(this.second, 60)
       if (minuteDiv) {

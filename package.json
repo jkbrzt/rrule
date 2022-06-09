@@ -23,7 +23,7 @@
     "prebuild": "yarn clean",
     "build": "yarn lint && yarn format-check && tsc -b tsconfig.build.json && webpack && tsc -b tsconfig.build.json dist/esm/**/*.d.ts",
     "clean": "rm -rf dist/",
-    "lint": "yarn eslint --fix --config .eslintrc.js",
+    "lint": "yarn eslint . --fix --config .eslintrc.js",
     "format": "yarn prettier --write .",
     "format-check": "yarn prettier --check .",
     "run-ts": "TS_NODE_PROJECT=tsconfig.json node --loader ts-node/esm",

@@ -56,7 +56,7 @@ module.exports = {
         avoidEscape: true,
       },
     ],
-    '@typescript-eslint/semi': ['error', 'never'],
+    '@typescript-eslint/semi': 'off',
     '@typescript-eslint/triple-slash-reference': [
       'error',
       {
@@ -111,10 +111,10 @@ module.exports = {
     'no-unused-labels': 'error',
     'no-var': 'error',
     'one-var': ['error', 'never'],
-    quotes: 'error',
+    quotes: 'off',
     radix: 'error',
-    semi: 'error',
-    'space-before-function-paren': ['error', 'always'],
+    semi: 'off',
+    'space-before-function-paren': ['error', 'never'],
     'space-in-parens': ['error', 'never'],
     'spaced-comment': [
       'error',
@@ -125,4 +125,12 @@ module.exports = {
     ],
     'use-isnan': 'error',
   },
+  overrides: [
+    {
+      files: ['*.test.*'],
+      rules: {
+        '@typescript-eslint/no-unused-expressions': 'off',
+      },
+    },
+  ],
 }

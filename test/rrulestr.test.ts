@@ -276,7 +276,7 @@ describe('rrulestr', function () {
 
     expect(rrule.origOptions).to.deep.include({
       freq: Frequency.WEEKLY,
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
     })
   })
 
@@ -289,8 +289,8 @@ describe('rrulestr', function () {
     expect(rrule.origOptions).to.deep.include({
       tzid: 'America/New_York',
       freq: Frequency.DAILY,
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
-      until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
+      until: datetime(1998, 9, 2, 9, 0, 0),
     })
   })
 
@@ -300,8 +300,8 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
-      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      until: datetime(1999, 4, 4, 11, 0, 0),
+      dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
       byweekday: [Days.TU.weekday, Days.WE.weekday],
     })
@@ -313,8 +313,8 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
-      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      until: datetime(1999, 4, 4, 11, 0, 0),
+      dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
       tzid: 'America/New_York',
       byweekday: [Days.TU.weekday, Days.WE.weekday],
@@ -327,7 +327,7 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      dtstart: new Date(Date.UTC(2018, 6, 19, 11, 15, 0)),
+      dtstart: datetime(2018, 7, 19, 11, 15, 0),
       freq: Frequency.DAILY,
       interval: 1,
       tzid: 'America/Los_Angeles',
@@ -379,20 +379,17 @@ describe('parseInput', () => {
       {}
     )
     expect(output).to.deep.include({
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
       tzid: 'America/New_York',
       rrulevals: [
         {
           interval: 1,
           freq: Frequency.DAILY,
-          until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0)),
+          until: datetime(1998, 9, 2, 9, 0, 0),
         },
       ],
-      exdatevals: [new Date(Date.UTC(1997, 8, 4, 9, 0, 0))],
-      rdatevals: [
-        new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
-        new Date(Date.UTC(1997, 8, 4, 9, 0, 0)),
-      ],
+      exdatevals: [datetime(1997, 9, 4, 9, 0, 0)],
+      rdatevals: [datetime(1997, 9, 2, 9, 0, 0), datetime(1997, 9, 4, 9, 0, 0)],
       exrulevals: [
         {
           interval: 2,

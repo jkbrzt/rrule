@@ -59,15 +59,11 @@ describe('RRule', function () {
     'missing Feb 28 https://github.com/jakubroztocil/rrule/issues/21',
     new RRule({
       freq: RRule.MONTHLY,
-      dtstart: new Date(Date.UTC(2013, 0, 1)),
+      dtstart: datetime(2013, 1, 1),
       count: 3,
       bymonthday: [28],
     }),
-    [
-      new Date(Date.UTC(2013, 0, 28)),
-      new Date(Date.UTC(2013, 1, 28)),
-      new Date(Date.UTC(2013, 2, 28)),
-    ]
+    [datetime(2013, 1, 28), datetime(2013, 2, 28), datetime(2013, 3, 28)]
   )
 
   // =============================================================================
@@ -3978,8 +3974,8 @@ describe('RRule', function () {
   it('testConvertAndBack', function () {
     ;[6, RRule.SU].forEach(function (wkst) {
       const rr = new RRule({
-        dtstart: new Date(Date.UTC(2017, 9, 17, 0, 30, 0, 0)),
-        until: new Date(Date.UTC(2017, 11, 22, 1, 30, 0, 0)),
+        dtstart: datetime(2017, 10, 17, 0, 30, 0),
+        until: datetime(2017, 12, 22, 1, 30, 0),
         freq: RRule.MONTHLY,
         interval: 1,
         bysetpos: 17,
@@ -4053,10 +4049,10 @@ describe('RRule', function () {
   it('calculates byweekday recurrences correctly across DST boundaries', () => {
     const rule = new RRule({
       freq: RRule.WEEKLY,
-      dtstart: new Date(Date.UTC(2018, 9, 0, 0, 0, 0)),
+      dtstart: datetime(2018, 10, 0, 0, 0, 0),
       interval: 1,
       byweekday: [RRule.SU, RRule.WE],
-      until: new Date(Date.UTC(2018, 9, 9, 0, 0, 0)),
+      until: datetime(2018, 10, 9, 0, 0, 0),
     })
 
     expect(rule.all()).to.deep.equal([
@@ -4132,19 +4128,19 @@ describe('RRule', function () {
   it('handles 3-digit years properly (#202)', () => {
     const rrule = new RRule({
       count: 1,
-      dtstart: new Date(Date.UTC(990, 0, 1, 0, 0, 0)),
+      dtstart: datetime(990, 1, 1, 0, 0, 0),
     })
     const ruleString = rrule.toString()
     const rrule2 = RRule.fromString(ruleString)
 
     expect(ruleString).to.equal('DTSTART:09900101T000000Z\nRRULE:COUNT=1')
     expect(rrule2.count()).to.equal(1)
-    expect(rrule2.all()).to.deep.equal([new Date(Date.UTC(990, 0, 1, 0, 0, 0))])
+    expect(rrule2.all()).to.deep.equal([datetime(990, 1, 1, 0, 0, 0)])
   })
 
   describe('time zones, when recurrence is in dst', () => {
     const targetZone = 'America/Los_Angeles'
-    const startDate = new Date(Date.UTC(2013, 7, 6, 11, 0, 0))
+    const startDate = datetime(2013, 8, 6, 11, 0, 0)
     const dtstart = startDate
 
     it('generates correct recurrences when current time is standard time', () => {
@@ -4201,7 +4197,7 @@ describe('RRule', function () {
 
   it('throws an error when dtstart is invalid', () => {
     const invalidDate = new Date(undefined)
-    const validDate = new Date(Date.UTC(2017, 0, 1))
+    const validDate = datetime(2017, 1, 1)
     expect(() => new RRule({ dtstart: invalidDate })).to.throw(
       'Invalid options: dtstart'
     )
@@ -4210,7 +4206,7 @@ describe('RRule', function () {
     ).to.throw('Invalid options: until')
 
     const rule = new RRule({
-      dtstart: new Date(Date.UTC(2017, 0, 1)),
+      dtstart: datetime(2017, 1, 1),
       freq: Frequency.DAILY,
       interval: 1,
     })

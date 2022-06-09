@@ -560,33 +560,33 @@ describe('RRuleSet', function () {
         new RRule({
           freq: RRule.YEARLY,
           count: 4,
-          dtstart: new Date(Date.UTC(2000, 0, 1, 9, 0, 0)),
+          dtstart: datetime(2000, 1, 1, 9, 0, 0),
           tzid: targetZone,
         })
       )
 
-      set.exdate(new Date(Date.UTC(2001, 0, 1, 9, 0, 0)))
+      set.exdate(datetime(2001, 1, 1, 9, 0, 0))
 
-      set.rdate(new Date(Date.UTC(2002, 2, 1, 9, 0, 0)))
+      set.rdate(datetime(2002, 3, 1, 9, 0, 0))
 
       expect(set.all()).to.deep.equal([
         expectedDate(
-          new Date(Date.UTC(2000, 0, 1, 9, 0, 0)),
+          datetime(2000, 1, 1, 9, 0, 0),
           currentLocalDate,
           targetZone
         ),
         expectedDate(
-          new Date(Date.UTC(2002, 0, 1, 9, 0, 0)),
+          datetime(2002, 1, 1, 9, 0, 0),
           currentLocalDate,
           targetZone
         ),
         expectedDate(
-          new Date(Date.UTC(2002, 2, 1, 9, 0, 0)),
+          datetime(2002, 3, 1, 9, 0, 0),
           currentLocalDate,
           targetZone
         ),
         expectedDate(
-          new Date(Date.UTC(2003, 0, 1, 9, 0, 0)),
+          datetime(2003, 1, 1, 9, 0, 0),
           currentLocalDate,
           targetZone
         ),
@@ -598,7 +598,7 @@ describe('RRuleSet', function () {
     it('permits only an rdate with a timezone', () => {
       const set = new RRuleSet()
       set.tzid('America/Los_Angeles')
-      set.rdate(new Date(Date.UTC(2010, 10, 10, 10, 0, 0)))
+      set.rdate(datetime(2010, 11, 10, 10, 0, 0))
 
       expect(set.valueOf()).to.deep.equal([
         'RDATE;TZID=America/Los_Angeles:20101110T100000',
@@ -640,14 +640,14 @@ describe('RRuleSet', function () {
     let cursor: Date
 
     beforeEach(() => {
-      cursor = new Date(Date.UTC(2017, 11, 25, 16, 0, 0))
+      cursor = datetime(2017, 12, 25, 16, 0, 0)
     })
 
     it('updates the ruleset to exclude recurrence date', () => {
       const legacy = ['RRULE:DTSTART=19990104T110000Z;FREQ=DAILY;INTERVAL=1']
       const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
 
-      const recurrenceDate = new Date(Date.UTC(2017, 7, 21, 16, 0, 0))
+      const recurrenceDate = datetime(2017, 8, 21, 16, 0, 0)
 
       expectRecurrence([repeat, legacy]).toAmendExdate(recurrenceDate, [
         'DTSTART:19990104T110000Z',
@@ -661,7 +661,7 @@ describe('RRuleSet', function () {
       const repeat = ['DTSTART:19990104T110000Z', 'RRULE:FREQ=DAILY;INTERVAL=1']
 
       const exrule = new RRule({
-        dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+        dtstart: datetime(1999, 1, 4, 11, 0, 0),
         freq: Frequency.WEEKLY,
         interval: 2,
         count: 1,

@@ -10,7 +10,6 @@
     "moduleResolution": "node",
     "noEmitOnError": true,
     "target": "es5",
-    "strictNullChecks": true,
     "importHelpers": true,
     "esModuleInterop": true,
     "rootDirs": ["./src/"]

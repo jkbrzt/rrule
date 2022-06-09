@@ -55,12 +55,12 @@ export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
   const [, y, m, d, h, i, s] = parts
   const year = Number(y)
-  const month = Number(m[0] === '0' ? m[1] : m) - 1
+  const month = Number(m[0] === '0' ? m[1] : m)
   const day = Number(d[0] === '0' ? d[1] : d)
   const hour = Number(h[0] === '0' ? h[1] : h)
   const minute = Number(i[0] === '0' ? i[1] : i)
   const second = Number(s[0] === '0' ? s[1] : s)
-  return new Date(Date.UTC(year, month, day, hour, minute, second))
+  return datetime(year, month, day, hour, minute, second)
 }
 
 interface TestRecurring {

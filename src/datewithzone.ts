@@ -5,6 +5,9 @@ export class DateWithZone {
   public tzid?: string | null
 
   constructor(date: Date, tzid?: string | null) {
+    if (isNaN(date.getTime())) {
+      throw new RangeError('Invalid date passed to DateWithZone')
+    }
     this.date = date
     this.tzid = tzid
   }

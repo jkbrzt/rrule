@@ -30,6 +30,12 @@ it('returns the time of the date', () => {
   expect(dt.getTime()).to.equal(d.getTime())
 })
 
+it('rejects invalid dates', () => {
+  expect(() => new DateWithZone(new Date(undefined))).to.throw(
+    'Invalid date passed to DateWithZone'
+  )
+})
+
 describe('rezonedDate', () => {
   it('returns the original date when no zone is given', () => {
     const d = new Date(Date.UTC(2010, 9, 5, 11, 0, 0))

@@ -88,7 +88,7 @@ export const testRecurring = function (
 ) {
   let rule: any
   let method: string
-  let args: any
+  let args: unknown[]
 
   if (typeof testObj === 'function') {
     testObj = testObj()
@@ -101,7 +101,7 @@ export const testRecurring = function (
   } else {
     rule = testObj.rrule
     method = testObj.method
-    args = testObj.args
+    args = testObj.args ?? []
   }
 
   // Use text and string representation of the rrule as the message.

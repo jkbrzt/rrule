@@ -64,7 +64,7 @@ export const datetimeUTC = function (
  */
 export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
-  const [_, y, m, d, h, i, s] = parts
+  const [, y, m, d, h, i, s] = parts
   const year = Number(y)
   const month = Number(m[0] === '0' ? m[1] : m) - 1
   const day = Number(d[0] === '0' ? d[1] : d)
@@ -75,19 +75,25 @@ export const parse = function (str: string) {
 }
 
 interface TestRecurring {
-  (m: string, testObj: any, expectedDates: Date | Date[]): void
-  only: (...args: any[]) => void
-  skip: (...args: any[]) => void
+  (m: string, testObj: unknown, expectedDates: Date | Date[]): void
+  only: (...args: unknown[]) => void
+  skip: (...args: unknown[]) => void
+}
+
+interface TestObj {
+  rrule: RRule
+  method: 'all' | 'between' | 'before' | 'after'
+  args: unknown[]
 }
 
 export const testRecurring = function (
   msg: string,
-  testObj: any,
+  testObj: TestObj | RRule | (() => TestObj),
   expectedDates: Date | Date[],
   itFunc: TestFunction | ExclusiveTestFunction = it
 ) {
-  let rule: any
-  let method: string
+  let rule: RRule
+  let method: 'all' | 'before' | 'between' | 'after'
   let args: unknown[]
 
   if (typeof testObj === 'function') {
@@ -115,12 +121,16 @@ export const testRecurring = function (
       rule.toString() +
       ']'
   } else {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     msg = msg + ' ' + rule.toString()
   }
 
   itFunc(msg, function () {
     const ctx = this.test.ctx
     let time = Date.now()
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     let actualDates = rule[method](...args)
     time = Date.now() - time
 
@@ -166,11 +176,15 @@ export const testRecurring = function (
       // Test fromText()/toText().
       const str = rule.toString()
       const text = rule.toText()
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const rrule2 = RRule.fromText(text, rule.options.dtstart)
       const text2 = rrule2.toText()
       expect(text2).to.equal(text, 'toText() == fromText(toText()).toText()')
 
       // Test fromText()/toString().
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const rrule3 = RRule.fromText(text, rule.options.dtstart)
       expect(rrule3.toString()).to.equal(
         str,

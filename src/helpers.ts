@@ -10,12 +10,12 @@ export const isPresent = function <T>(
   return value !== null && value !== undefined
 }
 
-export const isNumber = function (value?: any): value is number {
+export const isNumber = function (value: unknown): value is number {
   return typeof value === 'number'
 }
 
-export const isWeekdayStr = function (value?: any): value is WeekdayStr {
-  return ALL_WEEKDAYS.indexOf(value) >= 0
+export const isWeekdayStr = function (value: unknown): value is WeekdayStr {
+  return typeof value === 'string' && ALL_WEEKDAYS.includes(value as WeekdayStr)
 }
 
 export const isArray = Array.isArray

@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
-    "baseUrl": "./dist/esm",
-    "outDir": "./dist/esm",
-    "declaration": true,
-    "declarationMap": true,
+    "noEmit": true,
     "noImplicitAny": true,
     "sourceMap": true,
-    "module": "es2015",
-    "moduleResolution": "node",
+    "module": "commonjs",
     "noEmitOnError": true,
-    "target": "es5",
-    "jsx": "react",
-    "strictNullChecks": true,
-    "importHelpers": true,
     "esModuleInterop": true,
+    "target": "es6",
+    "baseUrl": ".",
     "rootDirs": ["./src/", "./test/"]
   },
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "./test/**/*"]
+  "include": ["./src/**/*", "./test/**/*"],
+  "exclude": ["node_modules"]
 }

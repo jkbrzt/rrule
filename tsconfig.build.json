@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./dist/esm",
+    "outDir": "./dist/esm",
+    "declaration": true,
+    "declarationMap": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "target": "es5",
+    "strictNullChecks": true,
+    "importHelpers": true,
+    "esModuleInterop": true,
+    "rootDirs": ["./src/"]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "./test/**/*"]
+}

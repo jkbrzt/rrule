@@ -43,6 +43,12 @@
     ],
     "all": true
   },
+  "lint-staged": {
+    "*.ts": [
+      "yarn lint",
+      "yarn format"
+    ]
+  },
   "devDependencies": {
     "@types/assert": "^1.4.3",
     "@types/chai": "^4.2.7",
@@ -59,6 +65,7 @@
     "eslint-plugin-jsdoc": "^39.3.2",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^8.0.1",
+    "lint-staged": "^13.0.1",
     "mocha": "^10.0.0",
     "mockdate": "^3.0.5",
     "nyc": "^15.1.0",

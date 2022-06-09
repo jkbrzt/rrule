@@ -1,6 +1,6 @@
 import { ParsedOptions, Frequency } from './types'
 import { pymod, divmod, empty, includes } from './helpers'
-import { dateutil } from './dateutil'
+import { getWeekday, MAXYEAR, monthRange } from './dateutil'
 
 export class Time {
   public hour: number
@@ -77,7 +77,7 @@ export class DateTime extends Time {
   }
 
   getWeekday() {
-    return dateutil.getWeekday(new Date(this.getTime()))
+    return getWeekday(new Date(this.getTime()))
   }
 
   getTime() {
@@ -225,7 +225,7 @@ export class DateTime extends Time {
       return
     }
 
-    let daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1]
+    let daysinmonth = monthRange(this.year, this.month - 1)[1]
     if (this.day <= daysinmonth) {
       return
     }
@@ -236,12 +236,12 @@ export class DateTime extends Time {
       if (this.month === 13) {
         this.month = 1
         ++this.year
-        if (this.year > dateutil.MAXYEAR) {
+        if (this.year > MAXYEAR) {
           return
         }
       }
 
-      daysinmonth = dateutil.monthRange(this.year, this.month - 1)[1]
+      daysinmonth = monthRange(this.year, this.month - 1)[1]
     }
   }
 

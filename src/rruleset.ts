@@ -1,5 +1,5 @@
 import { RRule } from './rrule'
-import dateutil from './dateutil'
+import { sort, timeToUntilString } from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
@@ -211,7 +211,7 @@ function _addDate(date: Date, collection: Date[]) {
   }
   if (!includes(collection.map(Number), Number(date))) {
     collection.push(date)
-    dateutil.sort(collection)
+    sort(collection)
   }
 }
 
@@ -224,7 +224,7 @@ function rdatesToString(
   const header = isUTC ? `${param}:` : `${param};TZID=${tzid}:`
 
   const dateString = rdates
-    .map((rdate) => dateutil.timeToUntilString(rdate.valueOf(), isUTC))
+    .map((rdate) => timeToUntilString(rdate.valueOf(), isUTC))
     .join(',')
 
   return `${header}${dateString}`

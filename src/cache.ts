@@ -1,5 +1,5 @@
 import IterResult, { IterArgs } from './iterresult'
-import dateutil from './dateutil'
+import { clone, cloneDates } from './dateutil'
 import { isArray } from './helpers'
 
 export type CacheKeys = 'before' | 'after' | 'between'
@@ -38,10 +38,7 @@ export class Cache {
     args?: Partial<IterArgs>
   ) {
     if (value) {
-      value =
-        value instanceof Date
-          ? dateutil.clone(value)
-          : dateutil.cloneDates(value)
+      value = value instanceof Date ? clone(value) : cloneDates(value)
     }
 
     if (what === 'all') {
@@ -101,9 +98,9 @@ export class Cache {
     }
 
     return isArray(cached)
-      ? dateutil.cloneDates(cached)
+      ? cloneDates(cached)
       : cached instanceof Date
-      ? dateutil.clone(cached)
+      ? clone(cached)
       : cached
   }
 }

@@ -1,6 +1,6 @@
 import { RRule } from './rrule'
 import { RRuleSet } from './rruleset'
-import dateutil from './dateutil'
+import { untilStringToDate } from './dateutil'
 import { includes, split } from './helpers'
 import { Options } from './types'
 import { parseString, parseDtstart } from './parsestring'
@@ -247,7 +247,5 @@ function validateDateParm(parms: string[]) {
 function parseRDate(rdateval: string, parms: string[]) {
   validateDateParm(parms)
 
-  return rdateval
-    .split(',')
-    .map((datestr) => dateutil.untilStringToDate(datestr))
+  return rdateval.split(',').map((datestr) => untilStringToDate(datestr))
 }

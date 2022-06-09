@@ -38,6 +38,7 @@ module.exports = {
     '@typescript-eslint/naming-convention': 'off',
     '@typescript-eslint/no-empty-function': 'error',
     '@typescript-eslint/no-extra-semi': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-misused-new': 'error',
     '@typescript-eslint/no-unnecessary-qualifier': 'error',

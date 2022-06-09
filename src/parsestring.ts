@@ -22,7 +22,7 @@ export function parseDtstart(line: string) {
     return options
   }
 
-  const [_, tzid, dtstart] = dtstartWithZone
+  const [, tzid, dtstart] = dtstartWithZone
 
   if (tzid) {
     options.tzid = tzid
@@ -40,7 +40,7 @@ function parseLine(rfcString: string) {
     return parseRrule(rfcString)
   }
 
-  const [_, key] = header
+  const [, key] = header
   switch (key.toUpperCase()) {
     case 'RRULE':
     case 'EXRULE':
@@ -135,7 +135,10 @@ function parseWeekday(value: string) {
     }
 
     // -1MO, +3FR, 1SO, 13TU ...
-    const parts = day.match(/^([+-]?\d{1,2})([A-Z]{2})$/)!
+    const parts = day.match(/^([+-]?\d{1,2})([A-Z]{2})$/)
+    if (!parts || parts.length < 3) {
+      throw new SyntaxError(`Invalid weekday string: ${day}`)
+    }
     const n = Number(parts[1])
     const wdaypart = parts[2] as keyof typeof Days
     const wday = Days[wdaypart].weekday

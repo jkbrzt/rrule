@@ -57,11 +57,11 @@ export namespace dateutil {
     return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
   }
 
-  export const isDate = function (value: any): value is Date {
+  export const isDate = function (value: unknown): value is Date {
     return value instanceof Date
   }
 
-  export const isValidDate = function (value: any): value is Date {
+  export const isValidDate = function (value: unknown): value is Date {
     return isDate(value) && !isNaN(value.getTime())
   }
 

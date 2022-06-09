@@ -16,7 +16,7 @@ export function optionsToString(options: Partial<Options>) {
     if (!includes(defaultKeys, keys[i])) continue
 
     let key = keys[i].toUpperCase()
-    const value: any = options[keys[i]]
+    const value = options[keys[i]]
     let outValue = ''
 
     if (!isPresent(value) || (isArray(value) && !value.length)) continue
@@ -45,7 +45,9 @@ export function optionsToString(options: Partial<Options>) {
 
           */
         key = 'BYDAY'
-        outValue = toArray<Weekday | number[] | number>(value)
+        outValue = toArray<Weekday | number[] | number>(
+          value as Weekday | number[] | number
+        )
           .map((wday) => {
             if (wday instanceof Weekday) {
               return wday
@@ -61,11 +63,11 @@ export function optionsToString(options: Partial<Options>) {
 
         break
       case 'DTSTART':
-        dtstart = buildDtstart(value, options.tzid)
+        dtstart = buildDtstart(value as number, options.tzid)
         break
 
       case 'UNTIL':
-        outValue = dateutil.timeToUntilString(value, !options.tzid)
+        outValue = dateutil.timeToUntilString(value as number, !options.tzid)
         break
 
       default:

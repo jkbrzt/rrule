@@ -100,7 +100,7 @@ export default class Iterinfo {
     return [range(this.yearlen), 0, this.yearlen]
   }
 
-  mdayset(_: any, month: number, __: any) {
+  mdayset(_: unknown, month: number) {
     const start = this.mrange[month - 1]
     const end = this.mrange[month]
     const set = repeat<number | null>(null, this.yearlen)

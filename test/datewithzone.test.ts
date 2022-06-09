@@ -42,11 +42,11 @@ describe('rezonedDate', () => {
     const currentLocalDate = new Date(2000, 1, 6, 1, 0, 0)
     setMockDate(currentLocalDate)
 
-    const d = new Date(Date.parse('20101005T110000'))
+    const d = new Date(Date.parse('2010-10-05T11:00:00'))
     const dt = new DateWithZone(d, targetZone)
     expect(dt.rezonedDate()).to.deep.equal(
       expectedDate(
-        new Date(Date.parse('20101005T110000')),
+        new Date(Date.parse('2010-10-05T11:00:00')),
         currentLocalDate,
         targetZone
       )

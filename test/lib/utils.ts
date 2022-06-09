@@ -1,5 +1,7 @@
 import { expect } from 'chai'
 import { ExclusiveTestFunction, TestFunction } from 'mocha'
+export { datetime } from '../../src/dateutil'
+import { datetime } from '../../src/dateutil'
 import { RRule, RRuleSet } from '../../src'
 
 const assertDatesEqual = function (
@@ -32,20 +34,6 @@ const assertDatesEqual = function (
 
 const extractTime = function (date: Date) {
   return date != null ? date.getTime() : void 0
-}
-
-/**
- * datetime.datetime
- */
-export const datetime = function (
-  y: number,
-  m: number,
-  d: number,
-  h = 0,
-  i = 0,
-  s = 0
-) {
-  return new Date(Date.UTC(y, m - 1, d, h, i, s))
 }
 
 /**

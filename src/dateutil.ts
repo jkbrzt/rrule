@@ -3,6 +3,17 @@ import { Time } from './datetime'
 
 type Datelike = Pick<Date, 'getTime'>
 
+export const datetime = function (
+  y: number,
+  m: number,
+  d: number,
+  h = 0,
+  i = 0,
+  s = 0
+) {
+  return new Date(Date.UTC(y, m - 1, d, h, i, s))
+}
+
 /**
  * General date-related utilities.
  * Also handles several incompatibilities between JavaScript and Python
@@ -25,7 +36,7 @@ export const MAXYEAR = 9999
  * want to confuse the JS engine with milliseconds > Number.MAX_NUMBER,
  * therefore we use 1-Jan-1970 instead
  */
-export const ORDINAL_BASE = new Date(Date.UTC(1970, 0, 1))
+export const ORDINAL_BASE = datetime(1970, 1, 1)
 
 /**
  * Python: MO-SU: 0 - 6
@@ -115,7 +126,7 @@ export const getWeekday = function (date: Date) {
  * @see: <http://docs.python.org/library/calendar.html#calendar.monthrange>
  */
 export const monthRange = function (year: number, month: number) {
-  const date = new Date(Date.UTC(year, month, 1))
+  const date = datetime(year, month + 1, 1)
   return [getWeekday(date), getMonthDays(date)]
 }
 

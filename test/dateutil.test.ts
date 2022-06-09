@@ -1,6 +1,5 @@
 import { expect } from 'chai'
-import { untilStringToDate } from '../src/dateutil'
-import { datetime } from './lib/utils'
+import { datetime, untilStringToDate } from '../src/dateutil'
 
 describe('untilStringToDate', () => {
   it('parses a date string', () => {

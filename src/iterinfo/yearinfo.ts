@@ -1,5 +1,5 @@
 import { ParsedOptions } from '../types'
-import { getWeekday, isLeapYear, toOrdinal } from '../dateutil'
+import { datetime, getWeekday, isLeapYear, toOrdinal } from '../dateutil'
 import { empty, repeat, pymod, includes } from '../helpers'
 import {
   M365MASK,
@@ -27,7 +27,7 @@ export interface YearInfo {
 }
 
 export function rebuildYear(year: number, options: ParsedOptions) {
-  const firstyday = new Date(Date.UTC(year, 0, 1))
+  const firstyday = datetime(year, 1, 1)
 
   const yearlen = isLeapYear(year) ? 366 : 365
   const nextyearlen = isLeapYear(year + 1) ? 366 : 365
@@ -118,7 +118,7 @@ export function rebuildYear(year: number, options: ParsedOptions) {
     // this year.
     let lnumweeks: number
     if (!includes(options.byweekno, -1)) {
-      const lyearweekday = getWeekday(new Date(Date.UTC(year - 1, 0, 1)))
+      const lyearweekday = getWeekday(datetime(year - 1, 1, 1))
 
       let lno1wkst = pymod(7 - lyearweekday.valueOf() + options.wkst, 7)
 
@@ -146,7 +146,7 @@ export function rebuildYear(year: number, options: ParsedOptions) {
 
 function baseYearMasks(year: number) {
   const yearlen = isLeapYear(year) ? 366 : 365
-  const firstyday = new Date(Date.UTC(year, 0, 1))
+  const firstyday = datetime(year, 1, 1)
   const wday = getWeekday(firstyday)
 
   if (yearlen === 365) {

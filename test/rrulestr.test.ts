@@ -1,4 +1,4 @@
-import { parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
+import { parse, datetime, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { expect } from 'chai'
 import { Days } from '../src/rrule'
@@ -56,9 +56,9 @@ describe('rrulestr', function () {
     'testStr',
     rrulestr('DTSTART:19970902T090000Z\n' + 'RRULE:FREQ=YEARLY;COUNT=3\n'),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -66,9 +66,9 @@ describe('rrulestr', function () {
     'testStrCase',
     rrulestr('dtstart:19970902T090000Z\n' + 'rrule:freq=yearly;count=3\n'),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -76,9 +76,9 @@ describe('rrulestr', function () {
     'testStrSpaces',
     rrulestr(' DTSTART:19970902T090000Z ' + ' RRULE:FREQ=YEARLY;COUNT=3 '),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -88,9 +88,9 @@ describe('rrulestr', function () {
       ' DTSTART:19970902T090000Z \n' + ' \n RRULE:FREQ=YEARLY;COUNT=3 \n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -139,9 +139,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 4, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 4, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
     ]
   )
 
@@ -154,9 +154,9 @@ describe('rrulestr', function () {
         'RDATE:19970909T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 4, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 4, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
     ]
   )
 
@@ -168,9 +168,9 @@ describe('rrulestr', function () {
         'EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -184,9 +184,9 @@ describe('rrulestr', function () {
         'EXDATE:19970918T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -205,9 +205,9 @@ describe('rrulestr', function () {
         'EXDATE:19970918T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -224,9 +224,9 @@ describe('rrulestr', function () {
         'EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -239,9 +239,9 @@ describe('rrulestr', function () {
         'BYHOUR=3;BYMINUTE=3;BYSECOND=3\n'
     ),
     [
-      datetimeUTC(2033, 3, 3, 3, 3, 3),
-      datetimeUTC(2039, 3, 3, 3, 3, 3),
-      datetimeUTC(2072, 3, 3, 3, 3, 3),
+      datetime(2033, 3, 3, 3, 3, 3),
+      datetime(2039, 3, 3, 3, 3, 3),
+      datetime(2072, 3, 3, 3, 3, 3),
     ]
   )
 
@@ -252,9 +252,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=1TU,-1TH\n'
     ),
     [
-      datetimeUTC(1997, 12, 25, 9, 0),
-      datetimeUTC(1998, 1, 6, 9, 0),
-      datetimeUTC(1998, 12, 31, 9, 0),
+      datetime(1997, 12, 25, 9, 0),
+      datetime(1998, 1, 6, 9, 0),
+      datetime(1998, 12, 31, 9, 0),
     ]
   )
 
@@ -265,9 +265,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=13TU,-13TH\n'
     ),
     [
-      datetimeUTC(1997, 10, 2, 9, 0),
-      datetimeUTC(1998, 3, 31, 9, 0),
-      datetimeUTC(1998, 10, 8, 9, 0),
+      datetime(1997, 10, 2, 9, 0),
+      datetime(1998, 3, 31, 9, 0),
+      datetime(1998, 10, 8, 9, 0),
     ]
   )
 

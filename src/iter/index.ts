@@ -1,6 +1,6 @@
 import IterResult from '../iterresult'
 import { ParsedOptions, freqIsDailyOrGreater, QueryMethodTypes } from '../types'
-import dateutil from '../dateutil'
+import { combine, fromOrdinal, MAXYEAR } from '../dateutil'
 import Iterinfo from '../iterinfo/index'
 import { RRule } from '../rrule'
 import { buildTimeset } from '../parseoptions'
@@ -66,10 +66,10 @@ export function iter<M extends QueryMethodTypes>(
           continue
         }
 
-        const date = dateutil.fromOrdinal(ii.yearordinal + currentDay)
+        const date = fromOrdinal(ii.yearordinal + currentDay)
         for (let k = 0; k < timeset.length; k++) {
           const time = timeset[k]
-          const res = dateutil.combine(date, time)
+          const res = combine(date, time)
           if (until && res > until) {
             return emitResult(iterResult)
           }
@@ -97,7 +97,7 @@ export function iter<M extends QueryMethodTypes>(
     // Handle frequency and interval
     counterDate.add(options, filtered)
 
-    if (counterDate.year > dateutil.MAXYEAR) {
+    if (counterDate.year > MAXYEAR) {
       return emitResult(iterResult)
     }
 

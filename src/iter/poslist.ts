@@ -1,4 +1,4 @@
-import dateutil from '../dateutil'
+import { combine, fromOrdinal, sort } from '../dateutil'
 import Iterinfo from '../iterinfo/index'
 import { pymod, isPresent, includes } from '../helpers'
 import { Time } from '../datetime'
@@ -40,14 +40,14 @@ export function buildPoslist(
     }
 
     const time = timeset[timepos]
-    const date = dateutil.fromOrdinal(ii.yearordinal + i)
-    const res = dateutil.combine(date, time)
+    const date = fromOrdinal(ii.yearordinal + i)
+    const res = combine(date, time)
     // XXX: can this ever be in the array?
     // - compare the actual date instead?
     if (!includes(poslist, res)) poslist.push(res)
   }
 
-  dateutil.sort(poslist)
+  sort(poslist)
 
   return poslist
 }

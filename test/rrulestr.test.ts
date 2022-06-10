@@ -1,4 +1,4 @@
-import { parse, datetime, datetimeUTC, testRecurring } from './lib/utils'
+import { parse, datetime, testRecurring } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
 import { expect } from 'chai'
 import { Days } from '../src/rrule'
@@ -56,9 +56,9 @@ describe('rrulestr', function () {
     'testStr',
     rrulestr('DTSTART:19970902T090000Z\n' + 'RRULE:FREQ=YEARLY;COUNT=3\n'),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -66,9 +66,9 @@ describe('rrulestr', function () {
     'testStrCase',
     rrulestr('dtstart:19970902T090000Z\n' + 'rrule:freq=yearly;count=3\n'),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -76,9 +76,9 @@ describe('rrulestr', function () {
     'testStrSpaces',
     rrulestr(' DTSTART:19970902T090000Z ' + ' RRULE:FREQ=YEARLY;COUNT=3 '),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -88,9 +88,9 @@ describe('rrulestr', function () {
       ' DTSTART:19970902T090000Z \n' + ' \n RRULE:FREQ=YEARLY;COUNT=3 \n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1998, 9, 2, 9, 0),
-      datetimeUTC(1999, 9, 2, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1998, 9, 2, 9, 0),
+      datetime(1999, 9, 2, 9, 0),
     ]
   )
 
@@ -139,9 +139,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 4, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 4, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
     ]
   )
 
@@ -154,9 +154,9 @@ describe('rrulestr', function () {
         'RDATE:19970909T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 4, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 4, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
     ]
   )
 
@@ -168,9 +168,9 @@ describe('rrulestr', function () {
         'EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -184,9 +184,9 @@ describe('rrulestr', function () {
         'EXDATE:19970918T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -205,9 +205,9 @@ describe('rrulestr', function () {
         'EXDATE:19970918T090000Z\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -224,9 +224,9 @@ describe('rrulestr', function () {
         'EXRULE:FREQ=YEARLY;COUNT=3;BYDAY=TH\n'
     ),
     [
-      datetimeUTC(1997, 9, 2, 9, 0),
-      datetimeUTC(1997, 9, 9, 9, 0),
-      datetimeUTC(1997, 9, 16, 9, 0),
+      datetime(1997, 9, 2, 9, 0),
+      datetime(1997, 9, 9, 9, 0),
+      datetime(1997, 9, 16, 9, 0),
     ]
   )
 
@@ -239,9 +239,9 @@ describe('rrulestr', function () {
         'BYHOUR=3;BYMINUTE=3;BYSECOND=3\n'
     ),
     [
-      datetimeUTC(2033, 3, 3, 3, 3, 3),
-      datetimeUTC(2039, 3, 3, 3, 3, 3),
-      datetimeUTC(2072, 3, 3, 3, 3, 3),
+      datetime(2033, 3, 3, 3, 3, 3),
+      datetime(2039, 3, 3, 3, 3, 3),
+      datetime(2072, 3, 3, 3, 3, 3),
     ]
   )
 
@@ -252,9 +252,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=1TU,-1TH\n'
     ),
     [
-      datetimeUTC(1997, 12, 25, 9, 0),
-      datetimeUTC(1998, 1, 6, 9, 0),
-      datetimeUTC(1998, 12, 31, 9, 0),
+      datetime(1997, 12, 25, 9, 0),
+      datetime(1998, 1, 6, 9, 0),
+      datetime(1998, 12, 31, 9, 0),
     ]
   )
 
@@ -265,9 +265,9 @@ describe('rrulestr', function () {
         'RRULE:FREQ=YEARLY;COUNT=3;BYDAY=13TU,-13TH\n'
     ),
     [
-      datetimeUTC(1997, 10, 2, 9, 0),
-      datetimeUTC(1998, 3, 31, 9, 0),
-      datetimeUTC(1998, 10, 8, 9, 0),
+      datetime(1997, 10, 2, 9, 0),
+      datetime(1998, 3, 31, 9, 0),
+      datetime(1998, 10, 8, 9, 0),
     ]
   )
 
@@ -276,7 +276,7 @@ describe('rrulestr', function () {
 
     expect(rrule.origOptions).to.deep.include({
       freq: Frequency.WEEKLY,
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
     })
   })
 
@@ -289,8 +289,8 @@ describe('rrulestr', function () {
     expect(rrule.origOptions).to.deep.include({
       tzid: 'America/New_York',
       freq: Frequency.DAILY,
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
-      until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
+      until: datetime(1998, 9, 2, 9, 0, 0),
     })
   })
 
@@ -300,8 +300,8 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
-      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      until: datetime(1999, 4, 4, 11, 0, 0),
+      dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
       byweekday: [Days.TU.weekday, Days.WE.weekday],
     })
@@ -313,8 +313,8 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      until: new Date(Date.UTC(1999, 3, 4, 11, 0, 0)),
-      dtstart: new Date(Date.UTC(1999, 0, 4, 11, 0, 0)),
+      until: datetime(1999, 4, 4, 11, 0, 0),
+      dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
       tzid: 'America/New_York',
       byweekday: [Days.TU.weekday, Days.WE.weekday],
@@ -327,7 +327,7 @@ describe('rrulestr', function () {
     )
 
     expect(rrule.options).to.deep.include({
-      dtstart: new Date(Date.UTC(2018, 6, 19, 11, 15, 0)),
+      dtstart: datetime(2018, 7, 19, 11, 15, 0),
       freq: Frequency.DAILY,
       interval: 1,
       tzid: 'America/Los_Angeles',
@@ -379,20 +379,17 @@ describe('parseInput', () => {
       {}
     )
     expect(output).to.deep.include({
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      dtstart: datetime(1997, 9, 2, 9, 0, 0),
       tzid: 'America/New_York',
       rrulevals: [
         {
           interval: 1,
           freq: Frequency.DAILY,
-          until: new Date(Date.UTC(1998, 8, 2, 9, 0, 0)),
+          until: datetime(1998, 9, 2, 9, 0, 0),
         },
       ],
-      exdatevals: [new Date(Date.UTC(1997, 8, 4, 9, 0, 0))],
-      rdatevals: [
-        new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
-        new Date(Date.UTC(1997, 8, 4, 9, 0, 0)),
-      ],
+      exdatevals: [datetime(1997, 9, 4, 9, 0, 0)],
+      rdatevals: [datetime(1997, 9, 2, 9, 0, 0), datetime(1997, 9, 4, 9, 0, 0)],
       exrulevals: [
         {
           interval: 2,

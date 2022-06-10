@@ -1,10 +1,10 @@
-import dateutil from '../dateutil'
 import { notEmpty, repeat, range, isPresent } from '../helpers'
 import { ParsedOptions, Frequency } from '../types'
 import { YearInfo, rebuildYear } from './yearinfo'
 import { rebuildMonth, MonthInfo } from './monthinfo'
 import { easter } from './easter'
 import { Time } from '../datetime'
+import { datetime, sort, toOrdinal } from '../dateutil'
 
 export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
@@ -111,9 +111,7 @@ export default class Iterinfo {
   wdayset(year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
     const set = repeat<number | null>(null, this.yearlen + 7)
-    let i =
-      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-      this.yearordinal
+    let i = toOrdinal(datetime(year, month, day)) - this.yearordinal
     const start = i
     for (let j = 0; j < 7; j++) {
       set[i] = i
@@ -125,9 +123,7 @@ export default class Iterinfo {
 
   ddayset(year: number, month: number, day: number) {
     const set = repeat(null, this.yearlen) as (number | null)[]
-    const i =
-      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-      this.yearordinal
+    const i = toOrdinal(datetime(year, month, day)) - this.yearordinal
     set[i] = i
     return [set, i, i + 1]
   }
@@ -137,7 +133,7 @@ export default class Iterinfo {
     this.options.byminute.forEach((minute) => {
       set = set.concat(this.mtimeset(hour, minute, second, millisecond))
     })
-    dateutil.sort(set)
+    sort(set)
     return set
   }
 
@@ -146,7 +142,7 @@ export default class Iterinfo {
       (second) => new Time(hour, minute, second, millisecond)
     )
 
-    dateutil.sort(set)
+    sort(set)
     return set
   }
 

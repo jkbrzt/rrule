@@ -54,15 +54,15 @@ $ npm install rrule
 **RRule:**
 
 ```es6
-import { RRule, RRuleSet, rrulestr } from 'rrule'
+import { datetime, RRule, RRuleSet, rrulestr } from 'rrule'
 
 // Create a rule:
 const rule = new RRule({
   freq: RRule.WEEKLY,
   interval: 5,
   byweekday: [RRule.MO, RRule.FR],
-  dtstart: new Date(Date.UTC(2012, 1, 1, 10, 30)),
-  until: new Date(Date.UTC(2012, 12, 31))
+  dtstart: datetime(2012, 2, 1, 10, 30),
+  until: datetime(2012, 12, 31)
 })
 
 // Get all occurrence dates (Date instances):
@@ -78,7 +78,7 @@ rule.all()
  /* … */]
 
 // Get a slice:
-rule.between(new Date(Date.UTC(2012, 7, 1)), new Date(Date.UTC(2012, 8, 1)))
+rule.between(datetime(2012, 8, 1), datetime(2012, 9, 1))
 ['2012-08-27T10:30:00.000Z',
  '2012-08-31T10:30:00.000Z']
 
@@ -103,27 +103,27 @@ rruleSet.rrule(
   new RRule({
     freq: RRule.MONTHLY,
     count: 5,
-    dtstart: new Date(Date.UTC(2012, 1, 1, 10, 30)),
+    dtstart: datetime(2012, 2, 1, 10, 30),
   })
 )
 
 // Add a date to rruleSet
-rruleSet.rdate(new Date(Date.UTC(2012, 6, 1, 10, 30)))
+rruleSet.rdate(datetime(2012, 7, 1, 10, 30))
 
 // Add another date to rruleSet
-rruleSet.rdate(new Date(Date.UTC(2012, 6, 2, 10, 30)))
+rruleSet.rdate(datetime(2012, 7, 2, 10, 30))
 
 // Add a exclusion rrule to rruleSet
 rruleSet.exrule(
   new RRule({
     freq: RRule.MONTHLY,
     count: 2,
-    dtstart: new Date(Date.UTC(2012, 2, 1, 10, 30)),
+    dtstart: datetime(2012, 3, 1, 10, 30),
   })
 )
 
 // Add a exclusion date to rruleSet
-rruleSet.exdate(new Date(Date.UTC(2012, 5, 1, 10, 30)))
+rruleSet.exdate(datetime(2012, 5, 1, 10, 30))
 
 // Get all occurrence dates (Date instances):
 rruleSet.all()[
@@ -134,10 +134,9 @@ rruleSet.all()[
 ]
 
 // Get a slice:
-rruleSet.between(
-  new Date(Date.UTC(2012, 2, 1)),
-  new Date(Date.UTC(2012, 6, 2))
-)[('2012-05-01T10:30:00.000Z', '2012-07-01T10:30:00.000Z')]
+rruleSet.between(datetime(2012, 2, 1), datetime(2012, 6, 2))[
+  ('2012-05-01T10:30:00.000Z', '2012-07-01T10:30:00.000Z')
+]
 
 // To string
 rruleSet.valueOf()[
@@ -178,7 +177,8 @@ By default, `RRule` deals in ["floating" times or UTC timezones](https://tools.i
 
 **The bottom line is the returned "UTC" dates are always meant to be interpreted as dates in your local timezone. This may mean you have to do additional conversion to get the "correct" local time with offset applied.**
 
-For this reason, it is highly recommended to use timestamps in UTC eg. `new Date(Date.UTC(...))`. Returned dates will likewise be in UTC (except on Chrome, which always returns dates with a timezone offset).
+For this reason, it is highly recommended to use timestamps in UTC eg. `new Date(Date.UTC(...))`. Returned dates will likewise be in UTC (except on Chrome, which always returns dates with a timezone offset). It's recommended to use the provided `datetime` helper, which
+creates dates in the correct format using a 1-based month.
 
 For example:
 
@@ -235,7 +235,7 @@ Example with `TZID`:
 
 ```js
 new RRule({
-  dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
+  dtstart: datetime(2018, 2, 1, 10, 30),
   count: 1,
   tzid: 'Asia/Tokyo',
 }).all()[
@@ -259,8 +259,8 @@ new RRule({
 // RIGHT: Will produce dates with recurrences at the correct time
 new RRule({
   freq: RRule.MONTHLY,
-  dtstart: new Date(Date.UTC(2018, 1, 1, 10, 30)),
-  until: new Date(Date.UTC(2018, 2, 31)),
+  dtstart: datetime(2018, 2, 1, 10, 30),
+  until: datetime(2018, 3, 31),
 }).all()[('2018-02-01T10:30:00.000Z', '2018-03-01T10:30:00.000Z')]
 ```
 
@@ -499,7 +499,7 @@ Optional `iterator` has the same function as it has with
 `RRule.prototype.all()`.
 
 ```javascript
-rule.between(new Date(Date.UTC(2012, 7, 1)), new Date(Date.UTC(2012, 8, 1)))[
+rule.between(datetime(2012, 8, 1), datetime(2012, 9, 1))[
   ('2012-08-27T10:30:00.000Z', '2012-08-31T10:30:00.000Z')
 ]
 ```
@@ -574,7 +574,7 @@ Only parse RFC string and return `options`.
 
 ```javascript
 var options = RRule.parseString('FREQ=DAILY;INTERVAL=6')
-options.dtstart = new Date(Date.UTC(2000, 1, 1))
+options.dtstart = datetime(2000, 2, 1)
 var rule = new RRule(options)
 ```
 
@@ -622,7 +622,7 @@ Parse `text` into `options`:
 ```javascript
 options = RRule.parseText('every day for 3 times')
 // {freq: 3, count: "3"}
-options.dtstart = new Date(Date.UTC(2000, 1, 1))
+options.dtstart = datetime(2000, 2, 1)
 var rule = new RRule(options)
 ```
 
@@ -756,7 +756,7 @@ will be used by default.
 
 ```javascript
 var rruleSet = new RRuleSet()
-var start = new Date(Date.UTC(2012, 1, 1, 10, 30))
+var start = datetime(2012, 2, 1, 10, 30)
 
 // Add a rrule to rruleSet
 rruleSet.rrule(

@@ -2,7 +2,7 @@ import IterResult from './iterresult'
 import { RRule } from './rrule'
 import { DateWithZone } from './datewithzone'
 import { iter } from './iter'
-import dateutil from './dateutil'
+import { sort } from './dateutil'
 import { QueryMethodTypes, IterResultType } from './types'
 
 export function iterSet<M extends QueryMethodTypes>(
@@ -64,7 +64,7 @@ export function iterSet<M extends QueryMethodTypes>(
   })
 
   const res = iterResult._result
-  dateutil.sort(res)
+  sort(res)
   switch (iterResult.method) {
     case 'all':
     case 'between':

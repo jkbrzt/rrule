@@ -8,7 +8,7 @@ import {
   isWeekdayStr,
 } from './helpers'
 import { RRule, defaultKeys, DEFAULT_OPTIONS } from './rrule'
-import dateutil from './dateutil'
+import { getWeekday, isDate, isValidDate } from './dateutil'
 import { Weekday } from './weekday'
 import { Time } from './datetime'
 
@@ -19,7 +19,7 @@ export function initializeOptions(options: Partial<Options>) {
   // Shallow copy for options and origOptions and check for invalid
   for (const key of keys) {
     if (!includes(defaultKeys, key)) invalid.push(key)
-    if (dateutil.isDate(options[key]) && !dateutil.isValidDate(options[key])) {
+    if (isDate(options[key]) && !isValidDate(options[key])) {
       invalid.push(key)
     }
   }
@@ -83,7 +83,7 @@ export function parseOptions(options: Partial<Options>) {
         opts.bymonthday = opts.dtstart.getUTCDate()
         break
       case RRule.WEEKLY:
-        opts.byweekday = [dateutil.getWeekday(opts.dtstart)]
+        opts.byweekday = [getWeekday(opts.dtstart)]
         break
     }
   }

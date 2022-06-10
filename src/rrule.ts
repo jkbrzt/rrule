@@ -1,4 +1,4 @@
-import dateutil from './dateutil'
+import { isValidDate } from './dateutil'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
@@ -176,7 +176,7 @@ export class RRule implements QueryMethods {
     inc = false,
     iterator?: (d: Date, len: number) => boolean
   ): Date[] {
-    if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before)) {
+    if (!isValidDate(after) || !isValidDate(before)) {
       throw new Error('Invalid date passed in to RRule.between')
     }
     const args = {
@@ -205,7 +205,7 @@ export class RRule implements QueryMethods {
    * @return Date or null
    */
   before(dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt)) {
+    if (!isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.before')
     }
     const args = { dt: dt, inc: inc }
@@ -225,7 +225,7 @@ export class RRule implements QueryMethods {
    * @return Date or null
    */
   after(dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt)) {
+    if (!isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.after')
     }
     const args = { dt: dt, inc: inc }

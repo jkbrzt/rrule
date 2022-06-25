@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { ExclusiveTestFunction, TestFunction } from 'mocha'
 export { datetime } from '../../src/dateutil'
-import { datetime } from '../../src/dateutil'
+import { datetime, isDate } from '../../src/dateutil'
 import { RRule, RRuleSet } from '../../src'
 
 const assertDatesEqual = function (
@@ -25,7 +25,7 @@ const assertDatesEqual = function (
   for (let i = 0; i < expected.length; i++) {
     const act = actual[i]
     const exp = expected[i]
-    expect(exp instanceof Date ? exp.toString() : exp).to.equal(
+    expect(isDate(exp) ? exp.toString() : exp).to.equal(
       act.toString(),
       msg + (i + 1) + '/' + expected.length
     )

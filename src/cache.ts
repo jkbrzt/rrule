@@ -1,5 +1,5 @@
 import IterResult, { IterArgs } from './iterresult'
-import { clone, cloneDates } from './dateutil'
+import { clone, cloneDates, isDate } from './dateutil'
 import { isArray } from './helpers'
 
 export type CacheKeys = 'before' | 'after' | 'between'
@@ -14,8 +14,8 @@ function argsMatch(
     return left.every((date, i) => date.getTime() === right[i].getTime())
   }
 
-  if (left instanceof Date) {
-    return right instanceof Date && left.getTime() === right.getTime()
+  if (isDate(left)) {
+    return isDate(right) && left.getTime() === right.getTime()
   }
 
   return left === right
@@ -38,7 +38,7 @@ export class Cache {
     args?: Partial<IterArgs>
   ) {
     if (value) {
-      value = value instanceof Date ? clone(value) : cloneDates(value)
+      value = isDate(value) ? clone(value) : cloneDates(value)
     }
 
     if (what === 'all') {
@@ -99,7 +99,7 @@ export class Cache {
 
     return isArray(cached)
       ? cloneDates(cached)
-      : cached instanceof Date
+      : isDate(cached)
       ? clone(cached)
       : cached
   }

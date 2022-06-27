@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { RRule } from '../src'
+import { Frequency, Options, RRule } from '../src'
 import { optionsToString } from '../src/optionstostring'
 import { DateFormatter } from '../src/nlp/totext'
 import { datetime } from './lib/utils'
@@ -29,6 +29,11 @@ const texts = [
   ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
 ]
 
+const textsByOptions: [string, Partial<Options>][] = [
+  // The option "byhour" is not fully convertible for monthly.
+  ['Every month on tuesday (~ approximate)', { dtstart: datetime(2022, 6, 1), freq: Frequency.MONTHLY, interval: 1, byweekday: 1, byhour: 1 }]
+]
+
 describe('NLP', () => {
   it('fromText()', function () {
     texts.forEach(function (item) {
@@ -45,6 +50,13 @@ describe('NLP', () => {
       expect(RRule.fromString(str).toText().toLowerCase()).equals(
         text.toLowerCase(),
         str + ' => ' + text
+      )
+    })
+    textsByOptions.forEach(function (item) {
+      const text = item[0]
+      const options = item[1]
+      expect(new RRule(options).toText().toLowerCase()).equals(
+        text.toLowerCase()
       )
     })
   })

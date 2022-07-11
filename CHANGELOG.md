@@ -1,10 +1,20 @@
 ### Changelog
 
+- 2.7.1 (2022-07-10)
+
+  - Internal:
+    - Upgrade build dependencies (#515)
+    - Migrate from tslint to eslint (#514)
+    - Fix precommit & lint warnings (#519)
+    - Fix invalid date formats in tests (#517)
+  - Remove default exports (#513)
+  - Point to esm correctly (#516)
+
 - 2.7.0 (2022-06-05)
 
   - Features:
     - **BREAKING CHANGE** Removes default export in favor of named exports
-    - Removes Luxon dependency
+    - Removes Luxon dependency (#508)
 
 - 2.6.8 (2021-02-04)
 

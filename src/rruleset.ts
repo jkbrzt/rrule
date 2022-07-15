@@ -1,5 +1,5 @@
 import { RRule } from './rrule'
-import { sort, timeToUntilString } from './dateutil'
+import { sort, timeToUntilString, isDate } from './dateutil'
 import { includes } from './helpers'
 import IterResult from './iterresult'
 import { iterSet } from './iterset'
@@ -206,7 +206,7 @@ function _addRule(rrule: RRule, collection: RRule[]) {
 }
 
 function _addDate(date: Date, collection: Date[]) {
-  if (!(date instanceof Date)) {
+  if (!isDate(date)) {
     throw new TypeError(String(date) + ' is not Date instance')
   }
   if (!includes(collection.map(Number), Number(date))) {

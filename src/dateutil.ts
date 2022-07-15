@@ -66,7 +66,11 @@ export const isLeapYear = function (year: number) {
 }
 
 export const isDate = function (value: unknown): value is Date {
-  return value instanceof Date
+  return (
+    value instanceof Date ||
+    (typeof value === 'object' &&
+      Object.prototype.toString.call(value) === '[object Date]')
+  )
 }
 
 export const isValidDate = function (value: unknown): value is Date {

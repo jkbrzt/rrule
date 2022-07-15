@@ -1,6 +1,6 @@
 {
   "name": "rrule-icalendar",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "license": "BSD-3-Clause",
   "keywords": [

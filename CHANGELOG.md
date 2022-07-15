@@ -1,5 +1,9 @@
 ### Changelog
 
+- 2.7.2 (2022-07-15)
+  - Features:
+    - Add 'Z' character to UNTIL when DTSTART has TZID
+
 - 2.7.1 (2022-07-10)
 
   - Internal:

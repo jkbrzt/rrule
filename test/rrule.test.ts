@@ -3946,6 +3946,27 @@ describe('RRule', function () {
     [new Date(1356991200001)]
   )
 
+  testRecurring(
+    'testBetweenWithTZ',
+    {
+      rrule: new RRule({
+        freq: RRule.WEEKLY,
+        dtstart: parse('20220613T090000'),
+        byweekday: [RRule.TU],
+        tzid: 'Europe/London',
+      }),
+      method: 'between',
+      args: [parse('20220613T093000'), parse('20220716T083000')],
+    },
+    [
+      datetime(2022, 6, 14, 9, 0),
+      datetime(2022, 6, 21, 9, 0),
+      datetime(2022, 6, 28, 9, 0),
+      datetime(2022, 7, 5, 9, 0),
+      datetime(2022, 7, 12, 9, 0),
+    ]
+  )
+
   it('testAfterBefore', function () {
     ;(
       ['YEARLY', 'MONTHLY', 'DAILY', 'HOURLY', 'MINUTELY', 'SECONDLY'] as const

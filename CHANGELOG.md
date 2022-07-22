@@ -1,6 +1,12 @@
 ### Changelog
 
+- 2.7.3 (2022-07-22)
+
+  - Fix:
+    - Fix rule.between() return invalid date when use TZID
+
 - 2.7.2 (2022-07-15)
+
   - Features:
     - Add 'Z' character to UNTIL when DTSTART has TZID
 

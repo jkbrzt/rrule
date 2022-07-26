@@ -81,7 +81,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "src/**"
   ],
   "peerDependencies": {},
   "dependencies": {

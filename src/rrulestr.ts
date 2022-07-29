@@ -90,7 +90,10 @@ export function parseInput(s: string, options: Partial<RRuleStrOptions>) {
   }
 }
 
-function buildRule(s: string, options: Partial<RRuleStrOptions>) {
+function buildRule(
+  s: string,
+  options: Partial<RRuleStrOptions>
+): RRuleSet | RRule {
   const { rrulevals, rdatevals, exrulevals, exdatevals, dtstart, tzid } =
     parseInput(s, options)
 
@@ -248,4 +251,27 @@ function parseRDate(rdateval: string, parms: string[]) {
   validateDateParm(parms)
 
   return rdateval.split(',').map((datestr) => untilStringToDate(datestr))
+}
+
+/**
+ *
+ * rrulestr return result may be an RRule Instance or RRuleSet Instance
+ *
+ * And RRuleSet maybe not have origOptions, so we must convert RRuleSet to RRule by rrules() function, and get first element of result
+ *
+ * @param rrule
+ * @returns
+ */
+export function parseOrigOptionsFromRRulestrFunction(rrule: RRule | RRuleSet) {
+  if (Object.keys(rrule.origOptions).length !== 0) {
+    return rrule.origOptions
+  } else {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const rruleFromRRuleSet = (<RRuleSet>rrule).rrules()
+    if (rruleFromRRuleSet.length === 1) {
+      return rruleFromRRuleSet[0].origOptions
+    } else {
+      throw new Error('Error RRuleSet')
+    }
+  }
 }

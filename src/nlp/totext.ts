@@ -195,9 +195,6 @@ export default class ToText {
         .add(
           this.plural(this.options.count) ? gettext('times') : gettext('time')
         )
-    } else {
-      this.text.push(',')
-      this.add(gettext('forever'))
     }
 
     // if (!this.isFullyConvertible()) this.add(gettext('(~ approximate)'))

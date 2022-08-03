@@ -25,7 +25,6 @@ const texts = [
   ['Every month on the 3rd last Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=-3TU'],
   ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
   ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
-  // ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
   ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
 ]
 
@@ -43,7 +42,7 @@ describe('NLP', () => {
       const text = item[0]
       const str = item[1]
       expect(RRule.fromString(str).toText().toLowerCase()).equals(
-        text.toLowerCase(),
+        `repeats ${text.toLowerCase()}`,
         str + ' => ' + text
       )
     })
@@ -53,6 +52,8 @@ describe('NLP', () => {
     texts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
+      const output = optionsToString(RRule.parseText(text))
+      console.log(text, output)
       expect(optionsToString(RRule.parseText(text))).equals(
         str,
         text + ' => ' + str
@@ -66,14 +67,16 @@ describe('NLP', () => {
       byweekday: 0,
     })
 
-    expect(rrule.toText()).to.equal('every week on Monday')
+    expect(rrule.toText()).to.equal('Repeats every week on Monday')
     expect(rrule.toString()).to.equal('RRULE:FREQ=WEEKLY;BYDAY=MO')
   })
 
   it('sorts monthdays correctly (#101)', () => {
     const options = { freq: 2, bymonthday: [3, 10, 17, 24] }
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every week on the 3rd, 10th, 17th and 24th')
+    expect(rule.toText()).to.equal(
+      'Repeats every week on the 3rd, 10th, 17th and 24th'
+    )
   })
 
   it('shows correct text for every day', () => {
@@ -90,19 +93,19 @@ describe('NLP', () => {
       ],
     }
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every day')
+    expect(rule.toText()).to.equal('Repeats every day')
   })
 
   it('shows correct text for every minute', () => {
     const options = { freq: RRule.MINUTELY }
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every minute')
+    expect(rule.toText()).to.equal('Repeats every minute')
   })
 
   it('shows correct text for every (plural) minutes', () => {
     const options = { freq: RRule.MINUTELY, interval: 2 }
     const rule = new RRule(options)
-    expect(rule.toText()).to.equal('every 2 minutes')
+    expect(rule.toText()).to.equal('Repeats every 2 minutes')
   })
 
   it("by default formats 'until' correctly", () => {
@@ -111,7 +114,9 @@ describe('NLP', () => {
       until: datetime(2012, 11, 10),
     })
 
-    expect(rrule.toText()).to.equal('every week until November 10, 2012')
+    expect(rrule.toText()).to.equal(
+      'Repeats every week until November 10, 2012'
+    )
   })
 
   it("formats 'until' as desired if asked", () => {
@@ -124,7 +129,7 @@ describe('NLP', () => {
       `${day}. ${month}, ${year}`
 
     expect(rrule.toText(undefined, undefined, dateFormatter)).to.equal(
-      'every week until 10. November, 2012'
+      'Repeats every week until 10. November, 2012'
     )
   })
 })

@@ -1,8 +1,25 @@
 import IterResult, { IterArgs } from './iterresult'
-import dateutil from './dateutil'
+import { clone, cloneDates } from './dateutil'
 import { isArray } from './helpers'
 
 export type CacheKeys = 'before' | 'after' | 'between'
+
+function argsMatch(
+  left: IterArgs[keyof IterArgs] | undefined,
+  right: IterArgs[keyof IterArgs] | undefined
+) {
+  if (Array.isArray(left)) {
+    if (!Array.isArray(right)) return false
+    if (left.length !== right.length) return false
+    return left.every((date, i) => date.getTime() === right[i].getTime())
+  }
+
+  if (left instanceof Date) {
+    return right instanceof Date && left.getTime() === right.getTime()
+  }
+
+  return left === right
+}
 
 export class Cache {
   all: Date[] | Partial<IterArgs> | false = false
@@ -15,34 +32,31 @@ export class Cache {
    * @param {Array,Date} value - an array of dates, one date, or null
    * @param {Object?} args - _iter arguments
    */
-  public _cacheAdd (
+  public _cacheAdd(
     what: CacheKeys | 'all',
     value: Date[] | Date | null,
     args?: Partial<IterArgs>
   ) {
     if (value) {
-      value =
-        value instanceof Date
-          ? dateutil.clone(value)
-          : dateutil.cloneDates(value)
+      value = value instanceof Date ? clone(value) : cloneDates(value)
     }
 
     if (what === 'all') {
       this.all = value as Date[]
     } else {
-      args!._value = value
+      args._value = value
       this[what].push(args as IterArgs)
     }
   }
 
   /**
    * @return false - not in the cache
-   *         null  - cached, but zero occurrences (before/after)
-   *         Date  - cached (before/after)
-   *         []    - cached, but zero occurrences (all/between)
-   *         [Date1, DateN] - cached (all/between)
+   * @return null  - cached, but zero occurrences (before/after)
+   * @return Date  - cached (before/after)
+   * @return []    - cached, but zero occurrences (all/between)
+   * @return [Date1, DateN] - cached (all/between)
    */
-  public _cacheGet (
+  public _cacheGet(
     what: CacheKeys | 'all',
     args?: Partial<IterArgs>
   ): Date | Date[] | false | null {
@@ -51,7 +65,7 @@ export class Cache {
     const findCacheDiff = function (item: IterArgs) {
       for (let i = 0; i < argsKeys.length; i++) {
         const key = argsKeys[i]
-        if (String(args![key]) !== String(item[key])) {
+        if (!argsMatch(args[key], item[key])) {
           return true
         }
       }
@@ -75,7 +89,7 @@ export class Cache {
     if (!cached && this.all) {
       // Not in the cache, but we already know all the occurrences,
       // so we can find the correct dates from the cached ones.
-      const iterResult = new IterResult(what, args!)
+      const iterResult = new IterResult(what, args)
       for (let i = 0; i < (this.all as Date[]).length; i++) {
         if (!iterResult.accept((this.all as Date[])[i])) break
       }
@@ -84,10 +98,9 @@ export class Cache {
     }
 
     return isArray(cached)
-      ? dateutil.cloneDates(cached)
+      ? cloneDates(cached)
       : cached instanceof Date
-        ? dateutil.clone(cached)
-        : cached
+      ? clone(cached)
+      : cached
   }
-
 }

@@ -2,12 +2,20 @@
 // Helper functions
 // =============================================================================
 
-export const isPresent = function<T>(value?: T | null | undefined): value is T {
+import { ALL_WEEKDAYS, WeekdayStr } from './weekday'
+
+export const isPresent = function <T>(
+  value?: T | null | undefined
+): value is T {
   return value !== null && value !== undefined
 }
 
-export const isNumber = function (value?: any): value is number {
+export const isNumber = function (value: unknown): value is number {
   return typeof value === 'number'
+}
+
+export const isWeekdayStr = function (value: unknown): value is WeekdayStr {
+  return typeof value === 'string' && ALL_WEEKDAYS.includes(value as WeekdayStr)
 }
 
 export const isArray = Array.isArray
@@ -25,11 +33,11 @@ export const range = function (start: number, end: number = start): number[] {
   return rang
 }
 
-export const clone = function<T>(array: T[]): T[] {
+export const clone = function <T>(array: T[]): T[] {
   return ([] as T[]).concat(array)
 }
 
-export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
+export const repeat = function <T>(value: T | T[], times: number): (T | T[])[] {
   let i = 0
   const array: (T | T[])[] = []
 
@@ -41,15 +49,19 @@ export const repeat = function<T>(value: T | T[], times: number): (T | T[])[] {
   return array
 }
 
-export const toArray = function<T>(item: T | T[]): T[] {
+export const toArray = function <T>(item: T | T[]): T[] {
   if (isArray(item)) {
     return item
   }
 
-  return [ item ]
+  return [item]
 }
 
-export function padStart (item: string | number, targetLength: number, padString: string = ' ') {
+export function padStart(
+  item: string | number,
+  targetLength: number,
+  padString = ' '
+) {
   const str = String(item)
   targetLength = targetLength >> 0
   if (str.length > targetLength) {
@@ -61,7 +73,7 @@ export function padStart (item: string | number, targetLength: number, padString
     padString += repeat(padString, targetLength / padString.length)
   }
 
-  return padString.slice(0,targetLength) + String(str)
+  return padString.slice(0, targetLength) + String(str)
 }
 
 /**
@@ -87,7 +99,7 @@ export const split = function (str: string, sep: string, num: number) {
  * @param {number} a The dividend.
  * @param {number} b The divisor.
  * @return {number} a % b where the result is between 0 and b (either 0 <= x < b
- *     or b < x <= 0, depending on the sign of b).
+ * or b < x <= 0, depending on the sign of b).
  */
 export const pymod = function (a: number, b: number) {
   const r = a % b
@@ -102,23 +114,24 @@ export const divmod = function (a: number, b: number) {
   return { div: Math.floor(a / b), mod: pymod(a, b) }
 }
 
-export const empty = function<T>(obj: T[] | null | undefined) {
+export const empty = function <T>(obj: T[] | null | undefined) {
   return !isPresent(obj) || obj.length === 0
 }
 
 /**
  * Python-like boolean
+ *
  * @return {Boolean} value of an object/primitive, taking into account
  * the fact that in Python an empty list's/tuple's
  * boolean value is False, whereas in JS it's true
  */
-export const notEmpty = function<T>(obj: T[] | null | undefined): obj is T[] {
+export const notEmpty = function <T>(obj: T[] | null | undefined): obj is T[] {
   return !empty(obj)
 }
 
 /**
  * Return true if a value is in an array
  */
-export const includes = function<T>(arr: T[] | null | undefined, val: T) {
+export const includes = function <T>(arr: T[] | null | undefined, val: T) {
   return notEmpty(arr) && arr.indexOf(val) !== -1
 }

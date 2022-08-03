@@ -1,5 +1,52 @@
 ### Changelog
 
+- 2.7.1 (2022-07-10)
+
+  - Internal:
+    - Upgrade build dependencies (#515)
+    - Migrate from tslint to eslint (#514)
+    - Fix precommit & lint warnings (#519)
+    - Fix invalid date formats in tests (#517)
+  - Remove default exports (#513)
+  - Point to esm correctly (#516)
+
+- 2.7.0 (2022-06-05)
+
+  - Features:
+    - **BREAKING CHANGE** Removes default export in favor of named exports
+    - Removes Luxon dependency (#508)
+
+- 2.6.8 (2021-02-04)
+
+  - Bugfixes:
+    - Solve circular imports (#444)
+
+- 2.6.6 (2020-08-23)
+
+  - Bugfixes:
+    - Fixed broken npm package (#417)
+
+- 2.6.5 (2020-08-23)
+  - Bugfixes:
+    - `luxon`-less binary should not contain any `luxon` imports (#410)
+    - Fixed `toText` pluralization of “minutes“ (#415)
+- 2.6.4 (2019-12-18)
+  - Bugfixes:
+    - Calculating series with unknown timezones will produce infinite loop (#320)
+  - Internal:
+    - Upgrade build dependencies
+- 2.6.3 (2019-11-24)
+  - Features
+    - Allow passing `WeekdayStr` to `byweekday` like the types suggest is possible (#371)
+- 2.6.2 (2019-06-08)
+  - Features
+    - Allow two digits for `BYDAY` (#330)
+    - Add a quick way to format `until` in `toText` (#313)
+    - Add support for parsing an rrule string without frequency (#339)
+    - Add getters for `rrules`, `exrules`, `rdates`, `exdates` (#347)
+- 2.6.0 (2019-01-03)
+  - Bugfixes:
+    - Fix sourcemap structure (#303)
 - 2.5.6 (2018-09-30)
   - Bugfixes:
     - Validate date inputs (#281)

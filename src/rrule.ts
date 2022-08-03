@@ -1,30 +1,24 @@
-import dateutil from './dateutil'
+import { isValidDate } from './dateutil'
 
 import IterResult, { IterArgs } from './iterresult'
 import CallbackIterResult from './callbackiterresult'
 import { Language } from './nlp/i18n'
-import { Nlp } from './nlp/index'
-import { GetText } from './nlp/totext'
-import { ParsedOptions, Options, Frequency, QueryMethods, QueryMethodTypes } from './types'
+import { fromText, parseText, toText, isFullyConvertible } from './nlp/index'
+import { DateFormatter, GetText } from './nlp/totext'
+import {
+  ParsedOptions,
+  Options,
+  Frequency,
+  QueryMethods,
+  QueryMethodTypes,
+  IterResultType,
+} from './types'
 import { parseOptions, initializeOptions } from './parseoptions'
 import { parseString } from './parsestring'
 import { optionsToString } from './optionstostring'
 import { Cache, CacheKeys } from './cache'
 import { Weekday } from './weekday'
 import { iter } from './iter/index'
-
-interface GetNlp {
-  _nlp: Nlp
-  (): Nlp
-}
-
-const getnlp: GetNlp = function () {
-  // Lazy, runtime import to avoid circular refs.
-  if (!getnlp._nlp) {
-    getnlp._nlp = require('./nlp')
-  }
-  return getnlp._nlp
-} as GetNlp
 
 // =============================================================================
 // RRule
@@ -37,7 +31,7 @@ export const Days = {
   TH: new Weekday(3),
   FR: new Weekday(4),
   SA: new Weekday(5),
-  SU: new Weekday(6)
+  SU: new Weekday(6),
 }
 
 export const DEFAULT_OPTIONS: Options = {
@@ -59,7 +53,7 @@ export const DEFAULT_OPTIONS: Options = {
   byhour: null,
   byminute: null,
   bysecond: null,
-  byeaster: null
+  byeaster: null,
 }
 
 export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
@@ -67,10 +61,10 @@ export const defaultKeys = Object.keys(DEFAULT_OPTIONS) as (keyof Options)[]
 /**
  *
  * @param {Options?} options - see <http://labix.org/python-dateutil/#head-cf004ee9a75592797e076752b2a889c10f445418>
- *        The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
+ * - The only required option is `freq`, one of RRule.YEARLY, RRule.MONTHLY, ...
  * @constructor
  */
-export default class RRule implements QueryMethods {
+export class RRule implements QueryMethods {
   public _cache: Cache | null
   public origOptions: Partial<Options>
   public options: ParsedOptions
@@ -84,7 +78,7 @@ export default class RRule implements QueryMethods {
     'DAILY',
     'HOURLY',
     'MINUTELY',
-    'SECONDLY'
+    'SECONDLY',
   ]
 
   static readonly YEARLY = Frequency.YEARLY
@@ -103,7 +97,7 @@ export default class RRule implements QueryMethods {
   static readonly SA = Days.SA
   static readonly SU = Days.SU
 
-  constructor (options: Partial<Options> = {}, noCache: boolean = false) {
+  constructor(options: Partial<Options> = {}, noCache = false) {
     // RFC string
     this._cache = noCache ? null : new Cache()
 
@@ -113,32 +107,34 @@ export default class RRule implements QueryMethods {
     this.options = parsedOptions
   }
 
-  static parseText (text: string, language?: Language) {
-    return getnlp().parseText(text, language)
+  static parseText(text: string, language?: Language) {
+    return parseText(text, language)
   }
 
-  static fromText (text: string, language?: Language) {
-    return getnlp().fromText(text, language)
+  static fromText(text: string, language?: Language) {
+    return fromText(text, language)
   }
 
   static parseString = parseString
 
-  static fromString (str: string) {
+  static fromString(str: string) {
     return new RRule(RRule.parseString(str) || undefined)
   }
 
   static optionsToString = optionsToString
 
-  protected _iter <M extends QueryMethodTypes> (iterResult: IterResult<M>) {
+  protected _iter<M extends QueryMethodTypes>(
+    iterResult: IterResult<M>
+  ): IterResultType<M> {
     return iter(iterResult, this.options)
   }
 
-  private _cacheGet (what: CacheKeys | 'all', args?: Partial<IterArgs>) {
+  private _cacheGet(what: CacheKeys | 'all', args?: Partial<IterArgs>) {
     if (!this._cache) return false
     return this._cache._cacheGet(what, args)
   }
 
-  public _cacheAdd (
+  public _cacheAdd(
     what: CacheKeys | 'all',
     value: Date[] | Date | null,
     args?: Partial<IterArgs>
@@ -149,11 +145,11 @@ export default class RRule implements QueryMethods {
 
   /**
    * @param {Function} iterator - optional function that will be called
-   *                   on each date that is added. It can return false
-   *                   to stop the iteration.
+   * on each date that is added. It can return false
+   * to stop the iteration.
    * @return Array containing all recurrences.
    */
-  all (iterator?: (d: Date, len: number) => boolean): Date[] {
+  all(iterator?: (d: Date, len: number) => boolean): Date[] {
     if (iterator) {
       return this._iter(new CallbackIterResult('all', {}, iterator))
     }
@@ -171,25 +167,26 @@ export default class RRule implements QueryMethods {
    * The inc keyword defines what happens if after and/or before are
    * themselves occurrences. With inc == True, they will be included in the
    * list, if they are found in the recurrence set.
+   *
    * @return Array
    */
-  between (
+  between(
     after: Date,
     before: Date,
-    inc: boolean = false,
+    inc = false,
     iterator?: (d: Date, len: number) => boolean
   ): Date[] {
-    if (!dateutil.isValidDate(after) || !dateutil.isValidDate(before)) throw new Error('Invalid date passed in to RRule.between')
+    if (!isValidDate(after) || !isValidDate(before)) {
+      throw new Error('Invalid date passed in to RRule.between')
+    }
     const args = {
       before,
       after,
-      inc
+      inc,
     }
 
     if (iterator) {
-      return this._iter(
-        new CallbackIterResult('between', args, iterator)
-      )
+      return this._iter(new CallbackIterResult('between', args, iterator))
     }
 
     let result = this._cacheGet('between', args)
@@ -204,10 +201,13 @@ export default class RRule implements QueryMethods {
    * Returns the last recurrence before the given datetime instance.
    * The inc keyword defines what happens if dt is an occurrence.
    * With inc == True, if dt itself is an occurrence, it will be returned.
+   *
    * @return Date or null
    */
-  before (dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.before')
+  before(dt: Date, inc = false): Date {
+    if (!isValidDate(dt)) {
+      throw new Error('Invalid date passed in to RRule.before')
+    }
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('before', args)
     if (result === false) {
@@ -221,10 +221,13 @@ export default class RRule implements QueryMethods {
    * Returns the first recurrence after the given datetime instance.
    * The inc keyword defines what happens if dt is an occurrence.
    * With inc == True, if dt itself is an occurrence, it will be returned.
+   *
    * @return Date or null
    */
-  after (dt: Date, inc = false): Date {
-    if (!dateutil.isValidDate(dt)) throw new Error('Invalid date passed in to RRule.after')
+  after(dt: Date, inc = false): Date {
+    if (!isValidDate(dt)) {
+      throw new Error('Invalid date passed in to RRule.after')
+    }
     const args = { dt: dt, inc: inc }
     let result = this._cacheGet('after', args)
     if (result === false) {
@@ -238,16 +241,17 @@ export default class RRule implements QueryMethods {
    * Returns the number of recurrences in this set. It will have go trough
    * the whole recurrence, if this hasn't been done before.
    */
-  count (): number {
+  count(): number {
     return this.all().length
   }
 
   /**
    * Converts the rrule into its string representation
+   *
    * @see <http://www.ietf.org/rfc/rfc2445.txt>
    * @return String
    */
-  toString () {
+  toString() {
     return optionsToString(this.origOptions)
   }
 
@@ -255,19 +259,23 @@ export default class RRule implements QueryMethods {
    * Will convert all rules described in nlp:ToText
    * to text.
    */
-  toText (gettext?: GetText, language?: Language) {
-    return getnlp().toText(this, gettext, language)
+  toText(
+    gettext?: GetText,
+    language?: Language,
+    dateFormatter?: DateFormatter
+  ) {
+    return toText(this, gettext, language, dateFormatter)
   }
 
-  isFullyConvertibleToText () {
-    return getnlp().isFullyConvertible(this)
+  isFullyConvertibleToText() {
+    return isFullyConvertible(this)
   }
 
   /**
    * @return a RRule instance with the same freq and options
-   *          as this one (cache is not cloned)
+   * as this one (cache is not cloned)
    */
-  clone (): RRule {
+  clone(): RRule {
     return new RRule(this.origOptions)
   }
 }

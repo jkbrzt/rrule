@@ -1,4 +1,4 @@
-/*!
+/* !
  * rrule.js - Library for working with recurrence rules for calendar dates.
  * https://github.com/jakubroztocil/rrule
  *
@@ -14,21 +14,11 @@
  *
  */
 
-import RRule from './rrule'
-import RRuleSet from './rruleset'
-import { rrulestr } from './rrulestr'
+export { RRule } from './rrule'
+export { RRuleSet } from './rruleset'
+
+export { rrulestr } from './rrulestr'
 export { Frequency, ByWeekday, Options } from './types'
 export { Weekday, WeekdayStr } from './weekday'
 export { RRuleStrOptions } from './rrulestr'
-
-// =============================================================================
-// Export
-// =============================================================================
-
-export {
-  RRule,
-  RRuleSet,
-  rrulestr
-}
-
-export default RRule
+export { datetime } from './dateutil'

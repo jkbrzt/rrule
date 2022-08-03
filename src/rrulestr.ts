@@ -1,6 +1,6 @@
-import RRule from './rrule'
-import RRuleSet from './rruleset'
-import dateutil from './dateutil'
+import { RRule } from './rrule'
+import { RRuleSet } from './rruleset'
+import { untilStringToDate } from './dateutil'
 import { includes, split } from './helpers'
 import { Options } from './types'
 import { parseString, parseDtstart } from './parsestring'
@@ -16,7 +16,7 @@ export interface RRuleStrOptions {
 
 /**
  * RRuleStr
- *  To parse a set of rrule strings
+ * To parse a set of rrule strings
  */
 const DEFAULT_OPTIONS: RRuleStrOptions = {
   dtstart: null,
@@ -24,20 +24,22 @@ const DEFAULT_OPTIONS: RRuleStrOptions = {
   unfold: false,
   forceset: false,
   compatible: false,
-  tzid: null
+  tzid: null,
 }
 
-export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
-  let rrulevals: Partial<Options>[] = []
+export function parseInput(s: string, options: Partial<RRuleStrOptions>) {
+  const rrulevals: Partial<Options>[] = []
   let rdatevals: Date[] = []
-  let exrulevals: Partial<Options>[] = []
+  const exrulevals: Partial<Options>[] = []
   let exdatevals: Date[] = []
 
-  let { dtstart, tzid } = parseDtstart(s)
+  const parsedDtstart = parseDtstart(s)
+  const { dtstart } = parsedDtstart
+  let { tzid } = parsedDtstart
 
   const lines = splitIntoLines(s, options.unfold)
 
-  lines.forEach(line => {
+  lines.forEach((line) => {
     if (!line) return
     const { name, parms, value } = breakDownLine(line)
 
@@ -51,7 +53,7 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
         break
 
       case 'RDATE':
-        const [ _, rdateTzid ] = /RDATE(?:;TZID=([^:=]+))?/i.exec(line)!
+        const [, rdateTzid] = /RDATE(?:;TZID=([^:=]+))?/i.exec(line) ?? []
         if (rdateTzid && !tzid) {
           tzid = rdateTzid
         }
@@ -84,19 +86,13 @@ export function parseInput (s: string, options: Partial<RRuleStrOptions>) {
     rrulevals,
     rdatevals,
     exrulevals,
-    exdatevals
+    exdatevals,
   }
 }
 
-function buildRule (s: string, options: Partial<RRuleStrOptions>) {
-  const {
-    rrulevals,
-    rdatevals,
-    exrulevals,
-    exdatevals,
-    dtstart,
-    tzid
-  } = parseInput(s, options)
+function buildRule(s: string, options: Partial<RRuleStrOptions>) {
+  const { rrulevals, rdatevals, exrulevals, exdatevals, dtstart, tzid } =
+    parseInput(s, options)
 
   const noCache = options.cache === false
 
@@ -113,62 +109,61 @@ function buildRule (s: string, options: Partial<RRuleStrOptions>) {
     exdatevals.length
   ) {
     const rset = new RRuleSet(noCache)
+
+    rset.dtstart(dtstart)
     rset.tzid(tzid || undefined)
 
-    rrulevals.forEach(val => {
-      rset.rrule(
-        new RRule(
-          groomRruleOptions(val, dtstart, tzid),
-          noCache
-        )
-      )
+    rrulevals.forEach((val) => {
+      rset.rrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache))
     })
 
-    rdatevals.forEach(date => {
+    rdatevals.forEach((date) => {
       rset.rdate(date)
     })
 
-    exrulevals.forEach(val => {
-      rset.exrule(
-        new RRule(
-          groomRruleOptions(val, dtstart, tzid),
-          noCache
-        )
-      )
+    exrulevals.forEach((val) => {
+      rset.exrule(new RRule(groomRruleOptions(val, dtstart, tzid), noCache))
     })
 
-    exdatevals.forEach(date => {
+    exdatevals.forEach((date) => {
       rset.exdate(date)
     })
 
-    if (options.compatible && options.dtstart) rset.rdate(dtstart!)
+    if (options.compatible && options.dtstart) rset.rdate(dtstart)
     return rset
   }
 
-  const val = rrulevals[0]
-  return new RRule(groomRruleOptions(
-    val,
-    val.dtstart || options.dtstart || dtstart,
-    val.tzid || options.tzid || tzid
-  ), noCache)
+  const val = rrulevals[0] || {}
+  return new RRule(
+    groomRruleOptions(
+      val,
+      val.dtstart || options.dtstart || dtstart,
+      val.tzid || options.tzid || tzid
+    ),
+    noCache
+  )
 }
 
-export function rrulestr (
+export function rrulestr(
   s: string,
   options: Partial<RRuleStrOptions> = {}
 ): RRule | RRuleSet {
   return buildRule(s, initializeOptions(options))
 }
 
-function groomRruleOptions (val: Partial<Options>, dtstart?: Date | null, tzid?: string | null) {
+function groomRruleOptions(
+  val: Partial<Options>,
+  dtstart?: Date | null,
+  tzid?: string | null
+) {
   return {
     ...val,
     dtstart,
-    tzid
+    tzid,
   }
 }
 
-function initializeOptions (options: Partial<RRuleStrOptions>) {
+function initializeOptions(options: Partial<RRuleStrOptions>) {
   const invalid: string[] = []
   const keys = Object.keys(options) as (keyof typeof options)[]
   const defaultKeys = Object.keys(
@@ -183,44 +178,37 @@ function initializeOptions (options: Partial<RRuleStrOptions>) {
     throw new Error('Invalid options: ' + invalid.join(', '))
   }
 
-  const initializedOptions = { ...options }
-
-  // Merge in default options
-  defaultKeys.forEach(function (key) {
-    if (!includes(keys, key)) initializedOptions[key] = DEFAULT_OPTIONS[key]
-  })
-
-  return initializedOptions
+  return { ...DEFAULT_OPTIONS, ...options }
 }
 
-function extractName (line: string) {
+function extractName(line: string) {
   if (line.indexOf(':') === -1) {
     return {
       name: 'RRULE',
-      value: line
+      value: line,
     }
   }
 
   const [name, value] = split(line, ':', 1)
   return {
     name,
-    value
+    value,
   }
 }
 
-function breakDownLine (line: string) {
+function breakDownLine(line: string) {
   const { name, value } = extractName(line)
-  let parms = name.split(';')
+  const parms = name.split(';')
   if (!parms) throw new Error('empty property name')
 
   return {
     name: parms[0].toUpperCase(),
     parms: parms.slice(1),
-    value
+    value,
   }
 }
 
-function splitIntoLines (s: string, unfold = false) {
+function splitIntoLines(s: string, unfold = false) {
   s = s && s.trim()
   if (!s) throw new Error('Invalid empty string')
 
@@ -248,18 +236,16 @@ function splitIntoLines (s: string, unfold = false) {
   return lines
 }
 
-function validateDateParm (parms: string[]) {
-  parms.forEach(parm => {
+function validateDateParm(parms: string[]) {
+  parms.forEach((parm) => {
     if (!/(VALUE=DATE(-TIME)?)|(TZID=)/.test(parm)) {
       throw new Error('unsupported RDATE/EXDATE parm: ' + parm)
     }
   })
 }
 
-function parseRDate (rdateval: string, parms: string[]) {
+function parseRDate(rdateval: string, parms: string[]) {
   validateDateParm(parms)
 
-  return rdateval
-    .split(',')
-    .map(datestr => dateutil.untilStringToDate(datestr))
+  return rdateval.split(',').map((datestr) => untilStringToDate(datestr))
 }

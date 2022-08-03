@@ -1,17 +1,18 @@
-import ToText, { GetText } from './totext'
+import ToText, { DateFormatter, GetText } from './totext'
 import parseText from './parsetext'
-import RRule from '../index'
+import { RRule } from '../rrule'
+import { Frequency } from '../types'
 import ENGLISH, { Language } from './i18n'
 
-/*!
-* rrule.js - Library for working with recurrence rules for calendar dates.
-* https://github.com/jakubroztocil/rrule
-*
-* Copyright 2010, Jakub Roztocil and Lars Schoning
-* Licenced under the BSD licence.
-* https://github.com/jakubroztocil/rrule/blob/master/LICENCE
-*
-*/
+/* !
+ * rrule.js - Library for working with recurrence rules for calendar dates.
+ * https://github.com/jakubroztocil/rrule
+ *
+ * Copyright 2010, Jakub Roztocil and Lars Schoning
+ * Licenced under the BSD licence.
+ * https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+ *
+ */
 
 /**
  *
@@ -34,13 +35,13 @@ import ENGLISH, { Language } from './i18n'
  * RULES
  *
  * Every ([n])
- *       day(s)
- *     | [weekday], ..., (and) [weekday]
- *     | weekday(s)
- *     | week(s)
- *     | month(s)
- *     | [month], ..., (and) [month]
- *     | year(s)
+ * day(s)
+ * | [weekday], ..., (and) [weekday]
+ * | weekday(s)
+ * | week(s)
+ * | month(s)
+ * | [month], ..., (and) [month]
+ * | year(s)
  *
  *
  * Plus 0, 1, or multiple of these:
@@ -66,10 +67,10 @@ import ENGLISH, { Language } from './i18n'
  * Definitely no supported for parsing:
  *
  * (for year):
- *     in week(s) [n], ..., (and) [n]
+ * in week(s) [n], ..., (and) [n]
  *
- *     on the [yearday], ..., (and) [n] day of the year
- *     on day [yearday], ..., (and) [n]
+ * on the [yearday], ..., (and) [n] day of the year
+ * on day [yearday], ..., (and) [n]
  *
  *
  * NON-TERMINALS
@@ -80,10 +81,10 @@ import ENGLISH, { Language } from './i18n'
  * [nth-weekday]: first [weekday], 2nd [weekday], ... last [weekday], ...
  * [monthday]: first, 1., 2., 1st, 2nd, second, ... 31st, last day, 2nd last day, ..
  * [date]:
- *     [month] (0-31(,) ([year])),
- *     (the) 0-31.(1-12.([year])),
- *     (the) 0-31/(1-12/([year])),
- *     [weekday]
+ * - [month] (0-31(,) ([year])),
+ * - (the) 0-31.(1-12.([year])),
+ * - (the) 0-31/(1-12/([year])),
+ * - [weekday]
  *
  * [year]: 0000, 0001, ... 01, 02, ..
  *
@@ -104,23 +105,28 @@ const common = [
   'interval',
   'byweekday',
   'bymonthday',
-  'bymonth'
+  'bymonth',
 ]
 
 ToText.IMPLEMENTED = []
-ToText.IMPLEMENTED[RRule.HOURLY] = common
-ToText.IMPLEMENTED[RRule.MINUTELY] = common
-ToText.IMPLEMENTED[RRule.DAILY] = ['byhour'].concat(common)
-ToText.IMPLEMENTED[RRule.WEEKLY] = common
-ToText.IMPLEMENTED[RRule.MONTHLY] = common
-ToText.IMPLEMENTED[RRule.YEARLY] = ['byweekno', 'byyearday'].concat(common)
+ToText.IMPLEMENTED[Frequency.HOURLY] = common
+ToText.IMPLEMENTED[Frequency.MINUTELY] = common
+ToText.IMPLEMENTED[Frequency.DAILY] = ['byhour'].concat(common)
+ToText.IMPLEMENTED[Frequency.WEEKLY] = common
+ToText.IMPLEMENTED[Frequency.MONTHLY] = common
+ToText.IMPLEMENTED[Frequency.YEARLY] = ['byweekno', 'byyearday'].concat(common)
 
 // =============================================================================
 // Export
 // =============================================================================
 
-const toText = function (rrule: RRule, gettext?: GetText, language?: Language) {
-  return new ToText(rrule, gettext, language).toString()
+const toText = function (
+  rrule: RRule,
+  gettext?: GetText,
+  language?: Language,
+  dateFormatter?: DateFormatter
+) {
+  return new ToText(rrule, gettext, language, dateFormatter).toString()
 }
 
 const { isFullyConvertible } = ToText

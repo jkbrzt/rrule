@@ -25,6 +25,8 @@ const defaultGetText: GetText = (id) => id.toString()
 
 export type DateFormatter = (year: number, month: string, day: number) => string
 
+export type ToStringOptions = { condenseOutput?: boolean }
+
 const defaultDateFormatter: DateFormatter = (
   year: number,
   month: string,
@@ -164,37 +166,45 @@ export default class ToText {
    * If some of the rrule's options aren't supported, they'll
    * be omitted from the output an "(~ approximate)" will be appended.
    *
+   * @param toTextOptions
    * @return {*}
    */
-  toString() {
+  toString(toTextOptions: { condenseOutput?: boolean } = {}) {
     const gettext = this.gettext
 
     if (!(this.options.freq in ToText.IMPLEMENTED)) {
       return gettext('RRule error: Unable to fully convert this rrule to text')
     }
 
-    this.text = [gettext('Repeats every')]
-    // this.text = [gettext('every')]
+    const { condenseOutput } = toTextOptions
+
+    if (condenseOutput) {
+      this.text = [gettext('Repeats')]
+    } else {
+      this.text = [gettext('Repeats every')]
+    }
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    this[RRule.FREQUENCIES[this.options.freq]]()
+    this[RRule.FREQUENCIES[this.options.freq]](condenseOutput)
 
-    if (this.options.until) {
-      this.add(gettext('until'))
-      const until = this.options.until
-      this.add(
-        this.dateFormatter(
-          until.getUTCFullYear(),
-          this.language.monthNames[until.getUTCMonth()],
-          until.getUTCDate()
+    if (!condenseOutput) {
+      if (this.options.until) {
+        this.add(gettext('until'))
+        const until = this.options.until
+        this.add(
+          this.dateFormatter(
+            until.getUTCFullYear(),
+            this.language.monthNames[until.getUTCMonth()],
+            until.getUTCDate()
+          )
         )
-      )
-    } else if (this.options.count) {
-      this.add(gettext('for'))
-        .add(this.options.count.toString())
-        .add(
-          this.plural(this.options.count) ? gettext('times') : gettext('time')
-        )
+      } else if (this.options.count) {
+        this.add(gettext('for'))
+          .add(this.options.count.toString())
+          .add(
+            this.plural(this.options.count) ? gettext('times') : gettext('time')
+          )
+      }
     }
 
     // if (!this.isFullyConvertible()) this.add(gettext('(~ approximate)'))
@@ -202,8 +212,17 @@ export default class ToText {
     return this.text.join('')
   }
 
-  HOURLY() {
+  HOURLY(condenseOutput = false) {
     const gettext = this.gettext
+
+    // If we have condensed output here, determine if we need to add a qualifier
+    if (condenseOutput) {
+      if (this.options.interval === 1) {
+        this.add(gettext('hourly'))
+      }
+
+      return
+    }
 
     if (this.options.interval !== 1) this.add(this.options.interval.toString())
 
@@ -212,8 +231,12 @@ export default class ToText {
     )
   }
 
-  MINUTELY() {
+  MINUTELY(condenseOutput = false) {
     const gettext = this.gettext
+
+    if (condenseOutput) {
+      this.add(gettext('every'))
+    }
 
     if (this.options.interval !== 1) this.add(this.options.interval.toString())
 
@@ -224,8 +247,17 @@ export default class ToText {
     )
   }
 
-  DAILY() {
+  DAILY(condenseOutput = false) {
     const gettext = this.gettext
+
+    // If we have condensed output here, determine if we need to add a qualifier
+    if (condenseOutput) {
+      if (!this.byweekday && this.options.interval === 1) {
+        this.add(gettext('daily'))
+      }
+
+      return
+    }
 
     if (this.options.interval !== 1) this.add(this.options.interval.toString())
 
@@ -261,8 +293,29 @@ export default class ToText {
     }
   }
 
-  WEEKLY() {
+  WEEKLY(condenseOutput = false) {
     const gettext = this.gettext
+
+    // If we have condensed output here, determine if we need to add a qualifier
+    if (condenseOutput) {
+      if (this.options.interval === 1) {
+        if (this.bymonthday) {
+          return
+        }
+
+        if (this.byweekday && this.byweekday?.allWeeks) {
+          if (this.byweekday.allWeeks.length === 1) {
+            this.add(gettext('weekly'))
+          } else if (this.byweekday.allWeeks.length === 7) {
+            this.add(gettext('daily'))
+          }
+        } else {
+          this.add(gettext('weekly'))
+        }
+      }
+
+      return
+    }
 
     if (this.options.interval !== 1) {
       this.add(this.options.interval.toString()).add(
@@ -310,8 +363,17 @@ export default class ToText {
     }
   }
 
-  MONTHLY() {
+  MONTHLY(condenseOutput = false) {
     const gettext = this.gettext
+
+    // If we have condensed output here, determine if we need to add a qualifier
+    if (condenseOutput) {
+      if (this.options.interval === 1) {
+        this.add(gettext('monthly'))
+      }
+
+      return
+    }
 
     if (this.origOptions.bymonth) {
       if (this.options.interval !== 1) {
@@ -340,8 +402,17 @@ export default class ToText {
     }
   }
 
-  YEARLY() {
+  YEARLY(condenseOutput = false) {
     const gettext = this.gettext
+
+    // If we have condensed output here, determine if we need to add a qualifier
+    if (condenseOutput) {
+      if (!this.origOptions.bymonth && this.options.interval === 1) {
+        this.add(gettext('yearly'))
+      }
+
+      return
+    }
 
     if (this.origOptions.bymonth) {
       if (this.options.interval !== 1) {

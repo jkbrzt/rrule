@@ -5,58 +5,90 @@ import { DateFormatter } from '../src/nlp/totext'
 import { datetime } from './lib/utils'
 
 const texts = [
-  ['Every day', 'RRULE:FREQ=DAILY'],
-  ['Every day at 10, 12 and 17', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
-  ['Every week', 'RRULE:FREQ=WEEKLY'],
-  ['Every hour', 'RRULE:FREQ=HOURLY'],
-  ['Every 4 hours', 'RRULE:INTERVAL=4;FREQ=HOURLY'],
-  ['Every week on Tuesday', 'RRULE:FREQ=WEEKLY;BYDAY=TU'],
-  ['Every week on Monday, Wednesday', 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE'],
-  ['Every weekday', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
-  ['Every 2 weeks', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
-  ['Every month', 'RRULE:FREQ=MONTHLY'],
-  ['Every 6 months', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
-  ['Every year', 'RRULE:FREQ=YEARLY'],
-  ['Every year on the 1st Friday', 'RRULE:FREQ=YEARLY;BYDAY=+1FR'],
-  ['Every year on the 13th Friday', 'RRULE:FREQ=YEARLY;BYDAY=+13FR'],
-  ['Every month on the 4th', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
-  ['Every month on the 4th last', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4'],
-  ['Every month on the 3rd Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=+3TU'],
-  ['Every month on the 3rd last Tuesday', 'RRULE:FREQ=MONTHLY;BYDAY=-3TU'],
-  ['Every month on the last Monday', 'RRULE:FREQ=MONTHLY;BYDAY=-1MO'],
-  ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
-  ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
+  ['Every day', 'daily', 'RRULE:FREQ=DAILY'],
+  ['Every day at 10, 12 and 17', 'daily', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
+  ['Every week', 'weekly', 'RRULE:FREQ=WEEKLY'],
+  ['Every 2 weeks', '', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
+  ['Every hour', 'hourly', 'RRULE:FREQ=HOURLY'],
+  ['Every 4 hours', '', 'RRULE:INTERVAL=4;FREQ=HOURLY'],
+  ['Every week on Tuesday', 'weekly', 'RRULE:FREQ=WEEKLY;BYDAY=TU'],
+  ['Every week on Monday, Wednesday', '', 'RRULE:FREQ=WEEKLY;BYDAY=MO,WE'],
+  ['Every weekday', '', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR'],
+  ['Every 2 weeks', '', 'RRULE:INTERVAL=2;FREQ=WEEKLY'],
+  ['Every month', 'monthly', 'RRULE:FREQ=MONTHLY'],
+  ['Every 6 months', '', 'RRULE:INTERVAL=6;FREQ=MONTHLY'],
+  ['Every year', 'yearly', 'RRULE:FREQ=YEARLY'],
+  ['Every year on the 1st Friday', 'yearly', 'RRULE:FREQ=YEARLY;BYDAY=+1FR'],
+  ['Every year on the 13th Friday', 'yearly', 'RRULE:FREQ=YEARLY;BYDAY=+13FR'],
+  ['Every month on the 4th', 'monthly', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=4'],
+  [
+    'Every month on the 4th last',
+    'monthly',
+    'RRULE:FREQ=MONTHLY;BYMONTHDAY=-4',
+  ],
+  [
+    'Every month on the 3rd Tuesday',
+    'monthly',
+    'RRULE:FREQ=MONTHLY;BYDAY=+3TU',
+  ],
+  [
+    'Every month on the 3rd last Tuesday',
+    'monthly',
+    'RRULE:FREQ=MONTHLY;BYDAY=-3TU',
+  ],
+  [
+    'Every month on the last Monday',
+    'monthly',
+    'RRULE:FREQ=MONTHLY;BYDAY=-1MO',
+  ],
+  [
+    'Every month on the 2nd last Friday',
+    'monthly',
+    'RRULE:FREQ=MONTHLY;BYDAY=-2FR',
+  ],
+  ['Every week for 20 times', 'weekly', 'RRULE:FREQ=WEEKLY;COUNT=20'],
 ]
 
 describe('NLP', () => {
   it('fromText()', function () {
     texts.forEach(function (item) {
-      const text = item[0]
-      const str = item[1]
-      expect(RRule.fromText(text).toString()).equals(str, text + ' => ' + str)
+      const parse = item[0]
+      const rule = item[2]
+      expect(RRule.fromText(parse).toString()).equals(
+        rule,
+        parse + ' => ' + rule
+      )
     })
   })
 
-  it('toText()', function () {
+  it('toText(options)', function () {
     texts.forEach(function (item) {
-      const text = item[0]
-      const str = item[1]
-      expect(RRule.fromString(str).toText().toLowerCase()).equals(
-        `repeats ${text.toLowerCase()}`,
-        str + ' => ' + text
+      const parse = item[0]
+      const condensed = item[1]
+      const rule = item[2]
+      expect(RRule.fromString(rule).toText().toLowerCase()).equals(
+        `repeats ${parse.toLowerCase()}`,
+        rule + ' => ' + parse
       )
+
+      const condensedToCompare = condensed
+        ? `repeats ${condensed.toLowerCase()}`
+        : 'repeats'
+      expect(
+        RRule.fromString(rule)
+          .toText(undefined, undefined, undefined, { condenseOutput: true })
+          .toLowerCase()
+      ).equals(condensedToCompare, rule + ' => ' + condensed)
     })
   })
 
   it('parseText()', function () {
     texts.forEach(function (item) {
-      const text = item[0]
-      const str = item[1]
-      const output = optionsToString(RRule.parseText(text))
-      console.log(text, output)
-      expect(optionsToString(RRule.parseText(text))).equals(
-        str,
-        text + ' => ' + str
+      const parse = item[0]
+      const rule = item[2]
+      expect(optionsToString(RRule.parseText(parse))).equals(
+        rule,
+        parse + ' => ' + rule
       )
     })
   })
@@ -68,6 +100,9 @@ describe('NLP', () => {
     })
 
     expect(rrule.toText()).to.equal('Repeats every week on Monday')
+    expect(
+      rrule.toText(undefined, undefined, undefined, { condenseOutput: true })
+    ).to.equal('Repeats weekly')
     expect(rrule.toString()).to.equal('RRULE:FREQ=WEEKLY;BYDAY=MO')
   })
 
@@ -77,6 +112,9 @@ describe('NLP', () => {
     expect(rule.toText()).to.equal(
       'Repeats every week on the 3rd, 10th, 17th and 24th'
     )
+    expect(
+      rule.toText(undefined, undefined, undefined, { condenseOutput: true })
+    ).to.equal('Repeats')
   })
 
   it('shows correct text for every day', () => {
@@ -94,6 +132,9 @@ describe('NLP', () => {
     }
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('Repeats every day')
+    expect(
+      rule.toText(undefined, undefined, undefined, { condenseOutput: true })
+    ).to.equal('Repeats daily')
   })
 
   it('shows correct text for every minute', () => {
@@ -106,6 +147,9 @@ describe('NLP', () => {
     const options = { freq: RRule.MINUTELY, interval: 2 }
     const rule = new RRule(options)
     expect(rule.toText()).to.equal('Repeats every 2 minutes')
+    expect(
+      rule.toText(undefined, undefined, undefined, { condenseOutput: true })
+    ).to.equal('Repeats every 2 minutes')
   })
 
   it("by default formats 'until' correctly", () => {
@@ -117,6 +161,9 @@ describe('NLP', () => {
     expect(rrule.toText()).to.equal(
       'Repeats every week until November 10, 2012'
     )
+    expect(
+      rrule.toText(undefined, undefined, undefined, { condenseOutput: true })
+    ).to.equal('Repeats weekly')
   })
 
   it("formats 'until' as desired if asked", () => {

@@ -1,4 +1,4 @@
-import ToText, { DateFormatter, GetText } from './totext'
+import ToText, { DateFormatter, GetText, ToStringOptions } from './totext'
 import parseText from './parsetext'
 import { RRule } from '../rrule'
 import { Frequency } from '../types'
@@ -124,9 +124,12 @@ const toText = function (
   rrule: RRule,
   gettext?: GetText,
   language?: Language,
-  dateFormatter?: DateFormatter
+  dateFormatter?: DateFormatter,
+  toStringOptions?: ToStringOptions
 ) {
-  return new ToText(rrule, gettext, language, dateFormatter).toString()
+  return new ToText(rrule, gettext, language, dateFormatter).toString(
+    toStringOptions
+  )
 }
 
 const { isFullyConvertible } = ToText

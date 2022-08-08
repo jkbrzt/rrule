@@ -36,10 +36,10 @@ export class DateWithZone {
 
     const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
     const dateInLocalTZ = new Date(
-      this.date.toLocaleString(undefined, { timeZone: localTimeZone })
+      this.date.toLocaleString('en-US', { timeZone: localTimeZone })
     )
     const dateInTargetTZ = new Date(
-      this.date.toLocaleString(undefined, { timeZone: this.tzid ?? 'UTC' })
+      this.date.toLocaleString('en-US', { timeZone: this.tzid ?? 'UTC' })
     )
     const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
 

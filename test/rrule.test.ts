@@ -171,11 +171,11 @@ describe('RRule', function () {
       args: [parse('20220613T093000'), parse('20220716T083000')],
     },
     [
-      datetime(2022, 6, 14, 9, 0),
-      datetime(2022, 6, 21, 9, 0),
-      datetime(2022, 6, 28, 9, 0),
-      datetime(2022, 7, 5, 9, 0),
-      datetime(2022, 7, 12, 9, 0),
+      expectedDate(datetime(2022, 6, 14, 9, 0), undefined, 'Europe/London'),
+      expectedDate(datetime(2022, 6, 21, 9, 0), undefined, 'Europe/London'),
+      expectedDate(datetime(2022, 6, 28, 9, 0), undefined, 'Europe/London'),
+      expectedDate(datetime(2022, 7, 5, 9, 0), undefined, 'Europe/London'),
+      expectedDate(datetime(2022, 7, 12, 9, 0), undefined, 'Europe/London'),
     ]
   )
 

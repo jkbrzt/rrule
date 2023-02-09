@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { ExclusiveTestFunction, TestFunction } from 'mocha'
 export { datetime } from '../../src/dateutil'
-import { datetime } from '../../src/dateutil'
+import { dateInTimeZone, datetime } from '../../src/dateutil'
 import { RRule, RRuleSet } from '../../src'
 
 const assertDatesEqual = function (
@@ -239,16 +239,5 @@ export function expectedDate(
   currentLocalDate: Date,
   targetZone: string
 ): Date {
-  // get the tzoffset between the client tz and the target tz
-  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const dateInLocalTZ = new Date(
-    startDate.toLocaleString(undefined, { timeZone: localTimeZone })
-  )
-  const dateInTargetTZ = new Date(
-    startDate.toLocaleString(undefined, { timeZone: targetZone })
-  )
-  const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
-
-  return new Date(startDate.getTime() - tzOffset)
-  // return new Date(new Date(startDate.getTime() + tzOffset).toLocaleDateString(undefined, { timeZone: localTimeZone }))
+  return dateInTimeZone(startDate, targetZone)
 }

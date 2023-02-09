@@ -34,13 +34,17 @@ export class DateWithZone {
       return this.date
     }
 
+    const dateTZtoISO8601 = (date: Date, timeZone: string) => {
+      // date format for sv-SE is almost ISO8601
+      const dateStr = date.toLocaleString('sv-SE', { timeZone })
+      // '2023-02-07 10:41:36'
+      return dateStr.replace(' ', 'T') + 'Z'
+    }
+
     const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const dateInLocalTZ = new Date(
-      this.date.toLocaleString('en-US', { timeZone: localTimeZone })
-    )
-    const dateInTargetTZ = new Date(
-      this.date.toLocaleString('en-US', { timeZone: this.tzid ?? 'UTC' })
-    )
+    // Date constructor can only reliably parse dates in ISO8601 format
+    const dateInLocalTZ = new Date(dateTZtoISO8601(this.date, localTimeZone))
+    const dateInTargetTZ = new Date(dateTZtoISO8601(this.date, this.tzid ?? 'UTC'))
     const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
 
     return new Date(this.date.getTime() - tzOffset)

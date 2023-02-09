@@ -165,7 +165,7 @@ describe('RRule', function () {
         freq: RRule.WEEKLY,
         dtstart: parse('20220613T090000'),
         byweekday: [RRule.TU],
-        tzid: 'Europe/London'
+        tzid: 'Europe/London',
       }),
       method: 'between',
       args: [parse('20220613T093000'), parse('20220716T083000')],

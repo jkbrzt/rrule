@@ -1,5 +1,9 @@
 ### Changelog
 
+- 2.7.2 (2023-02-10)
+
+  - Fix rezonedDate (#523)
+
 - 2.7.1 (2022-07-10)
 
   - Internal:

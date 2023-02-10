@@ -2,7 +2,11 @@
 
 - 2.7.2 (2023-02-10)
 
-  - Fix rezonedDate (#523)
+  - Bugfixes:
+    - Fix rezonedDate ([#523](https://github.com/jakubroztocil/rrule/issues/523))
+    - Export datetime ([#551](https://github.com/jakubroztocil/rrule/issues/551))
+    - Fixes types for `before()` and `after()` ([#560](https://github.com/jakubroztocil/rrule/issues/560))
+  - Update README (https://github.com/jakubroztocil/rrule/pull/543)
 
 - 2.7.1 (2022-07-10)
 

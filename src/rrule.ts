@@ -204,7 +204,7 @@ export class RRule implements QueryMethods {
    *
    * @return Date or null
    */
-  before(dt: Date, inc = false): Date {
+  before(dt: Date, inc = false): Date | null {
     if (!isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.before')
     }
@@ -214,7 +214,7 @@ export class RRule implements QueryMethods {
       result = this._iter(new IterResult('before', args))
       this._cacheAdd('before', result, args)
     }
-    return result as Date
+    return result as Date | null
   }
 
   /**
@@ -224,7 +224,7 @@ export class RRule implements QueryMethods {
    *
    * @return Date or null
    */
-  after(dt: Date, inc = false): Date {
+  after(dt: Date, inc = false): Date | null {
     if (!isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.after')
     }
@@ -234,7 +234,7 @@ export class RRule implements QueryMethods {
       result = this._iter(new IterResult('after', args))
       this._cacheAdd('after', result, args)
     }
-    return result as Date
+    return result as Date | null
   }
 
   /**

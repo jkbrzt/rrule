@@ -42,7 +42,7 @@ export class Weekday {
   toString() {
     let s: string = ALL_WEEKDAYS[this.weekday]
     if (this.n) s = (this.n > 0 ? '+' : '') + String(this.n) + s
-    return s
+    return s as WeekdayStr
   }
 
   getJsWeekday() {

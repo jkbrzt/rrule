@@ -1,5 +1,5 @@
 {
-  "name": "rrule",
+  "name": "@vend/rrule",
   "version": "2.7.2",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
@@ -20,15 +20,16 @@
     "url": "git://github.com/jakubroztocil/rrule.git"
   },
   "scripts": {
-    "prebuild": "yarn clean",
-    "build": "yarn lint && yarn format-check && tsc -b tsconfig.build.json && webpack && tsc dist/esm/**/*.d.ts",
+    "prebuild": "npm run clean",
+    "build": "npm run lint && npm run format-check && tsc -b tsconfig.build.json && webpack && tsc dist/esm/**/*.d.ts",
     "clean": "rm -rf dist/",
-    "lint": "yarn eslint . --fix --config .eslintrc.js",
-    "format": "yarn prettier --write .",
-    "format-check": "yarn prettier --check .",
+    "lint": "npx eslint . --fix --config .eslintrc.js",
+    "format": "npx prettier --write .",
+    "format-check": "npx prettier --check .",
     "run-ts": "TS_NODE_PROJECT=tsconfig.json node --loader ts-node/esm",
-    "test": "yarn run-ts ./node_modules/.bin/mocha **/*.test.ts",
-    "test-ci": "yarn run-ts ./node_modules/.bin/nyc yarn run-ts ./node_modules/.bin/mocha **/*.test.ts"
+    "test": "npm run run-ts ./node_modules/.bin/mocha **/*.test.ts",
+    "test-ci": "npm run run-ts ./node_modules/.bin/nyc npm run run-ts ./node_modules/.bin/mocha **/*.test.ts",
+    "registry-login": "npx google-artifactregistry-auth"
   },
   "nyc": {
     "extension": [
@@ -45,8 +46,8 @@
   },
   "lint-staged": {
     "*.ts": [
-      "yarn lint",
-      "yarn format"
+      "npm run lint",
+      "npm run format"
     ]
   },
   "devDependencies": {
@@ -54,7 +55,7 @@
     "@types/chai": "^4.2.7",
     "@types/mocha": "^9.1.1",
     "@types/mockdate": "^3.0.0",
-    "@types/node": "^17.0.41",
+    "@types/node": "18.15.3npm i",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "chai": "^4.2.0",
@@ -74,7 +75,7 @@
     "source-map-support": "^0.5.16",
     "terser-webpack-plugin": "^5.3.3",
     "ts-loader": "^9.3.0",
-    "ts-node": "^10.8.1",
+    "ts-node": "10.9.1",
     "typescript": "^4.7.3",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2"

@@ -1,6 +1,6 @@
 {
   "name": "@vend/rrule",
-  "version": "2.7.2",
+  "version": "3.0.0",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "BSD-3-Clause",
@@ -55,7 +55,7 @@
     "@types/chai": "^4.2.7",
     "@types/mocha": "^9.1.1",
     "@types/mockdate": "^3.0.0",
-    "@types/node": "18.15.3npm i",
+    "@types/node": "18.15.3",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
     "chai": "^4.2.0",

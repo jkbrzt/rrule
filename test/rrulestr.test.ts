@@ -294,6 +294,33 @@ describe('rrulestr', function () {
     })
   })
 
+  it('adds dtstart when forceset is applied', () => {
+    const rruleset = rrulestr('RRULE:FREQ=WEEKLY', {
+      forceset: true,
+      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+    })
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      'DTSTART:19970902T090000Z',
+      'RRULE:FREQ=WEEKLY',
+    ])
+  })
+
+  it("adds dtstart from options overriding rule's dtstart", () => {
+    const rruleset = rrulestr(
+      'RRULE:DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE',
+      {
+        forceset: true,
+        dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+      }
+    )
+
+    expect(rruleset.valueOf()).to.deep.equal([
+      'DTSTART:19970902T090000Z',
+      'RRULE:FREQ=WEEKLY;BYDAY=TU,WE',
+    ])
+  })
+
   it('parses a DTSTART inside an RRULE', () => {
     const rrule = rrulestr(
       'RRULE:UNTIL=19990404T110000Z;DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'

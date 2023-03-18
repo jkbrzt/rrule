@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm install -g codecov nyc
-      - run: npm run install
+      - run: npm install
       - run: npm run build
       - run: LANG=en_CA TZ=America/Vancouver npm run test
       - run: LANG=en_US TZ=America/Los_Angeles npm run test

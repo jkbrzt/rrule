@@ -13,7 +13,6 @@ jobs:
       - name: "Checkout repository"
         uses: actions/checkout@v3
         with:
-          node-version: ${{ matrix.node-version }}
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
 

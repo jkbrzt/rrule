@@ -1,21 +1,17 @@
 name: Publish
-
 on:
   push:
     branches:
       - master
-
 jobs:
   publish:
     runs-on: ubuntu-latest
-
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
-
       - name: "Use NodeJS 18"
         uses: actions/setup-node@v3
         with:
@@ -24,31 +20,24 @@ jobs:
           scope: "@vendpark"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PAT }}
-
       - name: "Install global dependencies"
         run: npm install -g codecov nyc
-
       - name: "Install dependencies"
         run: npm ci
-
       - name: "Build packages"
         run: npm run build
-
       - name: "Test in different timezones"
         run: |
           LANG=en_CA TZ=America/Vancouver npm run test
           LANG=en_US TZ=America/Los_Angeles npm run test
           LANG=sw_KE TZ=Africa/Nairobi npm run test
           LANG=jp_JP TZ=Asia/Tokyo npm run test-ci
-          
       - name: "NYC & Code Coverage"
         run: nyc report --reporter=json && codecov -t ${{ secrets.CODECOV_REPO_TOKEN }} -f coverage/*.json
-
       - name: "Deploy NPM packages to GH Packages"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
-
           npm publish

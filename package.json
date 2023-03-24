@@ -1,5 +1,5 @@
 {
-  "name": "@vend/rrule",
+  "name": "@vendpark/rrule",
   "version": "3.0.0",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
@@ -28,8 +28,7 @@
     "format-check": "npx prettier --check .",
     "run-ts": "TS_NODE_PROJECT=tsconfig.json node --loader ts-node/esm",
     "test": "npm run run-ts ./node_modules/.bin/mocha **/*.test.ts",
-    "test-ci": "npm run run-ts ./node_modules/.bin/nyc npm run run-ts ./node_modules/.bin/mocha **/*.test.ts",
-    "registry-login": "npx google-artifactregistry-auth"
+    "test-ci": "npm run run-ts ./node_modules/.bin/nyc npm run run-ts ./node_modules/.bin/mocha **/*.test.ts"
   },
   "nyc": {
     "extension": [

@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: "Build packages"
-        run: npx lerna run build
+        run: npm run build
 
       - name: "Test in different timezones"
         run: |

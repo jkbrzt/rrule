@@ -1,6 +1,6 @@
 {
   "name": "@vendpark/rrule",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "JavaScript library for working with recurrence rules for calendar dates.",
   "homepage": "http://jakubroztocil.github.io/rrule/",
   "license": "BSD-3-Clause",

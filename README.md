@@ -2,12 +2,7 @@
 
 **Library for working with recurrence rules for calendar dates.**
 
-[![NPM version][npm-image]][npm-url]
-[![Build Status][ci-image]][ci-url]
-[![js-standard-style][js-standard-image]][js-standard-url]
-[![Downloads][downloads-image]][downloads-url]
-[![Gitter][gitter-image]][gitter-url]
-[![codecov.io](http://codecov.io/github/jakubroztocil/rrule/coverage.svg?branch=master)](http://codecov.io/github/jakubroztocil/rrule?branch=master)
+[![Test](https://github.com/vendpark/rrule/actions/workflows/test.yml/badge.svg)](https://github.com/vendpark/rrule/actions/workflows/test.yml)
 
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](https://tools.ietf.org/html/rfc5545), with a few important
@@ -717,45 +712,45 @@ Additionally, it accepts the following keyword arguments:
 
 <dt><code>cache</code></dt>
 <dd>
-If <code>true</code>, the <code>rruleset</code> or <code>rrule</code> created instance 
+If <code>true</code>, the <code>rruleset</code> or <code>rrule</code> created instance
 will cache its results.
 Default is not to cache.
 </dd>
 
 <dt><code>dtstart</code></dt>
 <dd>
-If given, it must be a datetime instance that will be used when no 
-<code>DTSTART</code> property is found in the parsed string. 
-If it is not given, and the property is not found, 
+If given, it must be a datetime instance that will be used when no
+<code>DTSTART</code> property is found in the parsed string.
+If it is not given, and the property is not found,
 <code>datetime.now()</code> will be used instead.
 </dd>
 
 <dt><code>unfold</code></dt>
 <dd>
-If set to <code>true</code>, lines will be unfolded following the RFC specification. 
+If set to <code>true</code>, lines will be unfolded following the RFC specification.
 It defaults to <code>false</code>, meaning that spaces before every line will be stripped.
 </dd>
 
 <dt><code>forceset</code></dt>
 <dd>
-If set to <code>true</code>, an <code>rruleset</code> instance will be returned, 
-even if only a single rule is found. 
-The default is to return an <code>rrule</code> if possible, and 
+If set to <code>true</code>, an <code>rruleset</code> instance will be returned,
+even if only a single rule is found.
+The default is to return an <code>rrule</code> if possible, and
 an <code>rruleset</code> if necessary.
 </dd>
 
 <dt><code>compatible</code></dt>
 <dd>
-If set to <code>true</code>, the parser will operate in RFC-compatible mode. 
-Right now it means that unfold will be turned on, and if a <code>DTSTART</code> is found, 
+If set to <code>true</code>, the parser will operate in RFC-compatible mode.
+Right now it means that unfold will be turned on, and if a <code>DTSTART</code> is found,
 it will be considered the first recurrence instance, as documented in the RFC.
 </dd>
 
 <dt><code>tzid</code></dt>
 <dd>
-If given, it must be a string that will be used when no <code>TZID</code> 
-property is found in the parsed string. 
-If it is not given, and the property is not found, <code>'UTC'</code> will 
+If given, it must be a string that will be used when no <code>TZID</code>
+property is found in the parsed string.
+If it is not given, and the property is not found, <code>'UTC'</code> will
 be used by default.
 </dd>
 

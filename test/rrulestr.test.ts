@@ -295,30 +295,28 @@ describe('rrulestr', function () {
   })
 
   it('adds dtstart when forceset is applied', () => {
+    const dtstart = new Date(Date.UTC(1997, 8, 2, 9, 0, 0))
     const rruleset = rrulestr('RRULE:FREQ=WEEKLY', {
       forceset: true,
-      dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
-    })
+      dtstart,
+    }) as RRuleSet
 
-    expect(rruleset.valueOf()).to.deep.equal([
-      'DTSTART:19970902T090000Z',
-      'RRULE:FREQ=WEEKLY',
-    ])
+    expect(rruleset.dtstart()).to.deep.equal(dtstart)
   })
 
-  it("adds dtstart from options overriding rule's dtstart", () => {
+  it("Uses the rrule's DTSTART even if one is passed into the constructor", () => {
+    const dtstart = new Date(Date.UTC(1997, 8, 2, 9, 0, 0))
     const rruleset = rrulestr(
       'RRULE:DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE',
       {
         forceset: true,
-        dtstart: new Date(Date.UTC(1997, 8, 2, 9, 0, 0)),
+        dtstart,
       }
-    )
+    ) as RRuleSet
 
-    expect(rruleset.valueOf()).to.deep.equal([
-      'DTSTART:19970902T090000Z',
-      'RRULE:FREQ=WEEKLY;BYDAY=TU,WE',
-    ])
+    expect(rruleset.dtstart()).to.deep.equal(
+      new Date(Date.UTC(1999, 0, 4, 11, 0, 0))
+    )
   })
 
   it('parses a DTSTART inside an RRULE', () => {

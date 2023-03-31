@@ -1,13 +1,13 @@
 import { Options } from './types'
-import RRule, { DEFAULT_OPTIONS } from './rrule'
+import { RRule, DEFAULT_OPTIONS } from './rrule'
 import { includes, isPresent, isArray, isNumber, toArray } from './helpers'
 import { Weekday } from './weekday'
-import dateutil from './dateutil'
+import { timeToUntilString } from './dateutil'
 import { DateWithZone } from './datewithzone'
 
-export function optionsToString (options: Partial<Options>) {
-  let rrule: string[][] = []
-  let dtstart: string = ''
+export function optionsToString(options: Partial<Options>) {
+  const rrule: string[][] = []
+  let dtstart = ''
   const keys: (keyof Options)[] = Object.keys(options) as (keyof Options)[]
   const defaultKeys = Object.keys(DEFAULT_OPTIONS)
 
@@ -16,14 +16,14 @@ export function optionsToString (options: Partial<Options>) {
     if (!includes(defaultKeys, keys[i])) continue
 
     let key = keys[i].toUpperCase()
-    const value: any = options[keys[i]]
-    let outValue: string = ''
+    const value = options[keys[i]]
+    let outValue = ''
 
     if (!isPresent(value) || (isArray(value) && !value.length)) continue
 
     switch (key) {
       case 'FREQ':
-        outValue = RRule.FREQUENCIES[options.freq!]
+        outValue = RRule.FREQUENCIES[options.freq]
         break
       case 'WKST':
         if (isNumber(value)) {
@@ -33,7 +33,7 @@ export function optionsToString (options: Partial<Options>) {
         }
         break
       case 'BYWEEKDAY':
-          /*
+        /*
           NOTE: BYWEEKDAY is a special case.
           RRule() deconstructs the rule.options.byweekday array
           into an array of Weekday arguments.
@@ -45,25 +45,29 @@ export function optionsToString (options: Partial<Options>) {
 
           */
         key = 'BYDAY'
-        outValue = toArray<Weekday | number[] | number>(value).map(wday => {
-          if (wday instanceof Weekday) {
-            return wday
-          }
+        outValue = toArray<Weekday | number[] | number>(
+          value as Weekday | number[] | number
+        )
+          .map((wday) => {
+            if (wday instanceof Weekday) {
+              return wday
+            }
 
-          if (isArray(wday)) {
-            return new Weekday(wday[0], wday[1])
-          }
+            if (isArray(wday)) {
+              return new Weekday(wday[0], wday[1])
+            }
 
-          return new Weekday(wday)
-        }).toString()
+            return new Weekday(wday)
+          })
+          .toString()
 
         break
       case 'DTSTART':
-        dtstart = buildDtstart(value, options.tzid)
+        dtstart = buildDtstart(value as number, options.tzid)
         break
 
       case 'UNTIL':
-        outValue = dateutil.timeToUntilString(value, !options.tzid)
+        outValue = timeToUntilString(value as number, !options.tzid)
         break
 
       default:
@@ -83,16 +87,18 @@ export function optionsToString (options: Partial<Options>) {
     }
   }
 
-  const rules = rrule.map(([key, value]) => `${key}=${value.toString()}`).join(';')
+  const rules = rrule
+    .map(([key, value]) => `${key}=${value.toString()}`)
+    .join(';')
   let ruleString = ''
   if (rules !== '') {
     ruleString = `RRULE:${rules}`
   }
 
-  return [ dtstart, ruleString ].filter(x => !!x).join('\n')
+  return [dtstart, ruleString].filter((x) => !!x).join('\n')
 }
 
-function buildDtstart (dtstart?: number, tzid?: string | null) {
+function buildDtstart(dtstart?: number, tzid?: string | null) {
   if (!dtstart) {
     return ''
   }

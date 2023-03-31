@@ -1,11 +1,11 @@
 import IterResult from './iterresult'
-import RRule from './rrule'
+import { RRule } from './rrule'
 import { DateWithZone } from './datewithzone'
-import { iter } from './iter/index'
-import dateutil from './dateutil'
+import { iter } from './iter'
+import { sort } from './dateutil'
 import { QueryMethodTypes, IterResultType } from './types'
 
-export function iterSet <M extends QueryMethodTypes> (
+export function iterSet<M extends QueryMethodTypes>(
   iterResult: IterResult<M>,
   _rrule: RRule[],
   _exrule: RRule[],
@@ -16,7 +16,7 @@ export function iterSet <M extends QueryMethodTypes> (
   const _exdateHash: { [k: number]: boolean } = {}
   const _accept = iterResult.accept
 
-  function evalExdate (after: Date, before: Date) {
+  function evalExdate(after: Date, before: Date) {
     _exrule.forEach(function (rrule) {
       rrule.between(after, before, true).forEach(function (date) {
         _exdateHash[Number(date)] = true
@@ -43,7 +43,7 @@ export function iterSet <M extends QueryMethodTypes> (
   }
 
   if (iterResult.method === 'between') {
-    evalExdate(iterResult.args.after!, iterResult.args.before!)
+    evalExdate(iterResult.args.after, iterResult.args.before)
     iterResult.accept = function (date) {
       const dt = Number(date)
       if (!_exdateHash[dt]) {
@@ -64,7 +64,7 @@ export function iterSet <M extends QueryMethodTypes> (
   })
 
   const res = iterResult._result
-  dateutil.sort(res)
+  sort(res)
   switch (iterResult.method) {
     case 'all':
     case 'between':

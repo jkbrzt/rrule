@@ -1,4 +1,4 @@
-export function easter (y: number, offset: number = 0) {
+export function easter(y: number, offset = 0) {
   const a = y % 19
   const b = Math.floor(y / 100)
   const c = y % 100

@@ -305,7 +305,12 @@ export default class ToText {
           : gettext('month')
       )
     }
-    if (this.bymonthday) {
+
+    if (this.options.byweekday && this.origOptions.bysetpos) {
+      this.add(gettext('on the'))
+        .add(this.list(this.origOptions.bysetpos, this.nth, gettext('and')))
+        .add(this.list(this.origOptions.byweekday, this.weekdaytext))
+    } else if (this.bymonthday) {
       this._bymonthday()
     } else if (this.byweekday && this.byweekday.isWeekdays) {
       this.add(gettext('on')).add(gettext('weekdays'))

@@ -3,6 +3,7 @@ import { RRule } from '../src'
 import { optionsToString } from '../src/optionstostring'
 import { DateFormatter } from '../src/nlp/totext'
 import { datetime } from './lib/utils'
+import { parseString } from '../src/parsestring'
 
 const texts = [
   ['Every day', 'RRULE:FREQ=DAILY'],
@@ -125,6 +126,14 @@ describe('NLP', () => {
 
     expect(rrule.toText(undefined, undefined, dateFormatter)).to.equal(
       'every week until 10. November, 2012'
+    )
+  })
+
+  it('format a monthy recurrence with bySetPos', () => {
+    const rrule = new RRule(parseString('RRULE:FREQ=MONTHLY;BYDAY=MO;BYSETPOS=2'))
+
+    expect(rrule.toText()).to.equal(
+      'every month on the 2nd Monday'
     )
   })
 })

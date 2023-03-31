@@ -1,5 +1,5 @@
 import { ParsedOptions } from '../types'
-import RRule from '../rrule'
+import { RRule } from '../rrule'
 import { empty, repeat, pymod } from '../helpers'
 
 export interface MonthInfo {
@@ -8,7 +8,7 @@ export interface MonthInfo {
   nwdaymask: number[]
 }
 
-export function rebuildMonth (
+export function rebuildMonth(
   year: number,
   month: number,
   yearlen: number,
@@ -19,7 +19,7 @@ export function rebuildMonth (
   const result: MonthInfo = {
     lastyear: year,
     lastmonth: month,
-    nwdaymask: []
+    nwdaymask: [],
   }
 
   let ranges: number[][] = []
@@ -49,9 +49,9 @@ export function rebuildMonth (
     const first = rang[0]
     const last = rang[1] - 1
 
-    for (let k = 0; k < options.bynweekday!.length; k++) {
+    for (let k = 0; k < options.bynweekday.length; k++) {
       let i
-      const [ wday, n ] = options.bynweekday![k]
+      const [wday, n] = options.bynweekday[k]
       if (n < 0) {
         i = last + (n + 1) * 7
         i -= pymod(wdaymask[i] - wday, 7)

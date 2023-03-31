@@ -1,14 +1,18 @@
 import { Weekday, WeekdayStr } from './weekday'
 
 export interface QueryMethods {
-  all (): Date[]
-  between (after: Date, before: Date, inc: boolean): Date[]
-  before (date: Date, inc: boolean): Date
-  after (date: Date, inc: boolean): Date
+  all(): Date[]
+  between(after: Date, before: Date, inc: boolean): Date[]
+  before(date: Date, inc: boolean): Date | null
+  after(date: Date, inc: boolean): Date | null
 }
 
 export type QueryMethodTypes = keyof QueryMethods
-export type IterResultType<M extends QueryMethodTypes> = M extends 'all' | 'between' ? Date[] : (Date | null)
+export type IterResultType<M extends QueryMethodTypes> = M extends
+  | 'all'
+  | 'between'
+  ? Date[]
+  : Date | null
 
 export enum Frequency {
   YEARLY = 0,
@@ -17,10 +21,16 @@ export enum Frequency {
   DAILY = 3,
   HOURLY = 4,
   MINUTELY = 5,
-  SECONDLY = 6
+  SECONDLY = 6,
 }
 
-export function freqIsDailyOrGreater (freq: Frequency): freq is Frequency.YEARLY | Frequency.MONTHLY | Frequency.WEEKLY | Frequency.DAILY {
+export function freqIsDailyOrGreater(
+  freq: Frequency
+): freq is
+  | Frequency.YEARLY
+  | Frequency.MONTHLY
+  | Frequency.WEEKLY
+  | Frequency.DAILY {
   return freq < Frequency.HOURLY
 }
 

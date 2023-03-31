@@ -1,17 +1,43 @@
 ### Changelog
 
+- 2.7.2 (2023-02-10)
+
+  - Bugfixes:
+    - Fix rezonedDate ([#523](https://github.com/jakubroztocil/rrule/issues/523))
+    - Export datetime ([#551](https://github.com/jakubroztocil/rrule/issues/551))
+    - Fixes types for `before()` and `after()` ([#560](https://github.com/jakubroztocil/rrule/issues/560))
+  - Update README (https://github.com/jakubroztocil/rrule/pull/543)
+
+- 2.7.1 (2022-07-10)
+
+  - Internal:
+    - Upgrade build dependencies (#515)
+    - Migrate from tslint to eslint (#514)
+    - Fix precommit & lint warnings (#519)
+    - Fix invalid date formats in tests (#517)
+  - Remove default exports (#513)
+  - Point to esm correctly (#516)
+
+- 2.7.0 (2022-06-05)
+
+  - Features:
+    - **BREAKING CHANGE** Removes default export in favor of named exports
+    - Removes Luxon dependency (#508)
+
 - 2.6.8 (2021-02-04)
+
   - Bugfixes:
     - Solve circular imports (#444)
 
 - 2.6.6 (2020-08-23)
+
   - Bugfixes:
     - Fixed broken npm package (#417)
 
 - 2.6.5 (2020-08-23)
   - Bugfixes:
-    - `luxon`-less binary should not contain any `luxon` imports (#410) 
-    - Fixed `toText` pluralization of “minutes“ (#415) 
+    - `luxon`-less binary should not contain any `luxon` imports (#410)
+    - Fixed `toText` pluralization of “minutes“ (#415)
 - 2.6.4 (2019-12-18)
   - Bugfixes:
     - Calculating series with unknown timezones will produce infinite loop (#320)

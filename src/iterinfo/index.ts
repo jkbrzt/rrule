@@ -1,15 +1,10 @@
-import dateutil from '../dateutil'
-import {
-  notEmpty,
-  repeat,
-  range,
-  isPresent
-} from '../helpers'
+import { notEmpty, repeat, range, isPresent } from '../helpers'
 import { ParsedOptions, Frequency } from '../types'
 import { YearInfo, rebuildYear } from './yearinfo'
 import { rebuildMonth, MonthInfo } from './monthinfo'
 import { easter } from './easter'
 import { Time } from '../datetime'
+import { datetime, sort, toOrdinal } from '../dateutil'
 
 export type DaySet = [(number | null)[], number, number]
 export type GetDayset = () => DaySet
@@ -23,9 +18,10 @@ export default class Iterinfo {
   public monthinfo: MonthInfo
   public eastermask: number[] | null
 
-  constructor (private options: ParsedOptions) {}
+  // eslint-disable-next-line no-empty-function
+  constructor(private options: ParsedOptions) {}
 
-  rebuild (year: number, month: number) {
+  rebuild(year: number, month: number) {
     const options = this.options
 
     if (year !== this.lastyear) {
@@ -33,12 +29,17 @@ export default class Iterinfo {
     }
 
     if (
-      notEmpty(options.bynweekday!) &&
+      notEmpty(options.bynweekday) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
       const { yearlen, mrange, wdaymask } = this.yearinfo
       this.monthinfo = rebuildMonth(
-        year, month, yearlen, mrange, wdaymask, options
+        year,
+        month,
+        yearlen,
+        mrange,
+        wdaymask,
+        options
       )
     }
 
@@ -47,59 +48,59 @@ export default class Iterinfo {
     }
   }
 
-  get lastyear () {
+  get lastyear() {
     return this.monthinfo ? this.monthinfo.lastyear : null
   }
 
-  get lastmonth () {
+  get lastmonth() {
     return this.monthinfo ? this.monthinfo.lastmonth : null
   }
 
-  get yearlen () {
+  get yearlen() {
     return this.yearinfo.yearlen
   }
 
-  get yearordinal () {
+  get yearordinal() {
     return this.yearinfo.yearordinal
   }
 
-  get mrange () {
+  get mrange() {
     return this.yearinfo.mrange
   }
 
-  get wdaymask () {
+  get wdaymask() {
     return this.yearinfo.wdaymask
   }
 
-  get mmask () {
+  get mmask() {
     return this.yearinfo.mmask
   }
 
-  get wnomask () {
+  get wnomask() {
     return this.yearinfo.wnomask
   }
 
-  get nwdaymask () {
+  get nwdaymask() {
     return this.monthinfo ? this.monthinfo.nwdaymask : []
   }
 
-  get nextyearlen () {
+  get nextyearlen() {
     return this.yearinfo.nextyearlen
   }
 
-  get mdaymask () {
+  get mdaymask() {
     return this.yearinfo.mdaymask
   }
 
-  get nmdaymask () {
+  get nmdaymask() {
     return this.yearinfo.nmdaymask
   }
 
-  ydayset () {
+  ydayset() {
     return [range(this.yearlen), 0, this.yearlen]
   }
 
-  mdayset (_: any, month: number, __: any) {
+  mdayset(_: unknown, month: number) {
     const start = this.mrange[month - 1]
     const end = this.mrange[month]
     const set = repeat<number | null>(null, this.yearlen)
@@ -107,12 +108,10 @@ export default class Iterinfo {
     return [set, start, end]
   }
 
-  wdayset (year: number, month: number, day: number) {
+  wdayset(year: number, month: number, day: number) {
     // We need to handle cross-year weeks here.
     const set = repeat<number | null>(null, this.yearlen + 7)
-    let i =
-      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-      this.yearordinal
+    let i = toOrdinal(datetime(year, month, day)) - this.yearordinal
     const start = i
     for (let j = 0; j < 7; j++) {
       set[i] = i
@@ -122,52 +121,60 @@ export default class Iterinfo {
     return [set, start, i]
   }
 
-  ddayset (year: number, month: number, day: number) {
+  ddayset(year: number, month: number, day: number) {
     const set = repeat(null, this.yearlen) as (number | null)[]
-    const i =
-      dateutil.toOrdinal(new Date(Date.UTC(year, month - 1, day))) -
-      this.yearordinal
+    const i = toOrdinal(datetime(year, month, day)) - this.yearordinal
     set[i] = i
     return [set, i, i + 1]
   }
 
-  htimeset (hour: number, _: number, second: number, millisecond: number) {
+  htimeset(hour: number, _: number, second: number, millisecond: number) {
     let set: Time[] = []
-    this.options.byminute.forEach(minute => {
+    this.options.byminute.forEach((minute) => {
       set = set.concat(this.mtimeset(hour, minute, second, millisecond))
     })
-    dateutil.sort(set)
+    sort(set)
     return set
   }
 
-  mtimeset (hour: number, minute: number, _: number, millisecond: number) {
-    const set = this.options.bysecond.map(second =>
-      new Time(hour, minute, second, millisecond)
+  mtimeset(hour: number, minute: number, _: number, millisecond: number) {
+    const set = this.options.bysecond.map(
+      (second) => new Time(hour, minute, second, millisecond)
     )
 
-    dateutil.sort(set)
+    sort(set)
     return set
   }
 
-  stimeset (hour: number, minute: number, second: number, millisecond: number) {
+  stimeset(hour: number, minute: number, second: number, millisecond: number) {
     return [new Time(hour, minute, second, millisecond)]
   }
 
-  getdayset (freq: Frequency): (y: number, m: number, d: number) => DaySet {
+  getdayset(freq: Frequency): (y: number, m: number, d: number) => DaySet {
     switch (freq) {
-      case Frequency.YEARLY: return this.ydayset.bind(this)
-      case Frequency.MONTHLY: return this.mdayset.bind(this)
-      case Frequency.WEEKLY: return this.wdayset.bind(this)
-      case Frequency.DAILY: return this.ddayset.bind(this)
-      default: return this.ddayset.bind(this)
+      case Frequency.YEARLY:
+        return this.ydayset.bind(this)
+      case Frequency.MONTHLY:
+        return this.mdayset.bind(this)
+      case Frequency.WEEKLY:
+        return this.wdayset.bind(this)
+      case Frequency.DAILY:
+        return this.ddayset.bind(this)
+      default:
+        return this.ddayset.bind(this)
     }
   }
 
-  gettimeset (freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY): (h: number, m: number, s: number, ms: number) => Time[] {
+  gettimeset(
+    freq: Frequency.HOURLY | Frequency.MINUTELY | Frequency.SECONDLY
+  ): (h: number, m: number, s: number, ms: number) => Time[] {
     switch (freq) {
-      case Frequency.HOURLY: return this.htimeset.bind(this)
-      case Frequency.MINUTELY: return this.mtimeset.bind(this)
-      case Frequency.SECONDLY: return this.stimeset.bind(this)
+      case Frequency.HOURLY:
+        return this.htimeset.bind(this)
+      case Frequency.MINUTELY:
+        return this.mtimeset.bind(this)
+      case Frequency.SECONDLY:
+        return this.stimeset.bind(this)
     }
   }
 }

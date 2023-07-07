@@ -7,7 +7,10 @@ import { datetime } from './lib/utils'
 const texts = [
   ['Every day', 'RRULE:FREQ=DAILY'],
   ['Every day at 10, 12 and 17', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
-  ['Every week on Sunday at 10, 12 and 17', 'RRULE:FREQ=WEEKLY;BYDAY=SU;BYHOUR=10,12,17'],
+  [
+    'Every week on Sunday at 10, 12 and 17',
+    'RRULE:FREQ=WEEKLY;BYDAY=SU;BYHOUR=10,12,17',
+  ],
   ['Every week', 'RRULE:FREQ=WEEKLY'],
   ['Every hour', 'RRULE:FREQ=HOURLY'],
   ['Every 4 hours', 'RRULE:INTERVAL=4;FREQ=HOURLY'],

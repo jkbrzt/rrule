@@ -134,6 +134,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
         options.freq = RRule.WEEKLY
         if (ttr.nextSymbol()) {
           ON()
+          AT()
           F()
         }
         break

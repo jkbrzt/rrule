@@ -281,6 +281,10 @@ export default class ToText {
       } else if (this.byweekday) {
         this._byweekday()
       }
+
+      if (this.origOptions.byhour) {
+        this._byhour()
+      }
     }
   }
 

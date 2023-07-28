@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./dist/esm",
+    "baseUrl": "./src/",
     "outDir": "./dist/esm",
     "declaration": true,
     "declarationMap": true,

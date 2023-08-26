@@ -7,7 +7,7 @@
 [![js-standard-style][js-standard-image]][js-standard-url]
 [![Downloads][downloads-image]][downloads-url]
 [![Gitter][gitter-image]][gitter-url]
-[![codecov.io](http://codecov.io/github/jakubroztocil/rrule/coverage.svg?branch=master)](http://codecov.io/github/jakubroztocil/rrule?branch=master)
+[![codecov.io](http://codecov.io/github/jkbrzt/rrule/coverage.svg?branch=master)](http://codecov.io/github/jkbrzt/rrule?branch=master)
 
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](https://tools.ietf.org/html/rfc5545), with a few important
@@ -21,7 +21,7 @@ to natural language.
 
 ### Quick Start
 
-- [Demo app](http://jakubroztocil.github.io/rrule/)
+- [Demo app](http://jkbrzt.github.io/rrule/)
 - # For contributors and maintainers: the code for the demo app is only on `gh-pages` branch
 
 #### Client Side
@@ -32,8 +32,8 @@ $ yarn add rrule
 
 Alternatively, download manually:
 
-- [rrule.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
-- [rrule.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
+- [rrule.min.js](https://jkbrzt.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
+- [rrule.js](https://jkbrzt.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
 
 ```html
 <script src="rrule/dist/es5/rrule.min.js"></script>
@@ -820,20 +820,20 @@ $ yarn build
 #### Authors
 
 - [Jakub Roztocil](http://roztocil.co)
-  ([@jakubroztocil](http://twitter.com/jakubroztocil))
+  ([@jkbrzt](http://twitter.com/jkbrzt))
 - Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 - David Golightly ([@davigoli](http://twitter.com/davigoli))
 
 Python `dateutil` is written by [Gustavo
 Niemeyer](http://niemeyer.net).
 
-See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
+See [LICENCE](https://github.com/jkbrzt/rrule/blob/master/LICENCE) for
 more details.
 
 [npm-url]: https://npmjs.org/package/rrule
 [npm-image]: http://img.shields.io/npm/v/rrule.svg
-[ci-url]: https://github.com/jakubroztocil/rrule/actions
-[ci-image]: https://github.com/jakubroztocil/rrule/workflows/Node%20CI/badge.svg
+[ci-url]: https://github.com/jkbrzt/rrule/actions
+[ci-image]: https://github.com/jkbrzt/rrule/workflows/Node%20CI/badge.svg
 [downloads-url]: https://npmjs.org/package/rrule
 [downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
 [js-standard-url]: https://github.com/feross/standard

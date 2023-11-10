@@ -11,17 +11,13 @@ export const TEST_CTX = {
 
 const assertDatesEqual = function (
   actual: Date | Date[],
-  expected: Date | Date[],
-  msg?: string
+  expected: Date | Date[]
 ) {
-  msg = msg ? ' [' + msg + '] ' : ''
-
   if (!(actual instanceof Array)) actual = [actual]
   if (!(expected instanceof Array)) expected = [expected]
 
   if (expected.length > 1) {
     expect(actual).toHaveLength(expected.length)
-    msg = ' - '
   }
 
   for (let i = 0; i < expected.length; i++) {
@@ -133,7 +129,7 @@ export const testRecurring = function (
       const string2 = rrule2.toString()
       expect(str).toBe(string2)
       if (method === 'all') {
-        assertDatesEqual(rrule2.all(), expectedDates, 'fromString().all()')
+        assertDatesEqual(rrule2.all(), expectedDates)
       }
     }
 
@@ -171,8 +167,7 @@ export const testRecurring = function (
             expectedDates[expectedDates.length - 1],
             true
           ),
-          expectedDates,
-          'between, inc=true'
+          expectedDates
         )
 
         assertDatesEqual(
@@ -181,8 +176,7 @@ export const testRecurring = function (
             expectedDates[expectedDates.length - 1],
             false
           ),
-          expectedDates.slice(1, expectedDates.length - 1),
-          'between, inc=false'
+          expectedDates.slice(1, expectedDates.length - 1)
         )
       }
 
@@ -196,18 +190,12 @@ export const testRecurring = function (
           prev = expectedDates[i - 1]
 
           // Test after() and before() with inc=true.
-          assertDatesEqual(rule.after(date, true), date, 'after, inc=true')
-          assertDatesEqual(rule.before(date, true), date, 'before, inc=true')
+          assertDatesEqual(rule.after(date, true), date)
+          assertDatesEqual(rule.before(date, true), date)
 
           // Test after() and before() with inc=false.
-          next &&
-            assertDatesEqual(rule.after(date, false), next, 'after, inc=false')
-          prev &&
-            assertDatesEqual(
-              rule.before(date, false),
-              prev,
-              'before, inc=false'
-            )
+          next && assertDatesEqual(rule.after(date, false), next)
+          prev && assertDatesEqual(rule.before(date, false), prev)
         }
       }
     }

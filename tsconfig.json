@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/esm",
+    "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,
     "noImplicitAny": true,
@@ -12,8 +12,7 @@
     "jsx": "react",
     "strictNullChecks": true,
     "importHelpers": true,
-    "rootDirs": ["./src/", "./test/", "./demo/"]
+    "rootDirs": ["./"]
   },
-  "include": ["./src/**/*", "./demo/**/*"],
-  "exclude": ["node_modules", "./test/**/*"]
+  "exclude": ["node_modules", "dist"]
 }

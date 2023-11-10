@@ -1,29 +1,36 @@
-import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
-import { expect } from 'chai'
+import {
+  parse,
+  datetime,
+  testRecurring,
+  expectedDate,
+  TEST_CTX,
+} from './lib/utils'
 import { RRule, rrulestr, Frequency } from '../src/index'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRule', function () {
-  // Enable additional toString() / fromString() tests
-  // for each testRecurring().
-  this.ctx.ALSO_TEST_STRING_FUNCTIONS = true
+  beforeAll(() => {
+    // Enable additional toString() / fromString() tests
+    // for each testRecurring().
+    TEST_CTX.ALSO_TESTSTRING_FUNCTIONS = true
 
-  // Enable additional toText() / fromText() tests
-  // for each testRecurring().
-  // Many of the tests fail because the conversion is only approximate,
-  // but it gives an idea about how well or bad it converts.
-  this.ctx.ALSO_TEST_NLP_FUNCTIONS = false
+    // Enable additional toText() / fromText() tests
+    // for each testRecurring().
+    // Many of the tests fail because the conversion is only approximate,
+    // but it gives an idea about how well or bad it converts.
+    TEST_CTX.ALSO_TESTNLP_FUNCTIONS = false
 
-  // Thorough after()/before()/between() tests.
-  // NOTE: can take a longer time.
-  this.ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN = true
+    // Thorough after()/before()/between() tests.
+    // NOTE: can take a longer time.
+    TEST_CTX.ALSO_TESTBEFORE_AFTER_BETWEEN = true
 
-  this.ctx.ALSO_TEST_SUBSECOND_PRECISION = true
+    TEST_CTX.ALSO_TESTSUBSECOND_PRECISION = true
+  })
 
   it('rrulestr https://github.com/jkbrzt/rrule/pull/164', function () {
     const s1 = 'RRULE:FREQ=WEEKLY;WKST=WE'
     const s2 = rrulestr(s1).toString()
-    expect(s1).equals(s2, s1 + ' => ' + s2)
+    expect(s1).toBe(s2)
   })
 
   it('rrulestr itteration not infinite when interval 0', function () {
@@ -34,7 +41,7 @@ describe('RRule', function () {
       'FREQ=HOURLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
       'FREQ=MINUTELY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
       'FREQ=SECONDLY;INTERVAL=0;BYSETPOS=1;BYDAY=MO',
-    ].map((s) => expect(rrulestr(s).count()).to.equal(0))
+    ].map((s) => expect(rrulestr(s).count()).toBe(0))
   })
 
   it('does not mutate the passed-in options object', function () {
@@ -46,13 +53,13 @@ describe('RRule', function () {
     }
     const rule = new RRule(options)
 
-    expect(options).deep.equals({
+    expect(options).toEqual({
       freq: RRule.MONTHLY,
       dtstart: new Date(2013, 0, 1),
       count: 3,
       bymonthday: [28],
     })
-    expect(rule.origOptions).deep.equals(options)
+    expect(rule.origOptions).toEqual(options)
   })
 
   testRecurring(
@@ -3977,18 +3984,12 @@ describe('RRule', function () {
         dtstart: date,
       })
 
-      expect(date.getTime()).equals(
-        rr.options.dtstart.getTime(),
-        'the supplied dtstart differs from RRule.options.dtstart'
-      )
+      expect(date.getTime()).toBe(rr.options.dtstart.getTime())
       const res: Date = rr.before(rr.after(rr.options.dtstart))
 
       let resTimestamp: number
       if (res != null) resTimestamp = res.getTime()
-      expect(resTimestamp).equals(
-        rr.options.dtstart.getTime(),
-        'after dtstart , followed by before does not return dtstart'
-      )
+      expect(resTimestamp).toBe(rr.options.dtstart.getTime())
     })
   })
 
@@ -4016,11 +4017,11 @@ describe('RRule', function () {
       })
 
       const rrstr = rr.toString()
-      expect(rrstr).equals(
+      expect(rrstr).toBe(
         'DTSTART:20171017T003000Z\nRRULE:UNTIL=20171222T013000Z;FREQ=MONTHLY;INTERVAL=1;BYSETPOS=17;BYDAY=SU,MO,TU,WE,TH,FR,SA;WKST=SU;BYHOUR=11;BYMINUTE=0;BYSECOND=0'
       )
       const newrr = RRule.fromString(rrstr)
-      expect(rrstr).equals(newrr.toString())
+      expect(rrstr).toBe(newrr.toString())
     })
   })
 
@@ -4037,7 +4038,7 @@ describe('RRule', function () {
     ].forEach(function (pair) {
       const rule = pair[0]
       const rr = RRule.fromString(rule)
-      expect(rr.toText()).to.be.ok
+      expect(rr.toText()).toBeTruthy()
       // assert.equal(rr.toText(), pair[1]) -- can't test this because it reports in local time which varies by machine
     })
   })
@@ -4046,7 +4047,7 @@ describe('RRule', function () {
     const rrule = RRule.fromString(
       'DTSTART=20181101T110000Z;UNTIL=20181106T110000Z;FREQ=DAILY'
     )
-    expect(rrule.all()).to.deep.equal([
+    expect(rrule.all()).toEqual([
       new Date('2018-11-01T11:00:00.000Z'),
       new Date('2018-11-02T11:00:00.000Z'),
       new Date('2018-11-03T11:00:00.000Z'),
@@ -4060,7 +4061,7 @@ describe('RRule', function () {
     const rrule = RRule.fromString(
       'DTSTART=20181031T180000Z\nRRULE:FREQ=WEEKLY;UNTIL=20181115T050000Z'
     )
-    expect(rrule.all()).to.deep.equal([
+    expect(rrule.all()).toEqual([
       new Date('2018-10-31T18:00:00.000Z'),
       new Date('2018-11-07T18:00:00.000Z'),
       new Date('2018-11-14T18:00:00.000Z'),
@@ -4076,7 +4077,7 @@ describe('RRule', function () {
       until: datetime(2018, 10, 9, 0, 0, 0),
     })
 
-    expect(rule.all()).to.deep.equal([
+    expect(rule.all()).toEqual([
       new Date('2018-09-30T00:00:00.000Z'),
       new Date('2018-10-03T00:00:00.000Z'),
       new Date('2018-10-07T00:00:00.000Z'),
@@ -4094,7 +4095,7 @@ describe('RRule', function () {
       until: new Date(endSearch),
     })
 
-    expect(rrule.all()).to.deep.equal([
+    expect(rrule.all()).toEqual([
       new Date('2018-08-10T10:00:00.000Z'),
       new Date('2018-08-17T10:00:00.000Z'),
       new Date('2018-08-24T10:00:00.000Z'),
@@ -4126,7 +4127,7 @@ describe('RRule', function () {
       until: end,
     })
 
-    expect(rrule.all()).to.deep.equal([
+    expect(rrule.all()).toEqual([
       new Date('2018-08-06T05:00:00.000Z'),
       new Date('2018-09-06T05:00:00.000Z'),
       new Date('2018-10-06T05:00:00.000Z'),
@@ -4138,7 +4139,7 @@ describe('RRule', function () {
       'DTSTART:20181101T120000Z\nRRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;COUNT=4;WKST=SU'
     const rrule = RRule.fromString(ruleString)
 
-    expect(rrule.all()).to.deep.equal([
+    expect(rrule.all()).toEqual([
       new Date('2018-11-02T12:00:00.000Z'),
       new Date('2018-11-05T12:00:00.000Z'),
       new Date('2018-11-07T12:00:00.000Z'),
@@ -4154,9 +4155,9 @@ describe('RRule', function () {
     const ruleString = rrule.toString()
     const rrule2 = RRule.fromString(ruleString)
 
-    expect(ruleString).to.equal('DTSTART:09900101T000000Z\nRRULE:COUNT=1')
-    expect(rrule2.count()).to.equal(1)
-    expect(rrule2.all()).to.deep.equal([datetime(990, 1, 1, 0, 0, 0)])
+    expect(ruleString).toBe('DTSTART:09900101T000000Z\nRRULE:COUNT=1')
+    expect(rrule2.count()).toBe(1)
+    expect(rrule2.all()).toEqual([datetime(990, 1, 1, 0, 0, 0)])
   })
 
   describe('time zones, when recurrence is in dst', () => {
@@ -4176,7 +4177,7 @@ describe('RRule', function () {
       const recurrence = rule.all()[0]
       const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
-      expect(recurrence).to.deep.equal(expected)
+      expect(recurrence).toEqual(expected)
 
       resetMockDate()
     })
@@ -4193,7 +4194,7 @@ describe('RRule', function () {
       const recurrence = rule.all()[0]
       const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
-      expect(recurrence).to.deep.equal(expected)
+      expect(recurrence).toEqual(expected)
 
       resetMockDate()
     })
@@ -4210,7 +4211,7 @@ describe('RRule', function () {
       const recurrence = rule.after(new Date(0))
       const expected = expectedDate(startDate, currentLocalDate, targetZone)
 
-      expect(recurrence).to.deep.equal(expected)
+      expect(recurrence).toEqual(expected)
 
       resetMockDate()
     })
@@ -4219,12 +4220,12 @@ describe('RRule', function () {
   it('throws an error when dtstart is invalid', () => {
     const invalidDate = new Date(undefined)
     const validDate = datetime(2017, 1, 1)
-    expect(() => new RRule({ dtstart: invalidDate })).to.throw(
+    expect(() => new RRule({ dtstart: invalidDate })).toThrow(
       'Invalid options: dtstart'
     )
-    expect(
-      () => new RRule({ dtstart: validDate, until: invalidDate })
-    ).to.throw('Invalid options: until')
+    expect(() => new RRule({ dtstart: validDate, until: invalidDate })).toThrow(
+      'Invalid options: until'
+    )
 
     const rule = new RRule({
       dtstart: datetime(2017, 1, 1),
@@ -4232,16 +4233,16 @@ describe('RRule', function () {
       interval: 1,
     })
 
-    expect(() => rule.after(invalidDate)).to.throw(
+    expect(() => rule.after(invalidDate)).toThrow(
       'Invalid date passed in to RRule.after'
     )
-    expect(() => rule.before(invalidDate)).to.throw(
+    expect(() => rule.before(invalidDate)).toThrow(
       'Invalid date passed in to RRule.before'
     )
-    expect(() => rule.between(invalidDate, validDate)).to.throw(
+    expect(() => rule.between(invalidDate, validDate)).toThrow(
       'Invalid date passed in to RRule.between'
     )
-    expect(() => rule.between(validDate, invalidDate)).to.throw(
+    expect(() => rule.between(validDate, invalidDate)).toThrow(
       'Invalid date passed in to RRule.between'
     )
   })

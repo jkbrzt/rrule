@@ -1,37 +1,40 @@
-import { parse, datetime, testRecurring } from './lib/utils'
+import { parse, datetime, testRecurring, TEST_CTX } from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
-import { expect } from 'chai'
 import { Days } from '../src/rrule'
 import { parseInput } from '../src/rrulestr'
 
 describe('rrulestr', function () {
-  // Enable additional toString() / fromString() tests
-  // for each testRecurring().
-  this.ctx.ALSO_TEST_STRING_FUNCTIONS = false
+  beforeAll(() => {
+    // Enable additional toString() / fromString() tests
+    // for each testRecurring().
+    TEST_CTX.ALSO_TESTSTRING_FUNCTIONS = false
 
-  // Enable additional toText() / fromText() tests
-  // for each testRecurring().
-  // Many of the tests fail because the conversion is only approximate,
-  // but it gives an idea about how well or bad it converts.
-  this.ctx.ALSO_TEST_NLP_FUNCTIONS = false
+    // Enable additional toText() / fromText() tests
+    // for each testRecurring().
+    // Many of the tests fail because the conversion is only approximate,
+    // but it gives an idea about how well or bad it converts.
+    TEST_CTX.ALSO_TESTNLP_FUNCTIONS = false
 
-  // Thorough after()/before()/between() tests.
-  // NOTE: can take a longer time.
-  this.ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN = true
+    // Thorough after()/before()/between() tests.
+    // NOTE: can take a longer time.
+    TEST_CTX.ALSO_TESTBEFORE_AFTER_BETWEEN = true
+
+    TEST_CTX.ALSO_TESTSUBSECOND_PRECISION = false
+  })
 
   it('parses an rrule', () => {
     expect(
       rrulestr('DTSTART:19970902T090000Z\n' + 'RRULE:FREQ=YEARLY;COUNT=3\n')
-    ).to.be.instanceof(RRule)
+    ).toBeInstanceOf(RRule)
   })
 
   it('parses an rrule without frequency', () => {
     const rRuleString = 'DTSTART:19970902T090000Z'
     const parsedRRuleSet = rrulestr(rRuleString, { forceset: true }) as RRuleSet
-    expect(parsedRRuleSet.toString()).to.be.equal(rRuleString)
+    expect(parsedRRuleSet.toString()).toBe(rRuleString)
 
     const parsedRRule = rrulestr(rRuleString) as RRule
-    expect(parsedRRule.toString()).to.be.equal(rRuleString)
+    expect(parsedRRule.toString()).toBe(rRuleString)
   })
 
   it('parses an rruleset when forceset=true', () => {
@@ -39,7 +42,7 @@ describe('rrulestr', function () {
       rrulestr('DTSTART:19970902T090000Z\n' + 'RRULE:FREQ=YEARLY;COUNT=3\n', {
         forceset: true,
       })
-    ).to.be.instanceof(RRuleSet)
+    ).toBeInstanceOf(RRuleSet)
   })
 
   it('parses an rruleset when there are multiple rrules', () => {
@@ -49,7 +52,7 @@ describe('rrulestr', function () {
           'RRULE:FREQ=YEARLY;COUNT=2;BYDAY=TU\n' +
           'RRULE:FREQ=YEARLY;COUNT=1;BYDAY=TH\n'
       )
-    ).to.be.instanceof(RRuleSet)
+    ).toBeInstanceOf(RRuleSet)
   })
 
   testRecurring(
@@ -274,7 +277,7 @@ describe('rrulestr', function () {
   it('parses without TZID', () => {
     const rrule = rrulestr('DTSTART:19970902T090000\nRRULE:FREQ=WEEKLY')
 
-    expect(rrule.origOptions).to.deep.include({
+    expect(rrule.origOptions).toMatchObject({
       freq: Frequency.WEEKLY,
       dtstart: datetime(1997, 9, 2, 9, 0, 0),
     })
@@ -286,7 +289,7 @@ describe('rrulestr', function () {
         'RRULE:FREQ=DAILY;UNTIL=19980902T090000'
     )
 
-    expect(rrule.origOptions).to.deep.include({
+    expect(rrule.origOptions).toMatchObject({
       tzid: 'America/New_York',
       freq: Frequency.DAILY,
       dtstart: datetime(1997, 9, 2, 9, 0, 0),
@@ -299,7 +302,7 @@ describe('rrulestr', function () {
       'RRULE:UNTIL=19990404T110000Z;DTSTART=19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'
     )
 
-    expect(rrule.options).to.deep.include({
+    expect(rrule.options).toMatchObject({
       until: datetime(1999, 4, 4, 11, 0, 0),
       dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
@@ -312,7 +315,7 @@ describe('rrulestr', function () {
       'RRULE:UNTIL=19990404T110000Z;DTSTART;TZID=America/New_York:19990104T110000Z;FREQ=WEEKLY;BYDAY=TU,WE'
     )
 
-    expect(rrule.options).to.deep.include({
+    expect(rrule.options).toMatchObject({
       until: datetime(1999, 4, 4, 11, 0, 0),
       dtstart: datetime(1999, 1, 4, 11, 0, 0),
       freq: Frequency.WEEKLY,
@@ -326,7 +329,7 @@ describe('rrulestr', function () {
       'RRULE:DTSTART;TZID=America/Los_Angeles:20180719T111500;FREQ=DAILY;INTERVAL=1'
     )
 
-    expect(rrule.options).to.deep.include({
+    expect(rrule.options).toMatchObject({
       dtstart: datetime(2018, 7, 19, 11, 15, 0),
       freq: Frequency.DAILY,
       interval: 1,
@@ -342,7 +345,7 @@ describe('rrulestr', function () {
         'EXDATE:20180721T111500Z'
     ) as RRuleSet
 
-    expect(rruleset.valueOf()).to.deep.equal([
+    expect(rruleset.valueOf()).toEqual([
       'DTSTART:20180719T111500Z',
       'RRULE:FREQ=DAILY;INTERVAL=1',
       'RDATE:20180720T111500Z',
@@ -358,7 +361,7 @@ describe('rrulestr', function () {
         'EXDATE;TZID=America/Los_Angeles:20180721T111500'
     ) as RRuleSet
 
-    expect(rruleset.valueOf()).to.deep.equal([
+    expect(rruleset.valueOf()).toEqual([
       'DTSTART;TZID=America/Los_Angeles:20180719T111500',
       'RRULE:FREQ=DAILY;INTERVAL=1',
       'RDATE;TZID=America/Los_Angeles:20180720T111500',
@@ -378,7 +381,7 @@ describe('parseInput', () => {
         'EXRULE:FREQ=WEEKLY;INTERVAL=2\n',
       {}
     )
-    expect(output).to.deep.include({
+    expect(output).toMatchObject({
       dtstart: datetime(1997, 9, 2, 9, 0, 0),
       tzid: 'America/New_York',
       rrulevals: [

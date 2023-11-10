@@ -1,5 +1,4 @@
 import { RRule } from '../src/rrule'
-import { expect } from 'chai'
 import { parseString } from '../src/parsestring'
 import { Options, Frequency } from '../src/types'
 import { datetime } from './lib/utils'
@@ -36,7 +35,8 @@ describe('parseString', () => {
     expectations.forEach(function (item) {
       const s = item[0]
       const s2 = item[1]
-      expect(parseString(s), s).to.deep.equal(s2)
+      // s
+      expect(parseString(s)).toEqual(s2)
     })
   })
 
@@ -64,7 +64,8 @@ describe('parseString', () => {
     expectations.forEach(function (item) {
       const s = item[0]
       const s2 = item[1]
-      expect(parseString(s), s).to.deep.equal(s2)
+      // s
+      expect(parseString(s)).toEqual(s2)
     })
   })
 
@@ -83,7 +84,8 @@ describe('parseString', () => {
     expectations.forEach(function (item) {
       const s = item[0]
       const s2 = item[1]
-      expect(parseString(s), s).to.deep.equal(s2)
+      // s
+      expect(parseString(s)).toEqual(s2)
     })
   })
 })

@@ -1,34 +1,29 @@
-import { expect } from 'chai'
-import { ExclusiveTestFunction, TestFunction } from 'mocha'
 export { datetime } from '../../src/dateutil'
 import { dateInTimeZone, datetime } from '../../src/dateutil'
 import { RRule, RRuleSet } from '../../src'
 
+export const TEST_CTX = {
+  ALSO_TESTSTRING_FUNCTIONS: false,
+  ALSO_TESTNLP_FUNCTIONS: false,
+  ALSO_TESTBEFORE_AFTER_BETWEEN: false,
+  ALSO_TESTSUBSECOND_PRECISION: false,
+}
+
 const assertDatesEqual = function (
   actual: Date | Date[],
-  expected: Date | Date[],
-  msg?: string
+  expected: Date | Date[]
 ) {
-  msg = msg ? ' [' + msg + '] ' : ''
-
   if (!(actual instanceof Array)) actual = [actual]
   if (!(expected instanceof Array)) expected = [expected]
 
   if (expected.length > 1) {
-    expect(actual).to.have.length(
-      expected.length,
-      msg + 'number of recurrences'
-    )
-    msg = ' - '
+    expect(actual).toHaveLength(expected.length)
   }
 
   for (let i = 0; i < expected.length; i++) {
     const act = actual[i]
     const exp = expected[i]
-    expect(exp instanceof Date ? exp.toString() : exp).to.equal(
-      act.toString(),
-      msg + (i + 1) + '/' + expected.length
-    )
+    expect(exp instanceof Date ? exp.toString() : exp).toBe(act.toString())
   }
 }
 
@@ -67,7 +62,7 @@ export const testRecurring = function (
   msg: string,
   testObj: TestObj | RRule | (() => TestObj),
   expectedDates: Date | Date[],
-  itFunc: TestFunction | ExclusiveTestFunction = it
+  itFunc: jest.Func = it
 ) {
   let rule: RRule
   let method: 'all' | 'before' | 'between' | 'after'
@@ -104,7 +99,6 @@ export const testRecurring = function (
   }
 
   itFunc(msg, function () {
-    const ctx = this.test.ctx
     let time = Date.now()
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -112,10 +106,7 @@ export const testRecurring = function (
     time = Date.now() - time
 
     const maxTestDuration = 200
-    expect(time).to.be.lessThan(
-      maxTestDuration,
-      `${rule}' method "${method}" should finish in ${maxTestDuration} ms, but took ${time} ms`
-    )
+    expect(time).toBeLessThan(maxTestDuration)
 
     if (!(actualDates instanceof Array)) actualDates = [actualDates]
     if (!(expectedDates instanceof Array)) expectedDates = [expectedDates]
@@ -125,28 +116,25 @@ export const testRecurring = function (
     // Additional tests using the expected dates
     // ==========================================================
 
-    if (ctx.ALSO_TEST_SUBSECOND_PRECISION) {
-      expect(actualDates.map(extractTime)).to.deep.equal(
+    if (TEST_CTX.ALSO_TESTSUBSECOND_PRECISION) {
+      expect(actualDates.map(extractTime)).toEqual(
         expectedDates.map(extractTime)
       )
     }
 
-    if (ctx.ALSO_TEST_STRING_FUNCTIONS) {
+    if (TEST_CTX.ALSO_TESTSTRING_FUNCTIONS) {
       // Test toString()/fromString()
       const str = rule.toString()
       const rrule2 = RRule.fromString(str)
       const string2 = rrule2.toString()
-      expect(str).to.equal(
-        string2,
-        'toString() == fromString(toString()).toString()'
-      )
+      expect(str).toBe(string2)
       if (method === 'all') {
-        assertDatesEqual(rrule2.all(), expectedDates, 'fromString().all()')
+        assertDatesEqual(rrule2.all(), expectedDates)
       }
     }
 
     if (
-      ctx.ALSO_TEST_NLP_FUNCTIONS &&
+      TEST_CTX.ALSO_TESTNLP_FUNCTIONS &&
       rule.isFullyConvertibleToText &&
       rule.isFullyConvertibleToText()
     ) {
@@ -157,19 +145,16 @@ export const testRecurring = function (
       // @ts-ignore
       const rrule2 = RRule.fromText(text, rule.options.dtstart)
       const text2 = rrule2.toText()
-      expect(text2).to.equal(text, 'toText() == fromText(toText()).toText()')
+      expect(text2).toBe(text)
 
       // Test fromText()/toString().
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const rrule3 = RRule.fromText(text, rule.options.dtstart)
-      expect(rrule3.toString()).to.equal(
-        str,
-        'toString() == fromText(toText()).toString()'
-      )
+      expect(rrule3.toString()).toBe(str)
     }
 
-    if (method === 'all' && ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN) {
+    if (method === 'all' && TEST_CTX.ALSO_TESTBEFORE_AFTER_BETWEEN) {
       // Test before, after, and between - use the expected dates.
       // create a clean copy of the rrule object to bypass caching
       rule = rule.clone()
@@ -182,8 +167,7 @@ export const testRecurring = function (
             expectedDates[expectedDates.length - 1],
             true
           ),
-          expectedDates,
-          'between, inc=true'
+          expectedDates
         )
 
         assertDatesEqual(
@@ -192,8 +176,7 @@ export const testRecurring = function (
             expectedDates[expectedDates.length - 1],
             false
           ),
-          expectedDates.slice(1, expectedDates.length - 1),
-          'between, inc=false'
+          expectedDates.slice(1, expectedDates.length - 1)
         )
       }
 
@@ -207,18 +190,12 @@ export const testRecurring = function (
           prev = expectedDates[i - 1]
 
           // Test after() and before() with inc=true.
-          assertDatesEqual(rule.after(date, true), date, 'after, inc=true')
-          assertDatesEqual(rule.before(date, true), date, 'before, inc=true')
+          assertDatesEqual(rule.after(date, true), date)
+          assertDatesEqual(rule.before(date, true), date)
 
           // Test after() and before() with inc=false.
-          next &&
-            assertDatesEqual(rule.after(date, false), next, 'after, inc=false')
-          prev &&
-            assertDatesEqual(
-              rule.before(date, false),
-              prev,
-              'before, inc=false'
-            )
+          next && assertDatesEqual(rule.after(date, false), next)
+          prev && assertDatesEqual(rule.before(date, false), prev)
         }
       }
     }
@@ -229,9 +206,9 @@ testRecurring.only = function (...args) {
   testRecurring.apply(it, [...args, it.only])
 }
 
-testRecurring.skip = function () {
-  // eslint-disable-next-line prefer-spread, prefer-rest-params
-  it.skip.apply(it, arguments)
+testRecurring.skip = function ([description]: [string]) {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function, no-empty-function
+  it.skip(description, () => {})
 }
 
 export function expectedDate(

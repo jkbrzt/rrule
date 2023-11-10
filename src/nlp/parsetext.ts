@@ -126,6 +126,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
         options.freq = RRule.WEEKLY
         options.byweekday = [RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR]
         ttr.nextSymbol()
+        AT()
         F()
         break
 
@@ -133,6 +134,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
         options.freq = RRule.WEEKLY
         if (ttr.nextSymbol()) {
           ON()
+          AT()
           F()
         }
         break
@@ -198,6 +200,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
           options.byweekday.push(RRule[wkd] as ByWeekday)
           ttr.nextSymbol()
         }
+        AT()
         MDAYs()
         F()
         break

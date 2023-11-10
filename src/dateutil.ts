@@ -86,10 +86,12 @@ export const tzOffset = function (date: Date) {
 export const daysBetween = function (date1: Date, date2: Date) {
   // The number of milliseconds in one day
   // Convert both dates to milliseconds
-  const date1ms = date1.getTime() - tzOffset(date1)
-  const date2ms = date2.getTime() - tzOffset(date2)
+  const date1ms = date1.getTime()
+  const date2ms = date2.getTime()
+
   // Calculate the difference in milliseconds
   const differencems = date1ms - date2ms
+
   // Convert back to days and return
   return Math.round(differencems / ONE_DAY)
 }

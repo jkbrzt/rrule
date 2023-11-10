@@ -1,5 +1,15 @@
 ### Changelog
 
+- 2.8.0 (2023-11-10)
+
+  - Bugfixes:
+    - Don't minify `rrule.js` (minified version is still at `rrule.min.js`) ([#606](https://github.com/jkbrzt/rrule/pull/606))
+    - Ignore tzid in NLP ([#528](https://github.com/jkbrzt/rrule/pull/528))
+    - Remove unnecessary offset in daysBetween() ([#539](https://github.com/jkbrzt/rrule/pull/539))
+  - Convert test suite from mocha to jest ([#605](https://github.com/jkbrzt/rrule/pull/605))
+  - Export `ALL_WEEKDAYS` ([#591](https://github.com/jkbrzt/rrule/pull/591))
+  - Support weekly by hour texts ([#590](https://github.com/jkbrzt/rrule/pull/590))
+
 - 2.7.2 (2023-02-10)
 
   - Bugfixes:

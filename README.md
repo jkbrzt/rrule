@@ -30,15 +30,6 @@ to natural language.
 $ yarn add rrule
 ```
 
-Alternatively, download manually:
-
-- [rrule.min.js](https://jkbrzt.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
-- [rrule.js](https://jkbrzt.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
-
-```html
-<script src="rrule/dist/es5/rrule.min.js"></script>
-```
-
 #### Server Side
 
 Includes optional TypeScript types

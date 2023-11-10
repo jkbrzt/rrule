@@ -203,3 +203,20 @@ export const untilStringToDate = function (until: string) {
     )
   )
 }
+
+const dateTZtoISO8601 = function (date: Date, timeZone: string) {
+  // date format for sv-SE is almost ISO8601
+  const dateStr = date.toLocaleString('sv-SE', { timeZone })
+  // '2023-02-07 10:41:36'
+  return dateStr.replace(' ', 'T') + 'Z'
+}
+
+export const dateInTimeZone = function (date: Date, timeZone: string) {
+  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  // Date constructor can only reliably parse dates in ISO8601 format
+  const dateInLocalTZ = new Date(dateTZtoISO8601(date, localTimeZone))
+  const dateInTargetTZ = new Date(dateTZtoISO8601(date, timeZone ?? 'UTC'))
+  const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
+
+  return new Date(date.getTime() - tzOffset)
+}

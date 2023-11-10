@@ -3,8 +3,8 @@ import { Weekday, WeekdayStr } from './weekday'
 export interface QueryMethods {
   all(): Date[]
   between(after: Date, before: Date, inc: boolean): Date[]
-  before(date: Date, inc: boolean): Date
-  after(date: Date, inc: boolean): Date
+  before(date: Date, inc: boolean): Date | null
+  after(date: Date, inc: boolean): Date | null
 }
 
 export type QueryMethodTypes = keyof QueryMethods

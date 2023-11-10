@@ -21,6 +21,7 @@
   },
   "scripts": {
     "prebuild": "yarn clean",
+    "prepublish": "yarn build",
     "build": "yarn lint && yarn format-check && tsc -b tsconfig.build.json && webpack && tsc dist/esm/**/*.d.ts",
     "clean": "rm -rf dist/",
     "lint": "yarn eslint . --fix --config .eslintrc.js",

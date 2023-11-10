@@ -1,5 +1,6 @@
 const path = require('path')
 const TerserPlugin = require('terser-webpack-plugin')
+const UnminifiedWebpackPlugin = require('unminified-webpack-plugin')
 
 const paths = {
   source: path.resolve(__dirname, 'src'),
@@ -8,7 +9,7 @@ const paths = {
 
 const commonConfig = {
   output: {
-    filename: '[name].js',
+    filename: '[name].min.js',
     path: paths.es5,
     library: 'rrule',
     libraryTarget: 'umd',
@@ -35,13 +36,13 @@ const commonConfig = {
     minimize: true,
     minimizer: [new TerserPlugin()],
   },
+  plugins: [new UnminifiedWebpackPlugin()],
 }
 
 const rruleConfig = Object.assign(
   {
     entry: {
       rrule: path.join(paths.source, 'index.ts'),
-      'rrule.min': path.join(paths.source, 'index.ts'),
     },
   },
   commonConfig

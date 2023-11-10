@@ -34,7 +34,10 @@ const texts = [
 
 const toTexts = [
   ...texts,
-  ['Every week on monday', 'DTSTART;TZID=America/New_York:20220601T000000\nRRULE:INTERVAL=1;FREQ=WEEKLY;BYDAY=MO'],
+  [
+    'Every week on monday',
+    'DTSTART;TZID=America/New_York:20220601T000000\nRRULE:INTERVAL=1;FREQ=WEEKLY;BYDAY=MO',
+  ],
 ]
 
 describe('NLP', () => {

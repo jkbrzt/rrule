@@ -1,7 +1,6 @@
 import { Options } from '../src/types'
 import { RRule } from '../src/rrule'
 import { optionsToString } from '../src/optionstostring'
-import { expect } from 'chai'
 import { datetime } from './lib/utils'
 
 describe('optionsToString', () => {
@@ -38,7 +37,8 @@ describe('optionsToString', () => {
     expectations.forEach(function (item) {
       const s = item[0]
       const s2 = item[1]
-      expect(optionsToString(s), JSON.stringify(s)).to.deep.equal(s2)
+      // JSON.stringify(s)
+      expect(optionsToString(s)).toEqual(s2)
     })
   })
 })

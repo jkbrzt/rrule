@@ -1,16 +1,31 @@
-import { parse, datetime, testRecurring, expectedDate } from './lib/utils'
+import {
+  parse,
+  datetime,
+  testRecurring,
+  expectedDate,
+  TEST_CTX,
+} from './lib/utils'
 import { RRule, RRuleSet, rrulestr, Frequency } from '../src'
-import { expect } from 'chai'
 import { set as setMockDate, reset as resetMockDate } from 'mockdate'
 
 describe('RRuleSet', function () {
-  // Enable additional toString() / fromString() tests
-  // for each testRecurring().
-  // this.ctx.ALSO_TEST_STRING_FUNCTIONS = false
+  beforeAll(() => {
+    // Enable additional toString() / fromString() tests
+    // for each testRecurring().
+    TEST_CTX.ALSO_TESTSTRING_FUNCTIONS = false
 
-  // Thorough after()/before()/between() tests.
-  // NOTE: can take a longer time.
-  this.ctx.ALSO_TEST_BEFORE_AFTER_BETWEEN = true
+    // Enable additional toText() / fromText() tests
+    // for each testRecurring().
+    // Many of the tests fail because the conversion is only approximate,
+    // but it gives an idea about how well or bad it converts.
+    TEST_CTX.ALSO_TESTNLP_FUNCTIONS = false
+
+    // Thorough after()/before()/between() tests.
+    // NOTE: can take a longer time.
+    TEST_CTX.ALSO_TESTBEFORE_AFTER_BETWEEN = false
+
+    TEST_CTX.ALSO_TESTSUBSECOND_PRECISION = false
+  })
 
   testRecurring(
     'testSet',
@@ -410,7 +425,7 @@ describe('RRuleSet', function () {
         })
       )
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'DTSTART:19600101T090000Z',
         'RRULE:FREQ=YEARLY;COUNT=2',
       ])
@@ -434,7 +449,7 @@ describe('RRuleSet', function () {
         })
       )
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'DTSTART:19600101T090000Z',
         'RRULE:FREQ=YEARLY;COUNT=2',
         'RRULE:FREQ=WEEKLY;COUNT=3',
@@ -460,7 +475,7 @@ describe('RRuleSet', function () {
         })
       )
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'DTSTART;TZID=America/New_York:19600101T090000',
         'RRULE:FREQ=YEARLY;COUNT=2',
         'RRULE:FREQ=WEEKLY;COUNT=3',
@@ -483,7 +498,7 @@ describe('RRuleSet', function () {
 
       set.rdate(parse('19610301T090000'))
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'DTSTART;TZID=America/New_York:19600101T090000',
         'RRULE:FREQ=YEARLY;COUNT=2',
         'RDATE;TZID=America/New_York:19610201T090000,19610301T090000',
@@ -499,7 +514,7 @@ describe('RRuleSet', function () {
 
       set.rdate(parse('19610301T090000'))
 
-      expect(set.toString()).to.deep.equal(
+      expect(set.toString()).toEqual(
         'RDATE;TZID=America/New_York:19610201T090000,19610301T090000'
       )
     })
@@ -513,17 +528,15 @@ describe('RRuleSet', function () {
 
       set.rdate(parse('19610301T090000'))
 
-      expect(set.toString()).to.deep.equal(
-        'RDATE:19610201T090000Z,19610301T090000Z'
-      )
+      expect(set.toString()).toEqual('RDATE:19610201T090000Z,19610301T090000Z')
     })
 
     it('parses RDATE strings without an RRULE', () => {
       const set = rrulestr(
         'RDATE;TZID=America/New_York:19610201T090000,19610301T090000'
       ) as RRuleSet
-      expect(set).to.be.instanceof(RRuleSet)
-      expect(set.tzid()).to.equal('America/New_York')
+      expect(set).toBeInstanceOf(RRuleSet)
+      expect(set.tzid()).toBe('America/New_York')
     })
 
     it('generates EXDATE with tzid', () => {
@@ -542,7 +555,7 @@ describe('RRuleSet', function () {
 
       set.exdate(parse('19610301T090000'))
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'DTSTART;TZID=America/New_York:19600101T090000',
         'RRULE:FREQ=YEARLY;COUNT=2',
         'EXDATE;TZID=America/New_York:19610201T090000,19610301T090000',
@@ -569,7 +582,7 @@ describe('RRuleSet', function () {
 
       set.rdate(datetime(2002, 3, 1, 9, 0, 0))
 
-      expect(set.all()).to.deep.equal([
+      expect(set.all()).toEqual([
         expectedDate(
           datetime(2000, 1, 1, 9, 0, 0),
           currentLocalDate,
@@ -600,15 +613,15 @@ describe('RRuleSet', function () {
       set.tzid('America/Los_Angeles')
       set.rdate(datetime(2010, 11, 10, 10, 0, 0))
 
-      expect(set.valueOf()).to.deep.equal([
+      expect(set.valueOf()).toEqual([
         'RDATE;TZID=America/Los_Angeles:20101110T100000',
       ])
-      expect(set.toString()).to.equal(
+      expect(set.toString()).toBe(
         'RDATE;TZID=America/Los_Angeles:20101110T100000'
       )
 
       const set2 = rrulestr(set.toString())
-      expect(set2.toString()).to.equal(
+      expect(set2.toString()).toBe(
         'RDATE;TZID=America/Los_Angeles:20101110T100000'
       )
     })
@@ -624,7 +637,7 @@ describe('RRuleSet', function () {
 
       set.rdate(new Date(Date.parse('2002-03-01T09:00:00')))
 
-      expect(set.all()).to.deep.equal([
+      expect(set.all()).toEqual([
         expectedDate(
           new Date(Date.parse('2002-03-01T09:00:00')),
           currentLocalDate,
@@ -777,19 +790,19 @@ describe('RRuleSet', function () {
         toAmendExrule(excluded: RRule, expected: string[]) {
           recurrences.forEach((recurrence) => {
             const actual = amendRuleSetWithExceptionRule(recurrence, excluded)
-            expect(actual).to.equal(expected.join('\n'))
+            expect(actual).toBe(expected.join('\n'))
           })
         },
         toAmendExdate(excluded: Date, expected: string[]) {
           recurrences.forEach((recurrence) => {
             const actual = amendRuleSetWithExceptionDate(recurrence, excluded)
-            expect(actual).to.equal(expected.join('\n'))
+            expect(actual).toBe(expected.join('\n'))
           })
         },
         toBeUpdatedWithEndDate(expected: string) {
           recurrences.forEach((recurrence) => {
             const actual = updateWithEndDate(recurrence, cursor)
-            expect(actual).to.equal(expected)
+            expect(actual).toBe(expected)
           })
         },
       }
@@ -807,21 +820,21 @@ describe('RRuleSet', function () {
     )
     set.exdate(parse('19970902T090000'))
 
-    expect(() => set.all().map(String)).to.throw(RangeError)
+    expect(() => set.all().map(String)).toThrow(RangeError)
   })
 
   it('throws an error if non-rrules are added via rrule or exrule', () => {
     const set = new RRuleSet()
 
-    expect(() => set.rrule('foo' as unknown as RRule)).to.throw()
-    expect(() => set.exrule('foo' as unknown as RRule)).to.throw()
+    expect(() => set.rrule('foo' as unknown as RRule)).toThrow()
+    expect(() => set.exrule('foo' as unknown as RRule)).toThrow()
   })
 
   it('throws an error if non-dates are added via rdate or exdate', () => {
     const set = new RRuleSet()
 
-    expect(() => set.rdate('foo' as unknown as Date)).to.throw()
-    expect(() => set.exdate('foo' as unknown as Date)).to.throw()
+    expect(() => set.rdate('foo' as unknown as Date)).toThrow()
+    expect(() => set.exdate('foo' as unknown as Date)).toThrow()
   })
 
   describe('getters', () => {
@@ -835,7 +848,7 @@ describe('RRuleSet', function () {
       })
       set.rrule(rrule)
 
-      expect(set.rrules().map((e) => e.toString())).eql([rrule.toString()])
+      expect(set.rrules().map((e) => e.toString())).toEqual([rrule.toString()])
     })
 
     it('exrules()', () => {
@@ -848,7 +861,7 @@ describe('RRuleSet', function () {
       })
       set.exrule(rrule)
 
-      expect(set.exrules().map((e) => e.toString())).eql([rrule.toString()])
+      expect(set.exrules().map((e) => e.toString())).toEqual([rrule.toString()])
     })
 
     it('rdates()', () => {
@@ -856,7 +869,7 @@ describe('RRuleSet', function () {
       const dt = parse('19610201T090000')
       set.rdate(dt)
 
-      expect(set.rdates()).eql([dt])
+      expect(set.rdates()).toEqual([dt])
     })
 
     it('exdates()', () => {
@@ -864,7 +877,7 @@ describe('RRuleSet', function () {
       const dt = parse('19610201T090000')
       set.exdate(dt)
 
-      expect(set.exdates()).eql([dt])
+      expect(set.exdates()).toEqual([dt])
     })
   })
 })

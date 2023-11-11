@@ -1,10 +1,38 @@
 ### Changelog
 
+- 2.8.0 (2023-11-10)
+
+  - Bugfixes:
+    - Don't minify `rrule.js` (minified version is still at `rrule.min.js`) ([#606](https://github.com/jkbrzt/rrule/pull/606))
+    - Ignore tzid in NLP ([#528](https://github.com/jkbrzt/rrule/pull/528))
+    - Remove unnecessary offset in daysBetween() ([#539](https://github.com/jkbrzt/rrule/pull/539))
+  - Convert test suite from mocha to jest ([#605](https://github.com/jkbrzt/rrule/pull/605))
+  - Export `ALL_WEEKDAYS` ([#591](https://github.com/jkbrzt/rrule/pull/591))
+  - Support weekly by hour texts ([#590](https://github.com/jkbrzt/rrule/pull/590))
+
+- 2.7.2 (2023-02-10)
+
+  - Bugfixes:
+    - Fix rezonedDate ([#523](https://github.com/jakubroztocil/rrule/issues/523))
+    - Export datetime ([#551](https://github.com/jakubroztocil/rrule/issues/551))
+    - Fixes types for `before()` and `after()` ([#560](https://github.com/jakubroztocil/rrule/issues/560))
+  - Update README (https://github.com/jakubroztocil/rrule/pull/543)
+
+- 2.7.1 (2022-07-10)
+
+  - Internal:
+    - Upgrade build dependencies (#515)
+    - Migrate from tslint to eslint (#514)
+    - Fix precommit & lint warnings (#519)
+    - Fix invalid date formats in tests (#517)
+  - Remove default exports (#513)
+  - Point to esm correctly (#516)
+
 - 2.7.0 (2022-06-05)
 
   - Features:
     - **BREAKING CHANGE** Removes default export in favor of named exports
-    - Removes Luxon dependency
+    - Removes Luxon dependency (#508)
 
 - 2.6.8 (2021-02-04)
 

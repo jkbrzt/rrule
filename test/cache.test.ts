@@ -1,5 +1,4 @@
 import { Cache } from '../src/cache'
-import { expect } from 'chai'
 import { IterArgs } from '../src/iterresult'
 
 const dates = [
@@ -21,7 +20,7 @@ describe('Cache', () => {
       inc: true,
     }
 
-    expect(cache._cacheGet('between', args)).to.be.false
+    expect(cache._cacheGet('between', args)).toBe(false)
   })
 
   it('returns an empty array for a cached but empty set', () => {
@@ -34,7 +33,7 @@ describe('Cache', () => {
 
     cache._cacheAdd('between', [], args)
 
-    expect(cache._cacheGet('between', args)).to.eql([])
+    expect(cache._cacheGet('between', args)).toEqual([])
   })
 
   it('returns cached entries if the "what" and the args both match', () => {
@@ -47,7 +46,7 @@ describe('Cache', () => {
 
     cache._cacheAdd('between', dates, args)
 
-    expect(cache._cacheGet('between', args)).to.eql(dates)
+    expect(cache._cacheGet('between', args)).toEqual(dates)
   })
 
   it('does not return cached entries if the "what" matches but the args do not', () => {
@@ -66,7 +65,7 @@ describe('Cache', () => {
         /** 1ms later than the args used for the insert */
         after: new Date('2021-01-01T00:00:00.001+00:00'),
       })
-    ).to.equal(false)
+    ).toBe(false)
   })
 
   it('does not return cached entries if args match but the "what" does not', () => {
@@ -79,7 +78,7 @@ describe('Cache', () => {
 
     cache._cacheAdd('between', dates, args)
 
-    expect(cache._cacheGet('after', args)).to.equal(false)
+    expect(cache._cacheGet('after', args)).toBe(false)
   })
 
   it('reuses dates cached for the "all" method when querying using another method', () => {
@@ -92,7 +91,7 @@ describe('Cache', () => {
 
     cache._cacheAdd('all', dates)
 
-    expect(cache._cacheGet('between', args)).to.eql([
+    expect(cache._cacheGet('between', args)).toEqual([
       new Date('2021-01-04T00:00:00.000+00:00'),
       new Date('2021-01-05T00:00:00.000+00:00'),
       new Date('2021-01-06T00:00:00.000+00:00'),

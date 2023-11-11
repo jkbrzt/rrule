@@ -14,8 +14,9 @@ jobs:
       - run: npm install -g codecov nyc
       - run: yarn install
       - run: yarn build
-      - run: TZ=America/Vancouver yarn test
-      - run: TZ=America/Los_Angeles yarn test
-      - run: TZ=Africa/Nairobi yarn test
-      - run: TZ=Asia/Tokyo yarn test-ci
+      - run: LANG=en_CA TZ=America/Vancouver yarn test
+      - run: LANG=en_US TZ=America/Los_Angeles yarn test
+      - run: LANG=sw_KE TZ=Africa/Nairobi yarn test
+      - run: LANG=en_KI TZ=Pacific/Kiritimati yarn test
+      - run: LANG=jp_JP TZ=Asia/Tokyo yarn test-ci
       - run: nyc report --reporter=json && codecov -t ${{ secrets.CODECOV_REPO_TOKEN }} -f coverage/*.json

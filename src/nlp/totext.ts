@@ -139,7 +139,7 @@ export default class ToText {
     if (rrule.origOptions.until && rrule.origOptions.count) return false
 
     for (const key in rrule.origOptions) {
-      if (contains(['dtstart', 'wkst', 'freq'], key)) continue
+      if (contains(['dtstart', 'tzid', 'wkst', 'freq'], key)) continue
       if (!contains(ToText.IMPLEMENTED[rrule.options.freq], key)) return false
     }
 
@@ -280,6 +280,10 @@ export default class ToText {
         this._bymonthday()
       } else if (this.byweekday) {
         this._byweekday()
+      }
+
+      if (this.origOptions.byhour) {
+        this._byhour()
       }
     }
   }

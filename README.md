@@ -7,7 +7,7 @@
 [![js-standard-style][js-standard-image]][js-standard-url]
 [![Downloads][downloads-image]][downloads-url]
 [![Gitter][gitter-image]][gitter-url]
-[![codecov.io](http://codecov.io/github/jakubroztocil/rrule/coverage.svg?branch=master)](http://codecov.io/github/jakubroztocil/rrule?branch=master)
+[![codecov.io](http://codecov.io/github/jkbrzt/rrule/coverage.svg?branch=master)](http://codecov.io/github/jkbrzt/rrule?branch=master)
 
 rrule.js supports recurrence rules as defined in the [iCalendar
 RFC](https://tools.ietf.org/html/rfc5545), with a few important
@@ -21,22 +21,13 @@ to natural language.
 
 ### Quick Start
 
-- [Demo app](http://jakubroztocil.github.io/rrule/)
+- [Demo app](http://jkbrzt.github.io/rrule/)
 - # For contributors and maintainers: the code for the demo app is only on `gh-pages` branch
 
 #### Client Side
 
 ```bash
 $ yarn add rrule
-```
-
-Alternatively, download manually:
-
-- [rrule.min.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.min.js) (bundled, minified)
-- [rrule.js](https://jakubroztocil.github.io/rrule/dist/es5/rrule.js) (bundled, not minified)
-
-```html
-<script src="rrule/dist/es5/rrule.min.js"></script>
 ```
 
 #### Server Side
@@ -175,9 +166,9 @@ Dates in JavaScript are tricky. `RRule` tries to support as much flexibility as 
 
 By default, `RRule` deals in ["floating" times or UTC timezones](https://tools.ietf.org/html/rfc5545#section-3.2.19). If you want results in a specific timezone, `RRule` also provides [timezone support](#timezone-support). Either way, JavaScript's built-in "timezone" offset tends to just get in the way, so this library simply doesn't use it at all. All times are returned with zero offset, as though it didn't exist in JavaScript.
 
-**The bottom line is the returned "UTC" dates are always meant to be interpreted as dates in your local timezone. This may mean you have to do additional conversion to get the "correct" local time with offset applied.**
+**THE BOTTOM LINE: Returned "UTC" dates are always meant to be interpreted as dates in your local timezone. This may mean you have to do additional conversion to get the "correct" local time with offset applied.**
 
-For this reason, it is highly recommended to use timestamps in UTC eg. `new Date(Date.UTC(...))`. Returned dates will likewise be in UTC (except on Chrome, which always returns dates with a timezone offset). It's recommended to use the provided `datetime` helper, which
+For this reason, it is highly recommended to use timestamps in UTC eg. `new Date(Date.UTC(...))`. Returned dates will likewise be in UTC (except on Chrome, which always returns dates with a timezone offset). It's recommended to use the provided `datetime()` helper, which
 creates dates in the correct format using a 1-based month.
 
 For example:
@@ -202,7 +193,7 @@ date.getUTCDate() // --> 1
 date.getUTCHours() // --> 18
 ```
 
-If you want to get the same times in true UTC, you may do so eg. using [Luxon](https://moment.github.io/luxon/#/):
+If you want to get the same times in true UTC, you may do so (e.g., using [Luxon](https://moment.github.io/luxon/#/)):
 
 ```ts
 rule.all().map(date =>
@@ -282,7 +273,7 @@ iCalendar RFC. Only `freq` is required.
         <th>Option</th>
         <th>Description</th>
     </tr>
-    <thead>
+    </thead>
     <tbody>
     <tr>
         <td><code>freq</code></td>
@@ -491,7 +482,7 @@ rule.all(function (date, i) {
 ##### `RRule.prototype.between(after, before, inc=false [, iterator])`
 
 Returns all the occurrences of the rrule between `after` and `before`.
-The inc keyword defines what happens if `after` and/or `before` are
+The `inc` keyword defines what happens if `after` and/or `before` are
 themselves occurrences. With `inc == true`, they will be included in the
 list, if they are found in the recurrence set.
 
@@ -582,8 +573,8 @@ var rule = new RRule(options)
 
 #### Natural Language Text Methods
 
-These methods provide an incomplete support for text–`RRule` and
-`RRule`–text conversion. You should test them with your input to see
+These methods provide an incomplete support for text→`RRule` and
+`RRule`→text conversion. You should test them with your input to see
 whether the result is acceptable.
 
 ##### `RRule.prototype.toText([gettext, [language]])`
@@ -634,7 +625,7 @@ var rule = new RRule(options)
 new RRuleSet([(noCache = false)])
 ```
 
-The RRuleSet instance allows more complex recurrence setups, mixing multiple
+The `RRuleSet` instance allows more complex recurrence setups, mixing multiple
 rules, dates, exclusion rules, and exclusion dates.
 
 Default `noCache` argument is `false`, caching of results will be enabled,
@@ -642,30 +633,30 @@ improving performance of multiple queries considerably.
 
 ##### `RRuleSet.prototype.rrule(rrule)`
 
-Include the given rrule instance in the recurrence set generation.
+Include the given `rrule` instance in the recurrence set generation.
 
 ##### `RRuleSet.prototype.rdate(dt)`
 
-Include the given datetime instance in the recurrence set generation.
+Include the given datetime instance `dt` in the recurrence set generation.
 
 ##### `RRuleSet.prototype.exrule(rrule)`
 
-Include the given rrule instance in the recurrence set exclusion list. Dates
+Include the given `rrule` instance in the recurrence set exclusion list. Dates
 which are part of the given recurrence rules will not be generated, even if
-some inclusive rrule or rdate matches them. NOTE: EXRULE has been (deprecated
+some inclusive rrule or rdate matches them. **NOTE:** `EXRULE` has been (deprecated
 in RFC 5545)[https://icalendar.org/iCalendar-RFC-5545/a-3-deprecated-features.html]
-and does not support a DTSTART property.
+and does not support a `DTSTART` property.
 
 ##### `RRuleSet.prototype.exdate(dt)`
 
-Include the given datetime instance in the recurrence set exclusion list. Dates
-included that way will not be generated, even if some inclusive rrule or
-rdate matches them.
+Include the given datetime instance `dt` in the recurrence set exclusion list. Dates
+included that way will not be generated, even if some inclusive `rrule` or
+`rdate` matches them.
 
 ##### `RRuleSet.prototype.tzid(tz?)`
 
 Sets or overrides the timezone identifier. Useful if there are no rrules in this
-RRuleSet and thus no DTSTART.
+`RRuleSet` and thus no `DTSTART`.
 
 ##### `RRuleSet.prototype.all([iterator])`
 
@@ -709,36 +700,57 @@ rrulestr(rruleStr[, options])
 
 The `rrulestr` function is a parser for RFC-like syntaxes. The string passed
 as parameter may be a multiple line string, a single line string, or just the
-RRULE property value.
+`RRULE` property value.
 
 Additionally, it accepts the following keyword arguments:
 
-`cache`
-If True, the rruleset or rrule created instance will cache its results.
+<dl>
+
+<dt><code>cache</code></dt>
+<dd>
+If <code>true</code>, the <code>rruleset</code> or <code>rrule</code> created instance 
+will cache its results.
 Default is not to cache.
+</dd>
 
-`dtstart`
-If given, it must be a datetime instance that will be used when no DTSTART
-property is found in the parsed string. If it is not given, and the property
-is not found, datetime.now() will be used instead.
+<dt><code>dtstart</code></dt>
+<dd>
+If given, it must be a datetime instance that will be used when no 
+<code>DTSTART</code> property is found in the parsed string. 
+If it is not given, and the property is not found, 
+<code>datetime.now()</code> will be used instead.
+</dd>
 
-`unfold`
-If set to True, lines will be unfolded following the RFC specification. It
-defaults to False, meaning that spaces before every line will be stripped.
+<dt><code>unfold</code></dt>
+<dd>
+If set to <code>true</code>, lines will be unfolded following the RFC specification. 
+It defaults to <code>false</code>, meaning that spaces before every line will be stripped.
+</dd>
 
-`forceset`
-If set to True a rruleset instance will be returned, even if only a single rule
-is found. The default is to return an rrule if possible, and an rruleset if necessary.
+<dt><code>forceset</code></dt>
+<dd>
+If set to <code>true</code>, an <code>rruleset</code> instance will be returned, 
+even if only a single rule is found. 
+The default is to return an <code>rrule</code> if possible, and 
+an <code>rruleset</code> if necessary.
+</dd>
 
-`compatible`
-If set to True, the parser will operate in RFC-compatible mode. Right now it
-means that unfold will be turned on, and if a DTSTART is found, it will be
-considered the first recurrence instance, as documented in the RFC.
+<dt><code>compatible</code></dt>
+<dd>
+If set to <code>true</code>, the parser will operate in RFC-compatible mode. 
+Right now it means that unfold will be turned on, and if a <code>DTSTART</code> is found, 
+it will be considered the first recurrence instance, as documented in the RFC.
+</dd>
 
-`tzid`
-If given, it must be a string that will be used when no `TZID` property is found
-in the parsed string. If it is not given, and the property is not found, `'UTC'`
-will be used by default.
+<dt><code>tzid</code></dt>
+<dd>
+If given, it must be a string that will be used when no <code>TZID</code> 
+property is found in the parsed string. 
+If it is not given, and the property is not found, <code>'UTC'</code> will 
+be used by default.
+</dd>
+
+</dl>
 
 ---
 
@@ -771,8 +783,8 @@ rruleSet.rrule(
 rruleSet.rdate(start)
 ```
 
-- Unlike documented in the RFC, every keyword is valid on every frequency (the
-  RFC documents that `byweekno` is only valid on yearly frequencies, for example).
+- Unlike documented in the RFC, every keyword is valid on every frequency. (The
+  RFC documents that `byweekno` is only valid on yearly frequencies, for example.)
 
 ### Development
 
@@ -798,21 +810,21 @@ $ yarn build
 
 #### Authors
 
-- [Jakub Roztocil](http://roztocil.co/)
-  ([@jakubroztocil](http://twitter.com/jakubroztocil))
+- [Jakub Roztocil](http://roztocil.co)
+  ([@jkbrzt](http://twitter.com/jkbrzt))
 - Lars Schöning ([@lyschoening](http://twitter.com/lyschoening))
 - David Golightly ([@davigoli](http://twitter.com/davigoli))
 
 Python `dateutil` is written by [Gustavo
-Niemeyer](http://niemeyer.net/).
+Niemeyer](http://niemeyer.net).
 
-See [LICENCE](https://github.com/jakubroztocil/rrule/blob/master/LICENCE) for
+See [LICENCE](https://github.com/jkbrzt/rrule/blob/master/LICENCE) for
 more details.
 
 [npm-url]: https://npmjs.org/package/rrule
 [npm-image]: http://img.shields.io/npm/v/rrule.svg
-[ci-url]: https://github.com/jakubroztocil/rrule/actions
-[ci-image]: https://github.com/jakubroztocil/rrule/workflows/Node%20CI/badge.svg
+[ci-url]: https://github.com/jkbrzt/rrule/actions
+[ci-image]: https://github.com/jkbrzt/rrule/workflows/Node%20CI/badge.svg
 [downloads-url]: https://npmjs.org/package/rrule
 [downloads-image]: http://img.shields.io/npm/dm/rrule.svg?style=flat-square
 [js-standard-url]: https://github.com/feross/standard
@@ -822,4 +834,4 @@ more details.
 
 #### Related projects
 
-- https://rrules.com/ — RESTful API to get back occurrences of RRULEs that conform to RFC 5545.
+- https://rrules.com — RESTful API to get back occurrences of RRULEs that conform to RFC 5545.

@@ -1,4 +1,4 @@
-import { timeToUntilString } from './dateutil'
+import { dateInTimeZone, timeToUntilString } from './dateutil'
 
 export class DateWithZone {
   public date: Date
@@ -34,15 +34,6 @@ export class DateWithZone {
       return this.date
     }
 
-    const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    const dateInLocalTZ = new Date(
-      this.date.toLocaleString(undefined, { timeZone: localTimeZone })
-    )
-    const dateInTargetTZ = new Date(
-      this.date.toLocaleString(undefined, { timeZone: this.tzid ?? 'UTC' })
-    )
-    const tzOffset = dateInTargetTZ.getTime() - dateInLocalTZ.getTime()
-
-    return new Date(this.date.getTime() - tzOffset)
+    return dateInTimeZone(this.date, this.tzid)
   }
 }

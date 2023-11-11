@@ -1,4 +1,4 @@
-import { RRule } from '../src'
+import { Frequency, Options, RRule } from '../src'
 import { optionsToString } from '../src/optionstostring'
 import { DateFormatter } from '../src/nlp/totext'
 import { datetime } from './lib/utils'
@@ -6,10 +6,6 @@ import { datetime } from './lib/utils'
 const texts = [
   ['Every day', 'RRULE:FREQ=DAILY'],
   ['Every day at 10, 12 and 17', 'RRULE:FREQ=DAILY;BYHOUR=10,12,17'],
-  [
-    'Every week on Sunday at 10, 12 and 17',
-    'RRULE:FREQ=WEEKLY;BYDAY=SU;BYHOUR=10,12,17',
-  ],
   ['Every week', 'RRULE:FREQ=WEEKLY'],
   ['Every hour', 'RRULE:FREQ=HOURLY'],
   ['Every 4 hours', 'RRULE:INTERVAL=4;FREQ=HOURLY'],
@@ -30,6 +26,29 @@ const texts = [
   ['Every month on the 2nd last Friday', 'RRULE:FREQ=MONTHLY;BYDAY=-2FR'],
   // ['Every week until January 1, 2007', 'RRULE:FREQ=WEEKLY;UNTIL=20070101T080000Z'],
   ['Every week for 20 times', 'RRULE:FREQ=WEEKLY;COUNT=20'],
+]
+
+const textsByOptions: [string, Partial<Options>][] = [
+  // The option "byhour" is not fully convertible for monthly.
+  [
+    'Every month on tuesday (~ approximate)',
+    {
+      dtstart: datetime(2022, 6, 1),
+      freq: Frequency.MONTHLY,
+      interval: 1,
+      byweekday: 1,
+      byhour: 1,
+    },
+  ],
+  // The option "byhour" is not fully convertible for weekly.
+  [
+    'Every week on Sunday at 10, 12 and 17 (~ approximate)',
+    {
+      freq: Frequency.WEEKLY,
+      byweekday: 6,
+      byhour: [10, 12, 17],
+    },
+  ],
 ]
 
 const toTexts = [
@@ -54,6 +73,13 @@ describe('NLP', () => {
       const text = item[0]
       const str = item[1]
       expect(RRule.fromString(str).toText().toLowerCase()).toBe(
+        text.toLowerCase()
+      )
+    })
+    textsByOptions.forEach(function (item) {
+      const text = item[0]
+      const options = item[1]
+      expect(new RRule(options).toText().toLowerCase()).toEqual(
         text.toLowerCase()
       )
     })

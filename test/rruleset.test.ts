@@ -728,7 +728,7 @@ describe('RRuleSet', function () {
       expectRecurrence([original, legacy]).toBeUpdatedWithEndDate(
         [
           'DTSTART;TZID=America/New_York:20171201T080000',
-          'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959',
+          'RRULE:FREQ=WEEKLY;UNTIL=20171224T235959Z',
         ].join('\n')
       )
     })

@@ -44,3 +44,10 @@ describe('byweekday', () => {
     expect(options.parsedOptions.byweekday).toEqual([1, 2])
   })
 })
+
+describe('interval', () => {
+  it('assigns interval to 1 when not present', () => {
+    const options = parseOptions({interval: undefined})
+    expect(options.parsedOptions.interval).to.eql(1)
+  })
+})

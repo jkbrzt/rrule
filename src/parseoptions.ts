@@ -36,6 +36,8 @@ export function parseOptions(options: Partial<Options>) {
 
   if (isPresent(opts.byeaster)) opts.freq = RRule.YEARLY
 
+  if (!isPresent(opts.interval)) opts.interval = 1
+
   if (!(isPresent(opts.freq) && RRule.FREQUENCIES[opts.freq])) {
     throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)
   }

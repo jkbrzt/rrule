@@ -194,6 +194,28 @@ describe('rrulestr', function () {
   )
 
   testRecurring(
+    'testStrSetExDate with count and exdate with options init',
+    rrulestr(
+      "FREQ=WEEKLY;WKST=SU;COUNT=2;INTERVAL=1;BYDAY=MO,TU\n" +
+      "EXDATE;TZID=America/Edmonton:20220502T090000"
+    ,{dtstart: datetime(2022, 5, 2,  9, 0)}),
+    [
+      datetime(2022, 5, 3, 9, 0),
+    ]
+  )
+
+  testRecurring(
+    'testStrSetExDate with count and exdate with DTSTART',
+    rrulestr(
+      "DTSTART;TZID=America/Edmonton:20220502T090000\n" +
+      "FREQ=WEEKLY;WKST=SU;COUNT=2;INTERVAL=1;BYDAY=MO,TU\n" +
+      "EXDATE;TZID=America/Edmonton:20220502T090000"),
+    [
+      datetime(2022, 5, 3, 9, 0),
+    ]
+  )
+
+  testRecurring(
     'testStrSetDateAndExDate',
     rrulestr(
       'DTSTART:19970902T090000Z\n' +

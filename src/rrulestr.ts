@@ -34,8 +34,8 @@ export function parseInput(s: string, options: Partial<RRuleStrOptions>) {
   let exdatevals: Date[] = []
 
   const parsedDtstart = parseDtstart(s)
-  const { dtstart } = parsedDtstart
-  let { tzid } = parsedDtstart
+  const dtstart = parsedDtstart?.dtstart ?? options?.dtstart
+  let tzid  = parsedDtstart?.tzid ?? options?.tzid
 
   const lines = splitIntoLines(s, options.unfold)
 

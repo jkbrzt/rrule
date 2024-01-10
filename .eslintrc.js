@@ -94,6 +94,7 @@ module.exports = {
     'no-caller': 'error',
     'no-case-declarations': 'off',
     'no-cond-assign': 'error',
+    'no-console': 'error',
     'no-constant-condition': 'error',
     'no-control-regex': 'error',
     'no-duplicate-imports': 'error',

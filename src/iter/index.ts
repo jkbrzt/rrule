@@ -67,8 +67,7 @@ export function iter<M extends QueryMethodTypes>(
         }
 
         const date = fromOrdinal(ii.yearordinal + currentDay)
-        for (let k = 0; k < timeset.length; k++) {
-          const time = timeset[k]
+        for (const time of timeset) {
           const res = combine(date, time)
           if (until && res > until) {
             return emitResult(iterResult)

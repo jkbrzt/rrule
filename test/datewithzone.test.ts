@@ -23,7 +23,8 @@ it('returns the time of the date', () => {
 })
 
 it('rejects invalid dates', () => {
-  expect(() => new DateWithZone(new Date(undefined))).toThrow(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expect(() => new DateWithZone(new Date(undefined as any))).toThrow(
     'Invalid date passed to DateWithZone'
   )
 })

@@ -63,7 +63,7 @@ describe('NLP', () => {
     texts.forEach(function (item) {
       const text = item[0]
       const str = item[1]
-      expect(optionsToString(RRule.parseText(text))).toBe(str)
+      expect(optionsToString(RRule.parseText(text)!)).toBe(str)
     })
   })
 

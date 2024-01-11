@@ -130,7 +130,7 @@ function isFiltered(
 
   return (
     (notEmpty(bymonth) && !includes(bymonth, ii.mmask[currentDay])) ||
-    (notEmpty(byweekno) && !ii.wnomask[currentDay]) ||
+    (notEmpty(byweekno) && !ii.wnomask?.[currentDay]) ||
     (notEmpty(byweekday) && !includes(byweekday, ii.wdaymask[currentDay])) ||
     (notEmpty(ii.nwdaymask) && !ii.nwdaymask[currentDay]) ||
     (byeaster !== null && !includes(ii.eastermask, currentDay)) ||
@@ -166,9 +166,11 @@ function removeFilteredDays(
   for (let dayCounter = start; dayCounter < end; dayCounter++) {
     const currentDay = dayset[dayCounter]
 
-    filtered = isFiltered(ii, currentDay, options)
+    if (currentDay !== null) {
+      filtered = isFiltered(ii, currentDay, options)
 
-    if (filtered) dayset[currentDay] = null
+      if (filtered) dayset[currentDay] = null
+    }
   }
 
   return filtered
@@ -178,7 +180,7 @@ function makeTimeset(
   ii: Iterinfo,
   counterDate: DateTime,
   options: ParsedOptions
-): Time[] | null {
+): Time[] {
   const { freq, byhour, byminute, bysecond } = options
 
   if (freqIsDailyOrGreater(freq)) {

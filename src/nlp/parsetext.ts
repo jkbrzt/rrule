@@ -9,9 +9,9 @@ import { WeekdayStr } from '../weekday'
 
 class Parser {
   private readonly rules: { [k: string]: RegExp }
-  public text: string
-  public symbol: string | null
-  public value: RegExpExecArray | null
+  public text!: string
+  public symbol!: string | null
+  public value!: RegExpExecArray | null
   private done = true
 
   constructor(rules: { [k: string]: RegExp }) {
@@ -30,7 +30,7 @@ class Parser {
 
   nextSymbol() {
     let best: RegExpExecArray | null
-    let bestSymbol: string
+    let bestSymbol = ''
 
     this.symbol = null
     this.value = null
@@ -390,7 +390,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
         ttr.nextSymbol()
         return ttr.accept('last') ? -3 : 3
       case 'nth':
-        const v = parseInt(ttr.value[1], 10)
+        const v = parseInt(ttr.value![1], 10)
         if (v < -366 || v > 366) throw new Error('Nth out of range: ' + v)
 
         ttr.nextSymbol()
@@ -431,7 +431,7 @@ export default function parseText(text: string, language: Language = ENGLISH) {
       if (!date) throw new Error('Cannot parse until date:' + ttr.text)
       options.until = new Date(date)
     } else if (ttr.accept('for')) {
-      options.count = parseInt(ttr.value[0], 10)
+      options.count = parseInt(ttr.value![0], 10)
       ttr.expect('number')
       // ttr.expect('times')
     }

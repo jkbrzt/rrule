@@ -3985,9 +3985,9 @@ describe('RRule', function () {
       })
 
       expect(date.getTime()).toBe(rr.options.dtstart.getTime())
-      const res: Date = rr.before(rr.after(rr.options.dtstart))
+      const res: Date | null = rr.before(rr.after(rr.options.dtstart)!)
 
-      let resTimestamp: number
+      let resTimestamp: number | null = null
       if (res != null) resTimestamp = res.getTime()
       expect(resTimestamp).toBe(rr.options.dtstart.getTime())
     })
@@ -4218,7 +4218,8 @@ describe('RRule', function () {
   })
 
   it('throws an error when dtstart is invalid', () => {
-    const invalidDate = new Date(undefined)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invalidDate = new Date(undefined as any)
     const validDate = datetime(2017, 1, 1)
     expect(() => new RRule({ dtstart: invalidDate })).toThrow(
       'Invalid options: dtstart'

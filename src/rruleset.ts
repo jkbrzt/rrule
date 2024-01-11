@@ -7,7 +7,8 @@ import { QueryMethodTypes, IterResultType } from './types'
 import { rrulestr } from './rrulestr'
 import { optionsToString } from './optionstostring'
 
-function createGetterSetter<T>(fieldName: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createGetterSetter<T>(this: any, fieldName: string) {
   return (field?: T) => {
     if (field !== undefined) {
       this[`_${fieldName}`] = field

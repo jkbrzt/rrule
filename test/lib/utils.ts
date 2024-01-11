@@ -218,3 +218,17 @@ export function expectedDate(
 ): Date {
   return dateInTimeZone(startDate, targetZone)
 }
+
+export function formatDate(d: Date, timeZone?: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short',
+  }).format(d)
+}

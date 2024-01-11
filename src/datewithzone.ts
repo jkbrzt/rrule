@@ -30,7 +30,7 @@ export class DateWithZone {
   }
 
   public rezonedDate() {
-    if (this.isUTC) {
+    if (this.isUTC || !this.tzid) {
       return this.date
     }
 

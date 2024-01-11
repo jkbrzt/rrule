@@ -41,6 +41,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-floating-promises': 'error',
     '@typescript-eslint/no-misused-new': 'error',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unnecessary-qualifier': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/no-unused-expressions': [
@@ -94,6 +95,7 @@ module.exports = {
     'no-caller': 'error',
     'no-case-declarations': 'off',
     'no-cond-assign': 'error',
+    'no-console': 'error',
     'no-constant-condition': 'error',
     'no-control-regex': 'error',
     'no-duplicate-imports': 'error',

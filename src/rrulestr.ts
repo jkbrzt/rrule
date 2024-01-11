@@ -129,7 +129,7 @@ function buildRule(s: string, options: Partial<RRuleStrOptions>) {
       rset.exdate(date)
     })
 
-    if (options.compatible && options.dtstart) rset.rdate(dtstart)
+    if (options.compatible && dtstart) rset.rdate(dtstart)
     return rset
   }
 

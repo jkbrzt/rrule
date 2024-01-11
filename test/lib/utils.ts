@@ -10,11 +10,15 @@ export const TEST_CTX = {
 }
 
 const assertDatesEqual = function (
-  actual: Date | Date[],
-  expected: Date | Date[]
+  actual: Date | Date[] | null | undefined,
+  expected: Date | Date[] | null | undefined
 ) {
-  if (!(actual instanceof Array)) actual = [actual]
-  if (!(expected instanceof Array)) expected = [expected]
+  if (actual && !(actual instanceof Array)) actual = [actual]
+  if (expected && !(expected instanceof Array)) expected = [expected]
+
+  if (!actual && !expected) return
+  if (!actual) throw new Error('actual null')
+  if (!expected) throw new Error('expected null')
 
   if (expected.length > 1) {
     expect(actual).toHaveLength(expected.length)
@@ -36,7 +40,7 @@ const extractTime = function (date: Date) {
  */
 export const parse = function (str: string) {
   const parts = str.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/)
-  const [, y, m, d, h, i, s] = parts
+  const [, y, m, d, h, i, s] = parts!
   const year = Number(y)
   const month = Number(m[0] === '0' ? m[1] : m)
   const day = Number(d[0] === '0' ? d[1] : d)
@@ -100,9 +104,7 @@ export const testRecurring = function (
 
   itFunc(msg, function () {
     let time = Date.now()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    let actualDates = rule[method](...args)
+    let actualDates = rule[method](...(args as [never, never]))!
     time = Date.now() - time
 
     const maxTestDuration = 200
@@ -202,19 +204,35 @@ export const testRecurring = function (
   })
 } as TestRecurring
 
-testRecurring.only = function (...args) {
-  testRecurring.apply(it, [...args, it.only])
+testRecurring.only = (...args) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  testRecurring.apply(it, [...(args as any[]), it.only] as any)
 }
 
-testRecurring.skip = function ([description]: [string]) {
+testRecurring.skip = (args) => {
+  const description = (args as [string])[0]
   // eslint-disable-next-line @typescript-eslint/no-empty-function, no-empty-function
   it.skip(description, () => {})
 }
 
 export function expectedDate(
   startDate: Date,
-  currentLocalDate: Date,
-  targetZone: string
+  currentLocalDate?: Date,
+  targetZone?: string
 ): Date {
   return dateInTimeZone(startDate, targetZone)
+}
+
+export function formatDate(d: Date, timeZone?: string) {
+  return new Intl.DateTimeFormat('sv-SE', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short',
+  }).format(d)
 }

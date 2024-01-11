@@ -27,9 +27,11 @@
     "lint": "yarn eslint . --fix --config .eslintrc.js",
     "format": "yarn prettier --write .",
     "format-check": "yarn prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "typecheck:watch": "tsc --noEmit --watch",
     "run-ts": "TS_NODE_PROJECT=tsconfig.json node --loader ts-node/esm",
-    "test": "jest **/*.test.ts",
-    "test-ci": "yarn run-ts ./node_modules/.bin/nyc jest **/*.test.ts"
+    "test": "jest",
+    "test-ci": "yarn run-ts ./node_modules/.bin/nyc jest"
   },
   "nyc": {
     "extension": [

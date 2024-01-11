@@ -44,6 +44,7 @@ export class Cache {
     if (what === 'all') {
       this.all = value as Date[]
     } else {
+      args = args || {}
       args._value = value
       this[what].push(args as IterArgs)
     }
@@ -65,7 +66,7 @@ export class Cache {
     const findCacheDiff = function (item: IterArgs) {
       for (let i = 0; i < argsKeys.length; i++) {
         const key = argsKeys[i]
-        if (!argsMatch(args[key], item[key])) {
+        if (!argsMatch(args?.[key], item[key])) {
           return true
         }
       }
@@ -89,7 +90,7 @@ export class Cache {
     if (!cached && this.all) {
       // Not in the cache, but we already know all the occurrences,
       // so we can find the correct dates from the cached ones.
-      const iterResult = new IterResult(what, args)
+      const iterResult = new IterResult(what, args ?? {})
       for (let i = 0; i < (this.all as Date[]).length; i++) {
         if (!iterResult.accept((this.all as Date[])[i])) break
       }

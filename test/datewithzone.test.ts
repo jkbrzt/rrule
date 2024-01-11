@@ -1,6 +1,5 @@
 import { DateWithZone } from '../src/datewithzone'
-import { set as setMockDate, reset as resetMockDate } from 'mockdate'
-import { datetime, expectedDate } from './lib/utils'
+import { datetime, formatDate } from './lib/utils'
 
 describe('toString', () => {
   it('returns the date when no tzid is present', () => {
@@ -24,7 +23,8 @@ it('returns the time of the date', () => {
 })
 
 it('rejects invalid dates', () => {
-  expect(() => new DateWithZone(new Date(undefined))).toThrow(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expect(() => new DateWithZone(new Date(undefined as any))).toThrow(
     'Invalid date passed to DateWithZone'
   )
 })
@@ -33,24 +33,16 @@ describe('rezonedDate', () => {
   it('returns the original date when no zone is given', () => {
     const d = datetime(2010, 10, 5, 11, 0, 0)
     const dt = new DateWithZone(d)
-    expect(dt.rezonedDate()).toEqual(d)
+    expect(dt.rezonedDate()).toStrictEqual(d)
   })
 
   it('returns the date in the correct zone when given', () => {
-    const targetZone = 'America/New_York'
-    const currentLocalDate = new Date(2000, 1, 6, 1, 0, 0)
-    setMockDate(currentLocalDate)
-
-    const d = new Date(Date.parse('2010-10-05T11:00:00'))
-    const dt = new DateWithZone(d, targetZone)
-    expect(dt.rezonedDate()).toEqual(
-      expectedDate(
-        new Date(Date.parse('2010-10-05T11:00:00')),
-        currentLocalDate,
-        targetZone
-      )
+    const dt = new DateWithZone(
+      new Date('2010-10-05T11:00:00'),
+      'America/New_York'
     )
-
-    resetMockDate()
+    expect(formatDate(dt.rezonedDate(), 'America/New_York')).toStrictEqual(
+      '2010-10-05 11:00:00 GMT−4'
+    )
   })
 })

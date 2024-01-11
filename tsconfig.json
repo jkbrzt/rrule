@@ -6,6 +6,7 @@
     "module": "commonjs",
     "noEmitOnError": true,
     "esModuleInterop": true,
+    "strict": true,
     "target": "es6",
     "baseUrl": ".",
     "rootDirs": ["./src/", "./test/"]

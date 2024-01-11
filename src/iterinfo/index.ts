@@ -14,9 +14,9 @@ export type GetDayset = () => DaySet
 // =============================================================================
 
 export default class Iterinfo {
-  public yearinfo: YearInfo
-  public monthinfo: MonthInfo
-  public eastermask: number[] | null
+  public yearinfo!: YearInfo
+  public monthinfo!: MonthInfo
+  public eastermask!: number[]
 
   // eslint-disable-next-line no-empty-function
   constructor(private options: ParsedOptions) {}
@@ -32,7 +32,7 @@ export default class Iterinfo {
       notEmpty(options.bynweekday) &&
       (month !== this.lastmonth || year !== this.lastyear)
     ) {
-      const { yearlen, mrange, wdaymask } = this.yearinfo
+      const { yearlen, mrange, wdaymask } = this.yearinfo ?? {}
       this.monthinfo = rebuildMonth(
         year,
         month,
@@ -153,15 +153,20 @@ export default class Iterinfo {
   getdayset(freq: Frequency): (y: number, m: number, d: number) => DaySet {
     switch (freq) {
       case Frequency.YEARLY:
-        return this.ydayset.bind(this)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.ydayset.bind(this) as any
       case Frequency.MONTHLY:
-        return this.mdayset.bind(this)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.mdayset.bind(this) as any
       case Frequency.WEEKLY:
-        return this.wdayset.bind(this)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.wdayset.bind(this) as any
       case Frequency.DAILY:
-        return this.ddayset.bind(this)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.ddayset.bind(this) as any
       default:
-        return this.ddayset.bind(this)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.ddayset.bind(this) as any
     }
   }
 

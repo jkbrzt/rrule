@@ -204,7 +204,7 @@ export class RRule implements QueryMethods {
    *
    * @return Date or null
    */
-  before(dt: Date, inc = false): Date | null {
+  before(dt?: Date, inc = false): Date | null {
     if (!isValidDate(dt)) {
       throw new Error('Invalid date passed in to RRule.before')
     }

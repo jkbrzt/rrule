@@ -49,9 +49,8 @@ export function rebuildMonth(
     const first = rang[0]
     const last = rang[1] - 1
 
-    for (let k = 0; k < options.bynweekday.length; k++) {
+    for (const [wday, n] of options.bynweekday ?? []) {
       let i
-      const [wday, n] = options.bynweekday[k]
       if (n < 0) {
         i = last + (n + 1) * 7
         i -= pymod(wdaymask[i] - wday, 7)

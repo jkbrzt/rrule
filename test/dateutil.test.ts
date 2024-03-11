@@ -11,13 +11,28 @@ describe('dateTZtoISO8601', () => {
   it('correctly formats a date with em suffix from toLocaleString', () => {
     // Mock Date.prototype.toLocaleString to simulate iOS behavior
     const originalToLocaleString = Date.prototype.toLocaleString
-    Date.prototype.toLocaleString = jest.fn(() => '2024-01-09 12:00:00 em')
+    Date.prototype.toLocaleString = jest.fn(() => '2045-10-31 1:00:00 em')
 
-    const date = new Date(1704830400000) // The specific date/time
+    const date = new Date()
     const timeZone = 'America/Los_Angeles'
 
     // Your patched function that handles the iOS date string correctly
-    expect(dateTZtoISO8601(date, timeZone)).toBe('2024-01-09T12:00:00Z')
+    expect(dateTZtoISO8601(date, timeZone)).toBe('2045-10-31T1:00:00Z')
+
+    // Restore the original toLocaleString method after the test
+    Date.prototype.toLocaleString = originalToLocaleString
+  })
+
+  it('correctly formats a date with fm suffix from toLocaleString', () => {
+    // Mock Date.prototype.toLocaleString to simulate iOS behavior
+    const originalToLocaleString = Date.prototype.toLocaleString
+    Date.prototype.toLocaleString = jest.fn(() => '2045-10-31 1:00:00 fm')
+
+    const date = new Date()
+    const timeZone = 'America/Los_Angeles'
+
+    // Your patched function that handles the iOS date string correctly
+    expect(dateTZtoISO8601(date, timeZone)).toBe('2045-10-31T1:00:00Z')
 
     // Restore the original toLocaleString method after the test
     Date.prototype.toLocaleString = originalToLocaleString

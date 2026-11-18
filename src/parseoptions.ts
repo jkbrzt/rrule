@@ -40,7 +40,9 @@ export function parseOptions(options: Partial<Options>) {
     throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)
   }
 
-  if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
+  if (!opts.dtstart) {
+    opts.dtstart = new Date(Math.floor(Date.now() / 1000) * 1000)
+  }
 
   if (!isPresent(opts.wkst)) {
     opts.wkst = RRule.MO.weekday

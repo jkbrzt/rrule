@@ -324,7 +324,7 @@ export default class ToText {
     if (this.origOptions.bymonth) {
       if (this.options.interval !== 1) {
         this.add(this.options.interval.toString())
-        this.add(gettext('years'))
+        this.add(gettext('years')).add(gettext('in'))
       } else {
         // this.add(gettext('YEAR'))
       }

@@ -41,6 +41,28 @@ const toTexts = [
 ]
 
 describe('NLP', () => {
+  it.each([
+    [
+      'FREQ=YEARLY;INTERVAL=3;BYMONTH=10;BYDAY=TU',
+      'every 3 years in October on Tuesday',
+    ],
+    [
+      'FREQ=YEARLY;INTERVAL=2;BYMONTH=1,7;BYMONTHDAY=4',
+      'every 2 years in January and July on the 4th',
+    ],
+    ['FREQ=YEARLY;BYMONTH=10', 'every October'],
+    ['FREQ=YEARLY;INTERVAL=3;BYDAY=TU', 'every 3 years on Tuesday'],
+  ])('describes yearly months in %s', (rule, expected) => {
+    expect(RRule.fromString(rule).toText()).toBe(expected)
+  })
+
+  it('translates the preposition before yearly months', () => {
+    const rule = RRule.fromString('FREQ=YEARLY;INTERVAL=3;BYMONTH=10')
+    expect(rule.toText((word) => (word === 'in' ? 'dans' : String(word)))).toBe(
+      'every 3 years dans October'
+    )
+  })
+
   it('fromText()', function () {
     texts.forEach(function (item) {
       const text = item[0]

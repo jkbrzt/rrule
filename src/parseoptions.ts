@@ -40,6 +40,13 @@ export function parseOptions(options: Partial<Options>) {
     throw new Error(`Invalid frequency: ${opts.freq} ${options.freq}`)
   }
 
+  if (
+    isPresent(opts.count) &&
+    (!Number.isInteger(opts.count) || opts.count < 0)
+  ) {
+    throw new Error('count must be a non-negative integer')
+  }
+
   if (!opts.dtstart) opts.dtstart = new Date(new Date().setMilliseconds(0))
 
   if (!isPresent(opts.wkst)) {

@@ -1,5 +1,50 @@
 import { parseOptions } from '../src/parseoptions'
-import { RRule } from '../src'
+import { RRule, rrulestr } from '../src'
+
+describe('interval', () => {
+  it.each([0.5, 1.5, -0.5, -1, NaN, Infinity, -Infinity])(
+    'rejects invalid numeric interval %s before iteration',
+    (interval) => {
+      expect(() => new RRule({ freq: RRule.DAILY, interval })).toThrow(
+        'interval must be a non-negative integer'
+      )
+    }
+  )
+
+  it.each([
+    'DTSTART:20231003T040000Z\nRRULE:FREQ=DAILY;INTERVAL=0.5',
+    'FREQ=HOURLY;INTERVAL=1.5;BYMINUTE=41',
+    'FREQ=DAILY;INTERVAL=-1',
+    'FREQ=DAILY;INTERVAL=abc',
+    'FREQ=DAILY;INTERVAL=1,2',
+  ])('rejects an invalid parsed interval in %s', (source) => {
+    expect(() => rrulestr(source)).toThrow(
+      'interval must be a non-negative integer'
+    )
+    expect(() => RRule.fromString(source)).toThrow(
+      'interval must be a non-negative integer'
+    )
+  })
+
+  it('keeps the default interval and valid integer recurrence', () => {
+    expect(parseOptions({}).parsedOptions.interval).toBe(1)
+    const rule = new RRule({
+      freq: RRule.DAILY,
+      interval: 2,
+      dtstart: new Date(Date.UTC(2023, 9, 3, 4)),
+      count: 3,
+    })
+    expect(rule.all().map((date) => date.toISOString())).toEqual([
+      '2023-10-03T04:00:00.000Z',
+      '2023-10-05T04:00:00.000Z',
+      '2023-10-07T04:00:00.000Z',
+    ])
+  })
+
+  it('preserves an empty recurrence for zero interval', () => {
+    expect(new RRule({ freq: RRule.DAILY, interval: 0 }).all()).toEqual([])
+  })
+})
 
 describe('TZID', () => {
   it('leaves null when null', () => {

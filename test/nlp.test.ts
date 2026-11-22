@@ -33,7 +33,13 @@ const texts = [
 ]
 
 const toTexts = [
-  ...texts,
+  ...texts.map(([text, rule]) => [
+    // Weekly BYHOUR is not in the text converter's supported-option table.
+    rule.includes('FREQ=WEEKLY') && rule.includes('BYHOUR=')
+      ? text + ' (~ approximate)'
+      : text,
+    rule,
+  ]),
   [
     'Every week on monday',
     'DTSTART;TZID=America/New_York:20220601T000000\nRRULE:INTERVAL=1;FREQ=WEEKLY;BYDAY=MO',
@@ -41,6 +47,45 @@ const toTexts = [
 ]
 
 describe('NLP', () => {
+  describe('isFullyConvertibleToText()', () => {
+    it.each([
+      'BYSETPOS=2;FREQ=MONTHLY;BYDAY=TU',
+      'FREQ=MONTHLY;BYDAY=TU;BYSETPOS=2',
+      'WKST=MO;BYSETPOS=2;FREQ=MONTHLY;BYDAY=TU',
+    ])('checks every option in %s', (source) => {
+      const rule = RRule.fromString(source)
+      expect(rule.isFullyConvertibleToText()).toBe(false)
+      expect(rule.toText()).toContain('(~ approximate)')
+    })
+
+    it.each(['dtstart', 'tzid'])('checks options after %s', (key) => {
+      const option =
+        key === 'dtstart'
+          ? { dtstart: new Date(Date.UTC(2026, 0, 1)) }
+          : { tzid: 'UTC' }
+      const rule = new RRule({
+        ...option,
+        bysetpos: 2,
+        freq: RRule.MONTHLY,
+        byweekday: RRule.TU,
+      })
+      expect(rule.isFullyConvertibleToText()).toBe(false)
+      expect(rule.toText()).toContain('(~ approximate)')
+    })
+
+    it('retains supported metadata and option combinations', () => {
+      const rule = new RRule({
+        dtstart: new Date(Date.UTC(2026, 0, 1)),
+        tzid: 'UTC',
+        wkst: RRule.MO,
+        freq: RRule.MONTHLY,
+        byweekday: RRule.TU,
+      })
+      expect(rule.isFullyConvertibleToText()).toBe(true)
+      expect(rule.toText()).not.toContain('(~ approximate)')
+    })
+  })
+
   it('fromText()', function () {
     texts.forEach(function (item) {
       const text = item[0]

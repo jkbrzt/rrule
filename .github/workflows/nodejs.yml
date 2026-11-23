@@ -11,7 +11,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install -g codecov nyc
+      - run: npm install -g codecov nyc@15
       - run: yarn install
       - run: yarn build
       - run: LANG=en_CA TZ=America/Vancouver yarn test

@@ -9,8 +9,8 @@ import {
   repeat,
   isPresent,
   isArray,
+  isNumber,
 } from '../src/helpers'
-import { isNumber } from 'util'
 
 describe('isPresent', () => {
   it('is false if object is null', () => {

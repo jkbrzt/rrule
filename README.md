@@ -17,6 +17,18 @@ RFC](https://tools.ietf.org/html/rfc5545), with a few important
 that, it supports parsing and serialization of recurrence rules from and
 to natural language.
 
+> **rrule.js is in maintenance mode.** No new features are planned, and
+> pull requests and issues may not be reviewed. Existing releases remain
+> available on npm.
+>
+> **For new projects, use [rrule-temporal](https://github.com/ggaabe/rrule-temporal).**
+> It implements RFC 5545 (and RFC 7529) on top of the
+> [Temporal](https://tc39.es/proposal-temporal/docs/) API, with time-zone-aware
+> results. Its API differs from rrule.js (`RRuleTemporal`, `Temporal.ZonedDateTime`
+> instead of `Date`), so moving existing code over is a rewrite rather than a
+> drop-in swap. In runtimes without native Temporal, use a polyfill such as
+> [temporal-polyfill](https://www.npmjs.com/package/temporal-polyfill).
+
 ---
 
 ### Quick Start

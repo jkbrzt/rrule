@@ -139,7 +139,7 @@ export default class ToText {
     if (rrule.origOptions.until && rrule.origOptions.count) return false
 
     for (const key in rrule.origOptions) {
-      if (contains(['dtstart', 'tzid', 'wkst', 'freq'], key)) return true
+      if (contains(['dtstart', 'tzid', 'wkst', 'freq'], key)) continue
       if (!contains(ToText.IMPLEMENTED[rrule.options.freq], key)) return false
     }
 

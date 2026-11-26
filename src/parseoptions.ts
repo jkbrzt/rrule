@@ -216,5 +216,13 @@ export function buildTimeset(opts: ParsedOptions) {
     })
   })
 
+  // Emit occurrences chronologically within each day, regardless of the order
+  // in which BYHOUR/BYMINUTE/BYSECOND values were given (#647). `between()`
+  // relies on ascending emission order to stop at the window end, so an
+  // unsorted timeset also drops in-window occurrences.
+  timeset.sort(
+    (a, b) => a.hour - b.hour || a.minute - b.minute || a.second - b.second
+  )
+
   return timeset
 }
